@@ -1,24 +1,31 @@
 package scalamd
 
+import java.io.ByteArrayOutputStream
 import java.io.OutputStream
-import java.io.StringWriter
-import tut._
-import java.io.{
-  File,
-  FileInputStream,
-  FileOutputStream,
-  OutputStreamWriter,
-  PrintStream,
-  PrintWriter
-}
+import java.io.File
+import java.io.OutputStreamWriter
+import java.io.PrintStream
+import java.io.PrintWriter
 import java.nio.charset.Charset
+import java.nio.file.Path
 import scala.tools.nsc.Settings
 import scala.tools.nsc.interpreter.IMain
-import scala.util.matching.Regex
-import scala.io.Source
 import tut.Zed._
+import tut._
 
 object TutCompiler {
+
+  def compile(source: Path, options: Options): String = {
+    val sw = new ByteArrayOutputStream()
+    val io = TutCompiler.tut(
+      source.toFile,
+      new PrintStream(sw),
+      options.classpath,
+      options.charset
+    )
+    io.unsafePerformIO()
+    sw.toString(options.charset.name())
+  }
 
   /**
     * Run the file through tut.
