@@ -26,6 +26,7 @@ lazy val fox = project
     },
     (managedClasspath in Runtime) += (packageBin in Assets).value,
     libraryDependencies ++= List(
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "org.tpolecat" %% "tut-core" % "0.5.5",
       "com.lihaoyi" %% "fansi" % "0.2.5",

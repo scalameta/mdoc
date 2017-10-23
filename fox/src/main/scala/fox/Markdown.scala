@@ -5,6 +5,7 @@ import scala.language.dynamics
 import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
+import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
@@ -12,24 +13,24 @@ import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.ast.Visitor
 import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
+import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
+import com.vladsch.flexmark.util.options.DataKey
+import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.options.MutableDataSet
 
-class Metadata(data: Map[String, String]) extends Dynamic {
-  def selectDynamic(key: String): String =
-    data.getOrElse(key, sys.error(s"Missing configuration for key '$key'"))
-}
-
 object Markdown {
-  case class Site(docs: List[Doc], config: Metadata)
+  case class Site(docs: List[Doc])
   case class Doc(
       path: Path,
       title: String,
       headers: List[Header],
-      body: ast.Document
+      contents: String
   )
-  case class Header(title: String, id: String, level: Int, text: String)
+  case class Header(title: String, id: String, level: Int, text: String) {
+    def target = s"#$id"
+  }
   object Header {
     def apply(h: Heading): Header = {
       val text = new java.lang.StringBuilder
@@ -91,10 +92,15 @@ object Markdown {
     options.set(!HtmlRenderer.GENERATE_HEADER_ID, true)
     options.set(
       Parser.EXTENSIONS,
-      Iterable(AnchorLinkExtension.create()).asJava
+      Iterable(
+        AnchorLinkExtension.create(),
+        markdown.HeaderIdExtension.create()
+      ).asJava
     )
-    options.set(!AnchorLinkExtension.ANCHORLINKS_SET_ID, true)
+    options.set(!AnchorLinkExtension.ANCHORLINKS_SET_ID, false)
     options.set(!AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false)
-    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "fox-header")
+    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "headerlink")
+    options.set(!AnchorLinkExtension.ANCHORLINKS_TEXT_SUFFIX, "¶")
   }
+
 }

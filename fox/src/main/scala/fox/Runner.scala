@@ -42,7 +42,7 @@ class Runner(
   }
 
   def cleanTarget(): Unit = {
-    if (!options.cleanTarget) return
+    if (!options.cleanTarget || !Files.exists(options.outPath)) return
     Files.walkFileTree(
       options.outPath,
       new SimpleFileVisitor[Path] {
@@ -68,12 +68,13 @@ class Runner(
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
     val md = parser.parse(compiled)
+    val html = renderer.render(md)
     val headers = collect[Heading, Header](md) { case h => Header(h) }
     val title = headers
       .find(_.level == 1)
       .getOrElse(sys.error(s"Missing h1 for page $path"))
       .title
-    Doc(path, title, headers, md)
+    Doc(path, title, headers, html)
   }
 
   class FileError(path: Path, cause: Throwable)
@@ -82,14 +83,19 @@ class Runner(
     override def getCause: Throwable = cause
   }
 
-  def handleDoc(doc: Doc): Unit = {
-    val html = renderer.render(doc.body)
-    val target = options.resolveOut(doc.path)
-    Files.createDirectories(target.getParent)
-    Files.write(target, html.getBytes(options.charset))
-    logger.info(
-      s"Compiled ${options.pretty(target)} => ${options.pretty(target)}"
-    )
+  def handleSite(site: Site): Unit = {
+    val template = new Template(options, logger)
+    site.docs.foreach { doc =>
+      val html = template.render(doc, site).toString()
+//      pprint.log(html)
+      val source = options.resolveIn(doc.path)
+      val target = options.resolveOut(doc.path)
+      Files.createDirectories(target.getParent)
+      Files.write(target, html.getBytes(options.charset))
+      logger.info(
+        s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
+      )
+    }
   }
 
   def copyAssets(): Unit = {
@@ -111,7 +117,7 @@ class Runner(
 //      "assets" / "javascripts" / "lunr" / "lunr.stemmer.support.js",
 //      "assets" / "javascripts" / "lunr" / "tinyseg.js",
 //      "assets" / "javascripts" / "paradox-material-theme.js",
-      "assets" / "stylesheets" / "application-0741cbeb94.css",
+      "assets" / "stylesheets" / "application-04ea671600.css",
       "assets" / "stylesheets" / "application-23f75ab9c7.palette.css",
       "assets" / "stylesheets" / "paradox-material-theme.css",
       "lib" / "material__tabs" / "dist" / "mdc.tabs.min.css",
@@ -124,7 +130,7 @@ class Runner(
       val appjs = resource / path
       val x = read.bytes(appjs)
       val out = Path(options.outPath) / path
-      pprint.log(out)
+//      pprint.log(out)
       write.over(out, x)
     }
   }
@@ -144,7 +150,7 @@ class Runner(
             Nil
         }
       }
-      docs.foreach(handleDoc)
+      handleSite(Site(docs.toList))
       copyAssets()
     }
   }

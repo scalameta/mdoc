@@ -10,6 +10,15 @@ import caseapp.AppVersion
 import caseapp.ExtraName
 import caseapp.HelpMessage
 import caseapp.ProgName
+import fox.Enrichments._
+import fox.Markdown.Doc
+
+object Enrichments {
+  implicit class XtensionPathUrl(val path: Path) extends AnyVal {
+    def stripSuffix(suffix: String): Path =
+      path.resolveSibling(path.getFileName.toString.stripSuffix(suffix))
+  }
+}
 
 @AppName("fox")
 @AppVersion("0.1.0-SNAPSHOT")
@@ -24,10 +33,22 @@ case class Options(
     cwd: String = Paths.get(".").toAbsolutePath.toString,
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
+    baseUrl: String = "",
     encoding: String = "UTF-8"
 ) {
   private val indexMd = Paths.get("index.md")
   private val indexHtml = Paths.get("index.html")
+
+  def asset(path: String) = s"$baseUrl/assets/$path"
+  def lib(path: String) = s"$baseUrl/lib/$path"
+  def href(doc: Doc): String = {
+    if (doc.path == indexMd) s"$baseUrl/"
+    else if (doc.path.endsWith(indexMd)) {
+      s"$baseUrl/${doc.path.getParent.toString}"
+    } else {
+      s"$baseUrl/${doc.path.toString}".stripSuffix(".md")
+    }
+  }
   def charset: Charset = Charset.forName(encoding)
   def resolveIn(relpath: Path): Path = {
     require(!relpath.isAbsolute)
@@ -36,16 +57,16 @@ case class Options(
   def resolveOut(relpath: Path): Path = {
     require(!relpath.isAbsolute)
     val base = outPath.resolve(relpath)
-    if (relpath.endsWith(indexMd)) {
-      // foo/index.md => foo/index.html
+    val x = if (relpath.endsWith(indexMd)) {
+      // foo/specimen.md => foo/index.html
       base.resolveSibling(indexHtml)
     } else {
       // foo/bar.md => foo/bar/index.html
-      outPath
-        .resolve(relpath)
-        .resolveSibling(relpath.getFileName.toString.stripSuffix(".md"))
-        .resolve(indexHtml)
+      outPath.resolve(relpath).stripSuffix(".md").resolve(indexHtml)
     }
+    pprint.log(relpath)
+    pprint.log(x)
+    x
   }
   def pretty(path: Path): String = cwdPath.relativize(path).toString
   lazy val cwdPath: Path = Paths.get(cwd).toAbsolutePath.normalize()
