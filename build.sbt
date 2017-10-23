@@ -1,4 +1,11 @@
-lazy val scalamd = project.settings(
+lazy val root = project
+  .copy(id = "foxRoot")
+  .in(file("."))
+  .settings(
+    name := "foxRoot"
+  )
+
+lazy val fox = project.settings(
   resolvers += Resolver.bintrayRepo("tpolecat", "maven"),
   libraryDependencies ++= List(
     "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
