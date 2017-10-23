@@ -15,7 +15,13 @@ import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.util.options.MutableDataSet
 
 object Markdown {
-  case class Doc(path: Path, headers: List[Header], body: ast.Document)
+  case class Site(docs: List[Doc])
+  case class Doc(
+      path: Path,
+      title: String,
+      headers: List[Header],
+      body: ast.Document
+  )
   case class Header(title: String, id: String, level: Int, text: String)
   object Header {
     def apply(h: Heading): Header = {
@@ -37,7 +43,16 @@ object Markdown {
       )
     }
   }
-  implicit class XtensionBang[A](val a: A) extends AnyVal {
+  // If you can figure out how to fix errors like here below than we can remove
+  // this unary_! hack:
+  // [error] [E1] fox/src/main/scala/fox/Markdown.scala
+  // [error]      type mismatch;
+  // [error]       found   : Class[_$1] where type _$1
+  // [error]       required: Class[_ <: T]
+  // [error]      L48:    new NodeVisitor(new VisitHandler[T](ev.runtimeClass, new Visitor[T] {
+  // [error]      L48:                                           ^
+  // [error] fox/src/main/scala/fox/Markdown.scala: L48 [E1]
+  private implicit class XtensionBang[A](val a: A) extends AnyVal {
     def unary_![B]: B = a.asInstanceOf[B]
   }
 
@@ -60,19 +75,19 @@ object Markdown {
     }
     buffer.result()
   }
+
   def default: MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     val options = new MutableDataSet()
     options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
-
     import scala.collection.JavaConverters._
     options.set(!HtmlRenderer.GENERATE_HEADER_ID, true)
-    options.set[Object](
-      !Parser.EXTENSIONS,
+    options.set(
+      Parser.EXTENSIONS,
       Iterable(AnchorLinkExtension.create()).asJava
     )
     options.set(!AnchorLinkExtension.ANCHORLINKS_SET_ID, true)
     options.set(!AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false)
-    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "scalamd-header")
+    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "fox-header")
   }
 }

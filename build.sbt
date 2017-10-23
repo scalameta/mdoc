@@ -4,6 +4,7 @@ lazy val root = project
   .settings(
     name := "foxRoot"
   )
+  .aggregate(fox)
 
 lazy val fox = project.settings(
   resolvers += Resolver.bintrayRepo("tpolecat", "maven"),

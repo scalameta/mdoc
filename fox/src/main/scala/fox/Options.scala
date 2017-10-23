@@ -15,16 +15,16 @@ import caseapp.ProgName
 @AppVersion("0.1.0-SNAPSHOT")
 @ProgName("fox")
 case class Options(
-                      @HelpMessage("The input directory to generate the scalamd site.")
+    @HelpMessage("The input directory to generate the scalamd site.")
     @ExtraName("i")
     in: String = Paths.get(".").toString,
-                      @HelpMessage("The output directory to generate the scalamd site.")
+    @HelpMessage("The output directory to generate the scalamd site.")
     @ExtraName("o")
     out: String = Paths.get("target").resolve("fox").toString,
-                      cwd: String = Paths.get(".").toAbsolutePath.toString,
-                      classpath: List[String] = Options.defaultClasspath,
-                      cleanTarget: Boolean = false,
-                      encoding: String = "UTF-8"
+    cwd: String = Paths.get(".").toAbsolutePath.toString,
+    classpath: List[String] = Options.defaultClasspath,
+    cleanTarget: Boolean = false,
+    encoding: String = "UTF-8"
 ) {
   private val indexMd = Paths.get("index.md")
   private val indexHtml = Paths.get("index.html")

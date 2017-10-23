@@ -68,8 +68,12 @@ class Runner(
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
     val md = parser.parse(compiled)
-    val headers = collect[Heading, Header](md) { case h: Heading => Header(h) }
-    Doc(path, headers, md)
+    val headers = collect[Heading, Header](md) { case h => Header(h) }
+    val title = headers
+      .find(_.level == 1)
+      .getOrElse(sys.error(s"Missing h1 for page $path"))
+      .title
+    Doc(path, title, headers, md)
   }
 
   class FileError(path: Path, cause: Throwable)

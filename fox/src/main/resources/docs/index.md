@@ -1,10 +1,12 @@
-## Hello world!
+# Hello world!
 
 * a
 * b
 
 ```tut
 val x = 1 + 2
+val y = 1 + 2
+y + x
 ```
 
 ```tut
