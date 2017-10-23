@@ -23,6 +23,7 @@ case class Options(
     out: String = Paths.get("target").resolve("scalamd").toString,
     cwd: String = Paths.get(".").toAbsolutePath.toString,
     classpath: List[String] = Options.defaultClasspath,
+    cleanTarget: Boolean = false,
     encoding: String = "UTF-8"
 ) {
   private val indexMd = Paths.get("index.md")

@@ -1,5 +1,6 @@
 package scalamd
 
+import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import com.vladsch.flexmark.ast
@@ -14,6 +15,7 @@ import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.util.options.MutableDataSet
 
 object Markdown {
+  case class Doc(path: Path, headers: List[Header], body: ast.Document)
   case class Header(title: String, id: String, level: Int, text: String)
   object Header {
     def apply(h: Heading): Header = {
@@ -70,5 +72,7 @@ object Markdown {
       Iterable(AnchorLinkExtension.create()).asJava
     )
     options.set(!AnchorLinkExtension.ANCHORLINKS_SET_ID, true)
+    options.set(!AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false)
+    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "scalamd-header")
   }
 }

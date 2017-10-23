@@ -1,5 +1,6 @@
 package scalamd
 
+import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
@@ -12,8 +13,6 @@ import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
-
-case class Doc(path: Path, headers: List[Header])
 
 class Runner(
     options: Options,
@@ -42,19 +41,35 @@ class Runner(
     paths.result()
   }
 
-  def handlePath(path: Path): Unit = {
+  def cleanTarget(): Unit = {
+    if (!options.cleanTarget) return
+    Files.walkFileTree(
+      options.outPath,
+      new SimpleFileVisitor[Path] {
+        override def visitFile(
+            file: Path,
+            attrs: BasicFileAttributes
+        ): FileVisitResult = {
+          Files.delete(file)
+          FileVisitResult.CONTINUE
+        }
+        override def postVisitDirectory(
+            dir: Path,
+            exc: IOException
+        ): FileVisitResult = {
+          Files.delete(dir)
+          FileVisitResult.CONTINUE
+        }
+      }
+    )
+  }
+
+  def handlePath(path: Path): Doc = {
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
     val md = parser.parse(compiled)
     val headers = collect[Heading, Header](md) { case h: Heading => Header(h) }
-    pprint.log(headers)
-    val html = renderer.render(md)
-    val target = options.resolveOut(path)
-    Files.createDirectories(target.getParent)
-    Files.write(target, html.getBytes(options.charset))
-    logger.info(
-      s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
-    )
+    Doc(path, headers, md)
   }
 
   class FileError(path: Path, cause: Throwable)
@@ -63,19 +78,32 @@ class Runner(
     override def getCause: Throwable = cause
   }
 
+  def handleDoc(doc: Doc): Unit = {
+    val html = renderer.render(doc.body)
+    val target = options.resolveOut(doc.path)
+    Files.createDirectories(target.getParent)
+    Files.write(target, html.getBytes(options.charset))
+    logger.info(
+      s"Compiled ${options.pretty(target)} => ${options.pretty(target)}"
+    )
+  }
+
   def run(): Unit = {
+    cleanTarget()
     val paths = collectInputPaths
     if (paths.isEmpty) {
       logger.error(s"${options.inPath} contains no .md files!")
     } else {
-      paths.foreach { path =>
+      val docs = paths.flatMap { path =>
         try {
-          handlePath(path)
+          handlePath(path) :: Nil
         } catch {
           case NonFatal(e) =>
             new FileError(path, e).printStackTrace()
+            Nil
         }
       }
+      docs.foreach(handleDoc)
     }
   }
 }
