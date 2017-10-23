@@ -1,1 +1,5 @@
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % coursier.util.Properties.version)
+addSbtPlugin(
+  "io.get-coursier" % "sbt-coursier" % coursier.util.Properties.version
+)
+addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-web"% "1.4.3")

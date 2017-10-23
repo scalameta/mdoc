@@ -1,5 +1,7 @@
 package fox
 
+import scala.language.dynamics
+
 import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
@@ -14,8 +16,13 @@ import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.util.options.MutableDataSet
 
+class Metadata(data: Map[String, String]) extends Dynamic {
+  def selectDynamic(key: String): String =
+    data.getOrElse(key, sys.error(s"Missing configuration for key '$key'"))
+}
+
 object Markdown {
-  case class Site(docs: List[Doc])
+  case class Site(docs: List[Doc], config: Metadata)
   case class Doc(
       path: Path,
       title: String,

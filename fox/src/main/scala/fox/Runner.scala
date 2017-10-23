@@ -92,6 +92,43 @@ class Runner(
     )
   }
 
+  def copyAssets(): Unit = {
+    import ammonite.ops._
+    import ammonite.ops.Path
+    val paths = List[RelPath](
+      "assets" / "images" / "favicon.png",
+      "assets" / "javascripts" / "application-268d62d82d.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.da.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.de.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.du.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.es.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.fi.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.fr.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.hu.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.it.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.jp.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.multi.js",
+//      "assets" / "javascripts" / "lunr" / "lunr.stemmer.support.js",
+//      "assets" / "javascripts" / "lunr" / "tinyseg.js",
+//      "assets" / "javascripts" / "paradox-material-theme.js",
+      "assets" / "stylesheets" / "application-0741cbeb94.css",
+      "assets" / "stylesheets" / "application-23f75ab9c7.palette.css",
+      "assets" / "stylesheets" / "paradox-material-theme.css",
+      "lib" / "material__tabs" / "dist" / "mdc.tabs.min.css",
+      "lib" / "modernizr" / "modernizr.min.js",
+      "lib" / "prettify" / "lang-scala.js",
+      "lib" / "prettify" / "prettify.css",
+      "lib" / "prettify" / "prettify.js"
+    )
+    paths.foreach { path =>
+      val appjs = resource / path
+      val x = read.bytes(appjs)
+      val out = Path(options.outPath) / path
+      pprint.log(out)
+      write.over(out, x)
+    }
+  }
+
   def run(): Unit = {
     cleanTarget()
     val paths = collectInputPaths
@@ -108,6 +145,7 @@ class Runner(
         }
       }
       docs.foreach(handleDoc)
+      copyAssets()
     }
   }
 }
