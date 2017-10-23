@@ -1,4 +1,4 @@
-package scalamd
+package fox
 
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -8,7 +8,7 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import scala.collection.GenSeq
 import scala.util.control.NonFatal
-import scalamd.Markdown._
+import fox.Markdown._
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser

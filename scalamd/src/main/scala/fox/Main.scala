@@ -1,4 +1,4 @@
-package scalamd
+package fox
 
 import caseapp._
 

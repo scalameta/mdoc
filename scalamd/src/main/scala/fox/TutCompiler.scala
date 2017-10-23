@@ -1,4 +1,4 @@
-package scalamd
+package fox
 
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream

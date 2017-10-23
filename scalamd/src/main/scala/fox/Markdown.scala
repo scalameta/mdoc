@@ -1,4 +1,4 @@
-package scalamd
+package fox
 
 import java.nio.file.Path
 import scala.annotation.tailrec
