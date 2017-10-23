@@ -1,5 +1,10 @@
 package scalamd
 
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
@@ -13,9 +18,9 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 
 class Runner(
-    options: ScalamdOptions,
-    mdSettings: MutableDataSet,
-    logger: Logger
+                options: Options,
+                mdSettings: MutableDataSet,
+                logger: Logger
 ) {
   private val parser = Parser.builder(mdSettings).build
   private val renderer = HtmlRenderer.builder(mdSettings).build
@@ -41,8 +46,19 @@ class Runner(
 
   def handlePath(path: Path): Unit = {
     val source = options.resolveIn(path)
-    val string = new String(Files.readAllBytes(source), options.charset)
-    val md = parser.parse(string)
+    val sw = new ByteArrayOutputStream()
+    val compiled: String = {
+      val io = TutCompiler.tut(
+        source.toFile,
+        new PrintStream(sw),
+        options.classpath,
+        options.charset
+      )
+      io.unsafePerformIO()
+      sw.toString(options.charset.name())
+    }
+    pprint.log(compiled)
+    val md = parser.parse(compiled)
     val html = renderer.render(md)
     val target = options.resolveOut(path)
     Files.createDirectories(target.getParent)
@@ -50,6 +66,7 @@ class Runner(
     logger.info(
       s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
     )
+
   }
 
   class FileError(path: Path, cause: Throwable)
@@ -60,8 +77,9 @@ class Runner(
 
   def run(): Unit = {
     val paths = collectInputPaths
-    if (paths.isEmpty) logger.error(s"${options.inPath} contains no .md files!")
-    else {
+    if (paths.isEmpty) {
+      logger.error(s"${options.inPath} contains no .md files!")
+    } else {
       paths.foreach { path =>
         try {
           handlePath(path)

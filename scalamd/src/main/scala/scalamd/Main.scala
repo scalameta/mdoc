@@ -3,10 +3,10 @@ package scalamd
 import caseapp._
 import com.vladsch.flexmark.util.options.MutableDataSet
 
-object Main extends CaseApp[ScalamdOptions] {
+object Main extends CaseApp[Options] {
   override def run(
-      options: ScalamdOptions,
-      remainingArgs: RemainingArgs
+                      options: Options,
+                      remainingArgs: RemainingArgs
   ): Unit = {
     val runner = new Runner(
       options,
