@@ -6,22 +6,14 @@ import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import scala.collection.GenSeq
-import scala.collection.parallel.mutable.ParArray
-import scala.reflect.ClassTag
 import scala.util.control.NonFatal
-import com.vladsch.flexmark.ast.Document
+import scalamd.Markdown._
 import com.vladsch.flexmark.ast.Heading
-import com.vladsch.flexmark.ast.Node
-import com.vladsch.flexmark.ast.NodeVisitor
-import com.vladsch.flexmark.ast.VisitHandler
-import com.vladsch.flexmark.ast.Visitor
 import com.vladsch.flexmark.html.HtmlRenderer
-import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.parser.block.NodePostProcessor
-import com.vladsch.flexmark.util.NodeTracker
-import Markdown._
 import com.vladsch.flexmark.util.options.MutableDataSet
+
+case class Doc(path: Path, headers: List[Header])
 
 class Runner(
     options: Options,
@@ -50,12 +42,12 @@ class Runner(
     paths.result()
   }
 
-
   def handlePath(path: Path): Unit = {
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
     val md = parser.parse(compiled)
     val headers = collect[Heading, Header](md) { case h: Heading => Header(h) }
+    pprint.log(headers)
     val html = renderer.render(md)
     val target = options.resolveOut(path)
     Files.createDirectories(target.getParent)
