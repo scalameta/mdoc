@@ -19,7 +19,7 @@ class Template(options: Options, logger: Logger) {
       <nav class="md-header-nav md-grid">
         <div class="md-flex">
           <div class="md-flex__cell md-flex__cell--shrink">
-            <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs" class="md-header-nav__button md-logo">
+            <a href={options.docs} title={options.title} class="md-header-nav__button md-logo">
               <i class="md-icon md-icon--home"></i>
             </a>
           </div>
@@ -28,7 +28,7 @@ class Template(options: Options, logger: Logger) {
           </div>
           <div class="md-flex__cell md-flex__cell--stretch">
             <span class="md-flex__ellipsis md-header-nav__title">
-              Material
+              {options.title}
             </span>
           </div>
           <div class="md-flex__cell md-flex__cell--shrink">
@@ -56,16 +56,16 @@ class Template(options: Options, logger: Logger) {
           </div>
           <div class="md-flex__cell md-flex__cell--shrink">
             <div class="md-header-nav__source">
-              <a href="https://github.com/squidfunk/mkdocs-material" title="Go to repository" class="md-source" data-md-source="github" data-md-state="done">
+              <a href={options.github} title="Go to repository" class="md-source" data-md-source="github" data-md-state="done">
                 <div class="md-source__icon">
                   <svg viewBox="0 0 24 24" width="24" height="24">
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#github" width="24" height="24"></use>
                   </svg>
                 </div>
                 <div class="md-source__repository">
-                  squidfunk/mkdocs-material
+                  {options.org}/{options.repo}
                   <ul class="md-source__facts">
-                    <li class="md-source__fact">791 Stars</li> <li class="md-source__fact">216 Forks</li>
+                    <li class="md-source__fact">{options.stars} stars</li> <li class="md-source__fact">{options.forks} forks</li>
                   </ul>
                 </div>
               </a>
@@ -102,8 +102,8 @@ class Template(options: Options, logger: Logger) {
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-    <meta name="description" content="A Material Design theme for MkDocs"/>
-    <link rel="canonical" href="http://squidfunk.github.io/mkdocs-material/"/>
+    <meta name="description" content={options.description}/>
+    <link rel="canonical" href={options.docs}/>
     <meta name="author" content="Martin Donath"/>
     <meta name="lang:clipboard.copy" content="Copy to clipboard"/>
     <meta name="lang:clipboard.copied" content="Copied to clipboard"/>
@@ -114,7 +114,7 @@ class Template(options: Options, logger: Logger) {
     <meta name="lang:search.tokenizer" content="[\s\-]+"/>
     <link rel="shortcut icon" href="./assets/images/favicon.png"/>
     <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.12.1"/>
-    <title>Material for MkDocs</title>
+    <title>{options.title}</title>
     <script src={options.lib("modernizr/modernizr.min.js")}></script>
     <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
     <link rel="stylesheet" href={options.asset("stylesheets/application-23f75ab9c7.palette.css")}/>
@@ -132,28 +132,22 @@ class Template(options: Options, logger: Logger) {
           <nav class="md-nav md-nav--primary" data-md-level="0">
             <label class="md-nav__title md-nav__title--site" for="drawer">
               <span class="md-nav__button md-logo">
-
                 <i class="md-icon md-icon--home"></i>
-
               </span>
-              Material for MkDocs
+              {options.title}
             </label>
 
             <div class="md-nav__source">
-
-
-              <a href="https://github.com/squidfunk/mkdocs-material" title="Go to repository" class="md-source" data-md-source="github" data-md-state="done">
-
+              <a href={options.github} title="Go to repository" class="md-source" data-md-source="github" data-md-state="done">
                 <div class="md-source__icon">
                   <svg viewBox="0 0 24 24" width="24" height="24">
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#github" width="24" height="24"></use>
                   </svg>
                 </div>
-
                 <div class="md-source__repository">
-                  squidfunk/mkdocs-material
+                  {options.org}/{options.repo}
                   <ul class="md-source__facts">
-                    <li class="md-source__fact">791 Stars</li> <li class="md-source__fact">216 Forks</li>
+                    <li class="md-source__fact">{options.stars} stars</li> <li class="md-source__fact">{options.forks} forks</li>
                   </ul>
                 </div>
               </a>

@@ -31,11 +31,20 @@ case class Options(
     @ExtraName("o")
     out: String = Paths.get("target").resolve("fox").toString,
     cwd: String = Paths.get(".").toAbsolutePath.toString,
+    org: String = "org",
+    repo: String = "repo",
+    docs: String = "docsurl",
+    title: String = "My Docs",
+    stars: Int = 0,
+    forks: Int = 0,
+    description: String = "My Description",
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
     baseUrl: String = "",
     encoding: String = "UTF-8"
 ) {
+
+  def github = s"https://github.com/$org/$repo"
   private val indexMd = Paths.get("index.md")
   private val indexHtml = Paths.get("index.html")
 
