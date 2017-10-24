@@ -57,16 +57,13 @@ case class Options(
   def resolveOut(relpath: Path): Path = {
     require(!relpath.isAbsolute)
     val base = outPath.resolve(relpath)
-    val x = if (relpath.endsWith(indexMd)) {
+    if (relpath.endsWith(indexMd)) {
       // foo/specimen.md => foo/index.html
       base.resolveSibling(indexHtml)
     } else {
       // foo/bar.md => foo/bar/index.html
       outPath.resolve(relpath).stripSuffix(".md").resolve(indexHtml)
     }
-    pprint.log(relpath)
-    pprint.log(x)
-    x
   }
   def pretty(path: Path): String = cwdPath.relativize(path).toString
   lazy val cwdPath: Path = Paths.get(cwd).toAbsolutePath.normalize()

@@ -89,18 +89,13 @@ object Markdown {
     val options = new MutableDataSet()
     options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
     import scala.collection.JavaConverters._
-    options.set(!HtmlRenderer.GENERATE_HEADER_ID, true)
     options.set(
       Parser.EXTENSIONS,
       Iterable(
-        AnchorLinkExtension.create(),
-        markdown.HeaderIdExtension.create()
+        markdown.FoxParserExtension.create(),
+        markdown.FoxAttributeProviderExtension.create()
       ).asJava
     )
-    options.set(!AnchorLinkExtension.ANCHORLINKS_SET_ID, false)
-    options.set(!AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false)
-    options.set(!AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "headerlink")
-    options.set(!AnchorLinkExtension.ANCHORLINKS_TEXT_SUFFIX, "¶")
   }
 
 }
