@@ -24,17 +24,16 @@ object Enrichments {
 @AppVersion("0.1.0-SNAPSHOT")
 @ProgName("fox")
 case class Options(
-    @HelpMessage("The input directory to generate the scalamd site.")
+    @HelpMessage("The input directory to generate the fox site.")
     @ExtraName("i")
     in: String = Paths.get(".").toString,
-    @HelpMessage("The output directory to generate the scalamd site.")
+    @HelpMessage("The output directory to generate the fox site.")
     @ExtraName("o")
     out: String = Paths.get("target").resolve("fox").toString,
     cwd: String = Paths.get(".").toAbsolutePath.toString,
-    org: String = "org",
-    repo: String = "repo",
-    docs: String = "docsurl",
-    title: String = "My Docs",
+    repoName: String = "olafurpg/fox",
+    repoUrl: String = "https://github.com/olafurpg/fox",
+    title: String = "Fox",
     stars: Int = 0,
     forks: Int = 0,
     description: String = "My Description",
@@ -44,7 +43,6 @@ case class Options(
     encoding: String = "UTF-8"
 ) {
 
-  def github = s"https://github.com/$org/$repo"
   private val indexMd = Paths.get("index.md")
   private val indexHtml = Paths.get("index.html")
 
