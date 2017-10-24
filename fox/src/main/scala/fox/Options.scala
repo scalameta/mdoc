@@ -12,6 +12,7 @@ import caseapp.HelpMessage
 import caseapp.ProgName
 import fox.Enrichments._
 import fox.Markdown.Doc
+import fox.Markdown.Site
 
 object Enrichments {
   implicit class XtensionPathUrl(val path: Path) extends AnyVal {

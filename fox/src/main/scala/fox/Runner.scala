@@ -84,9 +84,9 @@ class Runner(
   }
 
   def handleSite(site: Site): Unit = {
-    val template = new Template(options, logger)
     site.docs.foreach { doc =>
-      val html = template.render(doc, site).toString()
+      val template = new Template(options, logger, doc, site)
+      val html = template.html.toString()
 //      pprint.log(html)
       val source = options.resolveIn(doc.path)
       val target = options.resolveOut(doc.path)

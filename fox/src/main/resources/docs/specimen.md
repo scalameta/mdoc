@@ -1,5 +1,11 @@
 # Specimen
 
+```scala
+object a {
+  def bar = 2
+}
+```
+
 ## Body copy
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras arcu libero,

@@ -4,7 +4,13 @@ import scala.xml.Elem
 import fox.Markdown.Doc
 import fox.Markdown.Site
 
-class Template(options: Options, logger: Logger) {
+class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
+
+  def html =
+    <html lang="en" class="no-js">
+      {head}{body}{footer}
+    </html>
+
   val github = <svg class="md-svg">
     <defs>
       <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github">
@@ -63,10 +69,13 @@ class Template(options: Options, logger: Logger) {
                   </svg>
                 </div>
                 <div class="md-source__repository">
-                  {options.repoName}
-                  <ul class="md-source__facts">
-                    <li class="md-source__fact">{options.stars} stars</li> <li class="md-source__fact">{options.forks} forks</li>
-                  </ul>
+                  {options.repoName}<ul class="md-source__facts">
+                  <li class="md-source__fact">
+                    {options.stars}
+                    stars</li> <li class="md-source__fact">
+                    {options.forks}
+                    forks</li>
+                </ul>
                 </div>
               </a>
             </div>
@@ -75,7 +84,7 @@ class Template(options: Options, logger: Logger) {
       </nav>
     </header>
 
-  def render(doc: Doc, site: Site): xml.Node = html {
+  def body: xml.Node =
     <body data-md-color-primary="light-blue" data-md-color-accent="orange" data-md-state="">
       <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer"/>
       <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search"/>
@@ -91,12 +100,6 @@ class Template(options: Options, logger: Logger) {
       </main>
     </div>
     </body>
-  }
-
-  def html(body: xml.Node) =
-    <html lang="en" class="no-js">
-      {head}{body}
-    </html>
 
   def head: Elem = <head>
     <meta charset="utf-8"/>
@@ -114,7 +117,9 @@ class Template(options: Options, logger: Logger) {
     <meta name="lang:search.tokenizer" content="[\s\-]+"/>
     <link rel="shortcut icon" href="./assets/images/favicon.png"/>
     <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.12.1"/>
-    <title>{options.title}</title>
+    <title>
+      {options.title}
+    </title>
     <script src={options.lib("modernizr/modernizr.min.js")}></script>
     <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
     <link rel="stylesheet" href={options.asset("stylesheets/application-23f75ab9c7.palette.css")}/>
@@ -133,8 +138,7 @@ class Template(options: Options, logger: Logger) {
             <label class="md-nav__title md-nav__title--site" for="drawer">
               <span class="md-nav__button md-logo">
                 <i class="md-icon md-icon--home"></i>
-              </span>
-              {options.title}
+              </span>{options.title}
             </label>
 
             <div class="md-nav__source">
@@ -145,10 +149,13 @@ class Template(options: Options, logger: Logger) {
                   </svg>
                 </div>
                 <div class="md-source__repository">
-                  {options.repoName}
-                  <ul class="md-source__facts">
-                    <li class="md-source__fact">{options.stars} stars</li> <li class="md-source__fact">{options.forks} forks</li>
-                  </ul>
+                  {options.repoName}<ul class="md-source__facts">
+                  <li class="md-source__fact">
+                    {options.stars}
+                    stars</li> <li class="md-source__fact">
+                    {options.forks}
+                    forks</li>
+                </ul>
                 </div>
               </a>
             </div>
@@ -185,6 +192,77 @@ class Template(options: Options, logger: Logger) {
         </div>
       </div>
     </div>
+
+  val prev = site.docs
+    .sliding(2)
+    .collectFirst {
+      case prevDoc :: `doc` :: Nil =>
+        <a href={options.href(prevDoc)} title={prevDoc.title} class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                {prevDoc.title}
+              </span>
+            </div>
+          </a>
+    }
+    .orNull
+
+  def next =
+    site.docs
+      .sliding(2)
+      .collectFirst {
+        case `doc` :: nextDoc :: Nil =>
+          <a href={options.href(nextDoc)} title={nextDoc.title} class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                {nextDoc.title}
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+      }
+      .orNull
+
+  def footer =
+    <footer class="md-footer">
+      <div class="md-footer-nav">
+        <nav class="md-footer-nav__inner md-grid">
+          {prev}{next}
+        </nav>
+      </div>
+      <div class="md-footer-meta md-typeset">
+        <div class="md-footer-meta__inner md-grid">
+          <div class="md-footer-copyright">
+            <div class="md-footer-copyright__highlight">
+              Copyright © 2016 - 2017 Martin Donath
+            </div>
+            powered by
+            <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+            and
+            <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+              Material for MkDocs</a>
+          </div>
+          <div class="md-footer-social">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+            <a href="http://struct.cc" class="md-footer-social__link fa fa-globe"></a>
+            <a href="https://github.com/squidfunk" class="md-footer-social__link fa fa-github-alt"></a>
+            <a href="https://twitter.com/squidfunk" class="md-footer-social__link fa fa-twitter"></a>
+            <a href="https://linkedin.com/in/squidfunk" class="md-footer-social__link fa fa-linkedin"></a>
+          </div>
+        </div>
+      </div>
+    </footer>
 
   //    <ul>
   //  </ul>
