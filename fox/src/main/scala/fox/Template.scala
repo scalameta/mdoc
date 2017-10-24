@@ -20,7 +20,36 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </defs>
   </svg>
 
-  val header =
+  def head: Elem = <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content={options.description}/>
+    <link rel="canonical" href={options.repoUrl}/>
+    <meta name="author" content="Martin Donath"/>
+    <meta name="lang:clipboard.copy" content="Copy to clipboard"/>
+    <meta name="lang:clipboard.copied" content="Copied to clipboard"/>
+    <meta name="lang:search.languages" content=""/>
+    <meta name="lang:search.result.none" content="No matching documents"/>
+    <meta name="lang:search.result.one" content="1 matching document"/>
+    <meta name="lang:search.result.other" content="# matching documents"/>
+    <meta name="lang:search.tokenizer" content="[\s\-]+"/>
+    <link rel="shortcut icon" href="./assets/images/favicon.png"/>
+    <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.12.1"/>
+    <title>
+      {options.title}
+    </title>
+    <script src={options.lib("modernizr/modernizr.min.js")}></script>
+    <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
+    <link rel="stylesheet" href={options.asset("stylesheets/application-23f75ab9c7.palette.css")}/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono"/>
+    <style>
+      body,input{{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}}code,kbd,pre{{font-family:"Roboto Mono","Courier New",Courier,monospace}}
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+  </head>
+
+  val header: xml.Elem =
     <header class="md-header" data-md-component="header" data-md-state="shadow">
       <nav class="md-header-nav md-grid">
         <div class="md-flex">
@@ -101,35 +130,6 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </div>
     </body>
 
-  def head: Elem = <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
-    <meta name="description" content={options.description}/>
-    <link rel="canonical" href={options.repoUrl}/>
-    <meta name="author" content="Martin Donath"/>
-    <meta name="lang:clipboard.copy" content="Copy to clipboard"/>
-    <meta name="lang:clipboard.copied" content="Copied to clipboard"/>
-    <meta name="lang:search.languages" content=""/>
-    <meta name="lang:search.result.none" content="No matching documents"/>
-    <meta name="lang:search.result.one" content="1 matching document"/>
-    <meta name="lang:search.result.other" content="# matching documents"/>
-    <meta name="lang:search.tokenizer" content="[\s\-]+"/>
-    <link rel="shortcut icon" href="./assets/images/favicon.png"/>
-    <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.12.1"/>
-    <title>
-      {options.title}
-    </title>
-    <script src={options.lib("modernizr/modernizr.min.js")}></script>
-    <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
-    <link rel="stylesheet" href={options.asset("stylesheets/application-23f75ab9c7.palette.css")}/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono"/>
-    <style>
-      body,input{{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}}code,kbd,pre{{font-family:"Roboto Mono","Courier New",Courier,monospace}}
-    </style>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
-  </head>
-
   def sections(site: Site) =
     <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" data-md-state="lock">
       <div class="md-sidebar__scrollwrap">
@@ -193,7 +193,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       </div>
     </div>
 
-  val prev = site.docs
+  val prev: xml.Elem = site.docs
     .sliding(2)
     .collectFirst {
       case prevDoc :: `doc` :: Nil =>
@@ -213,7 +213,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     }
     .orNull
 
-  def next =
+  def next: xml.Elem =
     site.docs
       .sliding(2)
       .collectFirst {
@@ -234,7 +234,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       }
       .orNull
 
-  def footer =
+  def footer: xml.Elem =
     <footer class="md-footer">
       <div class="md-footer-nav">
         <nav class="md-footer-nav__inner md-grid">

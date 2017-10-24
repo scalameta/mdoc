@@ -12,6 +12,7 @@ import caseapp.HelpMessage
 import caseapp.ProgName
 import fox.Enrichments._
 import fox.Markdown.Doc
+import fox.Markdown.Header
 import fox.Markdown.Site
 
 object Enrichments {
@@ -77,6 +78,8 @@ case class Options(
   lazy val cwdPath: Path = Paths.get(cwd).toAbsolutePath.normalize()
   lazy val inPath: Path = Paths.get(in).toAbsolutePath.normalize()
   lazy val outPath: Path = Paths.get(out).toAbsolutePath.normalize()
+  lazy val searchIndexPath: Path =
+    outPath.resolve("mkdocs").resolve("search_index.json")
   def classpathOpts: List[String] =
     "-classpath" :: classpath.mkString(File.pathSeparator) :: Nil
 }

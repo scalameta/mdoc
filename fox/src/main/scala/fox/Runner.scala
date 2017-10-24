@@ -83,19 +83,25 @@ class Runner(
     override def getCause: Throwable = cause
   }
 
+  def writePath(path: Path, string: String): Unit = {
+    Files.createDirectories(path.getParent)
+    Files.write(path, string.getBytes(options.charset))
+
+  }
+
   def handleSite(site: Site): Unit = {
     site.docs.foreach { doc =>
       val template = new Template(options, logger, doc, site)
       val html = template.html.toString()
-//      pprint.log(html)
       val source = options.resolveIn(doc.path)
       val target = options.resolveOut(doc.path)
-      Files.createDirectories(target.getParent)
-      Files.write(target, html.getBytes(options.charset))
+      writePath(target, html)
       logger.info(
         s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
       )
     }
+    val index = Search.index(options, site)
+    writePath(options.searchIndexPath, index)
   }
 
   def copyAssets(): Unit = {

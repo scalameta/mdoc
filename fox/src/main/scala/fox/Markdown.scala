@@ -5,20 +5,16 @@ import scala.language.dynamics
 import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.ast.Visitor
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
-import com.vladsch.flexmark.util.options.DataKey
-import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.options.MutableDataSet
+
 
 object Markdown {
   case class Site(docs: List[Doc])
