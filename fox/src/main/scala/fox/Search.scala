@@ -18,8 +18,6 @@ object Search {
       )
   }
 
-  // TODO(olafur) replace this with proper JSON library, it's totally
-  // not worth it rolling this by hand.
   def index(options: Options, site: Site): String = {
     val sections = for {
       doc <- site.docs

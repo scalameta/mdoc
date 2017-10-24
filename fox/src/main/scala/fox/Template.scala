@@ -9,6 +9,8 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
   def html =
     <html lang="en" class="no-js">
       {head}{body}{footer}
+      <script src={options.asset("javascripts/application-268d62d82d.js")}></script>
+      <script>app.initialize({{url:{{base:'{options.baseUrl}'}}}})</script>
     </html>
 
   val github = <svg class="md-svg">
