@@ -11,10 +11,10 @@ import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.ast.Visitor
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.util.options.MutableDataSet
-
 
 object Markdown {
   case class Site(docs: List[Doc])
@@ -25,7 +25,7 @@ object Markdown {
       contents: String
   )
   case class Header(title: String, id: String, level: Int, text: String) {
-    def target: String = if (level==1) "" else s"#$id"
+    def target: String = if (level == 1) "" else s"#$id"
   }
   object Header {
     def apply(h: Heading): Header = {
@@ -88,6 +88,7 @@ object Markdown {
     options.set(
       Parser.EXTENSIONS,
       Iterable(
+        AutolinkExtension.create(),
         markdown.FoxParserExtension.create(),
         markdown.FoxAttributeProviderExtension.create()
       ).asJava
