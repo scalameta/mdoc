@@ -26,6 +26,7 @@ import com.vladsch.flexmark.parser.block.NodePostProcessor
 import com.vladsch.flexmark.parser.block.NodePostProcessorFactory
 import com.vladsch.flexmark.util.NodeTracker
 import com.vladsch.flexmark.util.html.Attributes
+import com.vladsch.flexmark.util.html.Escaping
 import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.BasedSequence
@@ -119,7 +120,78 @@ class FoxNodeRenderer extends NodeRenderer {
         }
       )
     )
+    set.add(
+      new NodeRenderingHandler[ast.Paragraph](
+        classOf[ast.Paragraph],
+        new CustomNodeRenderer[ast.Paragraph]() {
+          override def render(
+              node: ast.Paragraph,
+              context: NodeRendererContext,
+              html: HtmlWriter
+          ): Unit = {
+            FoxNodeRenderer.this.renderParagraph(node, context, html)
+          }
+        }
+      )
+    )
+    set.add(
+      new NodeRenderingHandler[ast.IndentedCodeBlock](
+        classOf[ast.IndentedCodeBlock],
+        new CustomNodeRenderer[ast.IndentedCodeBlock]() {
+          override def render(
+              node: ast.IndentedCodeBlock,
+              context: NodeRendererContext,
+              html: HtmlWriter
+          ): Unit = {
+            FoxNodeRenderer.this.renderIndentedCodeBlock(node, context, html)
+          }
+        }
+      )
+    )
     set
+  }
+
+  private def renderIndentedCodeBlock(
+      node: ast.IndentedCodeBlock,
+      context: NodeRendererContext,
+      html: HtmlWriter
+  ): Unit = {
+    Option(node.getPrevious) match {
+      case Some(p: ast.Paragraph) if p.getChars.startsWith("!!!") => // nothing
+      case _ =>
+        context.delegateRender()
+    }
+  }
+
+  private def renderParagraph(
+      node: ast.Paragraph,
+      context: NodeRendererContext,
+      html: HtmlWriter
+  ): Unit = {
+    if (node.getChars.startsWith("!!!") &&
+      node.getNext.isInstanceOf[ast.IndentedCodeBlock]) {
+      val next = node.getNext.asInstanceOf[ast.IndentedCodeBlock]
+      val (kind, title) = node.getChars.unescape().split(" ", 3).toList match {
+        case _ :: kind :: title :: Nil =>
+          kind -> title.stripSuffix("\"").stripPrefix("\"")
+        case _ :: kind :: Nil => kind -> kind
+        case _ => "unknown" -> node.getChars.toVisibleWhitespaceString
+      }
+      html.attr("class", s"admonition $kind")
+      html.withAttr().tag("div")
+      html.attr("class", "admonition-title")
+      html.withAttr().tag("p")
+      html.text(title)
+      html.tag("/p")
+      html.withAttr().tag("p")
+      // TODO(olafur) figure out how to render next chars as proper markdown.
+      html.text(node.getNext.getChars)
+      html.tag("/p")
+      html.tag("/div")
+    } else {
+      context.delegateRender()
+//      html.text(Escaping.normalizeEOL(node.getChars().unescape()));
+    }
   }
 
   private def render(

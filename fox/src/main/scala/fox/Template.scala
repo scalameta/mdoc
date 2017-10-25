@@ -134,6 +134,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
         0.2.0
       </span>
     </div>
+
   def editThisPage =
     <div>
       <a href={options.hrefGithub(doc)} title="Edit this page" class="md-source-file md-edit">
