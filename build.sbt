@@ -6,9 +6,41 @@ lazy val root = project
   )
   .aggregate(fox)
 
+lazy val paiges = project
+  .in(file("paiges/core"))
+  .settings(
+    scalacOptions += "-Yrangepos",
+    addCompilerPlugin(
+      "org.scalameta" % "semanticdb-scalac" % "2.0.1" cross CrossVersion.full
+    )
+  )
+
 lazy val fox = project
   .settings(
     resolvers += Resolver.bintrayRepo("tpolecat", "maven"),
+    TaskKey[Unit]("fox") := Def
+      .taskDyn[Unit] {
+        val cp = fullClasspath
+          .in(paiges, Compile)
+          .value
+          .map(_.data.getAbsolutePath)
+          .mkString(java.io.File.pathSeparator)
+        val in = resourceDirectory.in(Compile).value / "docs"
+        val args = List(
+          "",
+          "--classpath",
+          cp,
+          "--in",
+          in.getAbsolutePath,
+          "--clean-target",
+          "--base-url",
+          "/target/fox"
+        ).mkString(" ")
+        println(args)
+        run.in(Compile).toTask(args)
+      }
+      .value,
+    // TODO(olafur) validate this is needed
     WebKeys.webJars.in(Assets) := {
       val out = WebKeys.webJars.in(Assets).value
       WebKeys.webJarsDirectory
@@ -28,6 +60,8 @@ lazy val fox = project
     libraryDependencies ++= List(
       "io.circe" %% "circe-core" % "0.8.0",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+      "org.scalameta" %% "scalameta" % "2.0.1",
+      "org.scalameta" %% "metadoc-cli" % "0.1.0",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "org.tpolecat" %% "tut-core" % "0.5.5",
       "com.lihaoyi" %% "fansi" % "0.2.5",
@@ -46,4 +80,5 @@ lazy val fox = project
       }
     )
   )
+  .dependsOn(paiges) // temporary, only for testing purpuses.
   .enablePlugins(SbtWeb)
