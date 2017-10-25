@@ -14,7 +14,10 @@ import com.vladsch.flexmark.ast.Visitor
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
+import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
+import com.vladsch.flexmark.util.sequence.BasedSequence
+import com.vladsch.flexmark.util.sequence.CharSubSequence
 
 object Markdown {
   case class Site(docs: List[Doc])
@@ -79,6 +82,20 @@ object Markdown {
     }
     buffer.result()
   }
+
+  def toHtml(markdown: BasedSequence): String = {
+    val s = new java.lang.StringBuilder( )
+    markdown.appendTo(s)
+    val settings = default
+    val parser = Parser.builder(settings).build
+    val renderer = HtmlRenderer.builder(settings).build
+    val document = parser.parse(markdown)
+    renderer.render(document)
+  }
+  def toHtml(markdown: String): String = {
+    toHtml(CharSubSequence.of(markdown))
+  }
+
 
   def default: MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser

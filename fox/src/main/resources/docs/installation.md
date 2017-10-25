@@ -4,10 +4,12 @@
 
 !!! tip "Set up Material using Docker"
 
+    The official [Docker image][1] for Material comes with all dependencies
     pre-installed and ready-to-use with the latest version published on PyPI,
     packaged in a very small image (35MB compressed).
 
-  [1]: https://hub.docker.com/r/squidfunk/mkdocs-material/
+    [1]: https://hub.docker.com/r/squidfunk/mkdocs-material/
+
 
 ### Installing MkDocs
 

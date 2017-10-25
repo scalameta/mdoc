@@ -31,6 +31,7 @@ import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
+import fox.Markdown
 import fox.markdown
 
 class FoxParserExtension extends Parser.ParserExtension {
@@ -184,13 +185,16 @@ class FoxNodeRenderer extends NodeRenderer {
       html.text(title)
       html.tag("/p")
       html.withAttr().tag("p")
-      // TODO(olafur) figure out how to render next chars as proper markdown.
-      html.text(node.getNext.getChars)
+      val codeblockChars =
+        node.getNext.asInstanceOf[ast.IndentedCodeBlock].getContentChars
+      // NOTE(olafur) this means links like `[a][b]` must define [b]: inside
+      // the indented block.
+      html.raw(Markdown.toHtml(codeblockChars))
       html.tag("/p")
       html.tag("/div")
     } else {
       context.delegateRender()
-//      html.text(Escaping.normalizeEOL(node.getChars().unescape()));
+      node.getContentChars().trimTailBlankLines().normalizeEndWithEOL
     }
   }
 
