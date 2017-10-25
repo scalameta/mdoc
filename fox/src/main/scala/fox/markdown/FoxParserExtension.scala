@@ -1,21 +1,32 @@
 package fox.markdown
 
+import java.util
+import java.util.HashSet
+import java.util.Set
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Document
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
+import com.vladsch.flexmark.ext.anchorlink.AnchorLink
 import com.vladsch.flexmark.html.AttributeProvider
+import com.vladsch.flexmark.html.CustomNodeRenderer
 import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.html.HtmlWriter
 import com.vladsch.flexmark.html.IndependentAttributeProviderFactory
 import com.vladsch.flexmark.html.renderer.AttributablePart
+import com.vladsch.flexmark.html.renderer.CoreNodeRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
+import com.vladsch.flexmark.html.renderer.NodeRenderer
 import com.vladsch.flexmark.html.renderer.NodeRendererContext
+import com.vladsch.flexmark.html.renderer.NodeRendererFactory
+import com.vladsch.flexmark.html.renderer.NodeRenderingHandler
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.parser.block.NodePostProcessor
 import com.vladsch.flexmark.parser.block.NodePostProcessorFactory
 import com.vladsch.flexmark.util.NodeTracker
 import com.vladsch.flexmark.util.html.Attributes
+import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
@@ -67,6 +78,9 @@ class FoxAttributeProvider extends AttributeProvider {
       part: AttributablePart,
       attributes: Attributes
   ): Unit = node match {
+//    case p: ast.FencedCodeBlock =>
+//      val old = Option(attributes.get("class")).fold("")(_.getValue)
+//      attributes.replaceValue("class", "prettyprint prettyprinted " + old)
     case l: ast.Link =>
       if (l.getParent.isInstanceOf[Heading]) {
         attributes.replaceValue("class", "headerlink")
@@ -85,12 +99,68 @@ object FoxAttributeProvider {
       new FoxAttributeProvider
   }
 }
+
+class FoxNodeRenderer extends NodeRenderer {
+  override def getNodeRenderingHandlers: util.Set[NodeRenderingHandler[
+    _ <: Node
+  ]] = {
+    val set = new util.HashSet[NodeRenderingHandler[_ <: Node]]
+    set.add(
+      new NodeRenderingHandler[ast.FencedCodeBlock](
+        classOf[ast.FencedCodeBlock],
+        new CustomNodeRenderer[ast.FencedCodeBlock]() {
+          override def render(
+              node: ast.FencedCodeBlock,
+              context: NodeRendererContext,
+              html: HtmlWriter
+          ): Unit = {
+            FoxNodeRenderer.this.render(node, context, html)
+          }
+        }
+      )
+    )
+    set
+  }
+
+  private def render(
+      node: ast.FencedCodeBlock,
+      context: NodeRendererContext,
+      html: HtmlWriter
+  ): Unit = {
+    val language = node.getInfo
+    // TODO(olafur) instead of using javascript highlighting, we can statically
+    // generate it here with scalameta tokenizer.
+    html.attr("class", "prettyprint")
+    html
+      .line()
+      .srcPosWithEOL(node.getChars)
+      .withAttr()
+      .tag("pre")
+      .openPre()
+    html.attr("class", context.getHtmlOptions.languageClassPrefix + language)
+    html
+      .srcPosWithEOL(node.getContentChars)
+      .withAttr(CoreNodeRenderer.CODE_CONTENT)
+      .tag("code")
+    context.renderChildren(node)
+    html.tag("/code")
+    html.tag("/pre").closePre()
+    html.lineIf(context.getHtmlOptions.htmlBlockCloseTagEol)
+  }
+}
+object FoxNodeRenderer {
+  class Factory extends NodeRendererFactory {
+    override def create(options: DataHolder): NodeRenderer = new FoxNodeRenderer
+  }
+}
+
 class FoxAttributeProviderExtension extends HtmlRenderer.HtmlRendererExtension {
-  override def rendererOptions(options: MutableDataHolder) = ()
+  override def rendererOptions(options: MutableDataHolder): Unit = ()
   override def extend(
       rendererBuilder: HtmlRenderer.Builder,
       rendererType: String
-  ) = {
+  ): Unit = {
+    rendererBuilder.nodeRendererFactory(new FoxNodeRenderer.Factory)
     rendererBuilder.attributeProviderFactory(
       new FoxAttributeProvider.Factory
     )

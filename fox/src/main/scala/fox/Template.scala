@@ -6,11 +6,26 @@ import fox.Markdown.Site
 
 class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
 
+  val initializePrettify =
+    """
+      |document.addEventListener("DOMContentLoaded", function(event) {
+      |  console.log("Prettify!!!");
+      |  console.log(window.prettyPrint);
+      |  window.prettyPrint && window.prettyPrint();
+      |});
+      |
+    """.stripMargin
+
   def html =
     <html lang="en" class="no-js">
       {head}{body}{footer}
       <script src={options.asset("javascripts/application-268d62d82d.js")}></script>
       <script>app.initialize({{url:{{base:'{options.baseUrl}'}}}})</script>
+      <script type="text/javascript" src={options.lib("prettify/prettify.js")}></script>
+      <script type="text/javascript" src={options.lib("prettify/lang-scala.js")}></script>
+      <script type="text/javascript">
+        {xml.Unparsed(initializePrettify)}
+      </script>
     </html>
 
   val github = <svg class="md-svg">
@@ -44,11 +59,14 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     <script src={options.lib("modernizr/modernizr.min.js")}></script>
     <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
     <link rel="stylesheet" href={options.asset("stylesheets/application-23f75ab9c7.palette.css")}/>
+    <link rel="stylesheet" href={options.asset("stylesheets/application-04ea671600.css")}/>
+    <link rel="stylesheet" href={options.lib("prettify/prettify.css")}/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono"/>
     <style>
       body,input{{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}}code,kbd,pre{{font-family:"Roboto Mono","Courier New",Courier,monospace}}
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+    <link rel="stylesheet" href={options.asset("stylesheets/paradox-material-theme.css")}/>
   </head>
 
   val header: xml.Elem =
