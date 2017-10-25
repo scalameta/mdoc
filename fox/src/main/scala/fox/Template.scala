@@ -6,16 +6,6 @@ import fox.Markdown.Site
 
 class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
 
-  val initializePrettify =
-    """
-      |document.addEventListener("DOMContentLoaded", function(event) {
-      |  console.log("Prettify!!!");
-      |  console.log(window.prettyPrint);
-      |  window.prettyPrint && window.prettyPrint();
-      |});
-      |
-    """.stripMargin
-
   def html =
     <html lang="en" class="no-js">
       {head}{body}{footer}
@@ -23,9 +13,8 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       <script>app.initialize({{url:{{base:'{options.baseUrl}'}}}})</script>
       <script type="text/javascript" src={options.lib("prettify/prettify.js")}></script>
       <script type="text/javascript" src={options.lib("prettify/lang-scala.js")}></script>
-      <script type="text/javascript">
-        {xml.Unparsed(initializePrettify)}
-      </script>
+      <script type="text/javascript">{xml.Unparsed(initPrettify)}</script>
+      {googleAnalytics}
     </html>
 
   val github = <svg class="md-svg">
@@ -268,25 +257,38 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
         <div class="md-footer-meta__inner md-grid">
           <div class="md-footer-copyright">
             <div class="md-footer-copyright__highlight">
-              Copyright © 2016 - 2017 Martin Donath
+              {xml.Unparsed(options.copyright)}
             </div>
-            powered by
-            <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
-            and
-            <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
-              Material for MkDocs</a>
           </div>
           <div class="md-footer-social">
+            <!--
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
             <a href="http://struct.cc" class="md-footer-social__link fa fa-globe"></a>
             <a href="https://github.com/squidfunk" class="md-footer-social__link fa fa-github-alt"></a>
             <a href="https://twitter.com/squidfunk" class="md-footer-social__link fa fa-twitter"></a>
             <a href="https://linkedin.com/in/squidfunk" class="md-footer-social__link fa fa-linkedin"></a>
+            -->
           </div>
         </div>
       </div>
     </footer>
 
-  //    <ul>
-  //  </ul>
+  val initPrettify =
+    """
+      |document.addEventListener("DOMContentLoaded", function(event) {
+      |  console.log("Prettify!!!");
+      |  console.log(window.prettyPrint);
+      |  window.prettyPrint && window.prettyPrint();
+      |});
+      |
+    """.stripMargin
+
+  def googleAnalytics = options.googleAnalytics.fold[xml.Elem](null) { id =>
+    val code = s"""
+                  |!function(e,t,a,n,o,c,i){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,c=t.createElement(a),i=t.getElementsByTagName(a)[0],c.async=1,c.src=n,i.parentNode.insertBefore(c,i)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","$id","auto"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var t=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",t,e.href)})});var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})
+                  |
+    """.stripMargin
+    <script type="text/javascript">{xml.Unparsed(code)}</script>
+  }
+
 }

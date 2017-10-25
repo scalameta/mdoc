@@ -37,6 +37,11 @@ case class Options(
     repoUrl: String = "https://github.com/olafurpg/fox",
     title: String = "Fox",
     description: String = "My Description",
+    googleAnalytics: Option[String] = None,
+    copyright: String =
+      """Inspired by <a href='https://jonas.github.io/paradox-material-theme/'>paradox-material-theme</a>
+        |and <a href='http://squidfunk.github.io/mkdocs-material/'>mkdocs-material</a>
+        |""".stripMargin,
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
     baseUrl: String = "",
