@@ -127,6 +127,19 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       </nav>
     </header>
 
+  def printOnly =
+    <div class="print-only">
+      <span class="md-source-file md-version">
+        0.2.0
+      </span>
+    </div>
+  def editThisPage =
+    <div>
+      <a href={options.hrefGithub(doc)} title="Edit this page" class="md-source-file md-edit">
+        Edit this page
+      </a>
+    </div>
+
   def body: xml.Node =
     <body data-md-color-primary="light-blue" data-md-color-accent="orange" data-md-state="">
       <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer"/>
@@ -137,6 +150,8 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
           {sections(site)}{toc(doc)}<div class="md-content">
           <article class="md-content__inner md-typeset">
             {xml.Unparsed(doc.contents)}
+            {editThisPage}
+            {printOnly}
           </article>
         </div>
         </div>

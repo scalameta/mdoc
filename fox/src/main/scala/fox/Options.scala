@@ -28,7 +28,7 @@ object Enrichments {
 case class Options(
     @HelpMessage("The input directory to generate the fox site.")
     @ExtraName("i")
-    in: String = Paths.get(".").toString,
+    in: String = Paths.get("docs").toString,
     @HelpMessage("The output directory to generate the fox site.")
     @ExtraName("o")
     out: String = Paths.get("target").resolve("fox").toString,
@@ -48,6 +48,8 @@ case class Options(
 
   def asset(path: String) = s"$baseUrl/assets/$path"
   def lib(path: String) = s"$baseUrl/lib/$path"
+  def hrefGithub(doc: Doc) = s"$repoUrl/tree/master/$in/${doc.path}"
+
   def href(doc: Doc, withBase: Boolean = true): String = {
     val base = if (withBase) baseUrl else ""
     if (doc.path == indexMd) s"$base/"
