@@ -100,13 +100,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
                   </svg>
                 </div>
                 <div class="md-source__repository">
-                  {options.repoName}<ul class="md-source__facts">
-                  <li class="md-source__fact">
-                    {options.stars}
-                    stars</li> <li class="md-source__fact">
-                    {options.forks}
-                    forks</li>
-                </ul>
+                  {options.repoName}
                 </div>
               </a>
             </div>
@@ -151,13 +145,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
                   </svg>
                 </div>
                 <div class="md-source__repository">
-                  {options.repoName}<ul class="md-source__facts">
-                  <li class="md-source__fact">
-                    {options.stars}
-                    stars</li> <li class="md-source__fact">
-                    {options.forks}
-                    forks</li>
-                </ul>
+                  {options.repoName}
                 </div>
               </a>
             </div>

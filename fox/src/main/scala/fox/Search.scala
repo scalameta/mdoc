@@ -1,34 +1,24 @@
 package fox
 
-import io.circe._, syntax._
+import io.circe.Json
+import io.circe.JsonObject
 import fox.Markdown.Site
 
 object Search {
-  case class Index(docs: Seq[Section])
-  object Index {
-    implicit val encoder: ObjectEncoder[Index] =
-      Encoder.forProduct1("docs")(_.docs)
-  }
-
-  case class Section(location: String, title: String, text: String)
-  object Section {
-    implicit val encoder: ObjectEncoder[Section] =
-      Encoder.forProduct3("location", "text", "title")(
-        page => (page.location, page.text, page.title)
-      )
-  }
-
   def index(options: Options, site: Site): String = {
     val sections = for {
       doc <- site.docs
       header <- doc.headers
-    } yield
-      Section(
-        location = options.href(doc) + header.target,
-        title = header.title,
-        text = header.text
-      )
-    Index(sections).asJson.noSpaces
+    } yield {
+      val location = options.href(doc, withBase = false) + header.target
+      val section: List[(String, Json)] =
+        ("location" -> Json.fromString(location)) ::
+          ("title" -> Json.fromString(header.title)) ::
+          ("text" -> Json.fromString(header.text)) ::
+          Nil
+      Json.fromFields(section)
+    }
+    val docs = JsonObject.singleton("docs", Json.fromValues(sections))
+    Json.fromJsonObject(docs).noSpaces
   }
-
 }

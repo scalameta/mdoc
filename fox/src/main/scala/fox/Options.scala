@@ -36,8 +36,6 @@ case class Options(
     repoName: String = "olafurpg/fox",
     repoUrl: String = "https://github.com/olafurpg/fox",
     title: String = "Fox",
-    stars: Int = 0,
-    forks: Int = 0,
     description: String = "My Description",
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
@@ -50,12 +48,13 @@ case class Options(
 
   def asset(path: String) = s"$baseUrl/assets/$path"
   def lib(path: String) = s"$baseUrl/lib/$path"
-  def href(doc: Doc): String = {
-    if (doc.path == indexMd) s"$baseUrl/"
+  def href(doc: Doc, withBase: Boolean = true): String = {
+    val base = if (withBase) baseUrl else ""
+    if (doc.path == indexMd) s"$base/"
     else if (doc.path.endsWith(indexMd)) {
-      s"$baseUrl/${doc.path.getParent.toString}"
+      s"$base/${doc.path.getParent.toString}"
     } else {
-      s"$baseUrl/${doc.path.toString}".stripSuffix(".md")
+      s"$base/${doc.path.toString}".stripSuffix(".md")
     }
   }
   def charset: Charset = Charset.forName(encoding)

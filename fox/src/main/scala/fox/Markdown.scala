@@ -25,7 +25,7 @@ object Markdown {
       contents: String
   )
   case class Header(title: String, id: String, level: Int, text: String) {
-    def target = s"#$id"
+    def target: String = if (level==1) "" else s"#$id"
   }
   object Header {
     def apply(h: Heading): Header = {
