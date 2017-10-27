@@ -1,8 +1,8 @@
 package fox
 
 import scala.language.dynamics
-
 import java.nio.file.Path
+
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import com.vladsch.flexmark.ast
@@ -12,9 +12,11 @@ import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.ast.Visitor
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
@@ -107,7 +109,9 @@ object Markdown {
       Iterable(
         AutolinkExtension.create(),
         markdown.FoxParserExtension.create(),
-        markdown.FoxAttributeProviderExtension.create()
+        markdown.FoxAttributeProviderExtension.create(),
+        TablesExtension.create(),
+        StrikethroughExtension.create()
       ).asJava
     )
   }
