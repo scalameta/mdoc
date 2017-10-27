@@ -156,7 +156,7 @@ class Runner(
             Nil
         }
       }
-      val code = new Code(options).overview
+      val code = new Code(options).api
       handleSite(Site(code :: docs.toList))
       copyAssets()
     }
