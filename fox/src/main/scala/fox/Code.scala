@@ -36,10 +36,20 @@ class Code(options: Options) {
 
   private def api(index: MetadocIndex): Doc = {
     val symbols = index.symbolData
-    val names = symbols.map(_.symbol)
-    val content = <ul>{names.map(n => <li>{n.signature.name}</li>)}</ul>
-    val header =
-      Header("Symbols", "symbols", 1, names.map(_.signature.name).mkString(" "))
+    val search = new StringBuilder
+    def render(d: SymbolData): xml.Node = {
+      search
+        .append(d.symbol.signature.name)
+        .append(' ')
+      if (d.denotation.name == "<init>") xml.Text("")
+      else if (d.denotation.isDef ||
+        d.denotation.isVal ||
+        d.denotation.isVar) <p>{d.denotation.toString()}</p>
+      else <h2>{d.denotation.toString()}</h2>
+    }
+
+    val content = xml.NodeSeq.fromSeq(symbols.map(render))
+    val header = Header("Symbols", "symbols", 1, search.toString())
     Doc(
       Paths.get("api").resolve("index.md"),
       "API reference",

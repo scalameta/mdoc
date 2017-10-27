@@ -14,6 +14,9 @@ import java.util.zip.ZipInputStream
 import scala.collection.{GenSeq, concurrent}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
+import java.util
+import java.util.Collections
+import java.util.Comparator
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicInteger
@@ -37,12 +40,6 @@ import org.{langmeta => m}
 import org.langmeta.internal.semanticdb.{schema => s}
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
-case class SymbolData(
-    symbol: m.Symbol.Global,
-    definition: m.Position.Range,
-    denotation: m.Denotation,
-    docstring: Option[Token.Comment]
-)
 
 class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   val Target(target, onClose) = if (options.zip) {
@@ -316,42 +313,39 @@ class MetadocIndex(
     denotations: ConcurrentHashMap[String, s.Denotation]
 ) {
   import scala.collection.JavaConverters._
-  def symbolData: mutable.Iterable[SymbolData] = {
-    object R {
-      def unapply[T](arg: AtomicReference[T]): Option[T] =
-        Option(arg.get)
-    }
-    object S {
-      def unapply(sym: String): Option[(m.Symbol, m.Denotation)] =
-        for {
-          denot <- denotation(sym)
-          symbol <- m.Symbol.unapply(sym)
-        } yield symbol -> denot
-    }
-    object P {
-      def unapply(defn: d.Position): Option[m.Position.Range] =
-        for {
-          input <- Option(files.get(defn.filename))
-        } yield m.Position.Range(input, defn.start, defn.end)
-    }
-    symbols.asScala.collect {
+  private object R {
+    def unapply[T](arg: AtomicReference[T]): Option[T] =
+      Option(arg.get)
+  }
+  private object S {
+    def unapply(sym: String): Option[(m.Symbol, m.Denotation)] =
+      for {
+        ddenot <- Option(denotations.get(sym))
+        denot = m.Denotation(ddenot.flags, ddenot.name, ddenot.signature, Nil)
+        symbol <- m.Symbol.unapply(sym)
+      } yield symbol -> denot
+  }
+  private object P {
+    def unapply(defn: d.Position): Option[m.Position.Range] =
+      for {
+        input <- Option(files.get(defn.filename))
+      } yield m.Position.Range(input, defn.start, defn.end)
+  }
+
+  def symbolData: Seq[SymbolData] = {
+    val buffer = Array.newBuilder[SymbolData]
+    val symbolStrings =
+      symbols.values().iterator().asScala.map(_.get.symbol).toArray
+    util.Arrays.sort(symbolStrings, (a: String, b: String) => a.compareTo(b))
+    symbols.asScala.foreach {
       case (
           S(symbol: m.Symbol.Global, denot),
           R(SymbolIndex(_, Some(P(defn)), _))
           ) =>
-        SymbolData(symbol, defn, denot, None)
+        buffer += SymbolData(symbol, defn, denot, None)
+      case _ =>
     }
+    val result = buffer.result()
+    result
   }
-
-  def denotation(symbol: String): Option[m.Denotation] =
-    for {
-      denot <- Option(denotations.get(symbol))
-    } yield m.Denotation(denot.flags, denot.name, denot.signature, Nil)
-
-  def definition(symbol: String): Option[d.Position] =
-    for {
-      indexRef <- Option(symbols.get(symbol))
-      index = indexRef.get()
-      defn <- index.definition
-    } yield defn
 }
