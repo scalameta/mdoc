@@ -1,13 +1,13 @@
 package fox
 
-import java.io.File
 import java.nio.file.Paths
 import scala.{meta => m}
 import caseapp.RemainingArgs
 import fox.Markdown.Doc
 import fox.Markdown.Header
-import metadoc.{schema => d}
 import metadoc.cli.MetadocOptions
+import metadoc.{schema => d}
+import org.langmeta.internal.semanticdb.{schema => s}
 
 class Code(options: Options) {
   def docs: List[Doc] = {
@@ -20,8 +20,7 @@ class Code(options: Options) {
         nonInteractive = true
       )
     )
-    val index = runner.run()
-    sources :: api(index) :: Nil
+    sources :: api(runner.run())
   }
 
   private def sources: Doc = {
@@ -34,28 +33,30 @@ class Code(options: Options) {
     )
   }
 
-  private def api(index: MetadocIndex): Doc = {
-    val symbols = index.symbolData
+  private def api(implicit index: CodeIndex): List[Doc] = {
     val search = new StringBuilder
-    def render(d: SymbolData): xml.Node = {
-      search
-        .append(d.symbol.signature.name)
-        .append(' ')
-      if (d.denotation.name == "<init>") xml.Text("")
-      else if (d.denotation.isDef ||
-        d.denotation.isVal ||
-        d.denotation.isVar) <p>{d.denotation.toString()}</p>
-      else <h2>{d.denotation.toString()}</h2>
-    }
-
-    val content = xml.NodeSeq.fromSeq(symbols.map(render))
     val header = Header("Symbols", "symbols", 1, search.toString())
-    Doc(
-      Paths.get("api").resolve("index.md"),
-      "API reference",
-      header :: Nil,
-      content.toString()
-    )
+    pprint.log(index.packages)
+    val docs = List.newBuilder[Doc]
+    index.packages.values.toList.map { pkg =>
+      val url = pkg.syntax
+      val content = """"""
+      pprint.log(pkg.symbol.syntax)
+      index.definitions
+        .filterPrefix(pkg.symbol.syntax)
+        .values
+        .foreach { defn =>
+          pprint.log(defn.syntax)
+          pprint.log(defn.enclosingPackage.syntax)
+        }
+      Doc(
+        Paths.get("api").resolve(s"$url.md"),
+        url,
+        header :: Nil,
+        content.toString()
+      )
+    }
+    docs.result()
   }
 
 }

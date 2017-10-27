@@ -58,6 +58,8 @@ lazy val fox = project
     },
     (managedClasspath in Runtime) += (packageBin in Assets).value,
     libraryDependencies ++= List(
+      "io.monix" %% "monix" % "2.3.0",
+      "com.rklaehn" %% "radixtree" % "0.5.0",
       "io.circe" %% "circe-core" % "0.8.0",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
       "org.scalameta" %% "scalameta" % "2.0.1",

@@ -10,25 +10,20 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardOpenOption
-import java.util.zip.ZipInputStream
-import scala.collection.{GenSeq, concurrent}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
-import java.util
-import java.util.Collections
-import java.util.Comparator
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
-import scala.collection.mutable
+import java.util.zip.ZipInputStream
 import scala.collection.parallel.mutable.ParArray
-import scala.meta.tokens.Token
+import scala.collection.GenSeq
+import scala.collection.concurrent
 import scala.util.control.NonFatal
 import caseapp._
-import caseapp.core.Messages
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.cli.TermDisplay
@@ -36,8 +31,8 @@ import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
 import org.langmeta._
-import org.{langmeta => m}
 import org.langmeta.internal.semanticdb.{schema => s}
+import org.{langmeta => m}
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
@@ -290,7 +285,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     overwrite(target.resolve("index.workspace").toNIO, workspace.toByteArray)
   }
 
-  def run(): MetadocIndex = {
+  def run(): CodeIndex = {
     try {
       display.init()
       Files.createDirectories(target.toNIO)
@@ -299,53 +294,10 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
-      new MetadocIndex(files, symbols, denotations)
+      CodeIndex(files, symbols, denotations)
     } finally {
       display.stop()
       onClose()
     }
-  }
-}
-
-class MetadocIndex(
-    files: ConcurrentHashMap[String, m.Input.VirtualFile],
-    symbols: ConcurrentHashMap[String, AtomicReference[d.SymbolIndex]],
-    denotations: ConcurrentHashMap[String, s.Denotation]
-) {
-  import scala.collection.JavaConverters._
-  private object R {
-    def unapply[T](arg: AtomicReference[T]): Option[T] =
-      Option(arg.get)
-  }
-  private object S {
-    def unapply(sym: String): Option[(m.Symbol, m.Denotation)] =
-      for {
-        ddenot <- Option(denotations.get(sym))
-        denot = m.Denotation(ddenot.flags, ddenot.name, ddenot.signature, Nil)
-        symbol <- m.Symbol.unapply(sym)
-      } yield symbol -> denot
-  }
-  private object P {
-    def unapply(defn: d.Position): Option[m.Position.Range] =
-      for {
-        input <- Option(files.get(defn.filename))
-      } yield m.Position.Range(input, defn.start, defn.end)
-  }
-
-  def symbolData: Seq[SymbolData] = {
-    val buffer = Array.newBuilder[SymbolData]
-    val symbolStrings =
-      symbols.values().iterator().asScala.map(_.get.symbol).toArray
-    util.Arrays.sort(symbolStrings, (a: String, b: String) => a.compareTo(b))
-    symbols.asScala.foreach {
-      case (
-          S(symbol: m.Symbol.Global, denot),
-          R(SymbolIndex(_, Some(P(defn)), _))
-          ) =>
-        buffer += SymbolData(symbol, defn, denot, None)
-      case _ =>
-    }
-    val result = buffer.result()
-    result
   }
 }
