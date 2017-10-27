@@ -6,24 +6,23 @@ import scala.{meta => m}
 import caseapp.RemainingArgs
 import fox.Markdown.Doc
 import fox.Markdown.Header
-import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 
 class Code(options: Options) {
-  def metadoc: Doc = {
-    MetadocCli.run(
+  def docs: List[Doc] = {
+    val runner = new MetadocRunner(
+      options.classpathPaths,
       MetadocOptions(
         target = Some(options.outPath.resolve("metadoc").toString),
         cleanTargetFirst = false,
         zip = false,
         nonInteractive = true
-      ),
-      RemainingArgs(
-        remainingArgs = options.classpath,
-        Nil
       )
     )
+    sources :: api(runner) :: Nil
+  }
 
+  private def sources: Doc = {
     Doc(
       Paths.get("metadoc").resolve("index.md"),
       "Browse sources",
@@ -32,7 +31,8 @@ class Code(options: Options) {
       renderFile = false
     )
   }
-  def api: Doc = {
+
+  private def api(runner: MetadocRunner): Doc = {
     val cp = m.Classpath(options.classpath.mkString(File.pathSeparator))
     val db = m.Database.load(cp)
     pprint.log(cp)

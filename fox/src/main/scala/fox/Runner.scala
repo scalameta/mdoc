@@ -159,7 +159,7 @@ class Runner(
         }
       }
       val code = new Code(options)
-      handleSite(Site(code.api :: code.metadoc :: docs.toList))
+      handleSite(Site(code.docs ::: docs.toList))
       copyAssets()
     }
   }
