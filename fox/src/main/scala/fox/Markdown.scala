@@ -25,7 +25,8 @@ object Markdown {
       path: Path,
       title: String,
       headers: List[Header],
-      contents: String
+      contents: String,
+      renderFile: Boolean = true // HACK! false only for metadoc
   )
   case class Header(title: String, id: String, level: Int, text: String) {
     def target: String = if (level == 1) "" else s"#$id"

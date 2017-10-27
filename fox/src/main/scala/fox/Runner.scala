@@ -95,10 +95,12 @@ class Runner(
       val html = template.html.toString()
       val source = options.resolveIn(doc.path)
       val target = options.resolveOut(doc.path)
-      writePath(target, html)
-      logger.info(
-        s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
-      )
+      if (doc.renderFile) {
+        writePath(target, html)
+        logger.info(
+          s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
+        )
+      }
     }
     val index = Search.index(options, site)
     writePath(options.searchIndexPath, index)
@@ -156,8 +158,8 @@ class Runner(
             Nil
         }
       }
-      val code = new Code(options).api
-      handleSite(Site(code :: docs.toList))
+      val code = new Code(options)
+      handleSite(Site(code.api :: code.metadoc :: docs.toList))
       copyAssets()
     }
   }
