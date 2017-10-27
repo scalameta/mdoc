@@ -6,6 +6,7 @@ import scala.{meta => m}
 import caseapp.RemainingArgs
 import fox.Markdown.Doc
 import fox.Markdown.Header
+import metadoc.{schema => d}
 import metadoc.cli.MetadocOptions
 
 class Code(options: Options) {
@@ -19,30 +20,27 @@ class Code(options: Options) {
         nonInteractive = true
       )
     )
-    sources :: api(runner) :: Nil
+    val index = runner.run()
+    sources :: api(index) :: Nil
   }
 
   private def sources: Doc = {
     Doc(
-      Paths.get("metadoc").resolve("index.md"),
-      "Browse sources",
-      Nil,
-      "",
+      path = Paths.get("metadoc").resolve("index.md"),
+      title = "Browse sources",
+      headers = Nil,
+      contents = "",
       renderFile = false
     )
   }
 
-  private def api(runner: MetadocRunner): Doc = {
-    val cp = m.Classpath(options.classpath.mkString(File.pathSeparator))
-    val db = m.Database.load(cp)
-    pprint.log(cp)
-    pprint.log(db.toString())
-    val names = db.names.collect {
-      case m.ResolvedName(_, sym: m.Symbol.Global, true) =>
-        sym
+  private def api(index: MetadocIndex): Doc = {
+    val names = index.symbolIterator().collect {
+      case d.SymbolIndex(m.Symbol(symbol: m.Symbol.Global), Some(defn), _) =>
+        symbol
+//      case m.ResolvedName(_, sym: m.Symbol.Global, true) =>
     }
-    val content =
-      <ul>{names.sortBy(_.signature.name).reverseIterator.map(n => <li>{n.signature.name}</li>)}</ul>
+    val content = <ul>{names.map(n => <li>{n.signature.name}</li>)}</ul>
     val header =
       Header("Symbols", "symbols", 1, names.map(_.signature.name).mkString(" "))
     Doc(

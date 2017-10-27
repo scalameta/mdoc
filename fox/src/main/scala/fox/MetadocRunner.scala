@@ -62,10 +62,14 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
-  private val mappingFunction: JFunction[Symbol, AtomicReference[
+  private val denotations =
+    new ConcurrentHashMap[Symbol, s.Denotation]()
+  private val symbolMappingFunction: JFunction[Symbol, AtomicReference[
     d.SymbolIndex
   ]] =
     t => new AtomicReference(d.SymbolIndex(symbol = t))
+  private val denotationMappingFunction: JFunction[Symbol, s.Denotation] =
+    t => s.Denotation()
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
     Files.write(
@@ -77,7 +81,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   }
 
   private def addDefinition(symbol: Symbol, position: d.Position): Unit = {
-    val value = symbols.computeIfAbsent(symbol, mappingFunction)
+    val value = symbols.computeIfAbsent(symbol, symbolMappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
       override def apply(t: schema.SymbolIndex): schema.SymbolIndex =
         t.definition.fold(t.copy(definition = Some(position))) { _ =>
@@ -92,7 +96,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       range: d.Range,
       symbol: Symbol
   ): Unit = {
-    val value = symbols.computeIfAbsent(symbol, mappingFunction)
+    val value = symbols.computeIfAbsent(symbol, symbolMappingFunction)
     value.getAndUpdate(new UnaryOperator[d.SymbolIndex] {
       override def apply(t: d.SymbolIndex): d.SymbolIndex = {
         val ranges = t.references.getOrElse(filename, d.Ranges())
@@ -154,6 +158,11 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
                 addDefinition(sym, d.Position(document.filename, start, end))
               case s.ResolvedName(Some(s.Position(start, end)), sym, false) =>
                 addReference(document.filename, d.Range(start, end), sym)
+              case _ =>
+            }
+            document.symbols.foreach {
+              case s.ResolvedSymbol(sym, Some(denot)) =>
+                denotations.putIfAbsent(sym, denot)
               case _ =>
             }
             val out = semanticdb.resolve(document.filename)
@@ -271,14 +280,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     overwrite(target.resolve("index.workspace").toNIO, workspace.toByteArray)
   }
 
-  def definition(symbol: Symbol): Option[d.Position] =
-    for {
-      indexRef <- Option(symbols.get(symbol))
-      index = indexRef.get()
-      defn <- index.definition
-    } yield defn
-
-  def run(): Unit = {
+  def run(): MetadocIndex = {
     try {
       display.init()
       Files.createDirectories(target.toNIO)
@@ -287,9 +289,30 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
+      new MetadocIndex(symbols, denotations)
     } finally {
       display.stop()
       onClose()
     }
   }
+}
+
+class MetadocIndex(
+    symbols: ConcurrentHashMap[String, AtomicReference[d.SymbolIndex]],
+    denotations: ConcurrentHashMap[String, s.Denotation]
+) {
+  def symbolIterator(): Iterator[d.SymbolIndex] = {
+    import scala.collection.JavaConverters._
+    symbols.values().iterator().asScala.map(_.get)
+  }
+
+  def denotation(symbol: String): Option[s.Denotation] =
+    Option(denotations.get(symbol))
+
+  def definition(symbol: String): Option[d.Position] =
+    for {
+      indexRef <- Option(symbols.get(symbol))
+      index = indexRef.get()
+      defn <- index.definition
+    } yield defn
 }
