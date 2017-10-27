@@ -20,7 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 import java.util.function.{Function => JFunction}
+import scala.collection.mutable
 import scala.collection.parallel.mutable.ParArray
+import scala.meta.tokens.Token
 import scala.util.control.NonFatal
 import caseapp._
 import caseapp.core.Messages
@@ -31,9 +33,16 @@ import metadoc.schema
 import metadoc.schema.SymbolIndex
 import metadoc.{schema => d}
 import org.langmeta._
+import org.{langmeta => m}
 import org.langmeta.internal.semanticdb.{schema => s}
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
+case class SymbolData(
+    symbol: m.Symbol.Global,
+    definition: m.Position.Range,
+    denotation: m.Denotation,
+    docstring: Option[Token.Comment]
+)
 
 class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   val Target(target, onClose) = if (options.zip) {
@@ -64,12 +73,12 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
   private val denotations =
     new ConcurrentHashMap[Symbol, s.Denotation]()
+  private val files =
+    new ConcurrentHashMap[Symbol, m.Input.VirtualFile]()
   private val symbolMappingFunction: JFunction[Symbol, AtomicReference[
     d.SymbolIndex
   ]] =
     t => new AtomicReference(d.SymbolIndex(symbol = t))
-  private val denotationMappingFunction: JFunction[Symbol, s.Denotation] =
-    t => s.Denotation()
 
   private def overwrite(out: Path, bytes: Array[Byte]): Unit = {
     Files.write(
@@ -165,6 +174,10 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
                 denotations.putIfAbsent(sym, denot)
               case _ =>
             }
+            files.putIfAbsent(
+              document.filename,
+              Input.VirtualFile(document.filename, document.contents)
+            )
             val out = semanticdb.resolve(document.filename)
             Files.createDirectories(out.toNIO.getParent)
             overwrite(
@@ -289,7 +302,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
-      new MetadocIndex(symbols, denotations)
+      new MetadocIndex(files, symbols, denotations)
     } finally {
       display.stop()
       onClose()
@@ -298,16 +311,42 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
 }
 
 class MetadocIndex(
+    files: ConcurrentHashMap[String, m.Input.VirtualFile],
     symbols: ConcurrentHashMap[String, AtomicReference[d.SymbolIndex]],
     denotations: ConcurrentHashMap[String, s.Denotation]
 ) {
-  def symbolIterator(): Iterator[d.SymbolIndex] = {
-    import scala.collection.JavaConverters._
-    symbols.values().iterator().asScala.map(_.get)
+  import scala.collection.JavaConverters._
+  def symbolData: mutable.Iterable[SymbolData] = {
+    object R {
+      def unapply[T](arg: AtomicReference[T]): Option[T] =
+        Option(arg.get)
+    }
+    object S {
+      def unapply(sym: String): Option[(m.Symbol, m.Denotation)] =
+        for {
+          denot <- denotation(sym)
+          symbol <- m.Symbol.unapply(sym)
+        } yield symbol -> denot
+    }
+    object P {
+      def unapply(defn: d.Position): Option[m.Position.Range] =
+        for {
+          input <- Option(files.get(defn.filename))
+        } yield m.Position.Range(input, defn.start, defn.end)
+    }
+    symbols.asScala.collect {
+      case (
+          S(symbol: m.Symbol.Global, denot),
+          R(SymbolIndex(_, Some(P(defn)), _))
+          ) =>
+        SymbolData(symbol, defn, denot, None)
+    }
   }
 
-  def denotation(symbol: String): Option[s.Denotation] =
-    Option(denotations.get(symbol))
+  def denotation(symbol: String): Option[m.Denotation] =
+    for {
+      denot <- Option(denotations.get(symbol))
+    } yield m.Denotation(denot.flags, denot.name, denot.signature, Nil)
 
   def definition(symbol: String): Option[d.Position] =
     for {

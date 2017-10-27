@@ -35,11 +35,8 @@ class Code(options: Options) {
   }
 
   private def api(index: MetadocIndex): Doc = {
-    val names = index.symbolIterator().collect {
-      case d.SymbolIndex(m.Symbol(symbol: m.Symbol.Global), Some(defn), _) =>
-        symbol
-//      case m.ResolvedName(_, sym: m.Symbol.Global, true) =>
-    }
+    val symbols = index.symbolData
+    val names = symbols.map(_.symbol)
     val content = <ul>{names.map(n => <li>{n.signature.name}</li>)}</ul>
     val header =
       Header("Symbols", "symbols", 1, names.map(_.signature.name).mkString(" "))
