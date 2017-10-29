@@ -1,25 +1,14 @@
 package fox
 
 import scala.meta._
+import fox.code.Index
 
 case class SymbolData(
     symbol: Symbol.Global,
-    definition: Position.Range,
+    definition: Position,
     denotation: Denotation,
     docstring: Option[Token.Comment]
 ) {
-//  def children
-  def enclosingPackage(implicit index: CodeIndex): SymbolData = {
-    def loop(s: Symbol): SymbolData =
-      index
-        .data(s)
-        .fold(this /* ??? */ )(
-          data =>
-            if (data.denotation.isPackage) data
-            else loop(data.symbol.owner)
-        )
-    loop(symbol)
-  }
   def syntax: String = {
     val sb = new java.lang.StringBuilder()
     def loop(s: Symbol): Unit = s match {
@@ -29,6 +18,7 @@ case class SymbolData(
         loop(owner)
         if (s eq symbol) sb.append(signature.name)
         else sb.append(signature.syntax)
+      case _ => sb.append(s.syntax)
     }
     loop(symbol)
     sb.toString

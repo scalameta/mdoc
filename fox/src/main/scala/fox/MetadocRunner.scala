@@ -24,6 +24,7 @@ import scala.collection.GenSeq
 import scala.collection.concurrent
 import scala.util.control.NonFatal
 import caseapp._
+import fox.code.Index
 import metadoc.cli.MetadocCli
 import metadoc.cli.MetadocOptions
 import metadoc.cli.TermDisplay
@@ -285,7 +286,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
     overwrite(target.resolve("index.workspace").toNIO, workspace.toByteArray)
   }
 
-  def run(): CodeIndex = {
+  def run(): Index = {
     try {
       display.init()
       Files.createDirectories(target.toNIO)
@@ -294,7 +295,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
-      CodeIndex(files, symbols, denotations)
+      Index(files, symbols, denotations)
     } finally {
       display.stop()
       onClose()
