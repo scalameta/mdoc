@@ -64,6 +64,10 @@ class Runner(
     )
   }
 
+  val siteVariables = Map(
+    "site.version" -> "1.0.0"
+  )
+
   def handlePath(path: Path): Doc = {
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
