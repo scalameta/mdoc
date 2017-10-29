@@ -7,7 +7,8 @@ object Main extends CaseApp[Options] {
       options: Options,
       remainingArgs: RemainingArgs
   ): Unit = {
-    val runner = new Runner(options, Markdown.default, new Logger(System.out))
+    val markdown = Markdown.default(options)
+    val runner = new Runner(options, markdown, new Logger(System.out))
     runner.run()
     println(options.outPath.toString)
   }

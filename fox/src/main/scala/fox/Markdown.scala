@@ -20,18 +20,15 @@ import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
+import fox.markdown.FoxExtensions
 
 object Markdown {
   case class Site(docs: List[Doc])
-  case class Doc(
-      path: Path,
-      title: String,
-      headers: List[Header],
-      contents: String
-  )
+  case class Doc(path: Path, title: String, headers: List[Header], contents: String)
   case class Header(title: String, id: String, level: Int, text: String) {
     def target: String = if (level == 1) "" else s"#$id"
   }
+
   object Header {
     def apply(h: Heading): Header = {
       val text = new java.lang.StringBuilder
@@ -52,6 +49,7 @@ object Markdown {
       )
     }
   }
+
   // If you can figure out how to fix errors like here below than we can remove
   // this unary_! hack:
   // [error] [E1] fox/src/main/scala/fox/Markdown.scala
@@ -85,35 +83,24 @@ object Markdown {
     buffer.result()
   }
 
-  def toHtml(markdown: BasedSequence): String = {
-    val s = new java.lang.StringBuilder( )
+  def toHtml(markdown: BasedSequence, options: Options): String = {
+    val s = new java.lang.StringBuilder()
     markdown.appendTo(s)
-    val settings = default
+    val settings = default(options)
     val parser = Parser.builder(settings).build
     val renderer = HtmlRenderer.builder(settings).build
     val document = parser.parse(markdown)
     renderer.render(document)
   }
-  def toHtml(markdown: String): String = {
-    toHtml(CharSubSequence.of(markdown))
+
+  def toHtml(markdown: String, options: Options): String = {
+    toHtml(CharSubSequence.of(markdown), options)
   }
 
-
-  def default: MutableDataSet = {
+  def default(options: Options): MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
-    val options = new MutableDataSet()
-    options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
-    import scala.collection.JavaConverters._
-    options.set(
-      Parser.EXTENSIONS,
-      Iterable(
-        AutolinkExtension.create(),
-        markdown.FoxParserExtension.create(),
-        markdown.FoxAttributeProviderExtension.create(),
-        TablesExtension.create(),
-        StrikethroughExtension.create()
-      ).asJava
-    )
+    val markdownOptions = new MutableDataSet()
+    markdownOptions.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+    markdownOptions.set(Parser.EXTENSIONS, FoxExtensions.default(options))
   }
-
 }
