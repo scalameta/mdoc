@@ -2,6 +2,7 @@ package fox.code
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
+import scala.collection.immutable
 import cats.kernel.Order
 import com.rklaehn.radixtree.Hash
 import com.rklaehn.radixtree.RadixTree
@@ -39,6 +40,7 @@ object Index {
         for {
           sdenot <- Option(denotations.get(sym))
           denot = mdenot(sdenot)
+          if !denot.isTypeParam
           symbol <- m.Symbol.unapply(sym)
         } yield symbol -> denot
     }
@@ -49,7 +51,21 @@ object Index {
         } yield m.Position.Range(input, defn.start, defn.end)
     }
     import scala.collection.JavaConverters._
-    val packagesB = List.newBuilder[m.Symbol.Global]
+
+    val packages: List[SymbolData] = {
+      val buf = List.newBuilder[SymbolData]
+      denotations.asScala.foreach {
+        case (m.Symbol(symbol: m.Symbol.Global), sdenot) =>
+          val denot = mdenot(sdenot)
+          if (denot.isPackage) {
+            val data = SymbolData(symbol, m.Position.None, denot, None)
+            buf += data
+          }
+        case _ =>
+      }
+      buf.result()
+    }
+
     val table: SymbolTable = {
       val reducer = Reducer[SymbolTable](_ merge _)
       symbols.asScala.foreach {
@@ -70,28 +86,9 @@ object Index {
           )
         case _ =>
       }
-      denotations.asScala.foreach {
-        case (m.Symbol(symbol: m.Symbol.Global), sdenot) =>
-          val denot = mdenot(sdenot)
-          if (denot.isPackage) {
-            packagesB += symbol
-          }
-          reducer.apply(
-            RadixTree.singleton(
-              symbol.toKey,
-              SymbolData(
-                symbol,
-                m.Position.None,
-                denot,
-                None
-              )
-            )
-          )
-        case _ =>
-      }
       reducer.resultOrElse(RadixTree.empty)
     }
-    val packages = packagesB.result().flatMap(pkg => table.get(pkg.toKey))
+
     new Index(table, packages)
   }
 }

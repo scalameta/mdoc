@@ -25,6 +25,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       <script>app.initialize({{url:{{base:'{options.baseUrl}'}}}})</script>
       <script type="text/javascript" src={options.lib("prettify/prettify.js")}></script>
       <script type="text/javascript" src={options.lib("prettify/lang-scala.js")}></script>
+      <script type="text/javascript" src={options.asset("javascripts/custom.js")}></script>
       <script type="text/javascript">{xml.Unparsed(initPrettify)}</script>
       {googleAnalytics}
     </html>

@@ -14,11 +14,13 @@ object RadixTreeInternal {
     }
     def internalChildren: Array[RadixTree[A, B]] = tree.children
   }
-  implicit val signatureOrder: Order[Signature] = new Order[Signature] {
+  implicit val signatureOrder: Order[Signature] = SignatureOrder
+  private object SignatureOrder extends Order[Signature] {
     override def compare(x: Signature, y: Signature): Int =
       x.name.compareTo(y.name)
   }
-  implicit val signatureHash: Hash[Signature] = new Hash[Signature] {
+  implicit val signatureHash: Hash[Signature] = SignatureHash
+  private object SignatureHash extends Hash[Signature] {
     override def hash(a: Signature): Int = a.hashCode()
     override def eqv(x: Signature, y: Signature): Boolean = x == y
   }

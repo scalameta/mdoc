@@ -9,10 +9,11 @@ case class SymbolData(
     denotation: Denotation,
     docstring: Option[Token.Comment]
 ) {
-  def syntax: String = {
+  def syntax: String = syntax(Symbol.None)
+  def syntax(prefix: Symbol): String = {
     val sb = new java.lang.StringBuilder()
     def loop(s: Symbol): Unit = s match {
-      case Symbol.None =>
+      case `prefix` =>
       case Symbol.Global(Symbol.None, Signature.Term("_root_")) =>
       case Symbol.Global(owner, signature) =>
         loop(owner)
