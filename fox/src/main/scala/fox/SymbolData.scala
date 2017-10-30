@@ -2,6 +2,7 @@ package fox
 
 import scala.meta._
 import fox.code.Index
+import org.langmeta.semanticdb.fox.SemanticdbInternal._
 
 case class SymbolData(
     symbol: Symbol.Global,
@@ -9,6 +10,13 @@ case class SymbolData(
     denotation: Denotation,
     docstring: Option[Token.Comment]
 ) {
+  override def toString: String = syntax
+  def signature(implicit index: Index): String = {
+    if (denotation.isPackageObject) s"package object ${denotation.name}"
+    else if (denotation.isObject) s"object ${denotation.name}"
+    else if (denotation.isDef) s"${denotation.pretty}"
+    else denotation.toString()
+  }
   def syntax: String = syntax(Symbol.None)
   def syntax(prefix: Symbol): String = {
     val sb = new java.lang.StringBuilder()

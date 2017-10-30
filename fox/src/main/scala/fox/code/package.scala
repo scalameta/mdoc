@@ -1,5 +1,6 @@
 package fox
 
+import scala.collection.immutable.SortedSet
 import com.rklaehn.radixtree._
 import com.rklaehn.radixtree.RadixTreeInternal._
 import org.langmeta.semanticdb.Symbol
@@ -24,13 +25,26 @@ package object code {
       )
     }
   }
+  private val symbolDataByDefinitionPos: Ordering[SymbolData] =
+    new Ordering[SymbolData] {
+      override def compare(x: SymbolData, y: SymbolData): Int = {
+        val byFilename = x.filename.compareTo(y.filename)
+        if (byFilename != 0) byFilename
+        else {
+          val byStartOffset =
+            java.lang.Long.compare(x.definition.start, y.definition.start)
+          byStartOffset
+        }
+      }
+    }
+
   implicit class XtensionSymbolTableMembers(val symbol: Symbol) extends AnyVal {
     def data(implicit index: Index): Option[SymbolData] =
       index.table.get(symbol.toKey)
     def members(
         filter: SymbolData => Boolean
     )(implicit index: Index): List[SymbolData] = {
-      val buf = List.newBuilder[SymbolData]
+      val buf = SortedSet.newBuilder[SymbolData](symbolDataByDefinitionPos)
       index.table.filterPrefix(symbol.toKey).internalChildren.foreach { rt =>
         rt.internalValue.foreach { value =>
           // TODO(olafur) why is this guard necessary? .internalChildren should
@@ -40,7 +54,7 @@ package object code {
           }
         }
       }
-      buf.result()
+      buf.result().toList
     }
   }
 }

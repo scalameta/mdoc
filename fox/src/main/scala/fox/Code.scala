@@ -35,46 +35,62 @@ class Code(options: Options) {
     )
   }
 
+  // NOTE(olafur) this is super hacky, everything below needs to be re-written
+  // for better organization.
   private def api(implicit index: Index): List[Doc] = {
-    val search = new StringBuilder
-    val header = Header("Symbols", "symbols", 1, search.toString())
     val emptyXml: xml.Node = xml.Text("")
-//    pprint.log(index.packages)
     val docs = List.newBuilder[Doc]
+    val headers = List.newBuilder[Header]
     index.packages.foreach { pkg =>
       val url = pkg.syntax
-      def render(data: SymbolData): xml.Node = {
-        val children = data.publicMembers.map(render)
-        val header =
-          if (data.denotation.isClass ||
-            data.denotation.isTrait ||
-            data.denotation.isObject) {
-            <h2>{data.denotation}</h2>
-          } else if (data.denotation.isPackageObject) {
-            <h2>package object {pkg.denotation.name}</h2>
-          } else {
-            <h3>{data.denotation}</h3>
+      def render(level: Int)(data: SymbolData): xml.Node = {
+        val members = data.members { m =>
+          !m.denotation.isPrivate && {
+            if (data.denotation.isTrait || data.denotation.isObject) {
+              !m.denotation.isPrimaryCtor
+            } else true
+          }
+        }
+        if (data.denotation.isPackageObject && members.isEmpty) {
+          emptyXml
+        } else {
+          // NOTE(olafur) this id will make overloaded methods conflict
+          val id = data.syntax(pkg.symbol)
+          headers += Header(data.denotation.name, id, level, data.syntax)
+          val link = <a href={s"#$id"} class="headerlink">¶</a>
+          val header =
+            if (data.denotation.isClass ||
+              data.denotation.isTrait ||
+              data.denotation.isObject) {
+              <h2 id={id}>{data.signature}{link}</h2>
+            } else {
+              <h3 id={id}>{data.signature}{link}</h3>
+            }
+          val children = members.map(render(level + 1)) match {
+            case Nil => emptyXml
+            case x =>
+              <div style="margin-left: 1em">
+                {x}
+              </div>
           }
 
-        <div>
-          {header}
-          <div style="margin-left: 1em">
+          <div>
+            {header}
             {children}
           </div>
-        </div>
+        }
       }
       val members = pkg.members { m =>
         !m.denotation.isPackageObject &&
         !m.denotation.isPrivate
       }
-      members.foreach(member => pprint.log(member.syntax))
       if (members.nonEmpty) {
-        val pkgObject: xml.Node = pkg.packageObject.fold(emptyXml)(render)
-        val content = xml.NodeSeq.fromSeq(pkgObject :: members.map(render))
+        val pkgObject: xml.Node = pkg.packageObject.fold(emptyXml)(render(1))
+        val content = xml.NodeSeq.fromSeq(pkgObject :: members.map(render(1)))
         docs += Doc(
           Paths.get("api").resolve(s"$url.md"),
           url,
-          header :: Nil,
+          headers.result(),
           content.toString()
         )
       }
