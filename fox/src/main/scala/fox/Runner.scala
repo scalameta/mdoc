@@ -112,6 +112,7 @@ class Runner(
     val paths = List[RelPath](
       "assets" / "images" / "favicon.png",
       "assets" / "javascripts" / "application-268d62d82d.js",
+      "assets" / "javascripts" / "custom.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.da.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.de.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.du.js",

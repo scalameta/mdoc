@@ -9,10 +9,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-*/
+ */
 package fox
 
-import scala.xml.Elem
 import fox.Markdown.Doc
 import fox.Markdown.Site
 
@@ -39,7 +38,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </defs>
   </svg>
 
-  def head: Elem = <head>
+  def head: xml.Elem = <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
@@ -199,7 +198,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       </div>
     </div>
 
-  def toc(doc: Doc): Elem =
+  def toc(doc: Doc): xml.Elem =
     <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" data-md-state="lock">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
@@ -287,11 +286,9 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       </div>
     </footer>
 
-  val initPrettify =
+  val initPrettify: String =
     """
       |document.addEventListener("DOMContentLoaded", function(event) {
-      |  console.log("Prettify!!!");
-      |  console.log(window.prettyPrint);
       |  window.prettyPrint && window.prettyPrint();
       |});
       |

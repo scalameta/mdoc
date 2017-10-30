@@ -41,6 +41,7 @@ package object code {
   implicit class XtensionSymbolTableMembers(val symbol: Symbol) extends AnyVal {
     def data(implicit index: Index): Option[SymbolData] =
       index.table.get(symbol.toKey)
+
     def members(
         filter: SymbolData => Boolean
     )(implicit index: Index): List[SymbolData] = {
