@@ -295,8 +295,8 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
             </div>
           </div>
           <div class="md-footer-social">
-            <!--
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+            <!--
             <a href="http://struct.cc" class="md-footer-social__link fa fa-globe"></a>
             <a href="https://github.com/squidfunk" class="md-footer-social__link fa fa-github-alt"></a>
             <a href="https://twitter.com/squidfunk" class="md-footer-social__link fa fa-twitter"></a>

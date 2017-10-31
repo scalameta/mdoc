@@ -18,6 +18,7 @@ case class SymbolData(
     else denotation.toString()
   }
   def header: String = {
+    // very ugly but better than nothing :D
     val prefix =
       if (denotation.isObject) "Ⓞ "
       else if (denotation.isTrait) "Ⓣ "

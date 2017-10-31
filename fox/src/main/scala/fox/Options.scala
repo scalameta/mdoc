@@ -14,6 +14,7 @@ import fox.Enrichments._
 import fox.Markdown.Doc
 import fox.Markdown.Header
 import fox.Markdown.Site
+import org.langmeta.inputs.Position
 import org.langmeta.io.AbsolutePath
 import org.langmeta.io.Classpath
 

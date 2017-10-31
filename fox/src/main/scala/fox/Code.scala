@@ -33,7 +33,9 @@ class Code(options: Options)(implicit index: Index) {
       def render(level: Int)(data: SymbolData): xml.Node = {
         val members = data.members { m =>
           !m.denotation.isPrivate && {
-            if (data.denotation.isTrait || data.denotation.isObject) {
+            if (data.denotation.isTrait ||
+              data.denotation.isObject ||
+              data.denotation.isClass) {
               !m.denotation.isPrimaryCtor
             } else true
           }
@@ -45,13 +47,31 @@ class Code(options: Options)(implicit index: Index) {
           val id = data.syntax(pkg.symbol)
           headers += Header(data.header, id, level, data.syntax)
           val link = <a href={s"#$id"} class="headerlink">¶</a>
+          val source = data.definition match {
+            case pos @ m.Position.Range(m.Input.VirtualFile(path, _), _, _) =>
+              val link =
+                s"${options.baseUrl}/metadoc/#/$path#L${pos.startLine + 1}"
+              <a href={link} class="fa fa-code" style="float: right"></a>
+            case _ => emptyXml
+          }
           val header =
-            if (data.denotation.isClass ||
-              data.denotation.isTrait ||
+            if (data.denotation.isTrait ||
+              data.denotation.isClass ||
               data.denotation.isObject) {
-              <h2 id={id}>{data.signature}{link}</h2>
+              val signature =
+                if (data.denotation.isClass) {
+                  // NOTE(olafur) this will get very large for big classes.
+                  data
+                    .members(_.denotation.isPrimaryCtor)
+                    .headOption
+                    .fold(data.signature)(
+                      ctor => data.signature + ctor.denotation.signature
+                    )
+                } else
+                  data.signature
+              <h2 id={id}>{signature}{link}{source}</h2>
             } else {
-              <h3 id={id}>{data.signature}{link}</h3>
+              <h3 id={id}>{data.signature}{link}{source}</h3>
             }
           val children = members.map(render(level + 1)) match {
             case Nil => emptyXml
