@@ -1,24 +1,35 @@
 package org.langmeta.semanticdb.fox
 
 import scala.meta.Type
+import scala.meta.Input
+import scala.util.control.NonFatal
 import org.langmeta.internal.semanticdb.{schema => s}
 import org.langmeta.semanticdb.Denotation
 import org.langmeta.semanticdb.HasFlags
 object SemanticdbInternal {
   implicit class XtensionDenotationPretty(val d: Denotation) extends HasFlags {
     def flags: Long = d.flags
+    private def tpe: Type = {
+      val dialect = scala.meta.dialects.Scala212.copy(
+        allowMethodTypes = true,
+        allowTypeLambdas = true
+      )
+      import scala.meta._
+      try {
+        dialect(Input.VirtualFile(d.signature, d.signature)).parse[Type].get
+      } catch {
+        case NonFatal(e) =>
+          e.printStackTrace()
+          Type.Name(e.getMessage)
+      }
+    }
     def pretty: String = {
       if (!isDef) d.syntax
       else {
-        val dialect = scala.meta.dialects.Scala212.copy(
-          allowMethodTypes = true,
-          allowTypeLambdas = true
-        )
         def renderTypeMethod(tm: Type.Method) =
           tm.paramss
             .map(p => p.mkString("(", ", ", ")"))
             .mkString + ": " + tm.tpe.syntax
-        val tpe = dialect(d.signature).parse[Type].get
         val info = tpe match {
           case tpe: Type.Method => renderTypeMethod(tpe)
           case Type.Lambda(tparams, tpe: Type.Method) =>

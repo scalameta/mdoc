@@ -95,12 +95,10 @@ class Runner(
       val html = template.html.toString()
       val source = options.resolveIn(doc.path)
       val target = options.resolveOut(doc.path)
-      if (doc.renderFile) {
-        writePath(target, html)
-        logger.info(
-          s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
-        )
-      }
+      writePath(target, html)
+      logger.info(
+        s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
+      )
     }
     val index = Search.index(options, site)
     writePath(options.searchIndexPath, index)

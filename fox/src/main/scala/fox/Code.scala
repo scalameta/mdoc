@@ -18,8 +18,7 @@ class Code(options: Options)(implicit index: Index) {
       path = Paths.get("metadoc").resolve("index.md"),
       title = "Browse sources",
       headers = Nil,
-      contents = "",
-      renderFile = false
+      contents = ""
     )
   }
 
@@ -28,8 +27,8 @@ class Code(options: Options)(implicit index: Index) {
   def api: List[Doc] = {
     val emptyXml: xml.Node = xml.Text("")
     val docs = List.newBuilder[Doc]
-    val headers = List.newBuilder[Header]
     index.packages.foreach { pkg =>
+      val headers = List.newBuilder[Header]
       val url = pkg.syntax
       def render(level: Int)(data: SymbolData): xml.Node = {
         val members = data.members { m =>
@@ -73,8 +72,8 @@ class Code(options: Options)(implicit index: Index) {
         !m.denotation.isPrivate
       }
       if (members.nonEmpty) {
-        val pkgObject: xml.Node = pkg.packageObject.fold(emptyXml)(render(1))
-        val content = xml.NodeSeq.fromSeq(pkgObject :: members.map(render(1)))
+        val pkgObject: xml.Node = pkg.packageObject.fold(emptyXml)(render(2))
+        val content = xml.NodeSeq.fromSeq(pkgObject :: members.map(render(2)))
         docs += Doc(
           Paths.get("api").resolve(s"$url.md"),
           url,

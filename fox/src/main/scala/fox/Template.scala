@@ -220,13 +220,17 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
         <div class="md-sidebar__inner">
           <nav class="md-nav md-nav--secondary">
             <label class="md-nav__title" for="toc">Table of contents</label>
-            <ul class="md-nav__list" data-md-scrollfix="">
-              {doc.headers.withFilter(_.level == 2).map(tocItem)}
-            </ul>
+            {tocItems(doc.headers)}
           </nav>
         </div>
       </div>
     </div>
+
+  def tocItems(headers: List[Header]): xml.NodeSeq = {
+    <ul class="md-nav__list" data-md-scrollfix="">
+      {doc.headers.withFilter(_.level == 2).map(tocItem)}
+    </ul>
+  }
 
   def tocItem(header: Header): xml.Elem =
     <li class="md-nav__item">
