@@ -161,7 +161,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </div>
     </body>
 
-  def sections(site: Site) =
+  def sections(site: Site): xml.Elem =
     <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" data-md-state="lock">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
@@ -185,18 +185,33 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
               </a>
             </div>
             <ul class="md-nav__list" data-md-scrollfix="">
-              {site.docs.map(doc =>
-              <li class="md-nav__item">
-                <a href={options.href(doc)} title={doc.title} class="md-nav__link">
-                  {doc.title}
-                </a>
-              </li>
-            )}
+              {site.docs.map(navItem)}
+              {navItem(site.sources)}
+              {collapsibleNavItem("API", site.api)}
             </ul>
           </nav>
         </div>
       </div>
     </div>
+
+  def collapsibleNavItem(header: String, docs: List[Doc]): xml.Elem =
+    <li class="md-nav__item--nested md-nav__item md-nav__item--active">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-api" type="checkbox" id="nav-api" checked=""/>
+      <label class="md-nav__link" for="nav-api">{header}</label>
+      <nav class="md-nav" data-md-component="collapsible" data-md-level="1" style="">
+        <label class="md-nav__title">{header}</label>
+        <ul class="md-nav__list" data-md-scrollfix="">
+          {docs.map(navItem)}
+        </ul>
+      </nav>
+    </li>
+
+  def navItem(doc: Doc): xml.Elem =
+    <li class="md-nav__item">
+      <a href={options.href(doc)} title={doc.title} class="md-nav__link">
+        {doc.title}
+      </a>
+    </li>
 
   def toc(doc: Doc): xml.Elem =
     <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" data-md-state="lock">

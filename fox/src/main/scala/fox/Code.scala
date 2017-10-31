@@ -11,21 +11,9 @@ import metadoc.cli.MetadocOptions
 import metadoc.{schema => d}
 import org.langmeta.internal.semanticdb.{schema => s}
 
-class Code(options: Options) {
-  def docs: List[Doc] = {
-    val runner = new MetadocRunner(
-      options.classpathPaths,
-      MetadocOptions(
-        target = Some(options.outPath.resolve("metadoc").toString),
-        cleanTargetFirst = false,
-        zip = false,
-        nonInteractive = true
-      )
-    )
-    sources :: api(runner.run())
-  }
+class Code(options: Options)(implicit index: Index) {
 
-  private def sources: Doc = {
+  def sources: Doc = {
     Doc(
       path = Paths.get("metadoc").resolve("index.md"),
       title = "Browse sources",
@@ -37,7 +25,7 @@ class Code(options: Options) {
 
   // NOTE(olafur) this is super hacky, everything below needs to be re-written
   // for better organization.
-  private def api(implicit index: Index): List[Doc] = {
+  def api: List[Doc] = {
     val emptyXml: xml.Node = xml.Text("")
     val docs = List.newBuilder[Doc]
     val headers = List.newBuilder[Header]
@@ -111,4 +99,18 @@ class Code(options: Options) {
     docs.result()
   }
 
+}
+object Code {
+  def apply(options: Options): Code = {
+    val runner = new MetadocRunner(
+      options.classpathPaths,
+      MetadocOptions(
+        target = Some(options.outPath.resolve("metadoc").toString),
+        cleanTargetFirst = false,
+        zip = false,
+        nonInteractive = true
+      )
+    )
+    new Code(options)(runner.run())
+  }
 }

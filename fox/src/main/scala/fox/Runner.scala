@@ -90,7 +90,7 @@ class Runner(
   }
 
   def handleSite(site: Site): Unit = {
-    site.docs.foreach { doc =>
+    site.all.foreach { doc =>
       val template = new Template(options, logger, doc, site)
       val html = template.html.toString()
       val source = options.resolveIn(doc.path)
@@ -159,8 +159,8 @@ class Runner(
             Nil
         }
       }
-      val code = new Code(options)
-      handleSite(Site(code.docs ::: docs.toList))
+      val code = Code(options)
+      handleSite(Site(docs.toList, code.sources, code.api))
       copyAssets()
     }
   }
