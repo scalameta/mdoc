@@ -13,6 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 package fox
 
 import fox.Markdown.Doc
+import fox.Markdown.Header
 import fox.Markdown.Site
 
 class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
@@ -220,18 +221,19 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
           <nav class="md-nav md-nav--secondary">
             <label class="md-nav__title" for="toc">Table of contents</label>
             <ul class="md-nav__list" data-md-scrollfix="">
-              {doc.headers.withFilter(_.level == 2).map(header =>
-              <li class="md-nav__item">
-                <a href={header.target} title="What to expect" class="md-nav__link" data-md-state="">
-                  {header.title}
-                </a>
-              </li>
-            )}
+              {doc.headers.withFilter(_.level == 2).map(tocItem)}
             </ul>
           </nav>
         </div>
       </div>
     </div>
+
+  def tocItem(header: Header): xml.Elem =
+    <li class="md-nav__item">
+      <a href={header.target} title="What to expect" class="md-nav__link" data-md-state="">
+        {header.title}
+      </a>
+    </li>
 
   val prev: xml.Elem = site.docs
     .sliding(2)
