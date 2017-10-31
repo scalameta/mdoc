@@ -3,6 +3,7 @@ package fox.code
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 import scala.collection.immutable
+import scala.collection.immutable.SortedSet
 import cats.kernel.Order
 import com.rklaehn.radixtree.Hash
 import com.rklaehn.radixtree.RadixTree
@@ -53,7 +54,7 @@ object Index {
     import scala.collection.JavaConverters._
 
     val packages: List[SymbolData] = {
-      val buf = List.newBuilder[SymbolData]
+      val buf = SortedSet.newBuilder[SymbolData](Ordering.by(_.syntax))
       denotations.asScala.foreach {
         case (m.Symbol(symbol: m.Symbol.Global), sdenot) =>
           val denot = mdenot(sdenot)
@@ -63,7 +64,7 @@ object Index {
           }
         case _ =>
       }
-      buf.result()
+      buf.result().toList
     }
 
     val table: SymbolTable = {

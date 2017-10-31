@@ -17,6 +17,14 @@ case class SymbolData(
     else if (denotation.isDef) s"${denotation.pretty}"
     else denotation.toString()
   }
+  def header: String = {
+    val prefix =
+      if (denotation.isObject) "Ⓞ "
+      else if (denotation.isTrait) "Ⓣ "
+      else if (denotation.isClass) "Ⓒ "
+      else ""
+    s"$prefix${denotation.name}"
+  }
   def syntax: String = syntax(Symbol.None)
   def syntax(prefix: Symbol): String = {
     val sb = new java.lang.StringBuilder()

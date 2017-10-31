@@ -43,7 +43,7 @@ class Code(options: Options)(implicit index: Index) {
         } else {
           // NOTE(olafur) this id will make overloaded methods conflict
           val id = data.syntax(pkg.symbol)
-          headers += Header(data.denotation.name, id, level, data.syntax)
+          headers += Header(data.header, id, level, data.syntax)
           val link = <a href={s"#$id"} class="headerlink">¶</a>
           val header =
             if (data.denotation.isClass ||
