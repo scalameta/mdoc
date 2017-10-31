@@ -29,8 +29,8 @@ lazy val fox = project
         val args = List(
           "",
           "--classpath",
-          "/Users/ollie/dev/syntax-experiments/target/v12/scalatags",
-//          cp,
+//          "/Users/ollie/dev/syntax-experiments/target/v12/scalatags",
+          cp,
           "--in",
           in.getAbsolutePath,
           "--clean-target",

@@ -61,6 +61,7 @@ class Code(options: Options)(implicit index: Index) {
               val signature =
                 if (data.denotation.isClass) {
                   // NOTE(olafur) this will get very large for big classes.
+                  // need to figure out line wrapping.
                   data
                     .members(_.denotation.isPrimaryCtor)
                     .headOption

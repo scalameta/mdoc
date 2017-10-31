@@ -26,7 +26,8 @@ object Index {
   def apply(
       files: ConcurrentHashMap[String, m.Input.VirtualFile],
       symbols: ConcurrentHashMap[String, AtomicReference[d.SymbolIndex]],
-      denotations: ConcurrentHashMap[String, s.Denotation]
+      denotations: ConcurrentHashMap[String, s.Denotation],
+      docstrings: ConcurrentHashMap[String, String]
   ): Index = {
     object R {
       def unapply[T](arg: AtomicReference[T]): Option[T] =
@@ -71,9 +72,11 @@ object Index {
       val reducer = Reducer[SymbolTable](_ merge _)
       symbols.asScala.foreach {
         case (
-            S(symbol: m.Symbol.Global, denot),
+            symbolSyntax @ S(symbol: m.Symbol.Global, denot),
             R(SymbolIndex(_, Some(P(defn)), _))
             ) =>
+          val docstring = Option(docstrings.get(symbolSyntax))
+          pprint.log(docstring)
           reducer.apply(
             RadixTree.singleton(
               symbol.toKey,
@@ -81,7 +84,7 @@ object Index {
                 symbol = symbol,
                 definition = defn,
                 denotation = denot,
-                None
+                docstring = docstring
               )
             )
           )

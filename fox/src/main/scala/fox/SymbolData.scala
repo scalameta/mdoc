@@ -8,7 +8,7 @@ case class SymbolData(
     symbol: Symbol.Global,
     definition: Position,
     denotation: Denotation,
-    docstring: Option[Token.Comment]
+    docstring: Option[String]
 ) {
   override def toString: String = syntax
   def signature(implicit index: Index): String = {

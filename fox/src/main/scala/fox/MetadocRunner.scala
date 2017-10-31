@@ -22,6 +22,7 @@ import java.util.zip.ZipInputStream
 import scala.collection.parallel.mutable.ParArray
 import scala.collection.GenSeq
 import scala.collection.concurrent
+import scala.meta.tokens.Tokens
 import scala.util.control.NonFatal
 import caseapp._
 import fox.code.Index
@@ -64,6 +65,8 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
   private val filenames = new ConcurrentSkipListSet[String]()
   private val symbols =
     new ConcurrentHashMap[Symbol, AtomicReference[d.SymbolIndex]]()
+  private val docstrings =
+    new ConcurrentHashMap[Symbol, String]()
   private val denotations =
     new ConcurrentHashMap[Symbol, s.Denotation]()
   private val files =
@@ -152,12 +155,27 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           val bytes = path.readAllBytes
           val db = s.Database.parseFrom(bytes)
           db.documents.foreach { document =>
+            val input = Input.VirtualFile(document.filename, document.contents)
+            val tokens: Map[Int, String] = {
+              import scala.meta._
+              val buffer = Map.newBuilder[Int, String]
+              input.tokenize.get.collect {
+                case t: Token.Comment if t.syntax.startsWith("/**") =>
+                  buffer += (t.pos.endLine -> t.syntax)
+              }
+              buffer.result()
+            }
             document.names.foreach {
               case s.ResolvedName(_, sym, _)
                   if !sym.endsWith(".") && !sym.endsWith("#") =>
               // Do nothing, local symbol.
               case s.ResolvedName(Some(s.Position(start, end)), sym, true) =>
                 addDefinition(sym, d.Position(document.filename, start, end))
+                // TODO(olafur) come up with more robust way to associate comments
+                // with symbols.
+                tokens
+                  .get(m.Position.Range(input, start, end).startLine - 1)
+                  .foreach(docstring => docstrings.put(sym, docstring))
               case s.ResolvedName(Some(s.Position(start, end)), sym, false) =>
                 addReference(document.filename, d.Range(start, end), sym)
               case _ =>
@@ -295,7 +313,7 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       writeSymbolIndex()
       writeAssets()
       writeWorkspace()
-      Index(files, symbols, denotations)
+      Index(files, symbols, denotations, docstrings)
     } finally {
       display.stop()
       onClose()
