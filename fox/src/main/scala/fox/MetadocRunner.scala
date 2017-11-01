@@ -156,47 +156,11 @@ class MetadocRunner(
     }
 
   private def renderDocstring(t: Token.Comment): Option[String] = {
-    if (fox.renderDocstringsAsMarkdown) renderDocstringAsMarkdown(t)
-    else renderDocstringAsHtml(t)
-  }
-  private def renderDocstringAsMarkdown(t: Token.Comment): Option[String] = {
     val md =
       t.syntax.lines.map(_.replaceFirst(" */?\\*\\*?/?", "")).mkString("\n")
     val html = Markdown.toHtml(md)
     if (html.isEmpty) None
     else Some(html)
-  }
-  private def renderDocstringAsHtml(t: Token.Comment): Option[String] = {
-    // NOTE(olafur) ScaladocParser.DocToken is a mess, we need to reimplement it.
-    // to make this much much easier.
-    import scala.meta.contrib._
-    import DocToken._
-    def r(d: DocToken) = <p>{d.name.getOrElse("")}{d.body.getOrElse("")}</p>
-    val html = ScaladocParser.parseScaladoc(t).getOrElse(Nil).map {
-      case DocToken(Heading1, Some(name), _) =>
-        <h1>{name}</h1>
-      case DocToken(Heading2, Some(name), _) =>
-        <h2>{name}</h2>
-      case DocToken(Heading3, Some(name), _) =>
-        <h3>{name}</h3>
-      case DocToken(Heading4, Some(name), _) =>
-        <h4>{name}</h4>
-      case DocToken(Heading5, Some(name), _) =>
-        <h5>{name}</h5>
-      case DocToken(Heading6, Some(name), _) =>
-        <h6>{name}</h6>
-      case d @ DocToken(Description, _, _) => r(d)
-      case d @ DocToken(Paragraph, _, _) => r(d)
-      case DocToken(CodeBlock, _, Some(body)) =>
-        <pre class="prettyprint" style="">
-          <code class="language-scala">{body}</code>
-        </pre>
-      case d: DocToken =>
-        <p>UNKNOWN: {d.toString}</p>
-    }
-    val result = xml.NodeSeq.fromSeq(html).toString()
-    if (result.isEmpty) None
-    else Some(result)
   }
 
   def buildSymbolIndex(paths: GenSeq[AbsolutePath]): Unit =
