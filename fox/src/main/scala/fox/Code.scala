@@ -45,13 +45,13 @@ class Code(options: Options)(implicit index: Index) {
         } else {
           // NOTE(olafur) this id will make overloaded methods conflict
           val id = data.syntax(pkg.symbol)
-          headers += Header(data.header, id, level, data.syntax)
+          headers += Header(data.header, id, level, data.docstring.getOrElse(""))
           val link = <a href={s"#$id"} class="headerlink">¶</a>
           val source = data.definition match {
             case pos @ m.Position.Range(m.Input.VirtualFile(path, _), _, _) =>
               val link =
                 s"${options.baseUrl}/metadoc/#/$path#L${pos.startLine + 1}"
-              <a href={link} class="fa fa-code" style="float: right"></a>
+              <a href={link} class="fa fa-code" target="_blank" style="float: right"></a>
             case _ => emptyXml
           }
           val header =
@@ -84,6 +84,7 @@ class Code(options: Options)(implicit index: Index) {
 
           <div>
             {header}
+            {data.docstring.map(xml.Unparsed(_)).orNull}
             {children}
           </div>
         }
@@ -129,7 +130,8 @@ object Code {
         cleanTargetFirst = false,
         zip = false,
         nonInteractive = true
-      )
+      ),
+      options
     )
     new Code(options)(runner.run())
   }

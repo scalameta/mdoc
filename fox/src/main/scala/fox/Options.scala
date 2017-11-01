@@ -48,6 +48,7 @@ case class Options(
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
     baseUrl: String = "",
+    renderDocstringsAsMarkdown: Boolean = true,
     encoding: String = "UTF-8"
 ) {
 

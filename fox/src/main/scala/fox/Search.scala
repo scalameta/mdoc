@@ -7,7 +7,7 @@ import fox.Markdown.Site
 object Search {
   def index(options: Options, site: Site): String = {
     val sections = for {
-      doc <- site.docs
+      doc <- site.all
       header <- doc.headers
     } yield {
       val location = options.href(doc, withBase = false) + header.target
@@ -18,7 +18,8 @@ object Search {
           Nil
       Json.fromFields(section)
     }
-    val docs = JsonObject.singleton("docs", Json.fromValues(sections))
+    val docs =
+      JsonObject.singleton("docs", Json.fromValues(sections.toIterable))
     Json.fromJsonObject(docs).noSpaces
   }
 }

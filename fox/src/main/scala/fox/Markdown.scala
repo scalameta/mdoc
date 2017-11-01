@@ -107,7 +107,8 @@ object Markdown {
   def default: MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     val options = new MutableDataSet()
-    options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+    // Don't want soft breaks.
+//    options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
     import scala.collection.JavaConverters._
     options.set(
       Parser.EXTENSIONS,

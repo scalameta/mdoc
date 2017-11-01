@@ -15,6 +15,7 @@ import org.langmeta.internal.semanticdb.{schema => s}
 import org.langmeta.semanticdb.Signature
 import org.{langmeta => m}
 import com.rklaehn.radixtree.RadixTreeInternal._
+import org.scalameta.logger
 
 case class Index(
     table: SymbolTable,
@@ -76,7 +77,7 @@ object Index {
             R(SymbolIndex(_, Some(P(defn)), _))
             ) =>
           val docstring = Option(docstrings.get(symbolSyntax))
-          pprint.log(docstring)
+//          logger.elem(docstring, symbolSyntax)
           reducer.apply(
             RadixTree.singleton(
               symbol.toKey,

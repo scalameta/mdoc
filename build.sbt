@@ -63,6 +63,7 @@ lazy val fox = project
       "io.circe" %% "circe-core" % "0.8.0",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
       "org.scalameta" %% "scalameta" % "2.0.1",
+      "org.scalameta" %% "contrib" % "2.0.1",
       "org.scalameta" %% "metadoc-cli" % "0.1.0",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "org.tpolecat" %% "tut-core" % "0.5.5",

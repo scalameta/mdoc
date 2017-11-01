@@ -22,6 +22,10 @@ import java.util.zip.ZipInputStream
 import scala.collection.parallel.mutable.ParArray
 import scala.collection.GenSeq
 import scala.collection.concurrent
+import scala.meta.contrib.DocToken
+import scala.meta.contrib.DocToken.Heading1
+import scala.meta.contrib.ScaladocParser
+import scala.meta.tokens.Token
 import scala.meta.tokens.Tokens
 import scala.util.control.NonFatal
 import caseapp._
@@ -38,7 +42,11 @@ import org.{langmeta => m}
 
 case class Target(target: AbsolutePath, onClose: () => Unit)
 
-class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
+class MetadocRunner(
+    classpath: Seq[AbsolutePath],
+    options: MetadocOptions,
+    fox: Options
+) {
   val Target(target, onClose) = if (options.zip) {
     // For large corpora (>1M LOC) writing the symbol/ directory is the
     // bottle-neck unless --zip is enabled.
@@ -147,6 +155,50 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
       files.result()
     }
 
+  private def renderDocstring(t: Token.Comment): Option[String] = {
+    if (fox.renderDocstringsAsMarkdown) renderDocstringAsMarkdown(t)
+    else renderDocstringAsHtml(t)
+  }
+  private def renderDocstringAsMarkdown(t: Token.Comment): Option[String] = {
+    val md =
+      t.syntax.lines.map(_.replaceFirst(" */?\\*\\*?/?", "")).mkString("\n")
+    val html = Markdown.toHtml(md)
+    if (html.isEmpty) None
+    else Some(html)
+  }
+  private def renderDocstringAsHtml(t: Token.Comment): Option[String] = {
+    // NOTE(olafur) ScaladocParser.DocToken is a mess, we need to reimplement it.
+    // to make this much much easier.
+    import scala.meta.contrib._
+    import DocToken._
+    def r(d: DocToken) = <p>{d.name.getOrElse("")}{d.body.getOrElse("")}</p>
+    val html = ScaladocParser.parseScaladoc(t).getOrElse(Nil).map {
+      case DocToken(Heading1, Some(name), _) =>
+        <h1>{name}</h1>
+      case DocToken(Heading2, Some(name), _) =>
+        <h2>{name}</h2>
+      case DocToken(Heading3, Some(name), _) =>
+        <h3>{name}</h3>
+      case DocToken(Heading4, Some(name), _) =>
+        <h4>{name}</h4>
+      case DocToken(Heading5, Some(name), _) =>
+        <h5>{name}</h5>
+      case DocToken(Heading6, Some(name), _) =>
+        <h6>{name}</h6>
+      case d @ DocToken(Description, _, _) => r(d)
+      case d @ DocToken(Paragraph, _, _) => r(d)
+      case DocToken(CodeBlock, _, Some(body)) =>
+        <pre class="prettyprint" style="">
+          <code class="language-scala">{body}</code>
+        </pre>
+      case d: DocToken =>
+        <p>UNKNOWN: {d.toString}</p>
+    }
+    val result = xml.NodeSeq.fromSeq(html).toString()
+    if (result.isEmpty) None
+    else Some(result)
+  }
+
   def buildSymbolIndex(paths: GenSeq[AbsolutePath]): Unit =
     phase("Building symbol index", paths.length) { tick =>
       paths.foreach { path =>
@@ -156,26 +208,32 @@ class MetadocRunner(classpath: Seq[AbsolutePath], options: MetadocOptions) {
           val db = s.Database.parseFrom(bytes)
           db.documents.foreach { document =>
             val input = Input.VirtualFile(document.filename, document.contents)
-            val tokens: Map[Int, String] = {
+            val tokens: Iterator[Token] = {
               import scala.meta._
-              val buffer = Map.newBuilder[Int, String]
-              input.tokenize.get.collect {
-                case t: Token.Comment if t.syntax.startsWith("/**") =>
-                  buffer += (t.pos.endLine -> t.syntax)
-              }
-              buffer.result()
+              input.tokenize.get.toIterator
             }
-            document.names.foreach {
+            def docstring(start: Int): Option[String] = {
+              tokens
+                .collectFirst {
+                  case t: Token.Comment if t.syntax.startsWith("/**") =>
+                    Right(t)
+                  case t: Token if t.pos.start >= start => Left(t)
+                }
+                .flatMap {
+                  case Right(t) => renderDocstring(t)
+                  case _ => None
+                }
+            }
+            def byPosition(n: s.ResolvedName) = n.position.fold(-1)(_.start)
+            document.names.sortBy(byPosition).foreach {
               case s.ResolvedName(_, sym, _)
                   if !sym.endsWith(".") && !sym.endsWith("#") =>
               // Do nothing, local symbol.
               case s.ResolvedName(Some(s.Position(start, end)), sym, true) =>
                 addDefinition(sym, d.Position(document.filename, start, end))
-                // TODO(olafur) come up with more robust way to associate comments
-                // with symbols.
-                tokens
-                  .get(m.Position.Range(input, start, end).startLine - 1)
-                  .foreach(docstring => docstrings.put(sym, docstring))
+                docstring(start).foreach { d =>
+                  docstrings.putIfAbsent(sym, d)
+                }
               case s.ResolvedName(Some(s.Position(start, end)), sym, false) =>
                 addReference(document.filename, d.Range(start, end), sym)
               case _ =>
