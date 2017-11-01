@@ -4,6 +4,7 @@ import scala.language.dynamics
 
 import java.nio.file.Path
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.reflect.ClassTag
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Heading
@@ -20,7 +21,14 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 
 object Markdown {
-  case class Site(docs: List[Doc])
+  case class Site(docs: List[Doc], sources: Doc, api: List[Doc]) {
+    def all: Traversable[Doc] = new Traversable[Doc] {
+      override def foreach[U](f: Doc => U): Unit = {
+        docs.foreach(f)
+        api.foreach(f)
+      }
+    }
+  }
   case class Doc(
       path: Path,
       title: String,
@@ -84,7 +92,7 @@ object Markdown {
   }
 
   def toHtml(markdown: BasedSequence): String = {
-    val s = new java.lang.StringBuilder( )
+    val s = new java.lang.StringBuilder()
     markdown.appendTo(s)
     val settings = default
     val parser = Parser.builder(settings).build
@@ -96,11 +104,11 @@ object Markdown {
     toHtml(CharSubSequence.of(markdown))
   }
 
-
   def default: MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     val options = new MutableDataSet()
-    options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+    // Don't want soft breaks.
+//    options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
     import scala.collection.JavaConverters._
     options.set(
       Parser.EXTENSIONS,

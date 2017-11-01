@@ -9,11 +9,11 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-*/
+ */
 package fox
 
-import scala.xml.Elem
 import fox.Markdown.Doc
+import fox.Markdown.Header
 import fox.Markdown.Site
 
 class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
@@ -25,6 +25,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       <script>app.initialize({{url:{{base:'{options.baseUrl}'}}}})</script>
       <script type="text/javascript" src={options.lib("prettify/prettify.js")}></script>
       <script type="text/javascript" src={options.lib("prettify/lang-scala.js")}></script>
+      <script type="text/javascript" src={options.asset("javascripts/custom.js")}></script>
       <script type="text/javascript">{xml.Unparsed(initPrettify)}</script>
       {googleAnalytics}
     </html>
@@ -38,7 +39,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </defs>
   </svg>
 
-  def head: Elem = <head>
+  def head: xml.Elem = <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
@@ -161,7 +162,7 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
     </div>
     </body>
 
-  def sections(site: Site) =
+  def sections(site: Site): xml.Elem =
     <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" data-md-state="lock">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
@@ -185,38 +186,58 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
               </a>
             </div>
             <ul class="md-nav__list" data-md-scrollfix="">
-              {site.docs.map(doc =>
-              <li class="md-nav__item">
-                <a href={options.href(doc)} title={doc.title} class="md-nav__link">
-                  {doc.title}
-                </a>
-              </li>
-            )}
+              {site.docs.map(navItem)}
+              {navItem(site.sources)}
+              {collapsibleNavItem("API", site.api)}
             </ul>
           </nav>
         </div>
       </div>
     </div>
 
-  def toc(doc: Doc): Elem =
+  def collapsibleNavItem(header: String, docs: List[Doc]): xml.Elem =
+    <li class="md-nav__item--nested md-nav__item md-nav__item--active">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-api" type="checkbox" id="nav-api" checked=""/>
+      <label class="md-nav__link" for="nav-api">{header}</label>
+      <nav class="md-nav" data-md-component="collapsible" data-md-level="1" style="">
+        <label class="md-nav__title">{header}</label>
+        <ul class="md-nav__list" data-md-scrollfix="">
+          {docs.map(navItem)}
+        </ul>
+      </nav>
+    </li>
+
+  def navItem(doc: Doc): xml.Elem =
+    <li class="md-nav__item">
+      <a href={options.href(doc)} title={doc.title} class="md-nav__link">
+        {doc.title}
+      </a>
+    </li>
+
+  def toc(doc: Doc): xml.Elem =
     <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" data-md-state="lock">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
           <nav class="md-nav md-nav--secondary">
             <label class="md-nav__title" for="toc">Table of contents</label>
-            <ul class="md-nav__list" data-md-scrollfix="">
-              {doc.headers.withFilter(_.level == 2).map(header =>
-              <li class="md-nav__item">
-                <a href={header.target} title="What to expect" class="md-nav__link" data-md-state="">
-                  {header.title}
-                </a>
-              </li>
-            )}
-            </ul>
+            {tocItems(doc.headers)}
           </nav>
         </div>
       </div>
     </div>
+
+  def tocItems(headers: List[Header]): xml.NodeSeq = {
+    <ul class="md-nav__list" data-md-scrollfix="">
+      {doc.headers.withFilter(_.level == 2).map(tocItem)}
+    </ul>
+  }
+
+  def tocItem(header: Header): xml.Elem =
+    <li class="md-nav__item">
+      <a href={header.target} title="What to expect" class="md-nav__link" data-md-state="">
+        {header.title}
+      </a>
+    </li>
 
   val prev: xml.Elem = site.docs
     .sliding(2)
@@ -274,8 +295,8 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
             </div>
           </div>
           <div class="md-footer-social">
-            <!--
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+            <!--
             <a href="http://struct.cc" class="md-footer-social__link fa fa-globe"></a>
             <a href="https://github.com/squidfunk" class="md-footer-social__link fa fa-github-alt"></a>
             <a href="https://twitter.com/squidfunk" class="md-footer-social__link fa fa-twitter"></a>
@@ -286,11 +307,9 @@ class Template(options: Options, logger: Logger, doc: Doc, site: Site) {
       </div>
     </footer>
 
-  val initPrettify =
+  val initPrettify: String =
     """
       |document.addEventListener("DOMContentLoaded", function(event) {
-      |  console.log("Prettify!!!");
-      |  console.log(window.prettyPrint);
       |  window.prettyPrint && window.prettyPrint();
       |});
       |

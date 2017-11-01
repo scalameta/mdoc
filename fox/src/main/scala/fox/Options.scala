@@ -14,6 +14,9 @@ import fox.Enrichments._
 import fox.Markdown.Doc
 import fox.Markdown.Header
 import fox.Markdown.Site
+import org.langmeta.inputs.Position
+import org.langmeta.io.AbsolutePath
+import org.langmeta.io.Classpath
 
 object Enrichments {
   implicit class XtensionPathUrl(val path: Path) extends AnyVal {
@@ -45,6 +48,7 @@ case class Options(
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
     baseUrl: String = "",
+    renderDocstringsAsMarkdown: Boolean = true,
     encoding: String = "UTF-8"
 ) {
 
@@ -81,6 +85,8 @@ case class Options(
     }
   }
   def pretty(path: Path): String = cwdPath.relativize(path).toString
+  lazy val classpathPaths: List[AbsolutePath] =
+    classpath.flatMap(_.split(File.pathSeparator).map(AbsolutePath(_)))
   lazy val cwdPath: Path = Paths.get(cwd).toAbsolutePath.normalize()
   lazy val inPath: Path = Paths.get(in).toAbsolutePath.normalize()
   lazy val outPath: Path = Paths.get(out).toAbsolutePath.normalize()

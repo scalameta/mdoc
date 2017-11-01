@@ -90,7 +90,7 @@ class Runner(
   }
 
   def handleSite(site: Site): Unit = {
-    site.docs.foreach { doc =>
+    site.all.foreach { doc =>
       val template = new Template(options, logger, doc, site)
       val html = template.html.toString()
       val source = options.resolveIn(doc.path)
@@ -110,6 +110,7 @@ class Runner(
     val paths = List[RelPath](
       "assets" / "images" / "favicon.png",
       "assets" / "javascripts" / "application-268d62d82d.js",
+      "assets" / "javascripts" / "custom.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.da.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.de.js",
 //      "assets" / "javascripts" / "lunr" / "lunr.du.js",
@@ -156,7 +157,8 @@ class Runner(
             Nil
         }
       }
-      handleSite(Site(docs.toList))
+      val code = Code(options)
+      handleSite(Site(docs.toList, code.sources, code.api))
       copyAssets()
     }
   }
