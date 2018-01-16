@@ -50,24 +50,12 @@ object Markdown {
     }
   }
 
-  // If you can figure out how to fix errors like here below than we can remove
-  // this unary_! hack:
-  // [error] [E1] fox/src/main/scala/fox/Markdown.scala
-  // [error]      type mismatch;
-  // [error]       found   : Class[_$1] where type _$1
-  // [error]       required: Class[_ <: T]
-  // [error]      L48:    new NodeVisitor(new VisitHandler[T](ev.runtimeClass, new Visitor[T] {
-  // [error]      L48:                                           ^
-  // [error] fox/src/main/scala/fox/Markdown.scala: L48 [E1]
-  private implicit class XtensionBang[A](val a: A) extends AnyVal {
-    def unary_![B]: B = a.asInstanceOf[B]
-  }
-
   def traverse[T <: Node](
       node: Node
   )(f: PartialFunction[T, Unit])(implicit ev: ClassTag[T]): Unit = {
     val lifted = f.lift
-    new NodeVisitor(new VisitHandler[T](!ev.runtimeClass, new Visitor[T] {
+    val clazz = ev.runtimeClass.asInstanceOf[Class[T]]
+    new NodeVisitor(new VisitHandler[T](clazz, new Visitor[T] {
       override def visit(node: T): Unit = lifted.apply(node)
     })).visit(node)
   }
