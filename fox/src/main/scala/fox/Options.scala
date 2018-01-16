@@ -45,11 +45,14 @@ case class Options(
     classpath: List[String] = Options.defaultClasspath,
     cleanTarget: Boolean = false,
     baseUrl: String = "",
-    encoding: String = "UTF-8"
+    encoding: String = "UTF-8",
+    configPath: String = Paths.get("fox.conf").toString
 ) {
 
   private val indexMd = Paths.get("index.md")
   private val indexHtml = Paths.get("index.html")
+
+  lazy val config: Config = Config.from(Paths.get(configPath))
 
   def asset(path: String) = s"$baseUrl/assets/$path"
   def lib(path: String) = s"$baseUrl/lib/$path"

@@ -33,7 +33,9 @@ lazy val fox = project
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "com.lihaoyi" %% "pprint" % "0.5.2",
       "com.lihaoyi" %% "ammonite-ops" % "1.0.3",
-      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3"
+      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
+      "io.circe" %% "circe-config" % "0.3.0",
+      "io.circe" %% "circe-generic" % "0.8.0"
     ),
     libraryDependencies ++= List(
       "org.webjars.npm" % "lunr" % "2.1.0" % Provided,
