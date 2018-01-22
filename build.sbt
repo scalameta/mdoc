@@ -17,7 +17,8 @@ lazy val fox = project
       "org.tpolecat" %% "tut-core" % "0.5.5",
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "com.lihaoyi" %% "pprint" % "0.5.2",
-      "com.lihaoyi" %% "ammonite-ops" % "1.0.3",
+      "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
+      ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full),
       "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
       "io.circe" %% "circe-config" % "0.3.0",
       "io.circe" %% "circe-generic" % "0.8.0"
