@@ -6,22 +6,21 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import scala.collection.GenSeq
-import scala.util.control.NonFatal
+
 import fox.Markdown._
 import com.vladsch.flexmark.ast.Heading
-import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 
-class Runner(
+final class Runner(
     options: Options,
     mdSettings: MutableDataSet,
     logger: Logger
 ) {
-  private val parser = Parser.builder(mdSettings).build
-  private val renderer = HtmlRenderer.builder(mdSettings).build
-  def collectInputPaths: GenSeq[Path] = {
+  private final val parser = Parser.builder(mdSettings).build
+  private final val formatter = Formatter.builder(mdSettings).build
+  def collectInputPaths: List[Path] = {
     val paths = List.newBuilder[Path]
     Files.walkFileTree(
       options.inPath,
@@ -68,81 +67,29 @@ class Runner(
     "site.version" -> "1.0.0"
   )
 
-  def handlePath(path: Path): Doc = {
+  import scala.util.Try
+  def handlePath(path: Path): Try[Doc] = Try {
     val source = options.resolveIn(path)
     val compiled = TutCompiler.compile(source, options)
-    val md = parser.parse(compiled)
-    val html = renderer.render(md)
-    val headers = collect[Heading, Header](md) { case h => Header(h) }
+    val ast = parser.parse(compiled)
+    val md = formatter.render(ast)
+    val headers = collect[Heading, Header](ast) { case h => Header(h) }
     val title = headers
       .find(_.level == 1)
       .getOrElse(sys.error(s"Missing h1 for page $path"))
       .title
-    Doc(path, title, headers, html)
-  }
-
-  class FileError(path: Path, cause: Throwable)
-      extends Exception(path.toString) {
-    override def getStackTrace: Array[StackTraceElement] = Array.empty
-    override def getCause: Throwable = cause
+    Doc(path, title, headers, md)
   }
 
   def writePath(path: Path, string: String): Unit = {
     Files.createDirectories(path.getParent)
     Files.write(path, string.getBytes(options.charset))
-
   }
 
-  def handleSite(site: Site): Unit = {
-    site.docs.foreach { doc =>
-      val template = new Template(options, logger, doc, site)
-      val html = template.html.toString()
-      val source = options.resolveIn(doc.path)
-      val target = options.resolveOut(doc.path)
-      writePath(target, html)
-      logger.info(
-        s"Compiled ${options.pretty(source)} => ${options.pretty(target)}"
-      )
-    }
-    val index = Search.index(options, site)
-    writePath(options.searchIndexPath, index)
-  }
-
-  def copyAssets(): Unit = {
-    import ammonite.ops._
-    import ammonite.ops.Path
-    val paths = List[RelPath](
-      "assets" / "images" / "favicon.png",
-      "assets" / "javascripts" / "application-268d62d82d.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.da.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.de.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.du.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.es.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.fi.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.fr.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.hu.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.it.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.jp.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.multi.js",
-//      "assets" / "javascripts" / "lunr" / "lunr.stemmer.support.js",
-//      "assets" / "javascripts" / "lunr" / "tinyseg.js",
-//      "assets" / "javascripts" / "paradox-material-theme.js",
-      "assets" / "stylesheets" / "application-04ea671600.css",
-      "assets" / "stylesheets" / "application-23f75ab9c7.palette.css",
-      "assets" / "stylesheets" / "paradox-material-theme.css",
-      "lib" / "material__tabs" / "dist" / "mdc.tabs.min.css",
-      "lib" / "modernizr" / "modernizr.min.js",
-      "lib" / "prettify" / "lang-scala.js",
-      "lib" / "prettify" / "prettify.css",
-      "lib" / "prettify" / "prettify.js"
-    )
-    paths.foreach { path =>
-      val appjs = resource / path
-      val x = read.bytes(appjs)
-      val out = Path(options.outPath) / path
-//      pprint.log(out)
-      write.over(out, x)
-    }
+  private class FileError(path: Path, cause: Throwable)
+    extends Exception(path.toString) {
+    override def getStackTrace: Array[StackTraceElement] = Array.empty
+    override def getCause: Throwable = cause
   }
 
   def run(): Unit = {
@@ -151,17 +98,20 @@ class Runner(
     if (paths.isEmpty) {
       logger.error(s"${options.inPath} contains no .md files!")
     } else {
+      import scala.util.{Success, Failure}
       val docs = paths.flatMap { path =>
-        try {
-          handlePath(path) :: Nil
-        } catch {
-          case NonFatal(e) =>
-            new FileError(path, e).printStackTrace()
-            Nil
+        handlePath(path) match {
+          case Success(doc) => doc :: Nil
+          case Failure(t) => new FileError(path, t).printStackTrace(); Nil
         }
       }
-      handleSite(Site(docs.toList))
-      copyAssets()
+
+      docs.foreach { doc =>
+        val source = options.resolveIn(doc.path)
+        val target = options.resolveOut(doc.path)
+        writePath(target, doc.contents)
+        logger.info(s"Markdown file ${target} has been generated.")
+      }
     }
   }
 }

@@ -49,9 +49,7 @@ case class Options(
     configPath: String = Paths.get("fox.conf").toString
 ) {
 
-  private val indexMd = Paths.get("index.md")
-  private val indexHtml = Paths.get("index.html")
-
+  private final val indexMd = Paths.get("index.md")
   lazy val config: Config = Config.from(Paths.get(configPath))
 
   def asset(path: String) = s"$baseUrl/assets/$path"
@@ -67,23 +65,27 @@ case class Options(
       s"$base/${doc.path.toString}".stripSuffix(".md")
     }
   }
+
   def charset: Charset = Charset.forName(encoding)
   def resolveIn(relpath: Path): Path = {
     require(!relpath.isAbsolute)
     inPath.resolve(relpath)
   }
+
+  // We may want to change the way the layout is resolved.
   def resolveOut(relpath: Path): Path = {
     require(!relpath.isAbsolute)
     val base = outPath.resolve(relpath)
     if (relpath.endsWith(indexMd)) {
       // foo/specimen.md => foo/index.html
-      base.resolveSibling(indexHtml)
+      base.resolveSibling(indexMd)
     } else {
-      // foo/bar.md => foo/bar/index.html
-      outPath.resolve(relpath).stripSuffix(".md").resolve(indexHtml)
+      // foo/bar/something.md => foo/bar/index.html
+      outPath.resolve(relpath).stripSuffix(".md").resolve(indexMd)
     }
   }
-  def pretty(path: Path): String = cwdPath.relativize(path).toString
+
+  def prettyPath(path: Path): String = cwdPath.relativize(path).toString
   lazy val cwdPath: Path = Paths.get(cwd).toAbsolutePath.normalize()
   lazy val inPath: Path = Paths.get(in).toAbsolutePath.normalize()
   lazy val outPath: Path = Paths.get(out).toAbsolutePath.normalize()
