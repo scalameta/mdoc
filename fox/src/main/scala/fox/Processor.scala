@@ -9,7 +9,7 @@ import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 
-final class Runner(
+final class Processor(
     options: Options,
     mdSettings: MutableDataSet,
     logger: Logger
