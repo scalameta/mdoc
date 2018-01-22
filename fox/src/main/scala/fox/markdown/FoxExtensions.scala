@@ -9,6 +9,7 @@ import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
 import com.vladsch.flexmark.ext.tables.TablesExtension
 
 object FoxExtensions {
+  // Should we try to emulate CommonMark for pandoc parsing? https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/samples/FormatConverterCommonMark.java#L24-L39
   def default(options: Options): java.lang.Iterable[Extension] = {
     import scala.collection.JavaConverters._
     List(
