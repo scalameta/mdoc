@@ -70,7 +70,7 @@ final class Runner(
   import scala.util.Try
   def handlePath(path: Path): Try[Doc] = Try {
     val source = options.resolveIn(path)
-    val compiled = TutCompiler.compile(source, options)
+    val compiled = Repl.compile(source, options)
     val ast = parser.parse(compiled)
     val md = formatter.render(ast)
     val headers = collect[Heading, Header](ast) { case h => Header(h) }

@@ -13,11 +13,10 @@ import scala.tools.nsc.interpreter.IMain
 import tut.Zed._
 import tut._
 
-object TutCompiler {
-
+object Repl {
   def compile(source: Path, options: Options): String = {
     val sw = new ByteArrayOutputStream()
-    val io = TutCompiler.tut(
+    val io = Repl.tut(
       source.toFile,
       new PrintStream(sw),
       options.classpath,
