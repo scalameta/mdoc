@@ -17,10 +17,6 @@ final class Runner(
   private final val parser = Parser.builder(mdSettings).build
   private final val formatter = Formatter.builder(mdSettings).build
 
-  val siteVariables = Map(
-    "site.version" -> "1.0.0"
-  )
-
   import scala.util.Try
   def handlePath(path: Path): Try[Doc] = Try {
     val source = options.resolveIn(path)
