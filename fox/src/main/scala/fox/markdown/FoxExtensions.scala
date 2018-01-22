@@ -1,6 +1,7 @@
 package fox.markdown
 
 import fox.Options
+
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.ext.emoji.EmojiExtension
@@ -15,6 +16,7 @@ object FoxExtensions {
     List(
       AutolinkExtension.create(),
       FoxParserExtension.create(options),
+      FoxFormatterExtension.create(options),
       TablesExtension.create(),
       EmojiExtension.create(),
       FootnoteExtension.create(),

@@ -53,7 +53,8 @@ class FoxParserExtension(options: Options) extends Parser.ParserExtension {
 
   override def extend(parserBuilder: Parser.Builder): Unit = {
     parserBuilder.linkRefProcessorFactory(new SiteVariableInjectorFactory)
-    parserBuilder.postProcessorFactory(new markdown.FoxNodePostProcessor.Factory)
+    parserBuilder.postProcessorFactory(new processors.FoxNodePostProcessor.Factory)
+    parserBuilder.postProcessorFactory(new processors.AmmonitePostProcessor.Factory(options))
   }
   override def parserOptions(options: MutableDataHolder): Unit = ()
 }

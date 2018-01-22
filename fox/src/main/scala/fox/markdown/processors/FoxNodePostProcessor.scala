@@ -1,10 +1,11 @@
-package fox.markdown
+package fox.markdown.processors
 
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.{Heading, Node}
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.block.{NodePostProcessor, NodePostProcessorFactory}
 import com.vladsch.flexmark.util.NodeTracker
+import fox.markdown.FoxHelpers
 
 class FoxNodePostProcessor extends NodePostProcessor {
   import FoxHelpers.stringToCharSequence
