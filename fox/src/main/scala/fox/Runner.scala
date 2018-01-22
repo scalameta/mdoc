@@ -1,11 +1,7 @@
 package fox
 
-import java.io.IOException
-import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
 
 import fox.Markdown._
 import com.vladsch.flexmark.ast.Heading
@@ -20,48 +16,6 @@ final class Runner(
 ) {
   private final val parser = Parser.builder(mdSettings).build
   private final val formatter = Formatter.builder(mdSettings).build
-  def collectInputPaths: List[Path] = {
-    val paths = List.newBuilder[Path]
-    Files.walkFileTree(
-      options.inPath,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(
-            file: Path,
-            attrs: BasicFileAttributes
-        ): FileVisitResult = {
-          if (Files.isRegularFile(file)
-            && file.getFileName.toString.endsWith(".md")) {
-            paths += options.inPath.relativize(file)
-          }
-          FileVisitResult.CONTINUE
-        }
-      }
-    )
-    paths.result()
-  }
-
-  def cleanTarget(): Unit = {
-    if (!options.cleanTarget || !Files.exists(options.outPath)) return
-    Files.walkFileTree(
-      options.outPath,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(
-            file: Path,
-            attrs: BasicFileAttributes
-        ): FileVisitResult = {
-          Files.delete(file)
-          FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(
-            dir: Path,
-            exc: IOException
-        ): FileVisitResult = {
-          Files.delete(dir)
-          FileVisitResult.CONTINUE
-        }
-      }
-    )
-  }
 
   val siteVariables = Map(
     "site.version" -> "1.0.0"
@@ -92,9 +46,10 @@ final class Runner(
     override def getCause: Throwable = cause
   }
 
+  import fox.utils.IO
   def run(): Unit = {
-    cleanTarget()
-    val paths = collectInputPaths
+    IO.cleanTarget(options)
+    val paths = IO.collectInputPaths(options)
     if (paths.isEmpty) {
       logger.error(s"${options.inPath} contains no .md files!")
     } else {
