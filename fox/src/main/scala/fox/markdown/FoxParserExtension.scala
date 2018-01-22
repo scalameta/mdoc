@@ -48,7 +48,7 @@ class FoxParserExtension(options: Options) extends Parser.ParserExtension {
     override def getBracketNestingLevel(options: DataHolder): Int = 0
     override def getWantExclamationPrefix(options: DataHolder): Boolean = true
     override def create(document: ast.Document): LinkRefProcessor =
-      new SiteVariableInjector(Map("site.version" -> "1.0"), document)
+      new SiteVariableInjector(options.config.variables.variables, document)
   }
 
   override def extend(parserBuilder: Parser.Builder): Unit = {
