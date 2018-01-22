@@ -15,7 +15,6 @@ object FoxExtensions {
     List(
       AutolinkExtension.create(),
       FoxParserExtension.create(options),
-      FoxAttributeProviderExtension.create(options),
       TablesExtension.create(),
       EmojiExtension.create(),
       FootnoteExtension.create(),
