@@ -42,7 +42,6 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
             val result = repl.run(stmt, repl.currentLine)
             val replOutput = result._3
             b.append("@ ").append(stmt).append(replOutput).append("\n")
-            println(result)
           }
 
           val ammoniteOut: BasedSequence = b.toString()
