@@ -27,28 +27,26 @@ object IO {
     paths.result()
   }
 
+  final val deleteVisitor = new SimpleFileVisitor[Path] {
+    override def visitFile(
+        file: Path,
+        attrs: BasicFileAttributes
+    ): FileVisitResult = {
+      Files.delete(file)
+      FileVisitResult.CONTINUE
+    }
+    override def postVisitDirectory(
+        dir: Path,
+        exc: IOException
+    ): FileVisitResult = {
+      Files.delete(dir)
+      FileVisitResult.CONTINUE
+    }
+  }
+
   def cleanTarget(options: Options): Unit = {
     // Clean all this and maybe use better-files as a better replacement?
     if (!options.cleanTarget || !Files.exists(options.outPath)) return
-    Files.walkFileTree(
-      options.outPath,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(
-            file: Path,
-            attrs: BasicFileAttributes
-        ): FileVisitResult = {
-          Files.delete(file)
-          FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(
-            dir: Path,
-            exc: IOException
-        ): FileVisitResult = {
-          Files.delete(dir)
-          FileVisitResult.CONTINUE
-        }
-      }
-    )
+    Files.walkFileTree(options.outPath, deleteVisitor)
   }
-
 }
