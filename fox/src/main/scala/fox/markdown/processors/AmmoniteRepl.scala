@@ -5,6 +5,7 @@ import java.io.PrintStream
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.ops.{Path, read}
 import ammonite.repl._
+import ammonite.runtime
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._

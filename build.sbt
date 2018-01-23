@@ -23,4 +23,8 @@ lazy val fox = project
       "io.circe" %% "circe-config" % "0.3.0",
       "io.circe" %% "circe-generic" % "0.8.0"
     ),
+    libraryDependencies ++= List(
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+      "org.scalameta" %% "testkit" % "2.1.7" % Test
+    )
   )

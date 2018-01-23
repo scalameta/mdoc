@@ -11,6 +11,7 @@ import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.ast.Visitor
+import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
@@ -87,5 +88,13 @@ object Markdown {
     val markdownOptions = new MutableDataSet()
     markdownOptions.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
     markdownOptions.set(Parser.EXTENSIONS, FoxExtensions.default(options))
+  }
+
+  def toMarkdown(input: String, options: Options): String = {
+    val settings = Markdown.default(options)
+    val parser = Parser.builder(settings).build
+    val formatter = Formatter.builder(settings).build
+    val ast = parser.parse(input)
+    formatter.render(ast)
   }
 }
