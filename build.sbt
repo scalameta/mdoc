@@ -1,30 +1,15 @@
+inThisBuild(
+  scalaVersion := "2.12.4"
+)
+
 lazy val root = project
-  .copy(id = "foxRoot")
   .in(file("."))
-  .settings(
-    name := "foxRoot"
-  )
+  .settings(name := "foxRoot")
   .aggregate(fox)
 
 lazy val fox = project
   .settings(
     resolvers += Resolver.bintrayRepo("tpolecat", "maven"),
-    WebKeys.webJars.in(Assets) := {
-      val out = WebKeys.webJars.in(Assets).value
-      WebKeys.webJarsDirectory
-        .in(Assets)
-        .value
-        .**(
-          "*.min.js" |
-            "*.min.css" |
-            "lang-*.js" |
-            "prettify.css" |
-            "prettify.js"
-        )
-        .get
-        .filter(_.isFile)
-    },
-    (managedClasspath in Runtime) += (packageBin in Assets).value,
     libraryDependencies ++= List(
       "io.circe" %% "circe-core" % "0.8.0",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
@@ -32,18 +17,14 @@ lazy val fox = project
       "org.tpolecat" %% "tut-core" % "0.5.5",
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "com.lihaoyi" %% "pprint" % "0.5.2",
-      "com.lihaoyi" %% "ammonite-ops" % "1.0.3",
-      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3"
+      "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
+      ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full),
+      "com.github.alexarchambault" %% "case-app" % "1.2.0-M3",
+      "io.circe" %% "circe-config" % "0.3.0",
+      "io.circe" %% "circe-generic" % "0.8.0"
     ),
     libraryDependencies ++= List(
-      "org.webjars.npm" % "lunr" % "2.1.0" % Provided,
-      "org.webjars" % "prettify" % "4-Mar-2013-1" % Provided,
-      "org.webjars" % "modernizr" % "2.8.3" % Provided,
-      Seq("animation", "base", "ripple", "rtl", "theme", "typography").foldLeft(
-        "org.webjars.npm" % "material__tabs" % "0.3.1" % Provided
-      ) { (lib, dep) =>
-        lib.exclude("org.webjars.npm", s"material__$dep")
-      }
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+      "org.scalameta" %% "testkit" % "2.1.7" % Test
     )
   )
-  .enablePlugins(SbtWeb)
