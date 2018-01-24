@@ -11,7 +11,8 @@ lazy val fox = project
   .settings(
     resolvers += Resolver.bintrayRepo("tpolecat", "maven"),
     libraryDependencies ++= List(
-      "io.circe" %% "circe-core" % "0.8.0",
+      "com.geirsson" %% "metaconfig-core" % "0.6.0",
+      "com.geirsson" %% "metaconfig-typesafe-config" % "0.6.0",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "org.tpolecat" %% "tut-core" % "0.5.5",

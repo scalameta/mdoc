@@ -50,7 +50,7 @@ case class Options(
 ) {
 
   private final val indexMd = Paths.get("index.md")
-  lazy val config: Config = Config.from(Paths.get(configPath))
+  lazy val config: Config = Config.fromPath(Paths.get(configPath))
 
   def asset(path: String) = s"$baseUrl/assets/$path"
   def lib(path: String) = s"$baseUrl/lib/$path"
