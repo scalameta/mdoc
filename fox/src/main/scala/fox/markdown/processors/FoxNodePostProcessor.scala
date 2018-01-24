@@ -5,16 +5,15 @@ import com.vladsch.flexmark.ast.{Heading, Node}
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.block.{NodePostProcessor, NodePostProcessorFactory}
 import com.vladsch.flexmark.util.NodeTracker
-import fox.markdown.FoxHelpers
+import com.vladsch.flexmark.util.sequence.CharSubSequence
 
 class FoxNodePostProcessor extends NodePostProcessor {
-  import FoxHelpers.stringToCharSequence
   override def process(state: NodeTracker, node: Node): Unit = node match {
     case heading: Heading =>
       val link = new ast.Link()
       val text = new ast.Text("¶")
       val id = HeaderIdGenerator.generateId(heading.getText, null, false)
-      link.setUrl(s"#$id")
+      link.setUrl(CharSubSequence.of(s"#$id"))
       heading.appendChild(link)
       state.nodeAdded(link)
       link.appendChild(text)

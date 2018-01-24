@@ -1,17 +1,6 @@
 package fox.markdown.processors
 
-import fox.{Markdown, Options}
-import scala.meta.testkit.DiffAssertions
-
-class AmmonitePostProcessorTest extends org.scalatest.FunSuite with DiffAssertions {
-  private val options = new Options()
-  def check(original: String, expected: String): Unit = {
-    test(original) {
-      val obtained = Markdown.toMarkdown(original, options)
-      assertNoDiff(obtained, expected)
-    }
-  }
-
+class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
   check(
     """
       |# Hey Scala!

@@ -12,6 +12,8 @@ import ammonite.util._
 
 import scala.collection.mutable
 
+// Copy pasted from Ammonite repl, original author Li Haoyi, license MIT
+// https://github.com/lihaoyi/Ammonite/blob/233d18951875c3273eead3901ec445979db916ee/LICENSE
 class AmmoniteRepl {
   var allOutput = ""
   def predef: (String, Option[ammonite.ops.Path]) = ("", None)

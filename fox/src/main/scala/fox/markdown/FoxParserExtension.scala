@@ -6,7 +6,7 @@ import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.parser.{LinkRefProcessor, LinkRefProcessorFactory, Parser}
 import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
-import com.vladsch.flexmark.util.sequence.{BasedSequence, PrefixedSubSequence}
+import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence, PrefixedSubSequence}
 
 class FoxParserExtension(options: Options) extends Parser.ParserExtension {
   class SiteVariableInjector(variables: Map[String, String], document: ast.Document)
@@ -29,11 +29,11 @@ class FoxParserExtension(options: Options) extends Parser.ParserExtension {
     }
 
     override def isMatch(nodeChars: BasedSequence): Boolean = {
-      import FoxHelpers.stringToCharSequence
       // It has to be of the shape `![key]` and not `![key]()` or `![](key)` or `![][key]`
       nodeChars.countChars(nodeChars) > 3 &&
-      nodeChars.startsWith("![") && nodeChars.endsWith("]") &&
-      !nodeChars.containsAllOf("][")
+      nodeChars.startsWith(CharSubSequence.of("![")) &&
+      nodeChars.endsWith(CharSubSequence.of("]")) &&
+      !nodeChars.containsAllOf(CharSubSequence.of("]["))
     }
 
     override def adjustInlineText(doc: ast.Document, node: ast.Node): BasedSequence = node.getChars
