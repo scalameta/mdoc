@@ -61,7 +61,7 @@ final class Processor(
         val source = options.resolveIn(doc.path)
         val target = options.resolveOut(doc.path)
         writePath(target, doc.contents)
-        logger.info(s"Markdown file ${target} has been generated.")
+        logger.info(s"Markdown file $target has been generated.")
       }
     }
   }
