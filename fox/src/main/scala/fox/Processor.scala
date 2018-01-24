@@ -1,5 +1,6 @@
 package fox
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -19,9 +20,9 @@ final class Processor(
 
   import scala.util.Try
   def handlePath(path: Path): Try[Doc] = Try {
-    val source = options.resolveIn(path)
-    val compiled = Repl.compile(source, options)
-    val ast = parser.parse(compiled)
+    val sourcePath = options.resolveIn(path)
+    val source = new String(java.nio.file.Files.readAllBytes(sourcePath), StandardCharsets.UTF_8)
+    val ast = parser.parse(source)
     val md = formatter.render(ast)
     val headers = collect[Heading, Header](ast) { case h => Header(h) }
     val title = headers
@@ -36,8 +37,7 @@ final class Processor(
     Files.write(path, string.getBytes(options.charset))
   }
 
-  private class FileError(path: Path, cause: Throwable)
-    extends Exception(path.toString) {
+  private class FileError(path: Path, cause: Throwable) extends Exception(path.toString) {
     override def getStackTrace: Array[StackTraceElement] = Array.empty
     override def getCause: Throwable = cause
   }
