@@ -16,6 +16,7 @@ lazy val fox = project
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "com.lihaoyi" %% "pprint" % "0.5.2",
       "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
+      "io.methvin" % "directory-watcher" % "0.4.0",
       ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full)
     ),
     libraryDependencies ++= List(

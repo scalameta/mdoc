@@ -28,6 +28,8 @@ case class Options(
     configPath: Path = Paths.get("fox.conf"),
     @Description("Optional classpath to compile Scala code examples")
     classpath: String = "",
+    @ExtraName("w")
+    watch: Boolean = false,
     config: Config = Config()
 ) {
 
