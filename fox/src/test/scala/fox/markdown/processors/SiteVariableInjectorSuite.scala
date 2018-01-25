@@ -1,9 +1,9 @@
 package fox.markdown.processors
 
-class VariableSplicerSuite extends BaseMarkdownSuite {
+class SiteVariableInjectorSuite extends BaseMarkdownSuite {
   check(
     """
-      |# Hey ![site.version]
+      |# Hey ![version]
     """.stripMargin,
     """
       |# Hey 1.0
@@ -12,7 +12,7 @@ class VariableSplicerSuite extends BaseMarkdownSuite {
 
   check(
     """
-      |I am ![site.version]
+      |I am ![version]
     """.stripMargin,
     """
       |I am 1.0
@@ -23,7 +23,7 @@ class VariableSplicerSuite extends BaseMarkdownSuite {
     """
       || C1 | C2 |
       || == | == |
-      || ![site.version] | hello |
+      || ![version] | hello |
     """.stripMargin,
     """
       |

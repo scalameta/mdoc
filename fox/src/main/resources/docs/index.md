@@ -1,8 +1,8 @@
 # Fox is great for docs
 
-Welcome to fox ![site.version].
+Welcome to fox ![version].
 
-# Hey ![site.version]!
+# Hey ![version]!
 
 // TODO: Make this work
 ```scala

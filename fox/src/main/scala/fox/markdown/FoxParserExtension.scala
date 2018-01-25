@@ -1,6 +1,6 @@
 package fox.markdown
 
-import fox.{Options, markdown}
+import fox.Options
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.parser.{LinkRefProcessor, LinkRefProcessorFactory, Parser}
@@ -9,7 +9,7 @@ import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence, PrefixedSubSequence}
 
 class FoxParserExtension(options: Options) extends Parser.ParserExtension {
-  class SiteVariableInjector(variables: Map[String, String], document: ast.Document)
+  class SiteVariableInjector(site: Map[String, String], document: ast.Document)
       extends LinkRefProcessor {
 
     /**
@@ -24,7 +24,7 @@ class FoxParserExtension(options: Options) extends Parser.ParserExtension {
       */
     override def createNode(nodeChars: BasedSequence): ast.Node = {
       val key = nodeChars.midSequence(2, nodeChars.length() - 1).trim()
-      val value = variables.getOrElse(key.unescape(), sys.error(s"Missing '$key' site variable."))
+      val value = site.getOrElse(key.unescape(), sys.error(s"Missing '$key' site variable."))
       new ast.Text(PrefixedSubSequence.of(value, nodeChars).removeSuffix(nodeChars))
     }
 
@@ -48,7 +48,7 @@ class FoxParserExtension(options: Options) extends Parser.ParserExtension {
     override def getBracketNestingLevel(options: DataHolder): Int = 0
     override def getWantExclamationPrefix(options: DataHolder): Boolean = true
     override def create(document: ast.Document): LinkRefProcessor =
-      new SiteVariableInjector(options.config.variables.variables, document)
+      new SiteVariableInjector(options.config.site, document)
   }
 
   override def extend(parserBuilder: Parser.Builder): Unit = {
