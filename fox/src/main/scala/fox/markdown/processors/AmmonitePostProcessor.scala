@@ -8,7 +8,6 @@ import fastparse.core.Parsed
 import fox.Options
 
 class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
-  import ammonite.util.Res
   import ammonite.interp.Parsers
   def parseCode(code: String): Seq[String] = {
     Parsers.Splitter.parse(code) match {
@@ -20,21 +19,24 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
     }
   }
 
-  private val repl = new AmmoniteRepl
+  private val repl = new AmmoniteRepl()
+  repl.loadClasspath(options.classpath)
+
   override def processDocument(doc: Document): Document = {
     import fox.Markdown._
     import scala.collection.JavaConverters._
     traverse[FencedCodeBlock](doc) {
       case block =>
-        val prefix = block.getInfo()
+        val prefix = block.getInfo
         if (prefix.startsWith("scala")) {
-          val code = block.getContentChars().toString()
+          val code = block.getContentChars().toString
 
           val b = new StringBuilder()
           for { stmt <- parseCode(code) } {
             val result = repl.run(stmt, repl.currentLine)
-            val replOutput = result._3
-            b.append("@ ").append(stmt).append(replOutput).append("\n")
+            b.append("@ ").append(stmt)
+            result.writeTo(b)
+            b.append("\n")
           }
 
           val ammoniteOut: BasedSequence = CharSubSequence.of(b.toString())

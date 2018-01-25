@@ -22,7 +22,7 @@ import fox.markdown.FoxExtensions
 
 object Markdown {
   case class Site(docs: List[Doc])
-  case class Doc(path: Path, title: String, headers: List[Header], contents: String)
+  case class Doc(path: Path, contents: String)
   case class Header(title: String, id: String, level: Int, text: String) {
     def target: String = if (level == 1) "" else s"#$id"
   }

@@ -1,16 +1,14 @@
 package fox.markdown.processors
 
-import java.io.PrintStream
-
+import java.io.File
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.ops.{Path, read}
 import ammonite.repl._
-import ammonite.runtime
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
-
 import scala.collection.mutable
+import ammonite.util.Res
 
 // Copy pasted from Ammonite repl, original author Li Haoyi, license MIT
 // https://github.com/lihaoyi/Ammonite/blob/233d18951875c3273eead3901ec445979db916ee/LICENSE
@@ -173,7 +171,7 @@ class AmmoniteRepl {
       val expected = resultLines.mkString(Util.newLine).trim
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, res, warning, error, info) =
+      val RunResult(processed, out, res, warning, error, info) =
         run(commandText.mkString(Util.newLine), currentLine)
 
       val allOut = out + res
@@ -250,7 +248,11 @@ class AmmoniteRepl {
     }
   }
 
-  def run(input: String, index: Int) = {
+  def loadClasspath(classpath: String): Unit = {
+    val files = classpath.split(File.pathSeparator).map(new File(_))
+    interp.headFrame.addClasspath(files)
+  }
+  def run(input: String, index: Int): RunResult = {
 
     outBytes.reset()
     resBytes.reset()
@@ -275,7 +277,7 @@ class AmmoniteRepl {
       case _ =>
     }
     Repl.handleOutput(interp, processed)
-    (
+    RunResult(
       processed,
       outString,
       resString,
@@ -286,7 +288,7 @@ class AmmoniteRepl {
   }
 
   def fail(input: String, failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, _, warning, error, info) = run(input, 0)
+    val RunResult(processed, out, _, warning, error, info) = run(input, 0)
 
     processed match {
       case Res.Success(v) => assert({ identity(v); identity(allOutput); false })
@@ -305,7 +307,7 @@ class AmmoniteRepl {
   }
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, _, warning, error, info) = run(input, 0)
+    val RunResult(processed, allOut, _, warning, error, info) = run(input, 0)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =
@@ -315,4 +317,18 @@ class AmmoniteRepl {
         println("FAILURE TRACE" + Util.newLine + allOutput)
         throw e
     }
+}
+
+case class RunResult(
+    evaluated: Res[Evaluated],
+    processed: String,
+    outString: String,
+    warning: String,
+    error: String,
+    info: String
+) {
+  def writeTo(sb: StringBuilder): Unit = {
+    if (!error.isEmpty) sb.append(error)
+    else sb.append(outString)
+  }
 }

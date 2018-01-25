@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import scala.util.Try
+import scala.util.control.NoStackTrace
 import fox.Markdown._
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.formatter.internal.Formatter
@@ -25,15 +26,10 @@ final class Processor(
 
   def handlePath(path: Path): Doc = {
     val sourcePath = options.resolveIn(path)
-    val source = new String(java.nio.file.Files.readAllBytes(sourcePath), StandardCharsets.UTF_8)
+    val source = new String(java.nio.file.Files.readAllBytes(sourcePath), options.encoding)
     val ast = parser.parse(source)
     val md = formatter.render(ast)
-    val headers = collect[Heading, Header](ast) { case h => Header(h) }
-    val title = headers
-      .find(_.level == 1)
-      .getOrElse(sys.error(s"Missing h1 for page $path"))
-      .title
-    Doc(path, title, headers, md)
+    Doc(path, md)
   }
 
   def writePath(path: Path, string: String): Unit = {
@@ -41,8 +37,9 @@ final class Processor(
     Files.write(path, string.getBytes(options.encoding))
   }
 
-  private class FileError(path: Path, cause: Throwable) extends Exception(path.toString) {
-    override def getStackTrace: Array[StackTraceElement] = Array.empty
+  private class FileError(path: Path, cause: Throwable)
+      extends Exception(path.toString)
+      with NoStackTrace {
     override def getCause: Throwable = cause
   }
 
@@ -62,7 +59,6 @@ final class Processor(
       }
 
       docs.foreach { doc =>
-        val source = options.resolveIn(doc.path)
         val target = options.resolveOut(doc.path)
         writePath(target, doc.contents)
         logger.info(s"Markdown file $target has been generated.")
