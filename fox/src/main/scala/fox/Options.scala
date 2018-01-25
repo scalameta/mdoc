@@ -26,6 +26,8 @@ case class Options(
     cleanTarget: Boolean = false,
     encoding: Charset = StandardCharsets.UTF_8,
     configPath: Path = Paths.get("fox.conf"),
+    @Description("Optional classpath to compile Scala code examples")
+    classpath: String = "",
     config: Config = Config()
 ) {
 

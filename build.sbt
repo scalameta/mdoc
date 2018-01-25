@@ -21,5 +21,13 @@ lazy val fox = project
     libraryDependencies ++= List(
       "org.scalatest" %% "scalatest" % "3.0.1" % Test,
       "org.scalameta" %% "testkit" % "2.1.7" % Test
-    )
+    ),
+    buildInfoPackage := "fox.internal",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
+    ),
+    compile.in(Test) := compile.in(Test).dependsOn(compile.in(testsInput, Compile)).value
   )
+  .enablePlugins(BuildInfoPlugin)
+
+lazy val testsInput = project.in(file("tests/input"))
