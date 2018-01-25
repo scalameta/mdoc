@@ -249,8 +249,10 @@ class AmmoniteRepl {
   }
 
   def loadClasspath(classpath: String): Unit = {
-    val files = classpath.split(File.pathSeparator).map(new File(_))
-    interp.headFrame.addClasspath(files)
+    if (!classpath.isEmpty) {
+      val files = classpath.split(File.pathSeparator).map(new File(_))
+      interp.headFrame.addClasspath(files)
+    }
   }
   def run(input: String, index: Int): RunResult = {
 

@@ -21,8 +21,8 @@ object SourceWatcher {
       new DirectoryChangeListener {
         override def onEvent(event: DirectoryChangeEvent): Unit = {
           val targetFile = event.path()
-          val targetPath = targetFile.toFile.getAbsolutePath()
-          if (Files.isRegularFile(targetFile) && (targetPath.endsWith(".md"))) {
+          val targetPath = targetFile.getFileName.toString
+          if (Files.isRegularFile(targetFile) && targetPath.endsWith(".md")) {
             event.eventType() match {
               case EventType.CREATE => runAction(event)
               case EventType.MODIFY => runAction(event)

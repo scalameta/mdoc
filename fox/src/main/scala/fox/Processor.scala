@@ -47,20 +47,19 @@ final class Processor(
   }
 
   import fox.utils.IO
-  def run(): Unit = {
-    def triggerGeneration: Unit = {
-      IO.cleanTarget(options)
-      val paths = IO.collectInputPaths(options)
-      if (paths.isEmpty) {
-        logger.error(s"${options.in} contains no .md files!")
-      } else {
-        import scala.util.{Success, Failure}
-        val docs = paths.flatMap { path =>
-          Try(handlePath(path)) match {
-            case Success(doc) => doc :: Nil
-            case Failure(t) => new FileError(path, t).printStackTrace(); Nil
-          }
+
+  def triggerGeneration(): Unit = {
+    val paths = IO.collectInputPaths(options)
+    if (paths.isEmpty) {
+      logger.error(s"${options.in} contains no .md files!")
+    } else {
+      import scala.util.{Success, Failure}
+      val docs = paths.flatMap { path =>
+        Try(handlePath(path)) match {
+          case Success(doc) => doc :: Nil
+          case Failure(t) => new FileError(path, t).printStackTrace(); Nil
         }
+      }
 
       docs.foreach { doc =>
         val target = options.resolveOut(doc.path)
@@ -68,9 +67,13 @@ final class Processor(
         logger.info(s"Markdown file $target has been generated.")
       }
     }
+  }
 
-    if (!options.watch) triggerGeneration
+  def run(): Unit = {
+    IO.cleanTarget(options)
+    if (!options.watch) triggerGeneration()
     else {
+      triggerGeneration()
       SourceWatcher.watch(
         List(options.in),
         (event: DirectoryChangeEvent) => {
@@ -78,9 +81,10 @@ final class Processor(
           logger.info(
             s"Event ${event.eventType()} at ${event.path()} triggered markdown generation."
           )
-          triggerGeneration
+          triggerGeneration()
         }
       )
     }
   }
+
 }
