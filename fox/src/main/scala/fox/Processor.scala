@@ -1,18 +1,16 @@
 package fox
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
 import scala.util.Try
 import scala.util.control.NoStackTrace
-import fox.Markdown._
-import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 import fox.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
+import fox.Markdown.Doc
 
 final class Processor(
     options: Options,

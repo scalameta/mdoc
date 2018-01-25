@@ -2,15 +2,16 @@ package fox.markdown.processors
 
 class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
   check(
+    "code",
     """
       |# Hey Scala!
       |
-      |```scala
+      |```scala fox
       |val xs = List(1, 2, 3)
       |val ys = xs.map(_ + 1)
       |```
       |
-      |```scala
+      |```scala fox
       |val zs = ys.map(_ * 2)
       |```
     """.stripMargin,
@@ -30,4 +31,59 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin
   )
+
+  check(
+    "passthrough",
+    """
+      |```scala fox:passthrough
+      |println("# Header\n\nparagraph\n\n* bullet")
+      |```
+    """.stripMargin,
+    """
+      |# Header
+      |
+      |paragraph
+      |
+      |* bullet
+    """.stripMargin
+  )
+
+  check(
+    "fail",
+    """
+      |```scala fox:fail
+      |val x: Int = "String"
+      |```
+    """.stripMargin,
+    """
+      |```scala
+      |@ val x: Int = "String"
+      |cmd0.sc:1: type mismatch;
+      | found   : String("String")
+      | required: Int
+      |val x: Int = "String"
+      |             ^
+      |Compilation Failed
+      |```
+    """.stripMargin
+  )
+
+  checkError[CodeFenceError](
+    "fail-error",
+    """
+      |```scala fox
+      |foobar
+      |```
+    """.stripMargin
+  )
+
+  checkError[CodeFenceSuccess](
+    "fail-success",
+    """
+      |```scala fox:fail
+      |1.to(2)
+      |```
+    """.stripMargin
+  )
+
 }

@@ -134,128 +134,28 @@ class AmmoniteRepl {
     )
   }
 
-  def session(sess: String): Unit = {
-    // Remove the margin from the block and break
-    // it into blank-line-delimited steps
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
-    // Strip margin & whitespace
-
-    val steps = sess
-      .replace(
-        Util.newLine + margin,
-        Util.newLine
-      )
-      .replaceAll(" *\n", "\n")
-      .split("\n\n")
-
-    for ((step, index) <- steps.zipWithIndex) {
-      // Break the step into the command lines, starting with @,
-      // and the result lines
-      val (cmdLines, resultLines) =
-        step.lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
-
-      val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
-
-      println(cmdLines.mkString(Util.newLine))
-      // Make sure all non-empty, non-complete command-line-fragments
-      // are considered incomplete during the parse
-      //
-      // ...except for the empty 0-line fragment, and the entire fragment,
-      // both of which are complete.
-      for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)) {
-        assert(ammonite.interp.Parsers.split(incomplete.mkString(Util.newLine)).isEmpty)
-      }
-
-      // Finally, actually run the complete command text through the
-      // interpreter and make sure the output is what we expect
-      val expected = resultLines.mkString(Util.newLine).trim
-      allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
-
-      val RunResult(processed, out, res, warning, error, info) =
-        run(commandText.mkString(Util.newLine), currentLine)
-
-      val allOut = out + res
-
-      if (expected.startsWith("error: ")) {
-        val strippedExpected = expected.stripPrefix("error: ")
-        assert(error.contains(strippedExpected))
-
-      } else if (expected.startsWith("warning: ")) {
-        val strippedExpected = expected.stripPrefix("warning: ")
-        assert(warning.contains(strippedExpected))
-
-      } else if (expected.startsWith("info: ")) {
-        val strippedExpected = expected.stripPrefix("info: ")
-        assert(info.contains(strippedExpected))
-
-      } else if (expected == "") {
-        processed match {
-          case Res.Success(_) => // do nothing
-          case Res.Skip => // do nothing
-          case _: Res.Failing =>
-            assert {
-              identity(error)
-              identity(warning)
-              identity(out)
-              identity(res)
-              identity(info)
-              false
-            }
-        }
-
-      } else {
-        processed match {
-          case Res.Success(str) =>
-            // Strip trailing whitespace
-            def normalize(s: String) =
-              s.lines
-                .map(_.replaceAll(" *$", ""))
-                .mkString(Util.newLine)
-                .trim()
-            failLoudly(
-              assert {
-                identity(error)
-                identity(warning)
-                identity(info)
-                normalize(allOut) == normalize(expected)
-              }
-            )
-
-          case Res.Failure(failureMsg) =>
-            assert {
-              identity(error)
-              identity(warning)
-              identity(out)
-              identity(res)
-              identity(info)
-              identity(expected)
-              false
-            }
-          case Res.Exception(ex, failureMsg) =>
-            val trace = Repl.showException(
-              ex,
-              fansi.Attrs.Empty,
-              fansi.Attrs.Empty,
-              fansi.Attrs.Empty
-            ) + Util.newLine + failureMsg
-            assert({ identity(trace); identity(expected); false })
-          case _ =>
-            throw new Exception(
-              s"Printed $allOut does not match what was expected: $expected"
-            )
-        }
-      }
-    }
-  }
-
   def loadClasspath(classpath: String): Unit = {
     if (!classpath.isEmpty) {
       val files = classpath.split(File.pathSeparator).map(new File(_))
       interp.headFrame.addClasspath(files)
     }
   }
-  def run(input: String, index: Int): RunResult = {
 
+  def run(input: String, index: Int): RunResult = {
+    val stdout = new ByteArrayOutputStream()
+    val stderr = new ByteArrayOutputStream()
+    val result = Console.withOut(stdout) {
+      Console.withErr(stderr) {
+        runImpl(input, index)
+      }
+    }
+    result.copy(
+      stdout = stdout.toString(),
+      stderr = stderr.toString()
+    )
+  }
+
+  def runImpl(input: String, index: Int): RunResult = {
     outBytes.reset()
     resBytes.reset()
     warningBuffer.clear()
@@ -285,40 +185,11 @@ class AmmoniteRepl {
       resString,
       warningBuffer.mkString,
       errorBuffer.mkString,
-      infoBuffer.mkString
+      infoBuffer.mkString,
+      "",
+      ""
     )
   }
-
-  def fail(input: String, failureCheck: String => Boolean = _ => true) = {
-    val RunResult(processed, out, _, warning, error, info) = run(input, 0)
-
-    processed match {
-      case Res.Success(v) => assert({ identity(v); identity(allOutput); false })
-      case Res.Failure(s) =>
-        failLoudly(assert(failureCheck(s)))
-      case Res.Exception(ex, s) =>
-        val msg = Repl.showException(
-          ex,
-          fansi.Attrs.Empty,
-          fansi.Attrs.Empty,
-          fansi.Attrs.Empty
-        ) + Util.newLine + s
-        failLoudly(assert(failureCheck(msg)))
-      case _ => ???
-    }
-  }
-
-  def result(input: String, expected: Res[Evaluated]) = {
-    val RunResult(processed, allOut, _, warning, error, info) = run(input, 0)
-    assert(processed == expected)
-  }
-  def failLoudly[T](t: => T) =
-    try t
-    catch {
-      case e: AssertionError =>
-        println("FAILURE TRACE" + Util.newLine + allOutput)
-        throw e
-    }
 }
 
 case class RunResult(
@@ -327,10 +198,7 @@ case class RunResult(
     outString: String,
     warning: String,
     error: String,
-    info: String
-) {
-  def writeTo(sb: StringBuilder): Unit = {
-    if (!error.isEmpty) sb.append(error)
-    else sb.append(outString)
-  }
-}
+    info: String,
+    stdout: String,
+    stderr: String
+) {}
