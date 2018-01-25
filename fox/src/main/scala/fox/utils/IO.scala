@@ -7,10 +7,15 @@ import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import fox.Options
 
 object IO {
+
+  def absolutize(path: Path, cwd: Path): Path =
+    if (path.isAbsolute) path
+    else cwd.resolve(path)
+
   def collectInputPaths(options: Options): List[Path] = {
     val paths = List.newBuilder[Path]
     Files.walkFileTree(
-      options.inPath,
+      options.in,
       new SimpleFileVisitor[Path] {
         override def visitFile(
             file: Path,
@@ -18,7 +23,7 @@ object IO {
         ): FileVisitResult = {
           if (Files.isRegularFile(file)
             && file.getFileName.toString.endsWith(".md")) {
-            paths += options.inPath.relativize(file)
+            paths += options.in.relativize(file)
           }
           FileVisitResult.CONTINUE
         }
@@ -46,7 +51,7 @@ object IO {
 
   def cleanTarget(options: Options): Unit = {
     // Clean all this and maybe use better-files as a better replacement?
-    if (!options.cleanTarget || !Files.exists(options.outPath)) return
-    Files.walkFileTree(options.outPath, deleteVisitor)
+    if (!options.cleanTarget || !Files.exists(options.out)) return
+    Files.walkFileTree(options.out, deleteVisitor)
   }
 }

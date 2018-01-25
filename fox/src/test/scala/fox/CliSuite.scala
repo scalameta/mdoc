@@ -12,14 +12,14 @@ class CliSuite extends FunSuite with DiffAssertions {
     val out = Files.createTempDirectory("fox")
     val conf = Files.createFile(in.resolve("fox.conf"))
     Files.write(conf, """site.version = "1.0" """.getBytes())
-    val args = Array(
+    val args = Array[String](
       "--in",
       in.toString,
       "--out",
       out.toString,
       "--clean-target",
-      "--config-path",
-      conf.toString
+      "--cwd",
+      in.toString
     )
     Cli.main(args)
     val expected = "# Hello 1.0"

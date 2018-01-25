@@ -1,77 +1,73 @@
 package fox
 
-import java.io.File
-import java.net.URLClassLoader
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import fox.Enrichments._
-import fox.Markdown.Doc
+import fox.utils.IO
+import metaconfig.Conf
 import metaconfig.ConfDecoder
+import metaconfig.Configured
 import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
-
-object Enrichments {
-  implicit class XtensionPathUrl(val path: Path) extends AnyVal {
-    def stripSuffix(suffix: String): Path =
-      path.resolveSibling(path.getFileName.toString.stripSuffix(suffix))
-  }
-}
+import metaconfig.typesafeconfig.typesafeConfigMetaconfigParser
 
 case class Options(
     @Description("The input directory to generate the fox site.")
     @ExtraName("i")
-    in: String = Paths.get("docs").toString,
+    in: Path = Paths.get("docs"),
     @Description("The output directory to generate the fox site.")
     @ExtraName("o")
-    out: String = Paths.get("target").resolve("fox").toString,
+    out: Path = Paths.get("target").resolve("fox"),
+    @Description("The current working directory")
+    cwd: Path = Paths.get(sys.props("user.dir")),
     cleanTarget: Boolean = false,
-    encoding: String = "UTF-8",
-    configPath: String = Paths.get("fox.conf").toString
+    encoding: Charset = StandardCharsets.UTF_8,
+    configPath: Path = Paths.get("fox.conf"),
+    config: Config = Config()
 ) {
 
-  private final val indexMd = Paths.get("index.md")
-  lazy val configFile = Paths.get(configPath)
-  lazy val config: Config =
-    if (Files.exists(configFile)) Config.fromPath(configFile)
-    else Config()
-
-  def charset: Charset = Charset.forName(encoding)
   def resolveIn(relpath: Path): Path = {
     require(!relpath.isAbsolute)
-    inPath.resolve(relpath)
+    in.resolve(relpath)
   }
 
-  // We may want to change the way the layout is resolved.
   def resolveOut(relpath: Path): Path = {
     require(!relpath.isAbsolute)
-    val base = outPath.resolve(relpath)
-    if (relpath.endsWith(indexMd)) {
-      // foo/specimen.md => foo/index.html
-      base.resolveSibling(indexMd)
-    } else {
-      // foo/bar/something.md => foo/bar/index.html
-      outPath.resolve(relpath).stripSuffix(".md").resolve(indexMd)
-    }
+    out.resolve(relpath)
   }
-
-  lazy val inPath: Path = Paths.get(in).toAbsolutePath.normalize()
-  lazy val outPath: Path = Paths.get(out).toAbsolutePath.normalize()
 }
 
 object Options {
+  def fromCliArgs(args: List[String]): Configured[Options] = {
+    Conf
+      .parseCliArgs[Options](args)
+      .andThen(_.as[Options])
+      .andThen(fromDefault)
+  }
+  def fromDefault(default: Options): Configured[Options] = {
+    val absoluteOptions: Options = {
+      import default._
+      copy(
+        in = IO.absolutize(in, cwd),
+        out = IO.absolutize(out, cwd),
+        configPath = IO.absolutize(configPath, cwd)
+      )
+    }
+
+    val parsedConfig: Configured[Config] =
+      if (Files.exists(absoluteOptions.configPath)) {
+        Conf.parseFile(absoluteOptions.configPath.toFile).andThen(_.as[Config])
+      } else {
+        Configured.ok(absoluteOptions.config)
+      }
+    parsedConfig.map(newConfig => absoluteOptions.copy(config = newConfig))
+  }
+  import fox.utils.Decoders._ // WARNING: IntelliJ will remove this required import
   implicit val surface: Surface[Options] =
     generic.deriveSurface[Options]
   implicit val decoder: ConfDecoder[Options] =
     generic.deriveDecoder[Options](Options())
-  def defaultClasspath: List[String] = this.getClass.getClassLoader match {
-    case url: URLClassLoader =>
-      url.getURLs.iterator
-        .map(url => Paths.get(url.toURI))
-        .map(_.toAbsolutePath.toString)
-        .toList
-    case els => sys.error(s"Expected URLClassloader, obtained $els")
-  }
 }
