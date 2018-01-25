@@ -3,7 +3,7 @@ package fox
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-
+import scala.util.Try
 import fox.Markdown._
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.formatter.internal.Formatter
@@ -15,11 +15,15 @@ final class Processor(
     mdSettings: MutableDataSet,
     logger: Logger
 ) {
+  require(
+    options.isAbsolute,
+    s"Options contains relative paths. " +
+      s"Use Options.fromDefault($options) to absolutize paths."
+  )
   private final val parser = Parser.builder(mdSettings).build
   private final val formatter = Formatter.builder(mdSettings).build
 
-  import scala.util.Try
-  def handlePath(path: Path): Try[Doc] = Try {
+  def handlePath(path: Path): Doc = {
     val sourcePath = options.resolveIn(path)
     val source = new String(java.nio.file.Files.readAllBytes(sourcePath), StandardCharsets.UTF_8)
     val ast = parser.parse(source)
@@ -34,7 +38,7 @@ final class Processor(
 
   def writePath(path: Path, string: String): Unit = {
     Files.createDirectories(path.getParent)
-    Files.write(path, string.getBytes(options.charset))
+    Files.write(path, string.getBytes(options.encoding))
   }
 
   private class FileError(path: Path, cause: Throwable) extends Exception(path.toString) {
@@ -47,11 +51,11 @@ final class Processor(
     IO.cleanTarget(options)
     val paths = IO.collectInputPaths(options)
     if (paths.isEmpty) {
-      logger.error(s"${options.inPath} contains no .md files!")
+      logger.error(s"${options.in} contains no .md files!")
     } else {
       import scala.util.{Success, Failure}
       val docs = paths.flatMap { path =>
-        handlePath(path) match {
+        Try(handlePath(path)) match {
           case Success(doc) => doc :: Nil
           case Failure(t) => new FileError(path, t).printStackTrace(); Nil
         }
