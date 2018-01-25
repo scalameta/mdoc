@@ -15,6 +15,11 @@ final class Processor(
     mdSettings: MutableDataSet,
     logger: Logger
 ) {
+  require(
+    options.isAbsolute,
+    s"Options contains relative paths. " +
+      s"Use Options.fromDefault($options) to absolutize paths."
+  )
   private final val parser = Parser.builder(mdSettings).build
   private final val formatter = Formatter.builder(mdSettings).build
 

@@ -29,6 +29,12 @@ case class Options(
     config: Config = Config()
 ) {
 
+  def isAbsolute: Boolean =
+    cwd.isAbsolute &&
+      configPath.isAbsolute &&
+      in.isAbsolute &&
+      out.isAbsolute
+
   def resolveIn(relpath: Path): Path = {
     require(!relpath.isAbsolute)
     in.resolve(relpath)
