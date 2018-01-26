@@ -29,24 +29,24 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
     traverse[FencedCodeBlock](doc) {
       case block =>
         block.getInfo.toString match {
-          case Mod(mod) =>
+          case FencedCodeMod(mod) =>
             block.setInfo(CharSubSequence.of("scala"))
             val code = block.getContentChars().toString
             val b = new StringBuilder()
             for { stmt <- parseCode(code) } {
               val result = repl.run(stmt, repl.currentLine)
               (result.evaluated.isSuccess, mod) match {
-                case (true, Mod.Fail) =>
+                case (true, FencedCodeMod.Fail) =>
                   throw CodeFenceSuccess(s"expected failure, got success for code block:\n$code")
                 case (true, _) => // Ok, do nothing
-                case (false, Mod.Fail) => // Ok, do nothing
+                case (false, FencedCodeMod.Fail) => // Ok, do nothing
                 case (false, _) =>
                   throw CodeFenceError(
                     s"expected success, got failure ${pprint.apply(result)} for code block:\n$code"
                   )
               }
               mod match {
-                case Mod.Default | Mod.Fail =>
+                case FencedCodeMod.Default | FencedCodeMod.Fail =>
                   b.append("@ ")
                     .append(stmt)
                     .append(
@@ -54,7 +54,7 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
                       else result.outString
                     )
                     .append("\n")
-                case Mod.Passthrough =>
+                case FencedCodeMod.Passthrough =>
                   b.append(result.stdout)
               }
             }
@@ -63,10 +63,10 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
             }
             val ammoniteOut = b.toString()
             mod match {
-              case Mod.Default | Mod.Fail =>
+              case FencedCodeMod.Default | FencedCodeMod.Fail =>
                 val content: BasedSequence = CharSubSequence.of(ammoniteOut)
                 block.setContent(List(content).asJava)
-              case Mod.Passthrough =>
+              case FencedCodeMod.Passthrough =>
                 // TODO(olafur) avoid creating fresh MutableDataSet for every passthrough
                 // We may be initializing a new ammonite repl every time here, which may be slow.
                 val child = Markdown.parse(ammoniteOut, options)
