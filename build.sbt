@@ -9,7 +9,10 @@ lazy val root = project
 
 lazy val fox = project
   .settings(
+    fork in run := true,
+    cancelable in Global := true,
     libraryDependencies ++= List(
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.geirsson" %% "metaconfig-core" % "0.6.0",
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.6.0",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
