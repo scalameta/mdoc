@@ -3,6 +3,7 @@ package fox
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+
 import scala.util.Try
 import scala.util.control.NoStackTrace
 import fox.Markdown._
@@ -10,6 +11,8 @@ import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
+import fox.utils.SourceWatcher
+import io.methvin.watcher.DirectoryChangeEvent
 
 final class Processor(
     options: Options,
@@ -44,8 +47,8 @@ final class Processor(
   }
 
   import fox.utils.IO
-  def run(): Unit = {
-    IO.cleanTarget(options)
+
+  def triggerGeneration(): Unit = {
     val paths = IO.collectInputPaths(options)
     if (paths.isEmpty) {
       logger.error(s"${options.in} contains no .md files!")
@@ -65,4 +68,23 @@ final class Processor(
       }
     }
   }
+
+  def run(): Unit = {
+    IO.cleanTarget(options)
+    if (!options.watch) triggerGeneration()
+    else {
+      triggerGeneration()
+      SourceWatcher.watch(
+        List(options.in),
+        (event: DirectoryChangeEvent) => {
+          // Let's make this info for now, we can turn it into debug afterwards
+          logger.info(
+            s"Event ${event.eventType()} at ${event.path()} triggered markdown generation."
+          )
+          triggerGeneration()
+        }
+      )
+    }
+  }
+
 }
