@@ -1,5 +1,7 @@
 package fox.markdown.processors
 
+import fox.markdown.repl.Evaluator
+
 class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
   check(
     "code",
@@ -68,7 +70,7 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-  checkError[CodeFenceError](
+  checkError[Evaluator.CodeFenceError](
     "fail-error",
     """
       |```scala fox
@@ -77,7 +79,7 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-  checkError[CodeFenceSuccess](
+  checkError[Evaluator.CodeFenceSuccess](
     "fail-success",
     """
       |```scala fox:fail

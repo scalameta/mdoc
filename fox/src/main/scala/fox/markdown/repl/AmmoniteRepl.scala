@@ -1,14 +1,15 @@
-package fox.markdown.processors
+package fox.markdown.repl
 
 import java.io.File
+
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.ops.{Path, read}
 import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
-import ammonite.util._
+import ammonite.util.{Res, _}
+
 import scala.collection.mutable
-import ammonite.util.Res
 
 // Copy pasted from Ammonite repl, original author Li Haoyi, license MIT
 // https://github.com/lihaoyi/Ammonite/blob/233d18951875c3273eead3901ec445979db916ee/LICENSE
