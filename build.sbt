@@ -1,6 +1,7 @@
 inThisBuild(
   List(
     scalaVersion := "2.12.4",
+    organization := "com.geirsson",
     version ~= { old =>
       val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
       old.replace('+', '-') + suffix
