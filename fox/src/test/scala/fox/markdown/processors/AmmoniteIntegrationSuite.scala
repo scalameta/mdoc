@@ -1,6 +1,5 @@
 package fox.markdown.processors
 
-import fox.Markdown
 import fox.markdown.repl.Evaluator
 
 class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
@@ -78,11 +77,14 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
       |foobar
       |```
     """.stripMargin,
-    """/data/rw/code/scala/fox/dummy-test-fail-error:1:3: unexpected failure
+    """Fox found evaluation failures.
+      |
+      |<path>:1:3: unexpected failure
       |>  cmd0.sc:1: not found: value foobar
       |>  val res0 = foobar
       |>             ^
-      |>  Compilation Failed""".stripMargin
+      |>  Compilation Failed
+      |""".stripMargin
   )
 
   checkError[Evaluator.CodeFenceFailure](
@@ -93,10 +95,13 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |/data/rw/code/scala/fox/dummy-test-fail-success:1:3: unexpected success of
+      |Fox found evaluation failures.
+      |
+      |<path>:1:3: unexpected success of
       |```
       |1.to(2)
-      |```""".stripMargin
+      |```
+      |""".stripMargin
   )
 
   checkError[Evaluator.CodeFenceFailure](
@@ -111,13 +116,15 @@ class AmmoniteIntegrationSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |/data/rw/code/scala/fox/dummy-test-mixed-fail-success-error:1:3: unexpected failure
+      |Fox found evaluation failures.
+      |
+      |<path>:1:3: unexpected failure
       |>  cmd0.sc:1: not found: value foobar
       |>  val res0 = foobar
       |>             ^
       |>  Compilation Failed
       |
-      |/data/rw/code/scala/fox/dummy-test-mixed-fail-success-error:5:7: unexpected success of
+      |<path>:5:7: unexpected success of
       |```
       |1.to(2)
       |```
