@@ -4,8 +4,8 @@ import fastparse.core.Parsed
 import fox.markdown.processors.FencedCodeMod
 
 object Evaluator {
-  case class CodeFenceError(msg: String) extends Exception(msg)
-  case class CodeFenceSuccess(msg: String) extends Exception(msg)
+  case class CodeFenceFailure(errors: List[String])
+      extends Exception("Fox found evaluation failures.\n" + errors.mkString("\n", "\n\n", "\n"))
 
   import ammonite.interp.Parsers
   def parseCode(code: String): Seq[String] = {
@@ -18,27 +18,39 @@ object Evaluator {
     }
   }
 
-  def evaluate(repl: AmmoniteRepl, code: String, mod: FencedCodeMod): String = {
+  def evaluate(
+      repl: AmmoniteRepl,
+      block: RichCodeBlock,
+      mod: FencedCodeMod
+  ): Either[String, String] = {
     val out = new StringBuilder()
-    parseCode(code).foreach { stmt =>
-      val result = repl.run(stmt, repl.currentLine)
-      (result.evaluated.isSuccess, mod) match {
-        case (false, FencedCodeMod.Fail) =>
-          out.append("@ ").append(stmt).append(result.error).append("\n")
-        case (true, FencedCodeMod.Passthrough) => out.append(result.stdout)
-        case (true, FencedCodeMod.Default) =>
-          out.append("@ ").append(stmt).append(result.outString).append("\n")
-        case (true, FencedCodeMod.Fail) =>
-          throw CodeFenceSuccess(s"expected failure, got success for code block:\n$code")
-        case (false, _) =>
-          throw CodeFenceError(
-            s"expected success, got failure ${pprint.apply(result)} for code block:\n$code"
-          )
-      }
-
+    val initial: Either[String, StringBuilder] = Right(out)
+    val res = parseCode(block.code).toList.foldLeft(initial) {
+      case (acc, stmt) =>
+        acc match {
+          case l: Left[String, StringBuilder] => l
+          case r: Right[String, StringBuilder] =>
+            val result = repl.run(stmt, repl.currentLine)
+            (result.evaluated.isSuccess, mod) match {
+              case (false, FencedCodeMod.Fail) =>
+                Right(out.append("@ ").append(stmt).append(result.error).append("\n"))
+              case (true, FencedCodeMod.Passthrough) =>
+                Right(out.append(result.stdout))
+              case (true, FencedCodeMod.Default) =>
+                Right(out.append("@ ").append(stmt).append(result.outString).append("\n"))
+              case (true, FencedCodeMod.Fail) =>
+                Left(s"${block.pos}: unexpected success of\n```\n${block.code}```")
+              case (false, _) =>
+                val receivedError = result.error.split("\n").map(l => s">  $l").mkString("\n")
+                Left(s"${block.pos}: unexpected failure\n$receivedError")
+            }
+        }
     }
 
-    if (out.charAt(out.size - 1) == '\n') { out.setLength(out.length - 1) } // strip trailing newline
-    out.toString()
+    res.map { out =>
+      if (out.size > 0 && out.charAt(out.size - 1) == '\n')
+        out.setLength(out.length - 1)
+      out.toString()
+    }
   }
 }

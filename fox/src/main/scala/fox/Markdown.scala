@@ -78,10 +78,6 @@ object Markdown {
     renderer.render(document)
   }
 
-  def parse(markdown: String, options: Options): Node = {
-    parse(CharSubSequence.of(markdown), default(options))
-  }
-
   def parse(markdown: BasedSequence, settings: MutableDataSet): Node = {
     val parser = Parser.builder(settings).build
     parser.parse(markdown)
@@ -98,8 +94,7 @@ object Markdown {
     markdownOptions.set(Parser.EXTENSIONS, FoxExtensions.default(options))
   }
 
-  def toMarkdown(input: String, options: Options): String = {
-    val settings = Markdown.default(options)
+  def toMarkdown(input: String, settings: MutableDataSet): String = {
     val parser = Parser.builder(settings).build
     val formatter = Formatter.builder(settings).build
     val ast = parser.parse(input)

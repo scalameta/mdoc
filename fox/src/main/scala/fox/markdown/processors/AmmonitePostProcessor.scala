@@ -3,10 +3,10 @@ package fox.markdown.processors
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.{Document, FencedCodeBlock}
 import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostProcessorFactory}
+import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
-import fox.Markdown
-import fox.Options
-import fox.markdown.repl.{AmmoniteRepl, Evaluator}
+import fox.{Markdown, Options, Processor}
+import fox.markdown.repl.{AmmoniteRepl, RichCodeBlock, Evaluator, Position}
 
 class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
   private val repl = new AmmoniteRepl()
@@ -14,28 +14,39 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
   override def processDocument(doc: Document): Document = {
     import fox.Markdown._
     import scala.collection.JavaConverters._
+    val originPath = doc
+      .get(Processor.PathKey)
+      .getOrElse(sys.error("Path key does not exist in Flexmark's settings!!"))
+    var errors = List.empty[String]
     traverse[FencedCodeBlock](doc) {
       case block =>
         block.getInfo.toString match {
           case FencedCodeMod(mod) =>
             block.setInfo(CharSubSequence.of("scala"))
             val code = block.getContentChars().toString
-            val evaluated = Evaluator.evaluate(repl, code, mod)
-            mod match {
-              case FencedCodeMod.Default | FencedCodeMod.Fail =>
-                val content: BasedSequence = CharSubSequence.of(evaluated)
-                block.setContent(List(content).asJava)
-              case FencedCodeMod.Passthrough =>
-                // TODO(olafur) avoid creating fresh MutableDataSet for every passthrough
-                // We may be initializing a new ammonite repl every time here, which may be slow.
-                val child = Markdown.parse(evaluated, options)
-                block.insertAfter(child)
-                block.unlink()
+            val pos = Position(originPath, block.getStartLineNumber, block.getEndLineNumber)
+            Evaluator.evaluate(repl, RichCodeBlock(code, pos), mod) match {
+              case Left(error) => errors ::= error
+              case Right(str) =>
+                mod match {
+                  case FencedCodeMod.Default | FencedCodeMod.Fail =>
+                    val content: BasedSequence = CharSubSequence.of(str)
+                    block.setContent(List(content).asJava)
+                  case FencedCodeMod.Passthrough =>
+                    val markdownOptions = new MutableDataSet()
+                    markdownOptions.setAll(doc) // A doc is a mutable data set itself
+                    val child = Markdown.parse(CharSubSequence.of(str), markdownOptions)
+                    block.insertAfter(child)
+                    block.unlink()
+                }
             }
-          case _ =>
+          case _ => ()
         }
     }
-    doc
+
+    if (errors.nonEmpty) { // Report errors in batch
+      throw Evaluator.CodeFenceFailure(errors.reverse)
+    } else doc
   }
 }
 
