@@ -5,7 +5,7 @@ jdk:
 stages:
   - name: test
   - name: release
-    if: (branch = master) AND (type = push)
+    if: (type = push)
 
 jobs:
   include:
