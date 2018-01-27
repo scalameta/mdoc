@@ -1,6 +1,17 @@
 inThisBuild(
-  scalaVersion := "2.12.4"
+  List(
+    scalaVersion := "2.12.4",
+    version ~= { old =>
+      val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
+      old.replace('+', '-') + suffix
+    }
+  )
 )
+
+commands += Command.command("ci-release") { s =>
+  "vork/publishSigned" ::
+    s
+}
 
 lazy val root = project
   .in(file("."))
@@ -35,3 +46,23 @@ lazy val vork = project
   .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project.in(file("tests/input"))
+
+inScope(Global)(
+  Seq(
+    publishTo := Some {
+      if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
+      else Opts.resolver.sonatypeStaging
+    },
+    credentials ++= (for {
+      username <- sys.env.get("SONATYPE_USERNAME")
+      password <- sys.env.get("SONATYPE_PASSWORD")
+    } yield
+      Credentials(
+        "Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        username,
+        password
+      )).toSeq,
+    PgpKeys.pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
+  )
+)
