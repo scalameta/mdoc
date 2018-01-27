@@ -74,6 +74,12 @@ object Markdown {
     parser.parse(markdown)
   }
 
+  /**
+    * Defines the default markdown settings.
+    *
+    * Do not use directly. The default flexmark settings have special keys set
+    * up by fox to keep track of certain document-specific information like path.
+    */
   def default(options: Options): MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     val markdownOptions = new MutableDataSet()
