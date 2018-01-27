@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-if [[ "$TRAVIS_SECURE_ENV_VARS" == true && "$CI_PUBLISH" == true ]]; then
+if [[ "$TRAVIS_SECURE_ENV_VARS" == true ]]; then
   echo "Publishing..."
   git log | head -n 20
   echo "$PGP_SECRET" | base64 --decode | gpg --import
