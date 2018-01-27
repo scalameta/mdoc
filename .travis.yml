@@ -32,6 +32,3 @@ before_cache:
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
   - rm -rf $HOME/.ivy2/local
 
-branches:
-  only:
-    - master
