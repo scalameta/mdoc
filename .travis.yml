@@ -4,6 +4,8 @@ jdk:
 
 stages:
   - name: test
+  - name: release
+    if: (branch = master) AND (type = push)
 
 jobs:
   include:
@@ -12,6 +14,8 @@ jobs:
       script: ./bin/scalafmt --test
     - env: TEST="sbt test"
       script: sbt test
+    - stage: release
+      script: ./bin/ci-publish.sh
 
 cache:
   directories:
