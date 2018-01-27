@@ -2,6 +2,7 @@ package fox.markdown.processors
 
 class SiteVariableInjectorSuite extends BaseMarkdownSuite {
   check(
+    "header",
     """
       |# Hey ![version]
     """.stripMargin,
@@ -11,6 +12,7 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
   )
 
   check(
+    "paragraph",
     """
       |I am ![version]
     """.stripMargin,
@@ -20,6 +22,7 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
   )
 
   check(
+    "table",
     """
       || C1 | C2 |
       || == | == |

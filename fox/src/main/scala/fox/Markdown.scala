@@ -69,20 +69,17 @@ object Markdown {
     buffer.result()
   }
 
-  def toHtml(markdown: BasedSequence, options: Options): String = {
-    val s = new java.lang.StringBuilder()
-    markdown.appendTo(s)
-    val settings = default(options)
+  def parse(markdown: BasedSequence, settings: MutableDataSet): Node = {
     val parser = Parser.builder(settings).build
-    val renderer = HtmlRenderer.builder(settings).build
-    val document = parser.parse(markdown)
-    renderer.render(document)
+    parser.parse(markdown)
   }
 
-  def toHtml(markdown: String, options: Options): String = {
-    toHtml(CharSubSequence.of(markdown), options)
-  }
-
+  /**
+    * Defines the default markdown settings.
+    *
+    * Do not use directly. The default flexmark settings have special keys set
+    * up by fox to keep track of certain document-specific information like path.
+    */
   def default(options: Options): MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     val markdownOptions = new MutableDataSet()
@@ -90,8 +87,7 @@ object Markdown {
     markdownOptions.set(Parser.EXTENSIONS, FoxExtensions.default(options))
   }
 
-  def toMarkdown(input: String, options: Options): String = {
-    val settings = Markdown.default(options)
+  def toMarkdown(input: String, settings: MutableDataSet): String = {
     val parser = Parser.builder(settings).build
     val formatter = Formatter.builder(settings).build
     val ast = parser.parse(input)

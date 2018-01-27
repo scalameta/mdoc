@@ -1,18 +1,16 @@
 package fox
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
 import scala.util.Try
 import scala.util.control.NoStackTrace
-import fox.Markdown._
-import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.options.MutableDataSet
+import com.vladsch.flexmark.util.options.{DataKey, MutableDataSet}
 import fox.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
+import fox.Markdown.Doc
 
 final class Processor(
     options: Options,
@@ -24,12 +22,13 @@ final class Processor(
     s"Options contains relative paths. " +
       s"Use Options.fromDefault($options) to absolutize paths."
   )
-  private final val parser = Parser.builder(mdSettings).build
-  private final val formatter = Formatter.builder(mdSettings).build
 
   def handlePath(path: Path): Doc = {
     val sourcePath = options.resolveIn(path)
     val source = new String(java.nio.file.Files.readAllBytes(sourcePath), options.encoding)
+    mdSettings.set(Processor.PathKey, Some(path))
+    val parser = Parser.builder(mdSettings).build
+    val formatter = Formatter.builder(mdSettings).build
     val ast = parser.parse(source)
     val md = formatter.render(ast)
     Doc(path, md)
@@ -87,4 +86,8 @@ final class Processor(
     }
   }
 
+}
+
+object Processor {
+  val PathKey = new DataKey[Option[Path]]("originPath", None)
 }

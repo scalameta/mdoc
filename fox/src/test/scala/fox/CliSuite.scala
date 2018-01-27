@@ -50,7 +50,7 @@ class CliSuite extends FunSuite with DiffAssertions {
     "classpath",
     """
       |/index.md
-      |```scala
+      |```scala fox
       |test.Test.greeting
       |```
     """.stripMargin,
