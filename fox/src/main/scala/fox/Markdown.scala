@@ -69,22 +69,9 @@ object Markdown {
     buffer.result()
   }
 
-  def toHtml(markdown: BasedSequence, options: Options): String = {
-    val s = new java.lang.StringBuilder()
-    markdown.appendTo(s)
-    val settings = default(options)
-    val renderer = HtmlRenderer.builder(settings).build
-    val document = parse(markdown, settings)
-    renderer.render(document)
-  }
-
   def parse(markdown: BasedSequence, settings: MutableDataSet): Node = {
     val parser = Parser.builder(settings).build
     parser.parse(markdown)
-  }
-
-  def toHtml(markdown: String, options: Options): String = {
-    toHtml(CharSubSequence.of(markdown), options)
   }
 
   def default(options: Options): MutableDataSet = {
