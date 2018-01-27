@@ -4,10 +4,10 @@ inThisBuild(
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "foxRoot")
-  .aggregate(fox)
+  .settings(name := "vorkRoot")
+  .aggregate(vork)
 
-lazy val fox = project
+lazy val vork = project
   .settings(
     fork in run := true,
     cancelable in Global := true,
@@ -26,7 +26,7 @@ lazy val fox = project
       "org.scalatest" %% "scalatest" % "3.0.1" % Test,
       "org.scalameta" %% "testkit" % "2.1.7" % Test
     ),
-    buildInfoPackage := "fox.internal",
+    buildInfoPackage := "vork.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     ),
