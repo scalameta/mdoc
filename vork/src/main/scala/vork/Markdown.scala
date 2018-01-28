@@ -82,9 +82,11 @@ object Markdown {
     */
   def default(options: Options): MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
-    val markdownOptions = new MutableDataSet()
-    markdownOptions.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
-    markdownOptions.set(Parser.EXTENSIONS, VorkExtensions.default(options))
+    // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
+    new MutableDataSet()
+      .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
+      .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
+      .set(Parser.EXTENSIONS, VorkExtensions.default(options))
   }
 
   def toMarkdown(input: String, settings: MutableDataSet): String = {
