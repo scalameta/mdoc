@@ -23,17 +23,26 @@ class VorkParserExtension(options: Options) extends Parser.ParserExtension {
       * Creating a custom node extending `ContentNode` or `CustomNode` did not help either.
       */
     override def createNode(nodeChars: BasedSequence): ast.Node = {
-      val key = nodeChars.midSequence(2, nodeChars.length() - 1).trim()
-      val value = site.getOrElse(key.unescape(), sys.error(s"Missing '$key' site variable."))
-      new ast.Text(PrefixedSubSequence.of(value, nodeChars).removeSuffix(nodeChars))
+      nodeChars.toString match {
+        case VariableInjectionPattern(key) =>
+          val value = site.getOrElse(key, sys.error(s"Missing '$key' site variable."))
+          new ast.Text(PrefixedSubSequence.of(value, nodeChars).removeSuffix(nodeChars))
+        case _ =>
+          sys.error("Flexmark matched a variable injection which is not of the expected shape.")
+      }
     }
 
+    private final val totalLength = document.getTextLength
+    private final val VariableInjectionPattern = "!\\[([^\\]\\[]*)\\]".r
     override def isMatch(nodeChars: BasedSequence): Boolean = {
-      // It has to be of the shape `![key]` and not `![key]()` or `![](key)` or `![][key]`
-      nodeChars.countChars(nodeChars) > 3 &&
-      nodeChars.startsWith(CharSubSequence.of("![")) &&
-      nodeChars.endsWith(CharSubSequence.of("]")) &&
-      !nodeChars.containsAllOf(CharSubSequence.of("]["))
+      val matches = nodeChars.toString.matches(VariableInjectionPattern.regex)
+      val startNext = nodeChars.getEndOffset
+      val endNext = startNext + 1
+      // As bracket nesting level is 0, we need to check that the following char does not start with `[`
+      matches && (
+        startNext == totalLength ||
+        !document.getChars.baseSubSequence(startNext, endNext).startsWith("[")
+      )
     }
 
     override def adjustInlineText(doc: ast.Document, node: ast.Node): BasedSequence = node.getChars
