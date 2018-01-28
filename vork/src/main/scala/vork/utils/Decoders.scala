@@ -6,6 +6,8 @@ import java.nio.charset.UnsupportedCharsetException
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.regex.PatternSyntaxException
+import scala.util.matching.Regex
 import metaconfig.ConfDecoder
 import metaconfig.ConfError
 import metaconfig.Configured
@@ -29,6 +31,16 @@ object Decoders {
         Configured.ok(Paths.get(str))
       } catch {
         case e: InvalidPathException =>
+          ConfError.message(e.getMessage).notOk
+      }
+    }
+
+  implicit val RegexDecoder: ConfDecoder[Regex] =
+    ConfDecoder.stringConfDecoder.flatMap { str =>
+      try {
+        Configured.ok(str.r)
+      } catch {
+        case e: PatternSyntaxException =>
           ConfError.message(e.getMessage).notOk
       }
     }

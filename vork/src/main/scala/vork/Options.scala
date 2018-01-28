@@ -5,14 +5,17 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import scala.util.matching.Regex
 import vork.utils.IO
 import metaconfig.Conf
 import metaconfig.ConfDecoder
+import metaconfig.ConfError
 import metaconfig.Configured
 import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
 import metaconfig.typesafeconfig.typesafeConfigMetaconfigParser
+import vork.utils.FilterMatcher
 
 case class Options(
     @Description("The input directory to generate the vork site.")
@@ -30,8 +33,15 @@ case class Options(
     classpath: String = "",
     @ExtraName("w")
     watch: Boolean = false,
+    @Description("Regex to filter which files from --in directory to include.")
+    // TODO(olafur) Make this List[String] once metaconfig supports List[T] flags.
+    includeFiles: Option[Regex] = None,
+    @Description("Regex to filter which files from --in directory to exclude.")
+    excludeFiles: Option[Regex] = None,
     config: Config = Config()
 ) {
+
+  lazy val matcher: FilterMatcher = FilterMatcher(includeFiles, excludeFiles)
 
   def isAbsolute: Boolean =
     cwd.isAbsolute &&
@@ -56,6 +66,10 @@ object Options {
       .parseCliArgs[Options](args)
       .andThen(_.as[Options])
       .andThen(fromDefault)
+      .andThen { options =>
+        if (Files.exists(options.in)) Configured.ok(options)
+        else ConfError.fileDoesNotExist(options.in).notOk
+      }
   }
   def fromDefault(default: Options): Configured[Options] = {
     val absoluteOptions: Options = {

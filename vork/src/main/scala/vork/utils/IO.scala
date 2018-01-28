@@ -8,9 +8,12 @@ import vork.Options
 
 object IO {
 
-  def absolutize(path: Path, cwd: Path): Path =
-    if (path.isAbsolute) path
-    else cwd.resolve(path)
+  def absolutize(path: Path, cwd: Path): Path = {
+    val absolute =
+      if (path.isAbsolute) path
+      else cwd.resolve(path)
+    absolute.normalize()
+  }
 
   def collectInputPaths(options: Options): List[Path] = {
     val paths = List.newBuilder[Path]
@@ -21,9 +24,8 @@ object IO {
             file: Path,
             attrs: BasicFileAttributes
         ): FileVisitResult = {
-          if (Files.isRegularFile(file)
-            && file.getFileName.toString.endsWith(".md")) {
-            paths += options.in.relativize(file)
+          if (Files.isRegularFile(file)) {
+            paths += file
           }
           FileVisitResult.CONTINUE
         }

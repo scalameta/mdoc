@@ -2,15 +2,15 @@ package vork
 
 import java.nio.file.Files
 import java.nio.file.Path
-
-import scala.util.Try
 import scala.util.control.NoStackTrace
+import scala.util.control.NonFatal
 import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataKey, MutableDataSet}
 import vork.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
-import vork.Markdown.Doc
+import org.langmeta.internal.io.PathIO
+import vork.utils.IO
 
 final class Processor(
     options: Options,
@@ -23,7 +23,7 @@ final class Processor(
       s"Use Options.fromDefault($options) to absolutize paths."
   )
 
-  def handlePath(path: Path): Doc = {
+  def handleMarkdown(path: Path): Unit = {
     val sourcePath = options.resolveIn(path)
     val source = new String(java.nio.file.Files.readAllBytes(sourcePath), options.encoding)
     mdSettings.set(Processor.PathKey, Some(path))
@@ -31,7 +31,35 @@ final class Processor(
     val formatter = Formatter.builder(mdSettings).build
     val ast = parser.parse(source)
     val md = formatter.render(ast)
-    Doc(path, md)
+    val target = options.resolveOut(path)
+    writePath(target, md)
+    logger.info(s"Generated $target")
+  }
+
+  def handleRegularFile(path: Path): Unit = {
+    val out = options.resolveOut(path)
+    Files.createDirectories(out.getParent)
+    val source = options.resolveIn(path)
+    Files.copy(source, out)
+    logger.info(s"Copied    $out")
+  }
+
+  def handlePath(path: Path): Unit = {
+    def run(path: Path): Unit = {
+      if (!options.matcher.matches(path)) ()
+      else {
+        PathIO.extension(path) match {
+          case "md" => handleMarkdown(path)
+          case _ => handleRegularFile(path)
+        }
+      }
+    }
+    try {
+      run(options.in.relativize(path))
+    } catch {
+      case NonFatal(e) =>
+        new FileError(path, e).printStackTrace()
+    }
   }
 
   def writePath(path: Path, string: String): Unit = {
@@ -45,42 +73,23 @@ final class Processor(
     override def getCause: Throwable = cause
   }
 
-  import vork.utils.IO
-
-  def triggerGeneration(): Unit = {
+  def generateCompleteSite(): Unit = {
     val paths = IO.collectInputPaths(options)
     if (paths.isEmpty) {
-      logger.error(s"${options.in} contains no .md files!")
+      logger.error(s"${options.in} contains no files!")
     } else {
-      import scala.util.{Success, Failure}
-      val docs = paths.flatMap { path =>
-        Try(handlePath(path)) match {
-          case Success(doc) => doc :: Nil
-          case Failure(t) => new FileError(path, t).printStackTrace(); Nil
-        }
-      }
-
-      docs.foreach { doc =>
-        val target = options.resolveOut(doc.path)
-        writePath(target, doc.contents)
-        logger.info(s"Markdown file $target has been generated.")
-      }
+      paths.foreach(handlePath)
     }
   }
 
   def run(): Unit = {
     IO.cleanTarget(options)
-    if (!options.watch) triggerGeneration()
-    else {
-      triggerGeneration()
+    generateCompleteSite()
+    if (options.watch) {
       SourceWatcher.watch(
         List(options.in),
         (event: DirectoryChangeEvent) => {
-          // Let's make this info for now, we can turn it into debug afterwards
-          logger.info(
-            s"Event ${event.eventType()} at ${event.path()} triggered markdown generation."
-          )
-          triggerGeneration()
+          handlePath(event.path())
         }
       )
     }
