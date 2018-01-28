@@ -2,6 +2,7 @@ package vork
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import scala.util.control.NoStackTrace
 import scala.util.control.NonFatal
 import com.vladsch.flexmark.formatter.internal.Formatter
@@ -37,11 +38,11 @@ final class Processor(
   }
 
   def handleRegularFile(path: Path): Unit = {
-    val out = options.resolveOut(path)
-    Files.createDirectories(out.getParent)
     val source = options.resolveIn(path)
-    Files.copy(source, out)
-    logger.info(s"Copied    $out")
+    val target = options.resolveOut(path)
+    Files.createDirectories(target.getParent)
+    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
+    logger.info(s"Copied    $target")
   }
 
   def handlePath(path: Path): Unit = {

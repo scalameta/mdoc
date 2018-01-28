@@ -1,5 +1,7 @@
 package vork
 
+import java.nio.file.Files
+import org.langmeta.io.AbsolutePath
 import vork.internal.BuildInfo
 
 class CliSuite extends BaseCliSuite {
@@ -66,7 +68,7 @@ class CliSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "non-markdown",
+    "copy-overwrite",
     """
       |/licence.txt
       |MIT
@@ -74,7 +76,11 @@ class CliSuite extends BaseCliSuite {
     """
       |/licence.txt
       |MIT
-    """.stripMargin
+    """.stripMargin,
+    setup = { fixture =>
+      // This file should be overwritten
+      Files.write(fixture.out.resolve("licence.txt"), "Apache".getBytes())
+    }
   )
 
 }
