@@ -1,11 +1,11 @@
 # Vork - markdown worksheets
 
 Vork is a tool to turn markdown into markdown with Scala code examples evaluated, site variables such as version numbers expanded, and links checked against 404s.
-Vork is greatly inspired by tut, but distinguishes itself by
+Vork is greatly inspired by [tut](https://github.com/tpolecat/tut), but distinguishes itself by:
 
-* using ammonite instead of the default Scala compiler repl, enabling powerful features such as importing libraries on the fly and prettier formatted output.
+* using [Ammonite](http://ammonite.io/) instead of the default Scala compiler REPL, enabling powerful features such as importing libraries on the fly and prettier formatted output.
 * replacing variables such as `![version]` with the configured version of your project, implemented using standard markdown AST processing as opposed to regex search and replace.
-* (on the roadmap) supporting single page markdown generation from multiple pages to generate PDF and EBUP files with pandoc.
+* (on the roadmap) supporting single page markdown generation from multiple pages to generate PDF and EPUB files with pandoc.
 * (on the roadmap) checking cross-section and external links for 404s
 * (on the roadmap) rendering instant preview in VS Code as you type
 
