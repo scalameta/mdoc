@@ -6,6 +6,23 @@ inThisBuild(
       if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
       else Opts.resolver.sonatypeStaging
     },
+    licenses := Seq(
+      "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+    ),
+    developers := List(
+      Developer(
+        "jvican",
+        "Jorge Vicente Cantero",
+        "jorgevc@fastmail.es",
+        url("https://jvican.github.io/")
+      ),
+      Developer(
+        "olafurpg",
+        "Ólafur Páll Geirsson",
+        "olafurpg@gmail.com",
+        url("https://geirsson.com")
+      )
+    ),
     version ~= { old =>
       val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
       old.replace('+', '-') + suffix
