@@ -1,36 +1,10 @@
 package vork
 
 import java.nio.file.Files
-import scala.meta.testkit.DiffAssertions
-import vork.internal.BuildInfo
 import org.langmeta.io.AbsolutePath
-import org.scalatest.FunSuite
+import vork.internal.BuildInfo
 
-class CliSuite extends FunSuite with DiffAssertions {
-  def checkCli(
-      name: String,
-      original: String,
-      expected: String,
-      extraArgs: Array[String] = Array.empty,
-      setup: () => Unit = () => ()
-  ): Unit = {
-    test(name) {
-      val in = StringFS.string2dir(original)
-      val out = Files.createTempDirectory("vork")
-      val args = Array[String](
-        "--in",
-        in.toString,
-        "--out",
-        out.toString,
-        "--clean-target",
-        "--cwd",
-        in.toString
-      )
-      Cli.main(args ++ extraArgs)
-      val obtained = StringFS.dir2string(AbsolutePath(out))
-      assertNoDiff(obtained, expected)
-    }
-  }
+class CliSuite extends BaseCliSuite {
 
   checkCli(
     "vork.conf",
@@ -43,6 +17,10 @@ class CliSuite extends FunSuite with DiffAssertions {
     """
       |/index.md
       |# Hello 1.0
+      |
+      |
+      |/vork.conf
+      |site.version = "1.0"
     """.stripMargin
   )
 
@@ -65,6 +43,44 @@ class CliSuite extends FunSuite with DiffAssertions {
       "--classpath",
       BuildInfo.testsInputClassDirectory.getAbsolutePath
     )
+  )
+
+  checkCli(
+    "include/exclude",
+    """
+      |/include.md
+      |# Include
+      |/index.md
+      |# Index
+      |/include-exclude.md
+      |# Exclude
+    """.stripMargin,
+    """
+      |/include.md
+      |# Include
+    """.stripMargin,
+    extraArgs = Array(
+      "--include-files",
+      "include",
+      "--exclude-files",
+      "exclude"
+    )
+  )
+
+  checkCli(
+    "copy-overwrite",
+    """
+      |/licence.txt
+      |MIT
+    """.stripMargin,
+    """
+      |/licence.txt
+      |MIT
+    """.stripMargin,
+    setup = { fixture =>
+      // This file should be overwritten
+      Files.write(fixture.out.resolve("licence.txt"), "Apache".getBytes())
+    }
   )
 
 }
