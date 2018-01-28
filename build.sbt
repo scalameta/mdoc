@@ -2,6 +2,10 @@ inThisBuild(
   List(
     scalaVersion := "2.12.4",
     organization := "com.geirsson",
+    publishTo := Some {
+      if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
+      else Opts.resolver.sonatypeStaging
+    },
     version ~= { old =>
       val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
       old.replace('+', '-') + suffix
@@ -50,10 +54,6 @@ lazy val testsInput = project.in(file("tests/input"))
 
 inScope(Global)(
   Seq(
-    publishTo := Some {
-      if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
-      else Opts.resolver.sonatypeStaging
-    },
     credentials ++= (for {
       username <- sys.env.get("SONATYPE_USERNAME")
       password <- sys.env.get("SONATYPE_PASSWORD")
