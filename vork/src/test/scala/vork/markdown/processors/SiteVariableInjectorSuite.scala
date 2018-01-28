@@ -36,10 +36,9 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-  // We're missing one leading `!` in the expected, issue has been reported upstream
   check(
     "travis",
-    "# Title ![travis][travis-image]",
+    "# Title [travis][travis-image]",
     "# Title [travis][travis-image]"
   )
 
