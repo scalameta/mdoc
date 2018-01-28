@@ -9,8 +9,12 @@ import vork.{Markdown, Options, Processor}
 import vork.markdown.repl.{AmmoniteRepl, RichCodeBlock, Evaluator, Position}
 
 class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
-  private val repl = new AmmoniteRepl()
-  repl.loadClasspath(options.classpath)
+  // lazy to avoid instantiating a new repl for markdown files that have no ```scala vork code fences.
+  private lazy val repl = {
+    val r = new AmmoniteRepl()
+    r.loadClasspath(options.classpath)
+    r
+  }
   override def processDocument(doc: Document): Document = {
     import vork.Markdown._
     import scala.collection.JavaConverters._
