@@ -43,6 +43,15 @@ lazy val root = project
 
 lazy val vork = project
   .settings(
+    mainClass in assembly := Some("vork.Cli"),
+    assemblyJarName in assembly := "vork.jar",
+    test in assembly := {},
+    assemblyMergeStrategy.in(assembly) ~= { old =>
+      {
+        case PathList("META-INF", "CHANGES") => MergeStrategy.discard
+        case x => old(x)
+      }
+    },
     fork in run := true,
     cancelable in Global := true,
     libraryDependencies ++= List(
