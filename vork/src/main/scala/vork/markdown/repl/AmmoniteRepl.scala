@@ -142,12 +142,12 @@ class AmmoniteRepl {
     }
   }
 
-  def run(input: String, index: Int): RunResult = {
+  def run(input: String): RunResult = {
     val stdout = new ByteArrayOutputStream()
     val stderr = new ByteArrayOutputStream()
     val result = Console.withOut(stdout) {
       Console.withErr(stderr) {
-        runImpl(input, index)
+        runImpl(input, this.currentLine)
       }
     }
     result.copy(

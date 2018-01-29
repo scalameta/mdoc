@@ -30,7 +30,7 @@ object Evaluator {
         acc match {
           case l: Left[String, StringBuilder] => l
           case r: Right[String, StringBuilder] =>
-            val result = repl.run(stmt, repl.currentLine)
+            val result = repl.run(stmt)
             (result.evaluated.isSuccess, mod) match {
               case (false, FencedCodeMod.Fail) =>
                 Right(out.append("@ ").append(stmt).append(result.error).append("\n"))

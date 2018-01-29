@@ -1,12 +1,13 @@
 package vork.markdown.processors
 
+import scala.collection.mutable.ArrayBuffer
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.{Document, FencedCodeBlock}
 import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostProcessorFactory}
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
 import vork.{Markdown, Options, Processor}
-import vork.markdown.repl.{AmmoniteRepl, RichCodeBlock, Evaluator, Position}
+import vork.markdown.repl.{AmmoniteRepl, Evaluator, Position, RichCodeBlock}
 
 class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
   // lazy to avoid instantiating a new repl for markdown files that have no ```scala vork code fences.
