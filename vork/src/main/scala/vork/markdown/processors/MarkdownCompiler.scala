@@ -14,8 +14,30 @@ import metaconfig.ConfError
 import metaconfig.Configured
 import org.langmeta.inputs.Input
 import org.langmeta.inputs.Position
+import vork.runtime.Document
+import vork.runtime.DocumentBuilder
 
 object MarkdownCompiler {
+  def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
+
+  def document(compiler: MarkdownCompiler): Document = {
+    val code =
+      """
+        |package vork
+        |class Generated extends runtime.DocumentBuilder {
+        |  def app(): Unit = {
+        |      statement {
+        |        val y = List(1, 2).map(_ + 1); binder(y);
+                 statement { section { () } }
+        |      }
+        |  }
+        |}
+      """.stripMargin
+    val loader = compiler.compile(Input.String(code)).get
+    val cls = loader.loadClass("vork.Generated")
+    cls.newInstance().asInstanceOf[DocumentBuilder].build()
+  }
+
   // Copy paste from scalafix
   def defaultClasspath: String = {
     getClass.getClassLoader match {
