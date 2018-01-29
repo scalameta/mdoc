@@ -31,6 +31,10 @@ inThisBuild(
   )
 )
 
+lazy val V = new {
+  val pprint = "0.5.2"
+}
+
 commands += Command.command("ci-release") { s =>
   "vork/publishSigned" ::
     s
@@ -40,6 +44,14 @@ lazy val root = project
   .in(file("."))
   .settings(name := "vorkRoot")
   .aggregate(vork)
+
+lazy val runtime = project
+  .settings(
+    libraryDependencies ++= List(
+      scalaOrganization.value % "scala-reflect" % scalaVersion.value,
+      "com.lihaoyi" %% "pprint" % V.pprint
+    )
+  )
 
 lazy val vork = project
   .settings(
@@ -60,7 +72,7 @@ lazy val vork = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.6.0",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "com.lihaoyi" %% "fansi" % "0.2.5",
-      "com.lihaoyi" %% "pprint" % "0.5.2",
+      "com.lihaoyi" %% "pprint" % V.pprint,
       "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
       "io.methvin" % "directory-watcher" % "0.4.0",
       ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full)
@@ -75,6 +87,7 @@ lazy val vork = project
     ),
     compile.in(Test) := compile.in(Test).dependsOn(compile.in(testsInput, Compile)).value
   )
+  .dependsOn(runtime)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project.in(file("tests/input"))

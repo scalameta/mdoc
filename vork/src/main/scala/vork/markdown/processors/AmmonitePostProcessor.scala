@@ -23,6 +23,7 @@ class AmmonitePostProcessor(options: Options) extends DocumentPostProcessor {
       .get(Processor.PathKey)
       .getOrElse(sys.error("Path key does not exist in Flexmark's settings!!"))
     var errors = List.empty[String]
+
     traverse[FencedCodeBlock](doc) {
       case block =>
         block.getInfo.toString match {
