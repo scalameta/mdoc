@@ -20,20 +20,17 @@ import vork.runtime.DocumentBuilder
 object MarkdownCompiler {
   def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
 
-  def document(compiler: MarkdownCompiler): Document = {
-    val code =
-      """
-        |package vork
-        |class Generated extends runtime.DocumentBuilder {
-        |  def app(): Unit = {
-        |      statement {
-        |        val y = List(1, 2).map(_ + 1); binder(y);
-                 statement { section { () } }
-        |      }
-        |  }
-        |}
+  def document(compiler: MarkdownCompiler, instrumented: String): Document = {
+    val wrapped =
+      s"""
+         |package vork
+         |class Generated extends _root_.vork.runtime.DocumentBuilder {
+         |  def app(): Unit = {
+         |    $instrumented
+         |  }
+         |}
       """.stripMargin
-    val loader = compiler.compile(Input.String(code)).get
+    val loader = compiler.compile(Input.String(wrapped)).get
     val cls = loader.loadClass("vork.Generated")
     cls.newInstance().asInstanceOf[DocumentBuilder].build()
   }
