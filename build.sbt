@@ -75,6 +75,7 @@ lazy val vork = project
       "com.lihaoyi" %% "pprint" % V.pprint,
       "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
       "io.methvin" % "directory-watcher" % "0.4.0",
+      "ch.epfl.scala" %% "scalafix-core" % "0.5.9",
       ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full)
     ),
     libraryDependencies ++= List(
