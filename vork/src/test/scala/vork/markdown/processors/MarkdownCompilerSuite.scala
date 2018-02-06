@@ -1,70 +1,76 @@
 package vork.markdown.processors
 
-import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
-import scalafix._
+import org.scalatest.FunSuite
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
-  def instrumentSections(sections: List[String]): String = {
-    val stats = sections.map(instrument)
-    val out = stats.foldRight("") {
-      case (section, "") =>
-        s"$section; section { () }"
-      case (section, accum) =>
-        s"$section; section { $accum }"
+
+  private val compiler = MarkdownCompiler.default()
+
+  def checkIgnore(name: String, original: String, expected: String): Unit =
+    ignore(name) {}
+
+  def check(name: String, original: String, expected: String): Unit =
+    check(name, original :: Nil, expected)
+
+  def check(name: String, original: List[String], expected: String): Unit = {
+    test(name) {
+      val obtained = MarkdownCompiler.render(original, compiler)
+      assertNoDiff(obtained, expected)
     }
-    out
   }
 
-  def instrument(md: String): String = {
-    val source = dialects.Sbt1(md).parse[Source].get
-    val stats = source.stats
-    val ctx = RuleCtx(source)
-    val rule = Rule.syntactic("Vork") { ctx =>
-      val last = ctx.tokens.last
-      val patches = stats.map {
-        case stat @ Defn.Val(_, pats, _, _) =>
-          val names = pats.flatMap { pat =>
-            pat.collect { case m: Member => m.name }
-          }
-          val binders = names
-            .map(name => s"binder($name)")
-            .mkString(";", ";", "; statement {")
-          ctx.addRight(stat, binders) +
-            ctx.addRight(last, " }")
-      }
-      val patch = patches.asPatch
-      patch
-    }
-    rule.apply(ctx)
-  }
-
-  val compiler = MarkdownCompiler.default()
-
-  test("instrument") {
-    val md1 =
+  check(
+    "two",
+    List(
       """
         |val x = 1.to(10)
-        |val List(y, z) = x.map(_ + 1).toList.take(2)
-      """.stripMargin
-    val md2 =
+      """.stripMargin,
       """
-        |val y = "msg"
-        |val z = y.length
+        |val y = x.length
       """.stripMargin
-    val out = instrumentSections(md1 :: md2 :: Nil)
-    val doc = MarkdownCompiler.document(compiler, out)
-    pprint.log(doc)
-    assertNoDiff(
-      out,
-      """"""
-    )
-  }
+    ),
+    """
+      |```scala
+      |@ val x = 1.to(10)
+      |x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      |```
+      |
+      |```scala
+      |@ val y = x.length
+      |y: Int = 10
+      |```
+    """.stripMargin
+  )
 
-  ignore("compiler") {
-    val doc = MarkdownCompiler.document(compiler, "")
-    pprint.log(doc)
-  }
+  check(
+    "stdout",
+    """
+      |val x = {
+      |  println(42)
+      |  System.err.println("err")
+      |  2
+      |}
+    """.stripMargin,
+    """
+      |```scala
+      |@ val x = {
+      |  println(42)
+      |  System.err.println("err")
+      |  2
+      |}
+      |42
+      |err
+      |x: Int = 2
+      |```
+    """.stripMargin
+  )
+
+  checkIgnore(
+    "non-val",
+    """println("hello world!") """,
+    "hello world!"
+  )
 
 }

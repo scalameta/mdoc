@@ -68,6 +68,7 @@ lazy val vork = project
     cancelable in Global := true,
     libraryDependencies ++= List(
       "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.scalameta" %% "scalameta" % "3.2.0",
       "com.geirsson" %% "metaconfig-core" % "0.6.0",
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.6.0",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
