@@ -1,5 +1,7 @@
 package vork.runtime
 
+import scala.language.experimental.macros
+
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import scala.collection.mutable.ArrayBuffer

@@ -6,6 +6,7 @@ import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostPro
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
 import org.langmeta.inputs.Input
+import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Options, Processor}
 
 class CompilerPostProcessor(options: Options) extends DocumentPostProcessor {
@@ -35,7 +36,13 @@ class CompilerPostProcessor(options: Options) extends DocumentPostProcessor {
       case VorkCodeFence(block, mod) => block -> mod
     }
     if (fences.nonEmpty) {
-      val code = fences.map(f => Input.VirtualFile(originPath, f._1.getContentChars.toString))
+      val code = fences.map {
+        case (block, mod) =>
+          val input = Input.VirtualFile(originPath, block.getContentChars.toString)
+          import scala.meta._
+          val source = dialects.Sbt1(input).parse[Source].get
+          SectionInput(source, mod)
+      }
       val rendered = MarkdownCompiler.renderInputs(code, compiler)
       rendered.sections.zip(fences).foreach {
         case (section, (block, mod)) =>

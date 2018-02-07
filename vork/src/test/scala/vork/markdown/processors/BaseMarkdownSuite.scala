@@ -42,6 +42,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     test(name) {
       val path = getPath(name, original)
       val obtained = Markdown.toMarkdown(original, getSettings(path))
+      println(obtained)
       assertNoDiff(obtained, expected)
     }
   }

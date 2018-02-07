@@ -16,15 +16,38 @@ class FailSuite extends BaseMarkdownSuite {
     """
       |```scala
       |@ val x: Int = "String"
-      |cmd0.sc:1: type mismatch;
+      |type mismatch;
       | found   : String("String")
       | required: Int
       |val x: Int = "String"
       |             ^
-      |Compilation Failed
       |```
     """.stripMargin
   )
+  check(
+    "triplequote",
+    """
+      |```scala vork:fail
+      |val y: Int = '''Triplequote
+      |newlines
+      |'''
+      |```
+    """.replace("'''", "\"\"\"").stripMargin,
+    """
+      |```scala
+      |@ val y: Int = '''Triplequote
+      |newlines
+      |'''
+      |type mismatch;
+      | found   : String("Triplequote\nnewlines\n")
+      | required: Int
+      |val y: Int = '''Triplequote
+      |              ^
+      |```
+      |""".replace("'''", "\"\"\"").stripMargin
+  )
+
+
 
 //  checkError[Evaluator.CodeFenceFailure](
 //    "fail-error",

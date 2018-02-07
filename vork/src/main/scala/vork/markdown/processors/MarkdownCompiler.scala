@@ -19,29 +19,38 @@ import org.langmeta.inputs.Input
 import org.langmeta.inputs.Position
 import vork.runtime.Document
 import vork.runtime.DocumentBuilder
+import vork.runtime.Macros
 import vork.runtime.Section
 
 object MarkdownCompiler {
 
   case class EvaluatedDocument(sections: List[EvaluatedSection])
   object EvaluatedDocument {
-    def apply(document: Document, trees: List[Source]): EvaluatedDocument =
-      EvaluatedDocument(document.sections.zip(trees).map { case (a, b) => EvaluatedSection(a, b) })
+    def apply(document: Document, trees: List[SectionInput]): EvaluatedDocument =
+      EvaluatedDocument(
+        document.sections.zip(trees).map {
+          case (a, b) => EvaluatedSection(a, b.source, b.mod)
+        }
+      )
   }
-  case class EvaluatedSection(section: Section, source: Source) {
+  case class EvaluatedSection(section: Section, source: Source, mod: FencedCodeMod) {
     def out: String = section.statements.map(_.out).mkString
   }
 
   def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
   def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
-    renderInputs(sections.map(Input.String.apply), compiler)
+    renderInputs(
+      sections.map(s => SectionInput(dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
+      compiler
+    )
   }
 
-  def renderInputs(sections: List[Input], compiler: MarkdownCompiler): EvaluatedDocument = {
-    val sources = sections.map(s => dialects.Sbt1(s).parse[Source].get)
-    val instrumented = MarkdownCompiler.instrumentSections(sources)
-    val doc = MarkdownCompiler.document(compiler, instrumented)
-    val evaluated = EvaluatedDocument(doc, sources)
+  case class SectionInput(source: Source, mod: FencedCodeMod)
+
+  def renderInputs(sections: List[SectionInput], compiler: MarkdownCompiler): EvaluatedDocument = {
+    val instrumented = instrumentSections(sections)
+    val doc = document(compiler, instrumented)
+    val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
 
@@ -57,7 +66,6 @@ object MarkdownCompiler {
         }
         sb.append("@ ")
           .append(tree.syntax)
-
         if (statement.out.nonEmpty) {
           sb.append("\n").append(statement.out)
         }
@@ -66,32 +74,50 @@ object MarkdownCompiler {
         }
 
         statement.binders.foreach { binder =>
-          sb.append(binder.name)
-            .append(": ")
-            .append(binder.tpe.render)
-            .append(" = ")
-            .append(pprint.PPrinter.BlackWhite.apply(binder.value))
-            .append("\n")
+          section.mod match {
+            case FencedCodeMod.Fail =>
+              binder.value match {
+                case Macros.TypecheckedOK =>
+                  sb.append("???\n")
+                case Macros.ParseError(msg) =>
+                  sb.append(msg)
+                case Macros.TypeError(msg) =>
+                  sb.append(msg)
+                case _ =>
+                  val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
+                  throw new IllegalArgumentException(
+                    s"Expected Macros.CompileResult." +
+                      s"Obtained $obtained"
+                  )
+              }
+            case _ =>
+              statement.binders.foreach { binder =>
+                sb.append(binder.name)
+                  .append(": ")
+                  .append(binder.tpe.render)
+                  .append(" = ")
+                  .append(pprint.PPrinter.BlackWhite.apply(binder.value))
+                  .append("\n")
+              }
+          }
         }
     }
-    if (sb.last == '\n') sb.setLength(sb.length - 1)
+    if (sb.nonEmpty && sb.last == '\n') sb.setLength(sb.length - 1)
     sb.toString()
   }
 
-  private val counter = new AtomicInteger()
   def document(compiler: MarkdownCompiler, instrumented: String): Document = {
-    val name = "Generated" + counter.getAndIncrement()
     val wrapped =
       s"""
          |package vork
-         |class $name extends _root_.vork.runtime.DocumentBuilder {
+         |class Generated extends _root_.vork.runtime.DocumentBuilder {
          |  def app(): Unit = {
          |    $instrumented
          |  }
          |}
       """.stripMargin
     val loader = compiler.compile(Input.String(wrapped)).get
-    val cls = loader.loadClass(s"vork.$name")
+    val cls = loader.loadClass(s"vork.Generated")
     cls.newInstance().asInstanceOf[DocumentBuilder].build()
   }
 
@@ -115,7 +141,7 @@ object MarkdownCompiler {
       case _ => ""
     }
   }
-  def instrumentSections(sections: List[Source]): String = {
+  def instrumentSections(sections: List[SectionInput]): String = {
     val stats = sections.map(instrument)
     val out = stats.foldRight("") {
       case (section, "") =>
@@ -136,24 +162,48 @@ object MarkdownCompiler {
     }
   }
 
-  def instrument(source: Source): String = {
+  def literal(string: String): String = {
+    val isTriplequote = string.contains("\"\"\"")
+    val code =
+      if (isTriplequote)
+        string.replace("\"\"\"", "'''")
+      else string
+    val suffix = if (isTriplequote) ".replace(\"'''\", \"\\\"\\\"\\\"\")" else ""
+    val result = "\"\"\"" + code + "\"\"\"" + suffix
+    result
+  }
+
+  def instrument(section: SectionInput): String = {
+    val source = section.source
     val stats = source.stats
     val ctx = RuleCtx(source)
     val rule = Rule.syntactic("Vork") { ctx =>
       val last = ctx.tokens.last
       val patches = stats.map {
         case stat @ Binders(names) =>
-          val binders = names
-            .map(name => s"binder($name)")
-            .mkString(";", ";", "; statement {")
-          ctx.addRight(stat, binders) +
-            ctx.addRight(last, " }")
+          section.mod match {
+            case FencedCodeMod.Fail =>
+              val newCode =
+                s"val compileError = _root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); " +
+                  "binder(compileError); " +
+                  s"statement {"
+              ctx.replaceTree(stat, newCode) +
+                ctx.addRight(last, " }")
+            case _ =>
+              val binders = names
+                .map(name => s"binder($name)")
+                .mkString(";", ";", "; statement {")
+              ctx.addRight(stat, binders) +
+                ctx.addRight(last, " }")
+          }
         case _ => Patch.empty
       }
       val patch = patches.asPatch
       patch
     }
-    rule.apply(ctx)
+    val out = rule.apply(ctx)
+
+    out
   }
 }
 
@@ -171,7 +221,13 @@ class MarkdownCompiler(
   private val classLoader =
     new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
+  private def clearTarget(): Unit = target match {
+    case vdir: VirtualDirectory => vdir.clear()
+    case _ =>
+  }
+
   def compile(input: Input): Configured[ClassLoader] = {
+    clearTarget()
     reporter.reset()
     val run = new global.Run
     val label = input match {

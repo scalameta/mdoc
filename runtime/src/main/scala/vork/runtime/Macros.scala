@@ -16,17 +16,28 @@ object Macros {
   def fail(code: String): CompileResult = macro failImpl
   def failImpl(c: blackbox.Context)(code: c.Tree): c.Tree = {
     import c.universe._
-    val Literal(Constant(string: String)) = code
+    val string = code match {
+      case Literal(Constant(str: String)) => str
+      case q"${Literal(Constant(str: String))}.replace($a, $b)" =>
+        str.replace("'''", "\"\"\"")
+    }
+
+    def formatPosition(message: String, pos: scala.reflect.api.Position): c.Expr[String] =
+      c.literal(
+        s"""$message
+           |${pos.lineContent}
+           |${(" " * (pos.column - 1)) + "^"}""".stripMargin
+      )
 
     try {
       c.typecheck(c.parse(string))
       reify { TypecheckedOK }.tree
     } catch {
       case e: ParseException =>
-        val msg = c.literal(e.getMessage)
+        val msg = formatPosition(e.getMessage, e.pos)
         reify { ParseError(msg.splice) }.tree
       case e: TypecheckException =>
-        val msg = c.literal(e.getMessage)
+        val msg = formatPosition(e.getMessage, e.pos)
         reify { TypeError(msg.splice) }.tree
     }
   }
