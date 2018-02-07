@@ -22,51 +22,59 @@ import vork.runtime.DocumentBuilder
 import vork.runtime.Section
 
 object MarkdownCompiler {
+
+  case class EvaluatedDocument(sections: List[EvaluatedSection])
+  object EvaluatedDocument {
+    def apply(document: Document, trees: List[Source]): EvaluatedDocument =
+      EvaluatedDocument(document.sections.zip(trees).map { case (a, b) => EvaluatedSection(a, b) })
+  }
+  case class EvaluatedSection(section: Section, source: Source) {
+    def out: String = section.statements.map(_.out).mkString
+  }
+
   def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
-  def render(sections: List[String], compiler: MarkdownCompiler): String = {
+  def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
+    renderInputs(sections.map(Input.String.apply), compiler)
+  }
+
+  def renderInputs(sections: List[Input], compiler: MarkdownCompiler): EvaluatedDocument = {
     val sources = sections.map(s => dialects.Sbt1(s).parse[Source].get)
     val instrumented = MarkdownCompiler.instrumentSections(sources)
     val doc = MarkdownCompiler.document(compiler, instrumented)
-    val obtained = renderDocument(doc, sources.map(_.stats))
-    obtained
+    val evaluated = EvaluatedDocument(doc, sources)
+    evaluated
   }
 
-  def renderDocument(doc: Document, statements: List[List[Tree]]): String = {
+  def renderEvaluatedSection(section: EvaluatedSection): String = {
     val sb = new StringBuilder
+    var first = true
+    section.section.statements.zip(section.source.stats).foreach {
+      case (statement, tree) =>
+        if (first) {
+          first = false
+        } else {
+          sb.append("\n")
+        }
+        sb.append("@ ")
+          .append(tree.syntax)
 
-    def section(s: Section, trees: List[Tree]): Unit = {
-      sb.append("```scala\n")
-      var first = true
-      s.statements.zip(trees).foreach {
-        case (statement, tree) =>
-          if (first) {
-            first = false
-          } else {
-            sb.append("\n")
-          }
-          sb.append("@ ")
-            .append(tree.syntax)
+        if (statement.out.nonEmpty) {
+          sb.append("\n").append(statement.out)
+        }
+        if (sb.charAt(sb.size - 1) != '\n') {
+          sb.append("\n")
+        }
 
-          if (statement.out.nonEmpty) {
-            sb.append("\n").append(statement.out)
-          }
-          if (sb.charAt(sb.size - 1) != '\n') {
-            sb.append("\n")
-          }
-          statement.binders.foreach { binder =>
-            sb.append(binder.name)
-              .append(": ")
-              .append(binder.tpe.render)
-              .append(" = ")
-              .append(pprint.PPrinter.BlackWhite.apply(binder.value))
-              .append("\n")
-          }
-      }
-      sb.append("```\n\n")
+        statement.binders.foreach { binder =>
+          sb.append(binder.name)
+            .append(": ")
+            .append(binder.tpe.render)
+            .append(" = ")
+            .append(pprint.PPrinter.BlackWhite.apply(binder.value))
+            .append("\n")
+        }
     }
-    doc.sections.zip(statements).foreach {
-      case (a, b) => section(a, b)
-    }
+    if (sb.last == '\n') sb.setLength(sb.length - 1)
     sb.toString()
   }
 

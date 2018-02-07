@@ -5,16 +5,8 @@ import org.scalatest.FunSuite
 import vork.runtime.DocumentBuilder
 import vork.runtime.Macros
 
-class RuntimeSuite extends FunSuite with DiffAssertions with DocumentBuilder {
-
-  test("app") {
-    val document = build()
-    val obtained = pprint.PPrinter.BlackWhite.apply(document, height = 1000, width = 70)
-    println(obtained)
-  }
-
+class RuntimeApp extends DocumentBuilder {
   override def app(): Unit = {
-//    format: off
     val x = List(1); binder(x);
     statement {
       val y = x.map(_ + 1); binder(y);
@@ -49,4 +41,15 @@ class RuntimeSuite extends FunSuite with DiffAssertions with DocumentBuilder {
       }
     }
   }
+
+}
+
+class RuntimeSuite extends FunSuite with DiffAssertions {
+
+  test("app") {
+    val app = new RuntimeApp()
+    val document = app.build()
+    val obtained = pprint.PPrinter.BlackWhite.apply(document, height = 1000, width = 70)
+  }
+
 }

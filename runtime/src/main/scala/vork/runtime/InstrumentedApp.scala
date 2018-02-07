@@ -6,7 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 import pprint.TPrint
 import sourcecode.Text
 
-class Binder[T](val value: T,val  name: String, val tpe: pprint.TPrint[T]) {
+class Binder[T](val value: T, val name: String, val tpe: pprint.TPrint[T]) {
   override def toString: String =
     s"""Binder(${pprint.PPrinter.BlackWhite.apply(value)}, "$name", "${tpe.render}")"""
 }
@@ -16,7 +16,9 @@ object Binder {
 }
 
 case class Statement(binders: List[Binder[_]], out: String)
-case class Section(statements: List[Statement])
+case class Section(statements: List[Statement]) {
+  def isError: Boolean = statements.exists(_.isInstanceOf[Macros.CompileError])
+}
 case class Document(sections: List[Section])
 
 trait DocumentBuilder {

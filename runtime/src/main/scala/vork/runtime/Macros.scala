@@ -8,9 +8,10 @@ import scala.reflect.macros.blackbox
 
 object Macros {
   sealed trait CompileResult
-  case object TypecheckedOK extends CompileResult
-  case class TypeError(msg: String) extends CompileResult
-  case class ParseError(msg: String) extends CompileResult
+  final case object TypecheckedOK extends CompileResult
+  sealed trait CompileError extends CompileResult
+  final case class TypeError(msg: String) extends CompileError
+  final case class ParseError(msg: String) extends CompileError
 
   def fail(code: String): CompileResult = macro failImpl
   def failImpl(c: blackbox.Context)(code: c.Tree): c.Tree = {
