@@ -163,14 +163,8 @@ object MarkdownCompiler {
   }
 
   def literal(string: String): String = {
-    val isTriplequote = string.contains("\"\"\"")
-    val code =
-      if (isTriplequote)
-        string.replace("\"\"\"", "'''")
-      else string
-    val suffix = if (isTriplequote) ".replace(\"'''\", \"\\\"\\\"\\\"\")" else ""
-    val result = "\"\"\"" + code + "\"\"\"" + suffix
-    result
+    import scala.meta.internal.prettyprinters._
+    enquote(string, DoubleQuotes)
   }
 
   def instrument(section: SectionInput): String = {
