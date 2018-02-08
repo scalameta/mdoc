@@ -9,13 +9,7 @@ import org.langmeta.inputs.Input
 import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Options, Processor}
 
-class CompilerPostProcessor(options: Options) extends DocumentPostProcessor {
-  private lazy val compiler = {
-    // TODO(olafur) reuse compiler instance across processors. Starting
-    // new Global instance is expensive!
-    if (options.classpath.isEmpty) MarkdownCompiler.default()
-    else new MarkdownCompiler(options.classpath)
-  }
+class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler) extends DocumentPostProcessor {
 
   object VorkCodeFence {
     def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, FencedCodeMod)] =
@@ -70,9 +64,9 @@ class CompilerPostProcessor(options: Options) extends DocumentPostProcessor {
 }
 
 object CompilerPostProcessor {
-  class Factory(options: Options) extends DocumentPostProcessorFactory {
+  class Factory(options: Options, compiler: MarkdownCompiler) extends DocumentPostProcessorFactory {
     override def create(document: ast.Document): DocumentPostProcessor = {
-      new CompilerPostProcessor(options)
+      new CompilerPostProcessor(options, compiler)
     }
   }
 }

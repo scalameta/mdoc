@@ -218,7 +218,7 @@ class MarkdownCompiler(
   settings.classpath.value = classpath
   lazy val reporter = new StoreReporter
   private val global = new Global(settings, reporter)
-  private val classLoader =
+  private def classLoader =
     new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
   private def clearTarget(): Unit = target match {
