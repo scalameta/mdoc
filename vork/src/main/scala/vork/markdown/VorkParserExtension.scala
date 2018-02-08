@@ -75,10 +75,7 @@ class VorkParserExtension(options: Options, compiler: MarkdownCompiler)
 
 object VorkParserExtension {
   def create(options: Options): Extension = {
-    val compiler = {
-      if (options.classpath.isEmpty) MarkdownCompiler.default()
-      else new MarkdownCompiler(options.classpath)
-    }
+    val compiler = MarkdownCompiler.fromClasspath(options.classpath)
     new VorkParserExtension(options, compiler)
   }
 }

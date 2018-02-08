@@ -37,6 +37,23 @@ object MarkdownCompiler {
     def out: String = section.statements.map(_.out).mkString
   }
 
+  def fromClasspath(cp: String): MarkdownCompiler =
+    if (cp.isEmpty) {
+      default()
+    } else {
+      val runtimeOnly = defaultClasspath(
+        path =>
+          Set(
+            "scala-reflect",
+            "pprint",
+            "vork-runtime"
+          ).contains(path)
+      )
+      val finalRuntime =
+        if (runtimeOnly.isEmpty) defaultClasspath
+        else runtimeOnly
+      new MarkdownCompiler(cp + File.pathSeparator + finalRuntime)
+    }
   def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
   def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
     renderInputs(
@@ -112,37 +129,44 @@ object MarkdownCompiler {
          |package vork
          |class Generated extends _root_.vork.runtime.DocumentBuilder {
          |  def app(): Unit = {
-         |    $instrumented
+         |$instrumented
          |  }
          |}
       """.stripMargin
+    println("COMPILING!!!")
+    println(wrapped)
     val loader = compiler.compile(Input.String(wrapped)).get
     val cls = loader.loadClass(s"vork.Generated")
     cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
   }
 
   // Copy paste from scalafix
-  def defaultClasspath: String = {
+  def defaultClasspath: String = defaultClasspath(_ => true)
+  def defaultClasspath(filter: String => Boolean): String = {
     getClass.getClassLoader match {
       case u: URLClassLoader =>
-        val paths = u.getURLs.toList.map(u => {
-          if (u.getProtocol.startsWith("bootstrap")) {
-            import java.io._
-            import java.nio.file._
-            val stream = u.openStream
-            val tmp = File.createTempFile("bootstrap-" + u.getPath, ".jar")
-            Files.copy(stream, Paths.get(tmp.getAbsolutePath), StandardCopyOption.REPLACE_EXISTING)
-            tmp.getAbsolutePath
-          } else {
-            URLDecoder.decode(u.getPath, "UTF-8")
-          }
-        })
+        val paths = u.getURLs.iterator
+          .map(u => {
+            if (u.getProtocol.startsWith("bootstrap")) {
+              import java.io._
+              import java.nio.file._
+              val stream = u.openStream
+              val tmp = File.createTempFile("bootstrap-" + u.getPath, ".jar")
+              Files
+                .copy(stream, Paths.get(tmp.getAbsolutePath), StandardCopyOption.REPLACE_EXISTING)
+              tmp.getAbsolutePath
+            } else {
+              URLDecoder.decode(u.getPath, "UTF-8")
+            }
+          })
+          .filter(path => filter(path))
+          .toList
         paths.mkString(File.pathSeparator)
       case _ => ""
     }
   }
   def instrumentSections(sections: List[SectionInput]): String = {
-    val stats = sections.map(instrument)
+    val stats = instrument(sections)
     val out = stats.foldRight("") {
       case (section, "") =>
         s"$section; $$doc.section { () }"
@@ -158,6 +182,8 @@ object MarkdownCompiler {
     def unapply(tree: Tree): Option[List[Name]] = tree match {
       case Defn.Val(_, pats, _, _) => Some(pats.flatMap(binders))
       case Defn.Var(_, pats, _, _) => Some(pats.flatMap(binders))
+      case _: Defn => Some(Nil)
+      case _: Import => Some(Nil)
       case _ => None
     }
   }
@@ -167,37 +193,56 @@ object MarkdownCompiler {
     enquote(string, DoubleQuotes)
   }
 
-  def instrument(section: SectionInput): String = {
+  def instrument(sections: List[SectionInput]): List[String] = {
+    val (_, result) = sections.foldLeft((0, List.empty[String])) {
+      case ((counter, tail), nextSection) =>
+        val (head, nextN) = instrument(nextSection, counter)
+        nextN -> (head :: tail)
+    }
+    result.reverse
+  }
+
+  def instrument(section: SectionInput, n: Int): (String, Int) = {
+    var counter = n
     val source = section.source
     val stats = source.stats
     val ctx = RuleCtx(source)
+    def freshBinder(): String = {
+      val name = "res" + counter
+      counter += 1
+      name
+    }
     val rule = Rule.syntactic("Vork") { ctx =>
       val last = ctx.tokens.last
-      val patches = stats.map {
-        case stat @ Binders(names) =>
-          section.mod match {
-            case FencedCodeMod.Fail =>
-              val newCode =
-                s"val compileError = _root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); " +
-                  "$doc.binder(compileError); " +
-                  s"$$doc.statement {"
-              ctx.replaceTree(stat, newCode) +
-                ctx.addRight(last, " }")
-            case _ =>
-              val binders = names
-                .map(name => s"$$doc.binder($name)")
-                .mkString(";", ";", "; $doc.statement {")
+      val patches = stats.map { stat =>
+        val (names, resPatch) = Binders.unapply(stat) match {
+          case Some(b) => b -> Patch.empty
+          case _ =>
+            val name = freshBinder()
+            List(Term.Name(name)) -> ctx.addLeft(stat, s"val $name = \n")
+        }
+        section.mod match {
+          case FencedCodeMod.Fail =>
+            val newCode =
+              s"val compileError = _root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); " +
+                "$doc.binder(compileError); " +
+                s"$$doc.statement {\n"
+            ctx.replaceTree(stat, newCode) +
+              ctx.addRight(last, " }")
+          case _ =>
+            val binders = names
+              .map(name => s"$$doc.binder($name)")
+              .mkString(";", ";", "; $doc.statement {\n")
+            resPatch +
               ctx.addRight(stat, binders) +
-                ctx.addRight(last, " }")
-          }
-        case _ => Patch.empty
+              ctx.addRight(last, " }")
+        }
       }
       val patch = patches.asPatch
       patch
     }
     val out = rule.apply(ctx)
-
-    out
+    out -> counter
   }
 }
 
