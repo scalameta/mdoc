@@ -118,7 +118,7 @@ object MarkdownCompiler {
       """.stripMargin
     val loader = compiler.compile(Input.String(wrapped)).get
     val cls = loader.loadClass(s"vork.Generated")
-    cls.newInstance().asInstanceOf[DocumentBuilder].build()
+    cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
   }
 
   // Copy paste from scalafix
@@ -145,9 +145,9 @@ object MarkdownCompiler {
     val stats = sections.map(instrument)
     val out = stats.foldRight("") {
       case (section, "") =>
-        s"$section; section { () }"
+        s"$section; $$doc.section { () }"
       case (section, accum) =>
-        s"$section; section { $accum }"
+        s"$section; $$doc.section { $accum }"
     }
     out
   }
@@ -179,14 +179,14 @@ object MarkdownCompiler {
             case FencedCodeMod.Fail =>
               val newCode =
                 s"val compileError = _root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); " +
-                  "binder(compileError); " +
-                  s"statement {"
+                  "$doc.binder(compileError); " +
+                  s"$$doc.statement {"
               ctx.replaceTree(stat, newCode) +
                 ctx.addRight(last, " }")
             case _ =>
               val binders = names
-                .map(name => s"binder($name)")
-                .mkString(";", ";", "; statement {")
+                .map(name => s"$$doc.binder($name)")
+                .mkString(";", ";", "; $doc.statement {")
               ctx.addRight(stat, binders) +
                 ctx.addRight(last, " }")
           }

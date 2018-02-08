@@ -1,5 +1,6 @@
 package vork.markdown
 
+import scala.collection.mutable
 import scala.tools.nsc.Global
 import vork.Options
 import com.vladsch.flexmark.Extension
@@ -10,7 +11,8 @@ import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence, PrefixedSubSequence}
 import vork.markdown.processors.MarkdownCompiler
 
-class VorkParserExtension(options: Options, compiler: MarkdownCompiler) extends Parser.ParserExtension {
+class VorkParserExtension(options: Options, compiler: MarkdownCompiler)
+    extends Parser.ParserExtension {
   class SiteVariableInjector(site: Map[String, String], document: ast.Document)
       extends LinkRefProcessor {
 
@@ -74,8 +76,6 @@ class VorkParserExtension(options: Options, compiler: MarkdownCompiler) extends 
 object VorkParserExtension {
   def create(options: Options): Extension = {
     val compiler = {
-      // TODO(olafur) reuse compiler instance across processors. Starting
-      // new Global instance is expensive!
       if (options.classpath.isEmpty) MarkdownCompiler.default()
       else new MarkdownCompiler(options.classpath)
     }

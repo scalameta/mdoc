@@ -42,4 +42,5 @@ object VorkExtensions {
       WikiLinkExtension.create(),
     ).asJava
   }
+
 }

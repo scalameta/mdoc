@@ -29,45 +29,50 @@ trait DocumentBuilder {
   private val mySections = ArrayBuffer.empty[Section]
   private val myOut = new ByteArrayOutputStream()
 
-  def binder[A](e: Text[A])(implicit tprint: TPrint[A]): A = {
-    myBinders.append(Binder.generate(e))
-    e.value
-  }
-
-  def statement[T](e: => T): T = {
-    val out = myOut.toString()
-    myOut.reset()
-    myStatements.append(Statement(myBinders.toList, out))
-    myBinders.clear()
-    e
-  }
-
-  def section[T](e: => T): T = {
-    mySections.append(Section(myStatements.toList))
-    myStatements.clear()
-    e
-  }
-
-  def build(): Document = {
-    val backupStdout = System.out
-    val backupStderr = System.err
-    try {
-      val out = new PrintStream(myOut)
-      System.setOut(out)
-      System.setErr(out)
-      Console.withOut(out) {
-        Console.withErr(out) {
-          app()
-        }
-      }
-    } finally {
-      System.setOut(backupStdout)
-      System.setErr(backupStderr)
+  object $doc {
+    def binder[A](e: Text[A])(implicit tprint: TPrint[A]): A = {
+      myBinders.append(Binder.generate(e))
+      e.value
     }
-    val document = Document(mySections.toList)
-    mySections.clear()
-    document
+
+    def statement[T](e: => T): T = {
+      val out = myOut.toString()
+      myOut.reset()
+      myStatements.append(Statement(myBinders.toList, out))
+      myBinders.clear()
+      e
+    }
+
+    def section[T](e: => T): T = {
+      mySections.append(Section(myStatements.toList))
+      myStatements.clear()
+      e
+    }
+
+    def build(): Document = {
+      val backupStdout = System.out
+      val backupStderr = System.err
+      try {
+        val out = new PrintStream(myOut)
+        System.setOut(out)
+        System.setErr(out)
+        Console.withOut(out) {
+          Console.withErr(out) {
+            app()
+          }
+        }
+      } finally {
+        System.setOut(backupStdout)
+        System.setErr(backupStderr)
+      }
+      val document = Document(mySections.toList)
+      mySections.clear()
+      document
+    }
   }
+
 
   def app(): Unit
+
 }
+

@@ -7,6 +7,7 @@ import vork.runtime.Macros
 
 class RuntimeApp extends DocumentBuilder {
   override def app(): Unit = {
+    import $doc._
     val x = List(1); binder(x);
     statement {
       val y = x.map(_ + 1); binder(y);
@@ -48,7 +49,7 @@ class RuntimeSuite extends FunSuite with DiffAssertions {
 
   test("app") {
     val app = new RuntimeApp()
-    val document = app.build()
+    val document = app.$doc.build()
     val obtained = pprint.PPrinter.BlackWhite.apply(document, height = 1000, width = 70)
   }
 

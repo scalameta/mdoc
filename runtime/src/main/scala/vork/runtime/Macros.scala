@@ -18,8 +18,8 @@ object Macros {
     import c.universe._
     val string = code match {
       case Literal(Constant(str: String)) => str
-      case q"${Literal(Constant(str: String))}.replace($a, $b)" =>
-        str.replace("'''", "\"\"\"")
+      case els =>
+        c.abort(c.enclosingPosition, s"Expected string literal, obtained $els")
     }
 
     def formatPosition(message: String, pos: scala.reflect.api.Position): c.Expr[String] =
