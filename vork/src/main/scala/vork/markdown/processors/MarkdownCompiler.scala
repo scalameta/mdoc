@@ -3,6 +3,8 @@ package vork.markdown.processors
 import scalafix._
 import scala.meta._
 import java.io.File
+import java.net.URI
+import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
 import java.util.concurrent.atomic.AtomicInteger
@@ -37,24 +39,23 @@ object MarkdownCompiler {
     def out: String = section.statements.map(_.out).mkString
   }
 
-  def fromClasspath(cp: String): MarkdownCompiler =
-    if (cp.isEmpty) {
-      default()
-    } else {
-      val runtimeOnly = defaultClasspath(
-        path =>
-          Set(
-            "scala-reflect",
-            "pprint",
-            "vork-runtime"
-          ).contains(path)
-      )
-      val finalRuntime =
-        if (runtimeOnly.isEmpty) defaultClasspath
-        else runtimeOnly
-      new MarkdownCompiler(cp + File.pathSeparator + finalRuntime)
+  def fromClasspath(cp: String): MarkdownCompiler = {
+    val prefix = if (cp.isEmpty) "" else cp + File.pathSeparator
+    val runtimeOnly = defaultClasspath { path =>
+      Set(
+        "scala-library",
+        "scala-reflect",
+        "pprint",
+        "vork-runtime"
+      ).contains(path)
     }
-  def default(): MarkdownCompiler = new MarkdownCompiler(defaultClasspath)
+    val finalRuntime =
+      if (runtimeOnly.isEmpty) defaultClasspath
+      else runtimeOnly
+    new MarkdownCompiler(prefix + finalRuntime)
+  }
+
+  def default(): MarkdownCompiler = fromClasspath("")
   def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
     renderInputs(
       sections.map(s => SectionInput(dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
@@ -144,23 +145,25 @@ object MarkdownCompiler {
     getClass.getClassLoader match {
       case u: URLClassLoader =>
         val paths = u.getURLs.iterator
-          .map(u => {
-            if (u.getProtocol.startsWith("bootstrap")) {
-              import java.io._
-              import java.nio.file._
-              val stream = u.openStream
-              val tmp = File.createTempFile("bootstrap-" + u.getPath, ".jar")
-              Files
-                .copy(stream, Paths.get(tmp.getAbsolutePath), StandardCopyOption.REPLACE_EXISTING)
-              tmp.getAbsolutePath
-            } else {
-              URLDecoder.decode(u.getPath, "UTF-8")
-            }
-          })
+          .map(sanitizeURL)
           .filter(path => filter(path))
           .toList
         paths.mkString(File.pathSeparator)
       case _ => ""
+    }
+  }
+
+  def sanitizeURL(u: URL): String = {
+    if (u.getProtocol.startsWith("bootstrap")) {
+      import java.io._
+      import java.nio.file._
+      val stream = u.openStream
+      val tmp = File.createTempFile("bootstrap-" + u.getPath, ".jar")
+      Files
+        .copy(stream, Paths.get(tmp.getAbsolutePath), StandardCopyOption.REPLACE_EXISTING)
+      tmp.getAbsolutePath
+    } else {
+      URLDecoder.decode(u.getPath, "UTF-8")
     }
   }
   def instrumentSections(sections: List[SectionInput]): String = {
@@ -256,8 +259,13 @@ class MarkdownCompiler(
   settings.classpath.value = classpath
   lazy val reporter = new StoreReporter
   private val global = new Global(settings, reporter)
-  private def classLoader =
-    new AbstractFileClassLoader(target, this.getClass.getClassLoader)
+  val appClassLoader = new URLClassLoader(
+    classpath
+      .split(File.pathSeparator)
+      .map(u => URI.create("file:" + u).toURL),
+    this.getClass.getClassLoader
+  )
+  private def classLoader = new AbstractFileClassLoader(target, appClassLoader)
 
   private def clearTarget(): Unit = target match {
     case vdir: VirtualDirectory => vdir.clear()

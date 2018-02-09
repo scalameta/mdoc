@@ -1,6 +1,10 @@
 inThisBuild(
   List(
     scalaVersion := "2.12.4",
+    version ~= { old =>
+      if (sys.env.contains("CI")) old
+      else "0.1.0-SNAPSHOT"
+    },
     organization := "com.geirsson",
     publishTo := Some {
       if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
