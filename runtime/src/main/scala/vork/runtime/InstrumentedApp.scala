@@ -28,6 +28,7 @@ trait DocumentBuilder {
   private val myStatements = ArrayBuffer.empty[Statement]
   private val mySections = ArrayBuffer.empty[Section]
   private val myOut = new ByteArrayOutputStream()
+  private var first = true
 
   object $doc {
     def binder[A](e: Text[A])(implicit tprint: TPrint[A]): A = {
@@ -44,8 +45,13 @@ trait DocumentBuilder {
     }
 
     def section[T](e: => T): T = {
-      mySections.append(Section(myStatements.toList))
-      myStatements.clear()
+      if (first) {
+        // HACK(olafur) we skip the leading $doc.section right after app().
+        first = false
+      } else {
+        mySections.append(Section(myStatements.toList))
+        myStatements.clear()
+      }
       e
     }
 
@@ -59,6 +65,7 @@ trait DocumentBuilder {
         Console.withOut(out) {
           Console.withErr(out) {
             app()
+            section { () }
           }
         }
       } finally {
@@ -71,8 +78,6 @@ trait DocumentBuilder {
     }
   }
 
-
   def app(): Unit
 
 }
-

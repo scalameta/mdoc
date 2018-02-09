@@ -9,14 +9,17 @@ import org.langmeta.inputs.Input
 import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Options, Processor}
 
-class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler) extends DocumentPostProcessor {
+class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler)
+    extends DocumentPostProcessor {
 
   object VorkCodeFence {
-    def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, FencedCodeMod)] =
+    def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, FencedCodeMod)] = {
       block.getInfo.toString match {
-        case FencedCodeMod(mod) => Some(block -> mod)
+        case FencedCodeMod(mod) =>
+          Some(block -> mod)
         case _ => None
       }
+    }
   }
   override def processDocument(doc: Document): Document = {
     import vork.Markdown._
@@ -27,12 +30,14 @@ class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler) extend
       .toString
 
     val fences = collect[FencedCodeBlock, (FencedCodeBlock, FencedCodeMod)](doc) {
-      case VorkCodeFence(block, mod) => block -> mod
+      case VorkCodeFence(block, mod) =>
+        block -> mod
     }
     if (fences.nonEmpty) {
       val code = fences.map {
         case (block, mod) =>
-          val input = Input.VirtualFile(originPath, block.getContentChars.toString)
+          val text = block.getContentChars.toString
+          val input = Input.VirtualFile(originPath, text)
           import scala.meta._
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(source, mod)

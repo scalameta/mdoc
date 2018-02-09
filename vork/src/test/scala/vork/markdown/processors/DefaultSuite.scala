@@ -110,4 +110,34 @@ class DefaultSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "many",
+    """
+      |```scala vork
+      |println(1)
+      |val x = 42
+      |```
+      |
+      |```scala vork
+      |println(x)
+      |```
+    """.stripMargin.replace("'''", "\"\"\""),
+    """
+      |```scala
+      |@ println(1)
+      |1
+      |res0: Unit = ()
+      |
+      |@ val x = 42
+      |x: Int = 42
+      |```
+      |
+      |```scala
+      |@ println(x)
+      |42
+      |res1: Unit = ()
+      |```
+    """.stripMargin
+  )
+
 }

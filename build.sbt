@@ -43,7 +43,7 @@ commands += Command.command("ci-release") { s =>
 lazy val root = project
   .in(file("."))
   .settings(name := "vorkRoot")
-  .aggregate(vork)
+  .aggregate(vork, runtime)
 
 lazy val runtime = project
   .settings(

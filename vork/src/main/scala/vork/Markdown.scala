@@ -1,8 +1,8 @@
 package vork
 
 import scala.language.dynamics
-import java.nio.file.Path
 
+import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import com.vladsch.flexmark.ast
@@ -53,9 +53,14 @@ object Markdown {
   )(f: PartialFunction[T, Unit])(implicit ev: ClassTag[T]): Unit = {
     val lifted = f.lift
     val clazz = ev.runtimeClass.asInstanceOf[Class[T]]
-    new NodeVisitor(new VisitHandler[T](clazz, new Visitor[T] {
-      override def visit(node: T): Unit = lifted.apply(node)
-    })).visit(node)
+    class Madness {
+      val visitor = new NodeVisitor(new VisitHandler[T](clazz, visit))
+      def visit(e: T): Unit = {
+        lifted.apply(e)
+        visitor.visitChildren(e)
+      }
+    }
+    new Madness().visitor.visit(node)
   }
 
   def collect[A <: Node: ClassTag, B](

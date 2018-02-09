@@ -133,8 +133,6 @@ object MarkdownCompiler {
          |  }
          |}
       """.stripMargin
-    println("COMPILING!!!")
-    println(wrapped)
     val loader = compiler.compile(Input.String(wrapped)).get
     val cls = loader.loadClass(s"vork.Generated")
     cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
@@ -166,14 +164,22 @@ object MarkdownCompiler {
     }
   }
   def instrumentSections(sections: List[SectionInput]): String = {
-    val stats = instrument(sections)
-    val out = stats.foldRight("") {
-      case (section, "") =>
-        s"$section; $$doc.section { () }"
-      case (section, accum) =>
-        s"$section; $$doc.section { $accum }"
+    var counter = 0
+    val totalStats = sections.map(_.source.stats.length).sum
+    val mapped = sections.map { section =>
+      val (instrumentedSection, nextCounter) = instrument(section, counter)
+      counter = nextCounter
+      WIDTH_INDENT +
+        "; $doc.section {\n" +
+        instrumentedSection
     }
-    out
+    val join = """
+                 |// =======
+                 |// Section
+                 |// =======
+                 |""".stripMargin
+    val end = "\n" + ("}" * (totalStats + sections.length))
+    mapped.mkString("", join, end)
   }
 
   object Binders {
@@ -193,14 +199,8 @@ object MarkdownCompiler {
     enquote(string, DoubleQuotes)
   }
 
-  def instrument(sections: List[SectionInput]): List[String] = {
-    val (_, result) = sections.foldLeft((0, List.empty[String])) {
-      case ((counter, tail), nextSection) =>
-        val (head, nextN) = instrument(nextSection, counter)
-        nextN -> (head :: tail)
-    }
-    result.reverse
-  }
+  private val WIDTH = 100
+  private val WIDTH_INDENT = " " * WIDTH
 
   def instrument(section: SectionInput, n: Int): (String, Int) = {
     var counter = n
@@ -213,30 +213,29 @@ object MarkdownCompiler {
       name
     }
     val rule = Rule.syntactic("Vork") { ctx =>
-      val last = ctx.tokens.last
       val patches = stats.map { stat =>
-        val (names, resPatch) = Binders.unapply(stat) match {
-          case Some(b) => b -> Patch.empty
+        val (names, freshBinderPatch) = Binders.unapply(stat) match {
+          case Some(b) if section.mod != FencedCodeMod.Fail =>
+            b -> Patch.empty
           case _ =>
             val name = freshBinder()
-            List(Term.Name(name)) -> ctx.addLeft(stat, s"val $name = \n")
+            List(Term.Name(name)) -> ctx.addLeft(stat, s"${WIDTH_INDENT}val $name = \n")
         }
-        section.mod match {
+        val failPatch = section.mod match {
           case FencedCodeMod.Fail =>
             val newCode =
-              s"val compileError = _root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); " +
-                "$doc.binder(compileError); " +
-                s"$$doc.statement {\n"
-            ctx.replaceTree(stat, newCode) +
-              ctx.addRight(last, " }")
+              s"_root_.vork.runtime.Macros.fail(${literal(stat.syntax)}); "
+            ctx.replaceTree(stat, newCode)
           case _ =>
-            val binders = names
-              .map(name => s"$$doc.binder($name)")
-              .mkString(";", ";", "; $doc.statement {\n")
-            resPatch +
-              ctx.addRight(stat, binders) +
-              ctx.addRight(last, " }")
+            Patch.empty
         }
+        val rightIndent = " " * (WIDTH - stat.pos.endColumn)
+        val binders = names
+          .map(name => s"$$doc.binder($name)")
+          .mkString(rightIndent + "; ", "; ", "; $doc.statement {")
+        failPatch +
+          freshBinderPatch +
+          ctx.addRight(stat, binders)
       }
       val patch = patches.asPatch
       patch
