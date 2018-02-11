@@ -259,10 +259,11 @@ class MarkdownCompiler(
   settings.classpath.value = classpath
   lazy val reporter = new StoreReporter
   private val global = new Global(settings, reporter)
-  val appClassLoader = new URLClassLoader(
-    classpath
-      .split(File.pathSeparator)
-      .map(u => URI.create("file:" + u).toURL),
+  private val appClasspath: Array[URL] = classpath
+    .split(File.pathSeparator)
+    .map(path => new File(path).toURI.toURL)
+  private val appClassLoader = new URLClassLoader(
+    appClasspath,
     this.getClass.getClassLoader
   )
   private def classLoader = new AbstractFileClassLoader(target, appClassLoader)
