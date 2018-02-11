@@ -48,66 +48,49 @@ class FailSuite extends BaseMarkdownSuite {
       |""".replace("'''", "\"\"\"").stripMargin
   )
 
+  checkError(
+    "fail-error",
+    """
+      |```scala vork
+      |foobar
+      |```
+    """.stripMargin,
+    """
+      |error: fail-error.md not found: value foobar
+      |foobar
+      |^
+      |""".stripMargin
+  )
 
+  checkError(
+    "fail-success",
+    """
+      |```scala vork:fail
+      |1.to(2)
+      |```
+    """.stripMargin,
+    """
+      |error: Expected compile error but the statement type-checked successfully to type scala.collection.immutable.Range.Inclusive:
+      |1.to(2)
+      |""".stripMargin
+  )
 
-//  check(
-//    "fail-error",
-//    """
-//      |```scala vork
-//      |foobar
-//      |```
-//    """.stripMargin,
-//    """Vork found evaluation failures.
-//      |
-//      |<path>:1:3: unexpected failure
-//      |>  cmd0.sc:1: not found: value foobar
-//      |>  val res0 = foobar
-//      |>             ^
-//      |>  Compilation Failed
-//      |""".stripMargin
-//  )
-//
-//  checkError[Evaluator.CodeFenceFailure](
-//    "fail-success",
-//    """
-//      |```scala vork:fail
-//      |1.to(2)
-//      |```
-//    """.stripMargin,
-//    """
-//      |Vork found evaluation failures.
-//      |
-//      |<path>:1:3: unexpected success of
-//      |```
-//      |1.to(2)
-//      |```
-//      |""".stripMargin
-//  )
-//
-//  checkError[Evaluator.CodeFenceFailure](
-//    "mixed-fail-success-error",
-//    """
-//      |```scala vork
-//      |foobar
-//      |```
-//      |
-//      |```scala vork:fail
-//      |1.to(2)
-//      |```
-//    """.stripMargin,
-//    """
-//      |Vork found evaluation failures.
-//      |
-//      |<path>:1:3: unexpected failure
-//      |>  cmd0.sc:1: not found: value foobar
-//      |>  val res0 = foobar
-//      |>             ^
-//      |>  Compilation Failed
-//      |
-//      |<path>:5:7: unexpected success of
-//      |```
-//      |1.to(2)
-//      |```
-//      |""".stripMargin
-//  )
+  // Compile-error causes nothing to run
+  checkError(
+    "mixed-fail-success-error",
+    """
+      |```scala vork
+      |val x = foobar
+      |```
+      |
+      |```scala vork:fail
+      |1.to(2)
+      |```
+    """.stripMargin,
+    """
+      |error: mixed-fail-success-error.md not found: value foobar
+      |val x = foobar
+      |        ^
+      |""".stripMargin
+  )
 }

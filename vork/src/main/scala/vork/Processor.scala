@@ -12,6 +12,7 @@ import vork.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
 import org.langmeta.internal.io.PathIO
 import vork.utils.IO
+import scala.meta.Input
 
 final class Processor(
     options: Options,
@@ -25,6 +26,7 @@ final class Processor(
   )
 
   def handleMarkdown(path: Path): Unit = {
+    logger.reset()
     val sourcePath = options.resolveIn(path)
     val source = new String(java.nio.file.Files.readAllBytes(sourcePath), options.encoding)
     mdSettings.set(Processor.PathKey, Some(path))
@@ -33,8 +35,12 @@ final class Processor(
     val ast = parser.parse(source)
     val md = formatter.render(ast)
     val target = options.resolveOut(path)
-    writePath(target, md)
-    logger.info(s"Generated $target")
+    if (logger.hasErrors) {
+      logger.error(s"Failed to generate $target")
+    } else {
+      writePath(target, md)
+      logger.info(s"Generated $target")
+    }
   }
 
   def handleRegularFile(path: Path): Unit = {
@@ -100,4 +106,6 @@ final class Processor(
 
 object Processor {
   val PathKey = new DataKey[Option[Path]]("originPath", None)
+  val InputKey = new DataKey[Option[Input.VirtualFile]]("originPath", None)
 }
+

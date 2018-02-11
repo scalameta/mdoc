@@ -49,8 +49,8 @@ class RuntimeSuite extends FunSuite with DiffAssertions {
 
   test("app") {
     val app = new RuntimeApp()
-    val document = app.$doc.build()
-    val obtained = pprint.PPrinter.BlackWhite.apply(document, height = 1000, width = 70)
+
+    app.$doc.build()
   }
 
 }

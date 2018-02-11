@@ -10,7 +10,7 @@ import vork.Context
 import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Options, Processor}
 
-class CompilerPostProcessor(context: Context) extends DocumentPostProcessor {
+class CompilerPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._
 
   object VorkCodeFence {
@@ -43,17 +43,13 @@ class CompilerPostProcessor(context: Context) extends DocumentPostProcessor {
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(source, mod)
       }
-      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger)
+      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger, originPath)
       rendered.sections.zip(fences).foreach {
         case (section, (block, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
-            case FencedCodeMod.Fail =>
-              val str = MarkdownCompiler.renderEvaluatedSection(section)
-              val content: BasedSequence = CharSubSequence.of(str)
-              block.setContent(List(content).asJava)
-            case FencedCodeMod.Default =>
-              val str = MarkdownCompiler.renderEvaluatedSection(section)
+            case FencedCodeMod.Default | FencedCodeMod.Fail =>
+              val str = MarkdownCompiler.renderEvaluatedSection(section, logger)
               val content: BasedSequence = CharSubSequence.of(str)
               block.setContent(List(content).asJava)
             case FencedCodeMod.Passthrough =>
@@ -72,7 +68,7 @@ class CompilerPostProcessor(context: Context) extends DocumentPostProcessor {
 object CompilerPostProcessor {
   class Factory(context: Context) extends DocumentPostProcessorFactory {
     override def create(document: ast.Document): DocumentPostProcessor = {
-      new CompilerPostProcessor(context)
+      new CompilerPostProcessor()(context)
     }
   }
 }

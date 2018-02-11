@@ -4,6 +4,7 @@ import java.io.OutputStream
 import java.io.PrintStream
 import fansi.Color._
 import scala.meta.Position
+import scala.meta.internal.inputs._
 
 class Logger(out: OutputStream) {
 
@@ -14,8 +15,12 @@ class Logger(out: OutputStream) {
   private val myError = Red("error")
 
   private var myErrors = 0
-  def errorCount: Int = myErrors
+  def hasErrors: Boolean = myErrors > 0
+  def reset(): Unit = myErrors = 0
 
+  def error(pos: Position, msg: String): Unit = {
+    error(pos.formatMessage("error", msg))
+  }
   def error(msg: String): Unit = {
     myErrors += 1
     ps.println(myError ++ s": $msg")

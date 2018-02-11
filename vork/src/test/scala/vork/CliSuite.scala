@@ -83,4 +83,20 @@ class CliSuite extends BaseCliSuite {
     }
   )
 
+  checkCli(
+    "error",
+    """
+      |/index.md
+      |# Hello
+      |```scala vork:foobar
+      |foobar
+      |```
+    """.stripMargin,
+    "", // empty site, did not generate
+    expectedExitCode = 1,
+    onStdout = { out =>
+      assert(out.contains("Invalid mode 'foobar'"))
+    }
+  )
+
 }

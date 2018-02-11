@@ -6,6 +6,7 @@ import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
+import java.util.regex.Pattern
 import scala.reflect.internal.util.AbstractFileClassLoader
 import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.nsc.Global
@@ -56,18 +57,20 @@ object MarkdownCompiler {
 
   def default(): MarkdownCompiler = fromClasspath("")
   def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
-    render(sections, compiler, Logger.default)
+    render(sections, compiler, Logger.default, "<input>")
   }
 
   def render(
       sections: List[String],
       compiler: MarkdownCompiler,
-      logger: Logger
+      logger: Logger,
+      filename: String
   ): EvaluatedDocument = {
     renderInputs(
       sections.map(s => SectionInput(dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
       compiler,
-      logger
+      logger,
+      filename
     )
   }
 
@@ -76,15 +79,16 @@ object MarkdownCompiler {
   def renderInputs(
       sections: List[SectionInput],
       compiler: MarkdownCompiler,
-      logger: Logger
+      logger: Logger,
+      filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val doc = document(compiler, instrumented, logger)
+    val doc = document(compiler, instrumented, logger, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
 
-  def renderEvaluatedSection(section: EvaluatedSection): String = {
+  def renderEvaluatedSection(section: EvaluatedSection, logger: Logger): String = {
     val sb = new StringBuilder
     var first = true
     section.section.statements.zip(section.source.stats).foreach {
@@ -107,8 +111,12 @@ object MarkdownCompiler {
           section.mod match {
             case FencedCodeMod.Fail =>
               binder.value match {
-                case Macros.TypecheckedOK =>
-                  sb.append("???\n")
+                case Macros.TypecheckedOK(code, tpe) =>
+                  // TODO(olafur) retrieve original position of source code
+                  logger.error(
+                    s"Expected compile error but the statement type-checked successfully to type $tpe:\n$code"
+                  )
+                  sb.append(s"// $tpe")
                 case Macros.ParseError(msg) =>
                   sb.append(msg)
                 case Macros.TypeError(msg) =>
@@ -136,22 +144,27 @@ object MarkdownCompiler {
     sb.toString()
   }
 
-  def document(compiler: MarkdownCompiler, instrumented: String, logger: Logger): Document = {
+  def document(
+      compiler: MarkdownCompiler,
+      instrumented: String,
+      logger: Logger,
+      filename: String
+  ): Document = {
     val wrapped =
       s"""
          |package vork
          |class Generated extends _root_.vork.runtime.DocumentBuilder {
          |  def app(): Unit = {
-         |$instrumented
+         |${instrumented}
          |  }
          |}
       """.stripMargin
-    compiler.compile(Input.String(wrapped)) match {
-      case Configured.Ok(loader) =>
+    compiler.compile(Input.VirtualFile(filename, wrapped), logger) match {
+      case Some(loader) =>
         val cls = loader.loadClass(s"vork.Generated")
         cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
-      case Configured.NotOk(err) =>
-        err.all.foreach(msg => logger.error(msg))
+      case None =>
+        // An empty document will render as the original markdown
         Document.empty
     }
   }
@@ -221,6 +234,12 @@ object MarkdownCompiler {
 
   private val WIDTH = 100
   private val WIDTH_INDENT = " " * WIDTH
+  private val VORK = "/* $vork */"
+  def stripVorkSuffix(message: String): String = {
+    val idx = message.indexOf(VORK)
+    if (idx < 0) message
+    else message.substring(0, idx)
+  }
 
   def instrument(section: SectionInput, n: Int): (String, Int) = {
     var counter = n
@@ -252,7 +271,7 @@ object MarkdownCompiler {
         val rightIndent = " " * (WIDTH - stat.pos.endColumn)
         val binders = names
           .map(name => s"$$doc.binder($name)")
-          .mkString(rightIndent + "; ", "; ", "; $doc.statement {")
+          .mkString(rightIndent + VORK + "; ", "; ", "; $doc.statement {")
         failPatch +
           freshBinderPatch +
           ctx.addRight(stat, binders)
@@ -290,7 +309,7 @@ class MarkdownCompiler(
     case _ =>
   }
 
-  def compile(input: Input): Configured[ClassLoader] = {
+  def compile(input: Input, logger: Logger): Option[ClassLoader] = {
     clearTarget()
     reporter.reset()
     val run = new global.Run
@@ -300,19 +319,24 @@ class MarkdownCompiler(
       case _ => "(input)"
     }
     run.compileSources(List(new BatchSourceFile(label, new String(input.chars))))
-    val errors = reporter.infos.collect {
-      case reporter.Info(pos, msg, reporter.ERROR) =>
-        ConfError
-          .message(msg)
-          .atPos(
-            if (pos.isDefined) Position.Range(input, pos.start, pos.end)
-            else Position.None
-          )
-          .notOk
+    if (!reporter.hasErrors) {
+      Some(classLoader)
+    } else {
+      reporter.infos.foreach {
+        case reporter.Info(pos, msg, severity) =>
+          // We don't include line:column because we'd need to source-map
+          // instrumented code positions to the original source.
+          val formatted = s"""|${input.syntax} $msg
+                              |${MarkdownCompiler.stripVorkSuffix(pos.lineContent)}
+                              |${pos.lineCaret}""".stripMargin
+          severity match {
+            case reporter.ERROR => logger.error(formatted)
+            case reporter.INFO => logger.info(formatted)
+            case reporter.WARNING => logger.warning(formatted)
+          }
+        case _ =>
+      }
+      None
     }
-    ConfError
-      .fromResults(errors.toSeq)
-      .map(_.notOk)
-      .getOrElse(Configured.Ok(classLoader))
   }
 }

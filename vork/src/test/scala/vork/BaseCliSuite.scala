@@ -1,5 +1,6 @@
 package vork
 
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import scala.meta.testkit.DiffAssertions
@@ -8,14 +9,18 @@ import org.scalatest.FunSuite
 
 case class CliFixture(in: Path, out: Path)
 abstract class BaseCliSuite extends FunSuite with DiffAssertions {
+  private val myStdout = new ByteArrayOutputStream()
   def checkCli(
       name: String,
       original: String,
       expected: String,
       extraArgs: Array[String] = Array.empty,
-      setup: CliFixture => Unit = _ => ()
+      setup: CliFixture => Unit = _ => (),
+      expectedExitCode: Int = 0,
+      onStdout: String => Unit = _ => ()
   ): Unit = {
     test(name) {
+      myStdout.reset()
       val in = StringFS.string2dir(original)
       val out = Files.createTempDirectory("vork")
       setup(CliFixture(in.toNIO, out))
@@ -27,9 +32,12 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
         "--cwd",
         in.toString
       )
-      Cli.main(args ++ extraArgs)
+      val code = Cli.process(args ++ extraArgs, myStdout)
+      assert(code == expectedExitCode)
       val obtained = StringFS.dir2string(AbsolutePath(out))
       assertNoDiff(obtained, expected)
+      val obtainedStdout = myStdout.toString()
+      onStdout(obtainedStdout)
     }
   }
 }

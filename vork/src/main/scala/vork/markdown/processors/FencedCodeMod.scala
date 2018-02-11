@@ -1,5 +1,7 @@
 package vork.markdown.processors
 
+import vork.Context
+
 /**
   * A vork code fence modifier.
   *
@@ -26,7 +28,7 @@ object FencedCodeMod {
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends FencedCodeMod
 
-  def unapply(string: String): Option[FencedCodeMod] = {
+  def unapply(string: String)(implicit ctx: Context): Option[FencedCodeMod] = {
     if (!string.startsWith("scala vork")) None
     else {
       if (!string.contains(':')) Some(Default)
@@ -34,7 +36,8 @@ object FencedCodeMod {
         val mode = string.stripPrefix("scala vork:")
         FencedCodeMod(mode).orElse {
           val msg = s"Invalid mode '$mode'. Expected one of ${all.mkString(", ")}"
-          throw new IllegalArgumentException(msg.toString)
+          ctx.logger.error(msg)
+          None
         }
       }
     }

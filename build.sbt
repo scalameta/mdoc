@@ -31,7 +31,9 @@ inThisBuild(
     version ~= { old =>
       val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
       old.replace('+', '-') + suffix
-    }
+    },
+    parallelExecution.in(Test) := false,
+    fork.in(run) := true
   )
 )
 
