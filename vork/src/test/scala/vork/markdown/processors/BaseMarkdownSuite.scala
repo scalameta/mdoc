@@ -7,12 +7,14 @@ import com.vladsch.flexmark.util.options.MutableDataSet
 import vork.{Markdown, Options, Processor}
 import scala.meta.testkit.DiffAssertions
 import scala.reflect.ClassTag
+import vork.Context
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   private val configPath = Paths.get(getClass.getClassLoader.getResource("vork.conf").toURI)
   private val options = Options.fromDefault(new Options(configPath = configPath)).get
+  private val context = Context.fromOptions(options)
   def getSettings(path: Path): MutableDataSet = {
-    val settings = Markdown.default(options)
+    val settings = Markdown.default(context)
     settings.set(Processor.PathKey, Some(path))
     settings
   }

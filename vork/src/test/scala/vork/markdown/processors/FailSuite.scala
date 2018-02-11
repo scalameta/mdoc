@@ -50,7 +50,7 @@ class FailSuite extends BaseMarkdownSuite {
 
 
 
-//  checkError[Evaluator.CodeFenceFailure](
+//  check(
 //    "fail-error",
 //    """
 //      |```scala vork

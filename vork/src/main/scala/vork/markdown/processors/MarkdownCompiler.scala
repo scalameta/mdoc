@@ -3,11 +3,9 @@ package vork.markdown.processors
 import scalafix._
 import scala.meta._
 import java.io.File
-import java.net.URI
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
-import java.util.concurrent.atomic.AtomicInteger
 import scala.reflect.internal.util.AbstractFileClassLoader
 import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.nsc.Global
@@ -19,6 +17,7 @@ import metaconfig.ConfError
 import metaconfig.Configured
 import org.langmeta.inputs.Input
 import org.langmeta.inputs.Position
+import vork.Logger
 import vork.runtime.Document
 import vork.runtime.DocumentBuilder
 import vork.runtime.Macros
@@ -57,17 +56,30 @@ object MarkdownCompiler {
 
   def default(): MarkdownCompiler = fromClasspath("")
   def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
+    render(sections, compiler, Logger.default)
+  }
+
+  def render(
+      sections: List[String],
+      compiler: MarkdownCompiler,
+      logger: Logger
+  ): EvaluatedDocument = {
     renderInputs(
       sections.map(s => SectionInput(dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
-      compiler
+      compiler,
+      logger
     )
   }
 
   case class SectionInput(source: Source, mod: FencedCodeMod)
 
-  def renderInputs(sections: List[SectionInput], compiler: MarkdownCompiler): EvaluatedDocument = {
+  def renderInputs(
+      sections: List[SectionInput],
+      compiler: MarkdownCompiler,
+      logger: Logger
+  ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val doc = document(compiler, instrumented)
+    val doc = document(compiler, instrumented, logger)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -124,7 +136,7 @@ object MarkdownCompiler {
     sb.toString()
   }
 
-  def document(compiler: MarkdownCompiler, instrumented: String): Document = {
+  def document(compiler: MarkdownCompiler, instrumented: String, logger: Logger): Document = {
     val wrapped =
       s"""
          |package vork
@@ -134,9 +146,14 @@ object MarkdownCompiler {
          |  }
          |}
       """.stripMargin
-    val loader = compiler.compile(Input.String(wrapped)).get
-    val cls = loader.loadClass(s"vork.Generated")
-    cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
+    compiler.compile(Input.String(wrapped)) match {
+      case Configured.Ok(loader) =>
+        val cls = loader.loadClass(s"vork.Generated")
+        cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
+      case Configured.NotOk(err) =>
+        err.all.foreach(msg => logger.error(msg))
+        Document.empty
+    }
   }
 
   // Copy paste from scalafix

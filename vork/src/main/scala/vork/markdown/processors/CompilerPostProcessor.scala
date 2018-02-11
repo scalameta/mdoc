@@ -6,11 +6,12 @@ import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostPro
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
 import org.langmeta.inputs.Input
+import vork.Context
 import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Options, Processor}
 
-class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler)
-    extends DocumentPostProcessor {
+class CompilerPostProcessor(context: Context) extends DocumentPostProcessor {
+  import context._
 
   object VorkCodeFence {
     def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, FencedCodeMod)] = {
@@ -42,7 +43,7 @@ class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler)
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(source, mod)
       }
-      val rendered = MarkdownCompiler.renderInputs(code, compiler)
+      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger)
       rendered.sections.zip(fences).foreach {
         case (section, (block, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
@@ -69,9 +70,9 @@ class CompilerPostProcessor(options: Options, compiler: MarkdownCompiler)
 }
 
 object CompilerPostProcessor {
-  class Factory(options: Options, compiler: MarkdownCompiler) extends DocumentPostProcessorFactory {
+  class Factory(context: Context) extends DocumentPostProcessorFactory {
     override def create(document: ast.Document): DocumentPostProcessor = {
-      new CompilerPostProcessor(options, compiler)
+      new CompilerPostProcessor(context)
     }
   }
 }

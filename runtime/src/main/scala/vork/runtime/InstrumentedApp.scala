@@ -22,6 +22,9 @@ case class Section(statements: List[Statement]) {
   def isError: Boolean = statements.exists(_.isInstanceOf[Macros.CompileError])
 }
 case class Document(sections: List[Section])
+object Document {
+  val empty: Document = Document(Nil)
+}
 
 trait DocumentBuilder {
   private val myBinders = ArrayBuffer.empty[Binder[_]]

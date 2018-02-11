@@ -85,13 +85,13 @@ object Markdown {
     * Do not use directly. The default flexmark settings have special keys set
     * up by vork to keep track of certain document-specific information like path.
     */
-  def default(options: Options): MutableDataSet = {
+  def default(context: Context): MutableDataSet = {
     import com.vladsch.flexmark.parser.Parser
     // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
     new MutableDataSet()
       .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
       .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
-      .set(Parser.EXTENSIONS, VorkExtensions.default(options))
+      .set(Parser.EXTENSIONS, VorkExtensions.default(context))
   }
 
   def toMarkdown(input: String, settings: MutableDataSet): String = {

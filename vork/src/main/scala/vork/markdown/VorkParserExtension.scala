@@ -9,10 +9,10 @@ import com.vladsch.flexmark.parser.{LinkRefProcessor, LinkRefProcessorFactory, P
 import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence, PrefixedSubSequence}
+import vork.Context
 import vork.markdown.processors.MarkdownCompiler
 
-class VorkParserExtension(options: Options, compiler: MarkdownCompiler)
-    extends Parser.ParserExtension {
+class VorkParserExtension(context: Context) extends Parser.ParserExtension {
   class SiteVariableInjector(site: Map[String, String], document: ast.Document)
       extends LinkRefProcessor {
 
@@ -61,21 +61,20 @@ class VorkParserExtension(options: Options, compiler: MarkdownCompiler)
     override def getBracketNestingLevel(options: DataHolder): Int = 0
     override def getWantExclamationPrefix(options: DataHolder): Boolean = true
     override def create(document: ast.Document): LinkRefProcessor =
-      new SiteVariableInjector(options.config.site, document)
+      new SiteVariableInjector(context.options.config.site, document)
   }
 
   override def extend(parserBuilder: Parser.Builder): Unit = {
     parserBuilder.linkRefProcessorFactory(new SiteVariableInjectorFactory)
     parserBuilder.postProcessorFactory(
-      new processors.CompilerPostProcessor.Factory(options, compiler)
+      new processors.CompilerPostProcessor.Factory(context)
     )
   }
   override def parserOptions(options: MutableDataHolder): Unit = ()
 }
 
 object VorkParserExtension {
-  def create(options: Options): Extension = {
-    val compiler = MarkdownCompiler.fromClasspath(options.classpath)
-    new VorkParserExtension(options, compiler)
+  def create(context: Context): Extension = {
+    new VorkParserExtension(context)
   }
 }
