@@ -24,6 +24,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin
   )
+
   check(
     "triplequote",
     """

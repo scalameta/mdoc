@@ -75,10 +75,16 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
     """.stripMargin
   )
 
-  checkIgnore(
+  check(
     "non-val",
     """println("hello world!") """,
-    "hello world!"
+    """
+      |```scala
+      |@ println("hello world!")
+      |hello world!
+      |res0: Unit = ()
+      |```
+      |""".stripMargin
   )
 
 }
