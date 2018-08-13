@@ -108,4 +108,3 @@ object Processor {
   val PathKey = new DataKey[Option[Path]]("originPath", None)
   val InputKey = new DataKey[Option[Input.VirtualFile]]("originPath", None)
 }
-
