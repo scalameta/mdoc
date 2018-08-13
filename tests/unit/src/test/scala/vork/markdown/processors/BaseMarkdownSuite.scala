@@ -13,6 +13,7 @@ import vork.Markdown
 import vork.Args
 import vork.Processor
 import StringSyntax._
+import scala.meta.inputs.Input
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   private val tmp = AbsolutePath(Files.createTempDirectory("vork"))
@@ -28,10 +29,10 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
   private val compiler = MarkdownCompiler.fromClasspath(options.classpath)
   private val context = Context(options, logger, compiler)
 
-  def getSettings(name: String): MutableDataSet = {
+  def getSettings(input: Input.VirtualFile): MutableDataSet = {
     myStdout.reset()
     val settings = Markdown.default(context)
-    settings.set(Processor.PathKey, Some(Paths.get(name + ".md")))
+    settings.set(Processor.InputKey, Some(input))
     settings
   }
 
@@ -41,7 +42,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       expected: String
   ): Unit = {
     test(name) {
-      Markdown.toMarkdown(original, getSettings(name))
+      val input = Input.VirtualFile(name + ".md", original)
+      Markdown.toMarkdown(original, getSettings(input))
       assert(logger.hasErrors, "Expected errors but logger.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
       assertNoDiff(obtainedErrors, expected)
@@ -50,7 +52,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
 
   def check(name: String, original: String, expected: String): Unit = {
     test(name) {
-      val obtained = Markdown.toMarkdown(original, getSettings(name)).trimLineEnds
+      val input = Input.VirtualFile(name + ".md", original)
+      val obtained = Markdown.toMarkdown(original, getSettings(input)).trimLineEnds
       assertNoDiff(obtained, expected)
     }
   }

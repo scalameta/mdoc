@@ -1,10 +1,9 @@
 package vork
 
-import java.io.OutputStream
 import java.io.PrintStream
 import fansi.Color._
 import scala.meta.Position
-import scala.meta.internal.inputs._
+import scalafix.internal.util.PositionSyntax._
 
 class Logger(ps: PrintStream) {
 

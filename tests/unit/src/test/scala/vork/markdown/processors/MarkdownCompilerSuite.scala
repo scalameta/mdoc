@@ -8,7 +8,7 @@ import vork.Logger
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
   private val compiler = MarkdownCompiler.default()
-  val logger = Logger.default
+  private val logger = Logger.default
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     ignore(name) {}
@@ -18,8 +18,9 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
+      val inputs = original.map(s => Input.String(s))
       val obtained = MarkdownCompiler
-        .render(original, compiler)
+        .render(inputs, logger, compiler)
         .sections
         .map(s => s"""```scala
                      |${MarkdownCompiler.renderEvaluatedSection(s, logger)}

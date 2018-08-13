@@ -106,7 +106,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: crash.md:1: error: an implementation is missing
+      |error: crash.md:6:5: error: an implementation is missing
       |val y = 2
       |    ^
       |scala.NotImplementedError: an implementation is missing

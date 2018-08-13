@@ -6,7 +6,6 @@ import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
-import java.util.regex.Pattern
 import scala.reflect.internal.util.AbstractFileClassLoader
 import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.nsc.Global
@@ -14,8 +13,6 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
-import metaconfig.ConfError
-import metaconfig.Configured
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import vork.Logger
@@ -24,7 +21,6 @@ import vork.runtime.DocumentBuilder
 import vork.runtime.Macros
 import vork.runtime.PositionedException
 import vork.runtime.Section
-import scalafix.internal.util.PositionSyntax._
 
 object MarkdownCompiler {
 
@@ -58,25 +54,29 @@ object MarkdownCompiler {
   }
 
   def default(): MarkdownCompiler = fromClasspath("")
-  def render(sections: List[String], compiler: MarkdownCompiler): EvaluatedDocument = {
-    render(sections, compiler, Logger.default, "<input>")
+  def render(
+      sections: List[Input],
+      logger: Logger,
+      compiler: MarkdownCompiler
+  ): EvaluatedDocument = {
+    render(sections, compiler, logger, "<input>")
   }
 
   def render(
-      sections: List[String],
+      sections: List[Input],
       compiler: MarkdownCompiler,
       logger: Logger,
       filename: String
   ): EvaluatedDocument = {
     renderInputs(
-      sections.map(s => SectionInput(dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
+      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, FencedCodeMod.Default)),
       compiler,
       logger,
       filename
     )
   }
 
-  case class SectionInput(source: Source, mod: FencedCodeMod)
+  case class SectionInput(input: Input, source: Source, mod: FencedCodeMod)
 
   def renderInputs(
       sections: List[SectionInput],
@@ -85,8 +85,8 @@ object MarkdownCompiler {
       filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val original = sections.map(_.source.syntax)
-    val doc = document(compiler, original, instrumented, logger, filename)
+    val inputs = sections.map(_.input)
+    val doc = document(compiler, inputs, instrumented, logger, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -149,7 +149,7 @@ object MarkdownCompiler {
 
   def document(
       compiler: MarkdownCompiler,
-      original: List[String],
+      original: List[Input],
       instrumented: String,
       logger: Logger,
       filename: String
@@ -159,7 +159,7 @@ object MarkdownCompiler {
          |package repl
          |class Session extends _root_.vork.runtime.DocumentBuilder {
          |  def app(): Unit = {
-         |${instrumented}
+         |$instrumented
          |  }
          |}
       """.stripMargin
@@ -171,19 +171,23 @@ object MarkdownCompiler {
           doc.build()
         } catch {
           case e: PositionedException =>
-            val text = original(e.section - 1)
-            val input = Input.VirtualFile(filename, text)
+            val input = original(e.section - 1)
             val pos =
               if (e.pos.isEmpty) {
                 Position.Range(input, 0, 0)
               } else {
-                Position.Range(
+                val slice = Position.Range(
                   input,
                   e.pos.startLine,
                   e.pos.startColumn,
                   e.pos.endLine,
                   e.pos.endColumn
                 )
+                input match {
+                  case Input.Slice(underlying, a, b) =>
+                    Position.Range(underlying, a + slice.start, b + slice.end)
+                  case _ => slice
+                }
               }
             logger.error(pos, e.getCause)
             Document.empty

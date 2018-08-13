@@ -25,7 +25,8 @@ final class Processor(
   def handleMarkdown(file: InputFile): Unit = {
     logger.reset()
     val source = FileIO.slurp(file.in, options.encoding)
-    mdSettings.set(Processor.PathKey, Some(file.in.toNIO))
+    val input = Input.VirtualFile(file.in.toString(), source)
+    mdSettings.set(Processor.InputKey, Some(input))
     val parser = Parser.builder(mdSettings).build
     val formatter = Formatter.builder(mdSettings).build
     val ast = parser.parse(source)
@@ -100,6 +101,5 @@ final class Processor(
 }
 
 object Processor {
-  val PathKey = new DataKey[Option[Path]]("originPath", None)
-  val InputKey = new DataKey[Option[Input.VirtualFile]]("originPath", None)
+  val InputKey = new DataKey[Option[Input.VirtualFile]]("scalametaInput", None)
 }

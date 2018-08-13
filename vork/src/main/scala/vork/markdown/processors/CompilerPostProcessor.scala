@@ -5,10 +5,11 @@ import com.vladsch.flexmark.ast.{Document, FencedCodeBlock}
 import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostProcessorFactory}
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
+import java.nio.file.Paths
 import scala.meta.inputs.Input
 import vork.Context
 import vork.markdown.processors.MarkdownCompiler.SectionInput
-import vork.{Markdown, Args, Processor}
+import vork.{Args, Markdown, Processor}
 
 class CompilerPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._
@@ -25,10 +26,10 @@ class CompilerPostProcessor(implicit context: Context) extends DocumentPostProce
   override def processDocument(doc: Document): Document = {
     import vork.Markdown._
     import scala.collection.JavaConverters._
-    val originPath = doc
-      .get(Processor.PathKey)
-      .getOrElse(sys.error("Path key does not exist in Flexmark's settings!!"))
-      .toString
+    val baseInput = doc
+      .get(Processor.InputKey)
+      .getOrElse(sys.error("INput key does not exist in Flexmark's settings!!"))
+    val filename = baseInput.path
 
     val fences = collect[FencedCodeBlock, (FencedCodeBlock, FencedCodeMod)](doc) {
       case VorkCodeFence(block, mod) =>
@@ -37,13 +38,15 @@ class CompilerPostProcessor(implicit context: Context) extends DocumentPostProce
     if (fences.nonEmpty) {
       val code = fences.map {
         case (block, mod) =>
-          val text = block.getContentChars.toString
-          val input = Input.VirtualFile(originPath, text)
+          val child = block.getFirstChild
+          val start = child.getStartOffset
+          val end = child.getEndOffset
+          val input = Input.Slice(baseInput, start, end)
           import scala.meta._
           val source = dialects.Sbt1(input).parse[Source].get
-          SectionInput(source, mod)
+          SectionInput(input, source, mod)
       }
-      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger, originPath)
+      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger, filename)
       rendered.sections.zip(fences).foreach {
         case (section, (block, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
