@@ -3,8 +3,8 @@ package vork.utils
 import java.io.IOException
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
-import org.langmeta.io.AbsolutePath
-import org.langmeta.io.RelativePath
+import scala.meta.io.AbsolutePath
+import scala.meta.io.RelativePath
 import vork.Args
 import vork.InputFile
 

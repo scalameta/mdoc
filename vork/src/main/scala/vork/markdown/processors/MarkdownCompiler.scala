@@ -1,6 +1,6 @@
 package vork.markdown.processors
 
-import scalafix._
+import scalafix.v0._
 import scala.meta._
 import java.io.File
 import java.net.URL
@@ -16,8 +16,8 @@ import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
 import metaconfig.ConfError
 import metaconfig.Configured
-import org.langmeta.inputs.Input
-import org.langmeta.inputs.Position
+import scala.meta.inputs.Input
+import scala.meta.inputs.Position
 import vork.Logger
 import vork.runtime.Document
 import vork.runtime.DocumentBuilder

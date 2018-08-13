@@ -3,9 +3,9 @@ package vork
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import org.langmeta.internal.io.PathIO
+import scala.meta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
-import org.langmeta.io.AbsolutePath
+import scala.meta.io.AbsolutePath
 import org.scalatest.FunSuite
 
 case class CliFixture(in: Path, out: Path)
@@ -32,14 +32,16 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
         "--out",
         out.toString,
         "--cwd",
-        in.toString
+        in.toString,
+        "--site.version",
+        "\"1.0\""
       )
       val code = Cli.process(args ++ extraArgs, myStdout, in.toNIO)
-      assert(code == expectedExitCode)
+      val stdout = fansi.Str(myStdout.toString()).plainText
+      assert(code == expectedExitCode, stdout)
       val obtained = StringFS.dir2string(AbsolutePath(out))
       assertNoDiff(obtained, expected)
-      val obtainedStdout = myStdout.toString()
-      onStdout(obtainedStdout)
+      onStdout(stdout)
     }
   }
 }

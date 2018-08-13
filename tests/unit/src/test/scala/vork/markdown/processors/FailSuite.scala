@@ -1,13 +1,11 @@
 package vork.markdown.processors
 
-import org.scalatest.Ignore
+import StringSyntax._
 
-// Not implemented yet with new renderer
-//@Ignore
 class FailSuite extends BaseMarkdownSuite {
 
   check(
-    "fail",
+    "mismatch",
     """
       |```scala vork:fail
       |val x: Int = "String"
@@ -33,7 +31,7 @@ class FailSuite extends BaseMarkdownSuite {
       |newlines
       |'''
       |```
-    """.replace("'''", "\"\"\"").stripMargin,
+    """.stripMargin.triplequoted,
     """
       |```scala
       |@ val y: Int = '''Triplequote
@@ -43,9 +41,9 @@ class FailSuite extends BaseMarkdownSuite {
       | found   : String("Triplequote\nnewlines\n")
       | required: Int
       |val y: Int = '''Triplequote
-      |              ^
+      |             ^
       |```
-      |""".replace("'''", "\"\"\"").stripMargin
+      |""".stripMargin.triplequoted
   )
 
   checkError(

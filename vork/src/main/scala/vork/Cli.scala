@@ -3,8 +3,8 @@ package vork
 import java.io.PrintStream
 import java.nio.file.Path
 import metaconfig.Configured
-import org.langmeta.internal.io.PathIO
-import org.langmeta.io.AbsolutePath
+import scala.meta.internal.io.PathIO
+import scala.meta.io.AbsolutePath
 import scala.tools.nsc.interpreter.OutputStream
 
 object Cli {
@@ -22,6 +22,9 @@ object Cli {
     val base = Args.default(AbsolutePath(cwd))
     Args.fromCliArgs(args.toList, logger, base) match {
       case Configured.NotOk(error) =>
+        pprint.log(error)
+        pprint.log(error.all)
+        logger.error("foooo")
         error.all.foreach(message => logger.error(message))
         1
       case Configured.Ok(context) =>

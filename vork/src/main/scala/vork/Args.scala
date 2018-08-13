@@ -15,8 +15,8 @@ import metaconfig.Configured
 import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
-import org.langmeta.io.AbsolutePath
-import org.langmeta.io.RelativePath
+import scala.meta.io.AbsolutePath
+import scala.meta.io.RelativePath
 import vork.markdown.processors.MarkdownCompiler
 
 case class InputFile(
@@ -41,10 +41,10 @@ case class Args(
     @ExtraName("w")
     watch: Boolean = false,
     @Description("Glob to filter which files from --in directory to include.")
-    files: List[AbsolutePath] = Nil,
+    includeFiles: List[PathMatcher] = Nil,
     @Description("Glob to filter which files from --in directory to exclude.")
     excludeFiles: List[PathMatcher] = Nil,
-    vars: Map[String, String] = Map.empty
+    site: Map[String, String] = Map.empty
 ) {
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = infile.toRelative(in)
@@ -56,6 +56,7 @@ case class Args(
     }
   }
   def matches(path: RelativePath): Boolean = {
+    (includeFiles.isEmpty || includeFiles.exists(_.matches(path.toNIO))) &&
     !excludeFiles.exists(_.matches(path.toNIO))
   }
   def validate(logger: Logger): Configured[Context] = {

@@ -60,7 +60,7 @@ class VorkParserExtension(context: Context) extends Parser.ParserExtension {
     override def getBracketNestingLevel(options: DataHolder): Int = 0
     override def getWantExclamationPrefix(options: DataHolder): Boolean = true
     override def create(document: ast.Document): LinkRefProcessor =
-      new SiteVariableInjector(context.args.vars, document)
+      new SiteVariableInjector(context.args.site, document)
   }
 
   override def extend(parserBuilder: Parser.Builder): Unit = {

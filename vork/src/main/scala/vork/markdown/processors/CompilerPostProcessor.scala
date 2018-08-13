@@ -5,7 +5,7 @@ import com.vladsch.flexmark.ast.{Document, FencedCodeBlock}
 import com.vladsch.flexmark.parser.block.{DocumentPostProcessor, DocumentPostProcessorFactory}
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
-import org.langmeta.inputs.Input
+import scala.meta.inputs.Input
 import vork.Context
 import vork.markdown.processors.MarkdownCompiler.SectionInput
 import vork.{Markdown, Args, Processor}

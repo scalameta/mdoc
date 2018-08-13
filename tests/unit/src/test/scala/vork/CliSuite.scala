@@ -1,28 +1,10 @@
 package vork
 
 import java.nio.file.Files
-import org.langmeta.io.AbsolutePath
+import scala.meta.io.AbsolutePath
 import vork.internal.BuildInfo
 
 class CliSuite extends BaseCliSuite {
-
-  checkCli(
-    "vork.conf",
-    """
-      |/index.md
-      |# Hello ![version]
-      |/vork.conf
-      |site.version = "1.0"
-    """.stripMargin,
-    """
-      |/index.md
-      |# Hello 1.0
-      |
-      |
-      |/vork.conf
-      |site.version = "1.0"
-    """.stripMargin
-  )
 
   checkCli(
     "classpath",
@@ -61,9 +43,9 @@ class CliSuite extends BaseCliSuite {
     """.stripMargin,
     extraArgs = Array(
       "--include-files",
-      "include",
+      "include.md",
       "--exclude-files",
-      "exclude"
+      "exclude.md"
     )
   )
 

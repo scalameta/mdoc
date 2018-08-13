@@ -10,9 +10,9 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataKey, MutableDataSet}
 import vork.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
-import org.langmeta.internal.io.FileIO
-import org.langmeta.internal.io.PathIO
-import org.langmeta.io.AbsolutePath
+import scala.meta.internal.io.FileIO
+import scala.meta.internal.io.PathIO
+import scala.meta.io.AbsolutePath
 import vork.utils.IO
 import scala.meta.Input
 
