@@ -3,38 +3,34 @@ package vork.utils
 import java.io.IOException
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
-
-import vork.Options
+import org.langmeta.io.AbsolutePath
+import org.langmeta.io.RelativePath
+import vork.Args
+import vork.InputFile
 
 object IO {
 
-  def absolutize(path: Path, cwd: Path): Path = {
-    val absolute =
-      if (path.isAbsolute) path
-      else cwd.resolve(path)
-    absolute.normalize()
-  }
-
-  def collectInputPaths(options: Options): List[Path] = {
-    val paths = List.newBuilder[Path]
-    Files.walkFileTree(
-      options.in,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(
-            file: Path,
-            attrs: BasicFileAttributes
-        ): FileVisitResult = {
-          if (Files.isRegularFile(file)) {
-            paths += file
-          }
-          FileVisitResult.CONTINUE
+  def foreachFile(args: Args)(fn: InputFile => Unit): Unit = {
+    implicit val cwd = args.cwd
+    val root = args.in.toNIO
+    val visitor = new SimpleFileVisitor[Path] {
+      override def visitFile(
+          file: Path,
+          attrs: BasicFileAttributes
+      ): FileVisitResult = {
+        args.toInputFile(AbsolutePath(file)) match {
+          case Some(inputFile) =>
+            fn(inputFile)
+          case None =>
+            () // excluded
         }
+        FileVisitResult.CONTINUE
       }
-    )
-    paths.result()
+    }
+    Files.walkFileTree(root, visitor)
   }
 
-  final val deleteVisitor = new SimpleFileVisitor[Path] {
+  val deleteVisitor: SimpleFileVisitor[Path] = new SimpleFileVisitor[Path] {
     override def visitFile(
         file: Path,
         attrs: BasicFileAttributes
@@ -51,9 +47,8 @@ object IO {
     }
   }
 
-  def cleanTarget(options: Options): Unit = {
-    // Clean all this and maybe use better-files as a better replacement?
-    if (!options.cleanTarget || !Files.exists(options.out)) return
-    Files.walkFileTree(options.out, deleteVisitor)
+  def cleanTarget(options: Args): Unit = {
+    if (!options.cleanTarget || !Files.exists(options.out.toNIO)) return
+    Files.walkFileTree(options.out.toNIO, deleteVisitor)
   }
 }

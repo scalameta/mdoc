@@ -10,82 +10,74 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataKey, MutableDataSet}
 import vork.utils.SourceWatcher
 import io.methvin.watcher.DirectoryChangeEvent
+import org.langmeta.internal.io.FileIO
 import org.langmeta.internal.io.PathIO
+import org.langmeta.io.AbsolutePath
 import vork.utils.IO
 import scala.meta.Input
 
 final class Processor(
-    options: Options,
+    options: Args,
     mdSettings: MutableDataSet,
     logger: Logger
 ) {
-  require(
-    options.isAbsolute,
-    s"Options contains relative paths. " +
-      s"Use Options.fromDefault($options) to absolutize paths."
-  )
 
-  def handleMarkdown(path: Path): Unit = {
+  def handleMarkdown(file: InputFile): Unit = {
     logger.reset()
-    val sourcePath = options.resolveIn(path)
-    val source = new String(java.nio.file.Files.readAllBytes(sourcePath), options.encoding)
-    mdSettings.set(Processor.PathKey, Some(path))
+    val source = FileIO.slurp(file.in, options.encoding)
+    mdSettings.set(Processor.PathKey, Some(file.in.toNIO))
     val parser = Parser.builder(mdSettings).build
     val formatter = Formatter.builder(mdSettings).build
     val ast = parser.parse(source)
     val md = formatter.render(ast)
-    val target = options.resolveOut(path)
     if (logger.hasErrors) {
-      logger.error(s"Failed to generate $target")
+      logger.error(s"Failed to generate ${file.out}")
     } else {
-      writePath(target, md)
-      logger.info(s"Generated $target")
+      writePath(file, md)
+      logger.info(s"Generated ${file.out}")
     }
   }
 
-  def handleRegularFile(path: Path): Unit = {
-    val source = options.resolveIn(path)
-    val target = options.resolveOut(path)
-    Files.createDirectories(target.getParent)
-    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
-    logger.info(s"Copied    $target")
+  def handleRegularFile(file: InputFile): Unit = {
+    Files.createDirectories(file.out.toNIO.getParent)
+    Files.copy(file.in.toNIO, file.out.toNIO, StandardCopyOption.REPLACE_EXISTING)
+    logger.info(s"Copied    ${file.out.toNIO}")
   }
 
-  def handlePath(path: Path): Unit = {
-    def run(path: Path): Unit = {
-      if (!options.matcher.matches(path)) ()
+  def handleFile(file: InputFile): Unit = {
+    try {
+      if (!options.matches(file.relpath)) ()
       else {
-        PathIO.extension(path) match {
-          case "md" => handleMarkdown(path)
-          case _ => handleRegularFile(path)
+        PathIO.extension(file.in.toNIO) match {
+          case "md" => handleMarkdown(file)
+          case _ => handleRegularFile(file)
         }
       }
-    }
-    try {
-      run(options.in.relativize(path))
     } catch {
       case NonFatal(e) =>
-        new FileError(path, e).printStackTrace()
+        new FileError(file.in, e).printStackTrace()
     }
   }
 
-  def writePath(path: Path, string: String): Unit = {
-    Files.createDirectories(path.getParent)
-    Files.write(path, string.getBytes(options.encoding))
+  def writePath(file: InputFile, string: String): Unit = {
+    Files.createDirectories(file.out.toNIO.getParent)
+    Files.write(file.out.toNIO, string.getBytes(options.encoding))
   }
 
-  private class FileError(path: Path, cause: Throwable)
+  private class FileError(path: AbsolutePath, cause: Throwable)
       extends Exception(path.toString)
       with NoStackTrace {
     override def getCause: Throwable = cause
   }
 
   def generateCompleteSite(): Unit = {
-    val paths = IO.collectInputPaths(options)
-    if (paths.isEmpty) {
-      logger.error(s"${options.in} contains no files!")
-    } else {
-      paths.foreach(handlePath)
+    var isEmpty = true
+    IO.foreachFile(options) { file =>
+      isEmpty = false
+      handleFile(file)
+    }
+    if (isEmpty) {
+      logger.error(s"no input files: ${options.in}")
     }
   }
 
@@ -94,9 +86,12 @@ final class Processor(
     generateCompleteSite()
     if (options.watch) {
       SourceWatcher.watch(
-        List(options.in),
+        List(options.in.toNIO),
         (event: DirectoryChangeEvent) => {
-          handlePath(event.path())
+          options.toInputFile(AbsolutePath(event.path())) match {
+            case Some(inputFile) => handleFile(inputFile)
+            case None => ()
+          }
         }
       )
     }

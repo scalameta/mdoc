@@ -8,7 +8,7 @@ import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence}
 import org.langmeta.inputs.Input
 import vork.Context
 import vork.markdown.processors.MarkdownCompiler.SectionInput
-import vork.{Markdown, Options, Processor}
+import vork.{Markdown, Args, Processor}
 
 class CompilerPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._

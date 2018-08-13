@@ -1,6 +1,6 @@
 package vork.markdown
 
-import vork.Options
+import vork.Args
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.ext.definition.DefinitionExtension
@@ -32,7 +32,7 @@ object VorkExtensions {
       DefinitionExtension.create(),
       AutolinkExtension.create(),
       VorkParserExtension.create(context),
-      VorkFormatterExtension.create(context.options),
+      VorkFormatterExtension.create(context.args),
       TablesExtension.create(),
       EmojiExtension.create(),
       FootnoteExtension.create(),

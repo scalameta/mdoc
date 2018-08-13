@@ -1,16 +1,15 @@
 package vork.markdown
 
-import scala.collection.mutable
-import scala.tools.nsc.Global
-import vork.Options
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
-import com.vladsch.flexmark.parser.{LinkRefProcessor, LinkRefProcessorFactory, Parser}
+import com.vladsch.flexmark.parser.LinkRefProcessor
+import com.vladsch.flexmark.parser.LinkRefProcessorFactory
+import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
-import com.vladsch.flexmark.util.sequence.{BasedSequence, CharSubSequence, PrefixedSubSequence}
+import com.vladsch.flexmark.util.sequence.BasedSequence
+import com.vladsch.flexmark.util.sequence.PrefixedSubSequence
 import vork.Context
-import vork.markdown.processors.MarkdownCompiler
 
 class VorkParserExtension(context: Context) extends Parser.ParserExtension {
   class SiteVariableInjector(site: Map[String, String], document: ast.Document)
@@ -61,7 +60,7 @@ class VorkParserExtension(context: Context) extends Parser.ParserExtension {
     override def getBracketNestingLevel(options: DataHolder): Int = 0
     override def getWantExclamationPrefix(options: DataHolder): Boolean = true
     override def create(document: ast.Document): LinkRefProcessor =
-      new SiteVariableInjector(context.options.config.site, document)
+      new SiteVariableInjector(context.args.vars, document)
   }
 
   override def extend(parserBuilder: Parser.Builder): Unit = {

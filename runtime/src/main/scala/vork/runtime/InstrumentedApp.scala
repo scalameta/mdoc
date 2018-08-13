@@ -52,7 +52,6 @@ trait DocumentBuilder {
 
     def section[T](e: => T): T = {
       if (first) {
-        // HACK(olafur) we skip the leading $doc.section right after app().
         first = false
       } else {
         mySections.append(Section(myStatements.toList))
@@ -62,11 +61,21 @@ trait DocumentBuilder {
     }
 
     def build(): Document = {
-      val out = new PrintStream(myOut)
-      Console.withOut(out) {
-        Console.withErr(out) {
-          app()
+      val backupStdout = System.out
+      val backupStderr = System.err
+      try {
+        val out = new PrintStream(myOut)
+        System.setOut(out)
+        System.setErr(out)
+        Console.withOut(out) {
+          Console.withErr(out) {
+            app()
+            section { () }
+          }
         }
+      } finally {
+        System.setOut(backupStdout)
+        System.setErr(backupStderr)
       }
       val document = Document(mySections.toList)
       mySections.clear()

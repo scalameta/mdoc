@@ -6,17 +6,19 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import scala.meta.testkit.DiffAssertions
 import com.vladsch.flexmark.util.options.MutableDataSet
+import java.io.PrintStream
+import org.langmeta.io.AbsolutePath
 import vork.Context
 import vork.Logger
 import vork.Markdown
-import vork.Options
+import vork.Args
 import vork.Processor
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
-  private val configPath = Paths.get(getClass.getClassLoader.getResource("vork.conf").toURI)
-  private val options = Options.fromDefault(new Options(configPath = configPath)).get
+  private val tmp = AbsolutePath(Files.createTempDirectory("vork"))
+  private val options = Args.default(tmp)
   private val myStdout = new ByteArrayOutputStream()
-  private val logger = new Logger(myStdout)
+  private val logger = new Logger(new PrintStream(myStdout))
   private val compiler = MarkdownCompiler.fromClasspath(options.classpath)
   private val context = Context(options, logger, compiler)
 

@@ -6,9 +6,7 @@ import fansi.Color._
 import scala.meta.Position
 import scala.meta.internal.inputs._
 
-class Logger(out: OutputStream) {
-
-  private val ps = new PrintStream(out)
+class Logger(ps: PrintStream) {
 
   private val myInfo = Blue("info")
   private val myWarning = Yellow("warning")

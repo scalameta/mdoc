@@ -3,12 +3,14 @@ package vork
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import org.langmeta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
 import org.langmeta.io.AbsolutePath
 import org.scalatest.FunSuite
 
 case class CliFixture(in: Path, out: Path)
 abstract class BaseCliSuite extends FunSuite with DiffAssertions {
+  private val cwd = PathIO.workingDirectory
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
       name: String,
@@ -32,7 +34,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
         "--cwd",
         in.toString
       )
-      val code = Cli.process(args ++ extraArgs, myStdout)
+      val code = Cli.process(args ++ extraArgs, myStdout, in.toNIO)
       assert(code == expectedExitCode)
       val obtained = StringFS.dir2string(AbsolutePath(out))
       assertNoDiff(obtained, expected)
