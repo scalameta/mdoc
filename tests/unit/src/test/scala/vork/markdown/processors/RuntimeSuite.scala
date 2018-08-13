@@ -42,7 +42,6 @@ class RuntimeApp extends DocumentBuilder {
       }
     }
   }
-
 }
 
 class RuntimeSuite extends FunSuite with DiffAssertions {

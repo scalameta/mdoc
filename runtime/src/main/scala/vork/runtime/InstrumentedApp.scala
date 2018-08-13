@@ -1,22 +1,25 @@
 package vork.runtime
 
 import scala.language.experimental.macros
-
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import pprint.PPrinter
 import scala.collection.mutable.ArrayBuffer
 import pprint.TPrint
+import pprint.TPrintColors
 import sourcecode.Text
 
-class Binder[T](val value: T, val name: String, val tpe: pprint.TPrint[T]) {
-  override def toString: String =
-    s"""Binder(${pprint.PPrinter.BlackWhite.apply(value)}, "$name", "${tpe.render}")"""
+final class Binder[T](val value: T, val name: String, val tpe: TPrint[T]) {
+  override def toString: String = {
+    val valueString = PPrinter.BlackWhite.apply(value)
+    val tpeString = tpe.render(TPrintColors.BlackWhite)
+    s"""Binder($valueString, "$name", "$tpeString")"""
+  }
 }
 object Binder {
-  def generate[A](e: Text[A])(implicit tprint: pprint.TPrint[A]): Binder[A] =
+  def generate[A](e: Text[A])(implicit tprint: TPrint[A]): Binder[A] =
     new Binder(e.value, e.source, tprint)
 }
-
 case class Statement(binders: List[Binder[_]], out: String)
 case class Section(statements: List[Statement]) {
   def isError: Boolean = statements.exists(_.isInstanceOf[Macros.CompileError])
@@ -59,21 +62,11 @@ trait DocumentBuilder {
     }
 
     def build(): Document = {
-      val backupStdout = System.out
-      val backupStderr = System.err
-      try {
-        val out = new PrintStream(myOut)
-        System.setOut(out)
-        System.setErr(out)
-        Console.withOut(out) {
-          Console.withErr(out) {
-            app()
-            section { () }
-          }
+      val out = new PrintStream(myOut)
+      Console.withOut(out) {
+        Console.withErr(out) {
+          app()
         }
-      } finally {
-        System.setOut(backupStdout)
-        System.setErr(backupStderr)
       }
       val document = Document(mySections.toList)
       mySections.clear()
