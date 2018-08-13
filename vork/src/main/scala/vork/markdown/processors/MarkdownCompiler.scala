@@ -185,7 +185,7 @@ object MarkdownCompiler {
                 )
                 input match {
                   case Input.Slice(underlying, a, b) =>
-                    Position.Range(underlying, a + slice.start, b + slice.end)
+                    Position.Range(underlying, a + slice.start, a + slice.end)
                   case _ => slice
                 }
               }
@@ -270,6 +270,10 @@ object MarkdownCompiler {
     else message.substring(0, idx)
   }
 
+  def position(pos: Position): String = {
+    s"${pos.startLine}, ${pos.startColumn}, ${pos.endLine}, ${pos.endColumn}"
+  }
+
   def instrument(section: SectionInput, n: Int): (String, Int) = {
     var counter = n
     val source = section.source
@@ -298,13 +302,19 @@ object MarkdownCompiler {
             Patch.empty
         }
         val rightIndent = " " * (WIDTH - stat.pos.endColumn)
+        val positionPatch =
+          if (section.mod.isDefault) {
+            val statPosition = s"$$doc.position(${position(stat.pos)}); \n"
+            ctx.addLeft(stat, statPosition)
+          } else {
+            Patch.empty
+          }
+
         val binders = names
-          .map(name => {
-            val pos = name.pos
-            s"$$doc.binder($name, ${pos.startLine}, ${pos.startColumn}, ${pos.endLine}, ${pos.endColumn})"
-          })
-          .mkString(rightIndent + VORK + "; ", "; ", "; $doc.statement {")
+          .map(name => s"$$doc.binder($name, ${position(name.pos)})")
+          .mkString(rightIndent + VORK + "; ", "; ", s"; $$doc.statement { ")
         failPatch +
+          positionPatch +
           freshBinderPatch +
           ctx.addRight(stat, binders)
       }

@@ -13,7 +13,12 @@ import vork.Context
   *
   * Currently, only supports parsing one modifier per code block.
   */
-sealed trait FencedCodeMod
+sealed trait FencedCodeMod {
+  import FencedCodeMod._
+  def isDefault: Boolean = this == Default
+  def isFail: Boolean = this == Fail
+  def isPassthrough: Boolean = this == Passthrough
+}
 object FencedCodeMod {
   def all: List[FencedCodeMod] = List(Default, Passthrough, Fail)
   def apply(string: String): Option[FencedCodeMod] =

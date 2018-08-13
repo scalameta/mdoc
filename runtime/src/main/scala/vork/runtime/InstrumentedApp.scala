@@ -68,16 +68,23 @@ trait DocumentBuilder {
   private var lastPosition = RangePosition.empty
 
   object $doc {
+
+    def position(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int): RangePosition = {
+      val pos = new RangePosition(startLine, startColumn, endLine, endColumn)
+      lastPosition = pos
+      pos
+    }
+
     def binder[A](e: Text[A])(
         implicit tprint: TPrint[A]
     ): A = {
       binder(e, -1, -1, -1, -1)
     }
+
     def binder[A](e: Text[A], startLine: Int, startColumn: Int, endLine: Int, endColumn: Int)(
         implicit tprint: TPrint[A]
     ): A = {
-      val pos = new RangePosition(startLine, startColumn, endLine, endColumn)
-      lastPosition = pos
+      val pos = position(startLine, startColumn, endLine, endColumn)
       myBinders.append(Binder.generate(e, pos))
       e.value
     }
