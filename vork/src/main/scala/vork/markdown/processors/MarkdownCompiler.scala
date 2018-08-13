@@ -154,18 +154,17 @@ object MarkdownCompiler {
       logger: Logger,
       filename: String
   ): Document = {
-    val wrapped =
-      s"""
-         |package repl
-         |class Session extends _root_.vork.runtime.DocumentBuilder {
-         |  def app(): Unit = {
-         |$instrumented
-         |  }
-         |}
-      """.stripMargin
+    val wrapped = new StringBuilder()
+        .append("package repl\n")
+        .append("class Session extends _root_.vork.runtime.DocumentBuilder {\n")
+        .append("  def app(): Unit = {\n")
+        .append(instrumented)
+        .append("  }\n")
+        .append("}\n")
+        .toString()
     compiler.compile(Input.VirtualFile(filename, wrapped), logger) match {
       case Some(loader) =>
-        val cls = loader.loadClass(s"repl.Session")
+        val cls = loader.loadClass("repl.Session")
         val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
         try {
           doc.build()

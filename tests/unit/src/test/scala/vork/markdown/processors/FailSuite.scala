@@ -112,9 +112,9 @@ class FailSuite extends BaseMarkdownSuite {
       |^^^^^^^^^
       |scala.NotImplementedError: an implementation is missing
       |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
-      |	at repl.Session.crash$1(crash.md:16)
-      |	at repl.Session.z$1(crash.md:18)
-      |	at repl.Session.$anonfun$app$9(crash.md:23)
+      |	at repl.Session.crash$1(crash.md:15)
+      |	at repl.Session.z$1(crash.md:17)
+      |	at repl.Session.$anonfun$app$9(crash.md:22)
       |	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
       |""".stripMargin
   )
