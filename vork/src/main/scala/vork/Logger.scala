@@ -16,6 +16,10 @@ class Logger(ps: PrintStream) {
   def hasErrors: Boolean = myErrors > 0
   def reset(): Unit = myErrors = 0
 
+  def error(pos: Position, throwable: Throwable): Unit = {
+    error(pos, throwable.getMessage)
+    throwable.printStackTrace(ps)
+  }
   def error(pos: Position, msg: String): Unit = {
     error(pos.formatMessage("error", msg))
   }

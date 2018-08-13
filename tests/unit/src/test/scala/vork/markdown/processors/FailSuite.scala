@@ -91,4 +91,30 @@ class FailSuite extends BaseMarkdownSuite {
       |        ^
       |""".stripMargin
   )
+
+  checkError(
+    "crash",
+    """
+      |```scala vork
+      |val x = 1
+      |```
+      |```scala vork
+      |val y = 2
+      |def crash() = ???
+      |def z: Int = crash()
+      |x + y + z
+      |```
+    """.stripMargin,
+    """
+      |error: crash.md:1: error: an implementation is missing
+      |val y = 2
+      |    ^
+      |scala.NotImplementedError: an implementation is missing
+      |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
+      |	at repl.Session.crash$1(crash.md:13)
+      |	at repl.Session.z$1(crash.md:14)
+      |	at repl.Session.$anonfun$app$8(crash.md:16)
+      |	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
+      |""".stripMargin
+  )
 }

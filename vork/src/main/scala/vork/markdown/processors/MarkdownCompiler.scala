@@ -22,7 +22,9 @@ import vork.Logger
 import vork.runtime.Document
 import vork.runtime.DocumentBuilder
 import vork.runtime.Macros
+import vork.runtime.PositionedException
 import vork.runtime.Section
+import scalafix.internal.util.PositionSyntax._
 
 object MarkdownCompiler {
 
@@ -83,7 +85,8 @@ object MarkdownCompiler {
       filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val doc = document(compiler, instrumented, logger, filename)
+    val original = sections.map(_.source.syntax)
+    val doc = document(compiler, original, instrumented, logger, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -146,14 +149,15 @@ object MarkdownCompiler {
 
   def document(
       compiler: MarkdownCompiler,
+      original: List[String],
       instrumented: String,
       logger: Logger,
       filename: String
   ): Document = {
     val wrapped =
       s"""
-         |package vork
-         |class Generated extends _root_.vork.runtime.DocumentBuilder {
+         |package repl
+         |class Session extends _root_.vork.runtime.DocumentBuilder {
          |  def app(): Unit = {
          |${instrumented}
          |  }
@@ -161,8 +165,29 @@ object MarkdownCompiler {
       """.stripMargin
     compiler.compile(Input.VirtualFile(filename, wrapped), logger) match {
       case Some(loader) =>
-        val cls = loader.loadClass(s"vork.Generated")
-        cls.newInstance().asInstanceOf[DocumentBuilder].$doc.build()
+        val cls = loader.loadClass(s"repl.Session")
+        val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
+        try {
+          doc.build()
+        } catch {
+          case e: PositionedException =>
+            val text = original(e.section - 1)
+            val input = Input.VirtualFile(filename, text)
+            val pos =
+              if (e.pos.isEmpty) {
+                Position.Range(input, 0, 0)
+              } else {
+                Position.Range(
+                  input,
+                  e.pos.startLine,
+                  e.pos.startColumn,
+                  e.pos.endLine,
+                  e.pos.endColumn
+                )
+              }
+            logger.error(pos, e.getCause)
+            Document.empty
+        }
       case None =>
         // An empty document will render as the original markdown
         Document.empty
@@ -270,7 +295,10 @@ object MarkdownCompiler {
         }
         val rightIndent = " " * (WIDTH - stat.pos.endColumn)
         val binders = names
-          .map(name => s"$$doc.binder($name)")
+          .map(name => {
+            val pos = name.pos
+            s"$$doc.binder($name, ${pos.startLine}, ${pos.startColumn}, ${pos.endLine}, ${pos.endColumn})"
+          })
           .mkString(rightIndent + VORK + "; ", "; ", "; $doc.statement {")
         failPatch +
           freshBinderPatch +
