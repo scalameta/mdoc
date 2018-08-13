@@ -42,7 +42,7 @@ lazy val runtime = project
 lazy val vork = project
   .settings(
     moduleName := "vork",
-    mainClass in assembly := Some("vork.Cli"),
+    mainClass in assembly := Some("vork.Main"),
     assemblyJarName in assembly := "vork.jar",
     test in assembly := {},
     assemblyMergeStrategy.in(assembly) ~= { old =>
