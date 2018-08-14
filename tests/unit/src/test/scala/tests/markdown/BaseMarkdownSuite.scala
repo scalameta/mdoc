@@ -11,13 +11,13 @@ import tests.markdown.StringSyntax._
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.cli.Settings
-import vork.internal.io.Logger
+import vork.internal.io.ConsoleLogger
 import vork.internal.markdown.Markdown
 import vork.internal.markdown.MarkdownCompiler
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   private val tmp = AbsolutePath(Files.createTempDirectory("vork"))
-  private val options = Settings
+  protected def settings: Settings = Settings
     .default(tmp)
     .copy(
       site = Map(
@@ -25,9 +25,9 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       )
     )
   private val myStdout = new ByteArrayOutputStream()
-  private val logger = new Logger(new PrintStream(myStdout))
-  private val compiler = MarkdownCompiler.fromClasspath(options.classpath)
-  private val context = Context(options, logger, compiler)
+  private val logger = new ConsoleLogger(new PrintStream(myStdout))
+  private val compiler = MarkdownCompiler.fromClasspath(settings.classpath)
+  private val context = Context(settings, logger, compiler)
 
   def getSettings(input: Input.VirtualFile): MutableDataSet = {
     myStdout.reset()
@@ -54,6 +54,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     test(name) {
       val input = Input.VirtualFile(name + ".md", original)
       val obtained = Markdown.toMarkdown(original, getSettings(input)).trimLineEnds
+      val stdout = fansi.Str(myStdout.toString()).plainText
+      assert(!logger.hasErrors, stdout)
       assertNoDiff(obtained, expected)
     }
   }

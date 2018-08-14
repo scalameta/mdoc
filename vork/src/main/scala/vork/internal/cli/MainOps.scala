@@ -13,8 +13,8 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NoStackTrace
 import scala.util.control.NonFatal
+import vork.Logger
 import vork.internal.io.IO
-import vork.internal.io.Logger
 import vork.internal.io.FileWatcher
 
 final class MainOps(

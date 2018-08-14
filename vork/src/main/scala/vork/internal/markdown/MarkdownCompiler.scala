@@ -17,11 +17,10 @@ import scala.tools.nsc.reporters.StoreReporter
 import scalafix.v0._
 import vork.document.CompileResult
 import vork.document.Section
-import vork.internal.io.Logger
 import vork.document.{Document, _}
 import vork.internal.document.DocumentBuilder
 import PositionSyntax._
-import scalafix.internal.util.PositionSyntax._
+import vork.Logger
 
 object MarkdownCompiler {
 
@@ -168,7 +167,7 @@ object MarkdownCompiler {
                       s"Obtained $obtained"
                   )
               }
-            case _ =>
+            case VorkModifier.Default | VorkModifier.Passthrough =>
               statement.binders.foreach { binder =>
                 sb.append(binder.name)
                   .append(": ")
@@ -177,6 +176,8 @@ object MarkdownCompiler {
                   .append(pprint.PPrinter.BlackWhite.apply(binder.value))
                   .append("\n")
               }
+            case c: VorkModifier.Custom =>
+              throw new IllegalArgumentException(c.toString)
           }
         }
     }

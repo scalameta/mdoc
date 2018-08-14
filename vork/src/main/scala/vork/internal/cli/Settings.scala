@@ -10,6 +10,7 @@ import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
 import metaconfig.Conf
 import metaconfig.ConfDecoder
+import metaconfig.ConfEncoder
 import metaconfig.ConfError
 import metaconfig.Configured
 import metaconfig.annotation._
@@ -17,8 +18,21 @@ import metaconfig.generic
 import metaconfig.generic.Surface
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import vork.internal.io.Logger
+import vork.Logger
 import vork.internal.markdown.MarkdownCompiler
+
+trait CustomModifier {
+  val name: String
+  def process(info: String, code: String): String
+}
+
+object CustomModifier {
+  implicit val surface: Surface[Settings] = new Surface(Nil)
+  implicit val decoder: ConfDecoder[CustomModifier] =
+    ConfDecoder.instanceF[CustomModifier](_ => ConfError.message("unsupported").notOk)
+  implicit val encoder: ConfEncoder[CustomModifier] =
+    ConfEncoder.StringEncoder.contramap(mod => s"<${mod.name}>")
+}
 
 case class Settings(
     @Description("The input directory to generate the vork site.")
@@ -39,7 +53,8 @@ case class Settings(
     includeFiles: List[PathMatcher] = Nil,
     @Description("Glob to filter which files from --in directory to exclude.")
     excludeFiles: List[PathMatcher] = Nil,
-    site: Map[String, String] = Map.empty
+    site: Map[String, String] = Map.empty,
+    modifiers: List[CustomModifier] = Nil
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {

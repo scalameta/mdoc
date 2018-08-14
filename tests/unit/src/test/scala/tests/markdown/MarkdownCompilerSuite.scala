@@ -3,13 +3,13 @@ package tests.markdown
 import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
-import vork.internal.io.Logger
+import vork.internal.io.ConsoleLogger
 import vork.internal.markdown.MarkdownCompiler
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
   private val compiler = MarkdownCompiler.default()
-  private val logger = Logger.default
+  private val logger = ConsoleLogger.default
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     ignore(name) {}

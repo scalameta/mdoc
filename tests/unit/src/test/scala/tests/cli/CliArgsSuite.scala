@@ -5,10 +5,10 @@ import org.scalatest.FunSuite
 import scala.meta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
 import vork.internal.cli.Settings
-import vork.internal.io.Logger
+import vork.internal.io.ConsoleLogger
 
 class CliArgsSuite extends FunSuite with DiffAssertions {
-  private val logger = Logger.default
+  private val logger = ConsoleLogger.default
   private val tmp = Files.createTempDirectory("vork")
   Files.delete(tmp)
   private val base = Settings.default(PathIO.workingDirectory)

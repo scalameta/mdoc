@@ -3,6 +3,7 @@ package vork.internal.markdown
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Document
 import com.vladsch.flexmark.ast.FencedCodeBlock
+import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.parser.block.DocumentPostProcessor
 import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
 import com.vladsch.flexmark.util.options.MutableDataSet
@@ -26,16 +27,27 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
         if (!string.contains(':')) Some(Default)
         else {
           val mode = string.stripPrefix("scala vork:")
-          VorkModifier(mode).orElse {
-            val expected = VorkModifier.all.map(_.toString.toLowerCase()).mkString(", ")
-            val msg = s"Invalid mode '$mode'. Expected one of: $expected"
-            val offset = "scala vork:".length
-            val start = block.getInfo.getStartOffset + offset
-            val end = block.getInfo.getEndOffset
-            val pos = Position.Range(input, start, end)
-            context.logger.error(pos, msg)
-            None
-          }
+          VorkModifier(mode)
+            .orElse {
+              val (name, info) = mode.split(":", 2) match {
+                case Array(a) => (a, "")
+                case Array(a, b) => (a, b)
+              }
+              context.settings.modifiers.collectFirst {
+                case mod if mod.name == name =>
+                  Custom(mod, info)
+              }
+            }
+            .orElse {
+              val expected = VorkModifier.all.map(_.toString.toLowerCase()).mkString(", ")
+              val msg = s"Invalid mode '$mode'. Expected one of: $expected"
+              val offset = "scala vork:".length
+              val start = block.getInfo.getStartOffset + offset
+              val end = block.getInfo.getEndOffset
+              val pos = Position.Range(input, start, end)
+              context.logger.error(pos, msg)
+              None
+            }
         }
       }
     }
@@ -59,8 +71,20 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
       case VorkCodeFence(block, mod) =>
         block -> mod
     }
-    if (fences.nonEmpty) {
-      val code = fences.map {
+    val custom = fences.collect {
+      case (f, c: Custom) => (f, c)
+    }
+    custom.foreach {
+      case (block, Custom(mod, info)) =>
+        val oldText = block.getContentChars().toString
+        val newText = mod.process(info, oldText)
+        replace(doc, block, newText)
+    }
+    val toCompile = fences.collect {
+      case (f, c) if !c.isCustom => (f, c)
+    }
+    if (toCompile.nonEmpty) {
+      val code = toCompile.map {
         case (block, mod) =>
           val child = block.getFirstChild
           val start = child.getStartOffset
@@ -71,7 +95,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
           SectionInput(input, source, mod)
       }
       val rendered = MarkdownCompiler.renderInputs(code, compiler, logger, filename)
-      rendered.sections.zip(fences).foreach {
+      rendered.sections.zip(toCompile).foreach {
         case (section, (block, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
@@ -80,15 +104,21 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
               val content: BasedSequence = CharSubSequence.of(str)
               block.setContent(List(content).asJava)
             case VorkModifier.Passthrough =>
-              val markdownOptions = new MutableDataSet()
-              markdownOptions.setAll(doc)
-              val child = Markdown.parse(CharSubSequence.of(section.out), markdownOptions)
-              block.insertAfter(child)
-              block.unlink()
+              replace(doc, block, section.out)
+            case c: VorkModifier.Custom =>
+              throw new IllegalArgumentException(c.toString)
           }
       }
     }
     doc
+  }
+
+  def replace(doc: Document, node: Node, text: String): Unit = {
+    val markdownOptions = new MutableDataSet()
+    markdownOptions.setAll(doc)
+    val child = Markdown.parse(CharSubSequence.of(text), markdownOptions)
+    node.insertAfter(child)
+    node.unlink()
   }
 }
 

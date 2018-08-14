@@ -4,8 +4,9 @@ import fansi.Color._
 import java.io.PrintStream
 import scala.meta.Position
 import scalafix.internal.util.PositionSyntax._
+import vork.Logger
 
-class Logger(ps: PrintStream) {
+class ConsoleLogger(ps: PrintStream) extends Logger {
 
   private val myInfo = Blue("info")
   private val myWarning = Yellow("warning")
@@ -40,6 +41,6 @@ class Logger(ps: PrintStream) {
   }
 }
 
-object Logger {
-  def default: Logger = new Logger(System.out)
+object ConsoleLogger {
+  def default: Logger = new ConsoleLogger(System.out)
 }

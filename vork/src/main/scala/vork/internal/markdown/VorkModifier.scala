@@ -1,5 +1,7 @@
 package vork.internal.markdown
 
+import vork.internal.cli.CustomModifier
+
 /**
   * A vork code fence modifier.
   *
@@ -16,6 +18,7 @@ sealed trait VorkModifier {
   def isDefault: Boolean = this == Default
   def isFail: Boolean = this == Fail
   def isPassthrough: Boolean = this == Passthrough
+  def isCustom: Boolean = this.isInstanceOf[Custom]
 }
 object VorkModifier {
   def all: List[VorkModifier] = List(Default, Passthrough, Fail)
@@ -30,5 +33,8 @@ object VorkModifier {
 
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends VorkModifier
+
+  /** Render this code fence according to this custom modifier */
+  case class Custom(mod: CustomModifier, info: String) extends VorkModifier
 
 }
