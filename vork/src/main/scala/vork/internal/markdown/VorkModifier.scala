@@ -1,7 +1,5 @@
 package vork.internal.markdown
 
-import vork.internal.cli.Context
-
 /**
   * A vork code fence modifier.
   *

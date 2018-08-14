@@ -53,6 +53,7 @@ lazy val vork = project
     },
     fork in run := true,
     libraryDependencies ++= List(
+      "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,

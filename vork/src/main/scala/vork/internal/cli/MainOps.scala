@@ -18,18 +18,18 @@ import vork.internal.io.Logger
 import vork.internal.io.FileWatcher
 
 final class MainOps(
-                     options: Settings,
-                     mdSettings: MutableDataSet,
-                     logger: Logger
+    settings: Settings,
+    markdown: MutableDataSet,
+    logger: Logger
 ) {
 
   def handleMarkdown(file: InputFile): Unit = {
     logger.reset()
-    val source = FileIO.slurp(file.in, options.encoding)
+    val source = FileIO.slurp(file.in, settings.encoding)
     val input = Input.VirtualFile(file.in.toString(), source)
-    mdSettings.set(MainOps.InputKey, Some(input))
-    val parser = Parser.builder(mdSettings).build
-    val formatter = Formatter.builder(mdSettings).build
+    markdown.set(MainOps.InputKey, Some(input))
+    val parser = Parser.builder(markdown).build
+    val formatter = Formatter.builder(markdown).build
     val ast = parser.parse(source)
     val md = formatter.render(ast)
     if (logger.hasErrors) {
@@ -48,7 +48,7 @@ final class MainOps(
 
   def handleFile(file: InputFile): Unit = {
     try {
-      if (!options.matches(file.relpath)) ()
+      if (!settings.matches(file.relpath)) ()
       else {
         PathIO.extension(file.in.toNIO) match {
           case "md" => handleMarkdown(file)
@@ -63,7 +63,7 @@ final class MainOps(
 
   def writePath(file: InputFile, string: String): Unit = {
     Files.createDirectories(file.out.toNIO.getParent)
-    Files.write(file.out.toNIO, string.getBytes(options.encoding))
+    Files.write(file.out.toNIO, string.getBytes(settings.encoding))
   }
 
   private class FileError(path: AbsolutePath, cause: Throwable)
@@ -74,23 +74,23 @@ final class MainOps(
 
   def generateCompleteSite(): Unit = {
     var isEmpty = true
-    IO.foreachFile(options) { file =>
+    IO.foreachFile(settings) { file =>
       isEmpty = false
       handleFile(file)
     }
     if (isEmpty) {
-      logger.error(s"no input files: ${options.in}")
+      logger.error(s"no input files: ${settings.in}")
     }
   }
 
   def run(): Unit = {
-    IO.cleanTarget(options)
+    IO.cleanTarget(settings)
     generateCompleteSite()
-    if (options.watch) {
+    if (settings.watch) {
       FileWatcher.watch(
-        List(options.in.toNIO),
+        List(settings.in.toNIO),
         (event: DirectoryChangeEvent) => {
-          options.toInputFile(AbsolutePath(event.path())) match {
+          settings.toInputFile(AbsolutePath(event.path())) match {
             case Some(inputFile) => handleFile(inputFile)
             case None => ()
           }

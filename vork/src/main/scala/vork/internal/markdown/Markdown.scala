@@ -17,31 +17,27 @@ import scala.reflect.ClassTag
 import vork.internal.cli.Context
 
 object Markdown {
-  case class Site(docs: List[Doc])
-  case class Doc(path: Path, contents: String)
-  case class Header(title: String, id: String, level: Int, text: String) {
-    def target: String = if (level == 1) "" else s"#$id"
+
+  /**
+    * Defines the default markdown settings.
+    *
+    * Do not use directly. The default flexmark settings have special keys set
+    * up by vork to keep track of certain document-specific information like path.
+    */
+  def default(context: Context): MutableDataSet = {
+    import com.vladsch.flexmark.parser.Parser
+    // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
+    new MutableDataSet()
+      .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
+      .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
+      .set(Parser.EXTENSIONS, VorkExtensions.default(context))
   }
 
-  object Header {
-    def apply(h: Heading): Header = {
-      val text = new java.lang.StringBuilder
-      @tailrec def loop(n: Node): Unit = n match {
-        case null =>
-        case h: ast.Heading => ()
-        case t =>
-          t.getChildChars.appendTo(text)
-          text.append("\n")
-          loop(t.getNext)
-      }
-      loop(h.getNext)
-      Header(
-        h.getText.toVisibleWhitespaceString,
-        HeaderIdGenerator.generateId(h.getText, null, true),
-        h.getLevel,
-        text.toString
-      )
-    }
+  def toMarkdown(input: String, settings: MutableDataSet): String = {
+    val parser = Parser.builder(settings).build
+    val formatter = Formatter.builder(settings).build
+    val ast = parser.parse(input)
+    formatter.render(ast)
   }
 
   def traverse[T <: Node](
@@ -75,25 +71,4 @@ object Markdown {
     parser.parse(markdown)
   }
 
-  /**
-    * Defines the default markdown settings.
-    *
-    * Do not use directly. The default flexmark settings have special keys set
-    * up by vork to keep track of certain document-specific information like path.
-    */
-  def default(context: Context): MutableDataSet = {
-    import com.vladsch.flexmark.parser.Parser
-    // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
-    new MutableDataSet()
-      .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
-      .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
-      .set(Parser.EXTENSIONS, VorkExtensions.default(context))
-  }
-
-  def toMarkdown(input: String, settings: MutableDataSet): String = {
-    val parser = Parser.builder(settings).build
-    val formatter = Formatter.builder(settings).build
-    val ast = parser.parse(input)
-    formatter.render(ast)
-  }
 }
