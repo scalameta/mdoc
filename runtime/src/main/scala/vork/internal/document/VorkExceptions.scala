@@ -5,5 +5,4 @@ object VorkExceptions {
     val stacktrace = e.getStackTrace.takeWhile(!_.getClassName.startsWith("vork"))
     e.setStackTrace(stacktrace)
   }
-
 }

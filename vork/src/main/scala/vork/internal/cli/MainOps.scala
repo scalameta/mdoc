@@ -7,6 +7,7 @@ import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.TimeUnit
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
@@ -26,6 +27,8 @@ final class MainOps(
 
   def handleMarkdown(file: InputFile): Unit = {
     reporter.reset()
+    reporter.info(s"Compiling ${file.in}")
+    val start = System.nanoTime()
     val source = FileIO.slurp(file.in, settings.encoding)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(MainOps.InputKey, Some(input))
@@ -34,7 +37,9 @@ final class MainOps(
       reporter.error(s"Failed to generate ${file.out}")
     } else {
       writePath(file, md)
-      reporter.info(s"Generated ${file.out}")
+      val end = System.nanoTime()
+      val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
+      reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
     }
   }
 
