@@ -13,8 +13,11 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import java.nio.file.Path
 import scala.annotation.tailrec
 import scala.language.dynamics
+import scala.meta.inputs.Input
 import scala.reflect.ClassTag
+import vork.Reporter
 import vork.internal.cli.Context
+import vork.internal.cli.MainOps
 
 object Markdown {
 
@@ -31,12 +34,16 @@ object Markdown {
       .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
       .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
       .set(Parser.EXTENSIONS, VorkExtensions.default(context))
+      .set(MainOps.VariablesKey, Some(context.settings.site))
   }
 
-  def toMarkdown(input: String, settings: MutableDataSet): String = {
+  def toMarkdown(input: Input.VirtualFile, settings: MutableDataSet, reporter: Reporter): String = {
+    val variables = settings.get(MainOps.VariablesKey).getOrElse(Map.empty)
+    val textWithVariables = SiteVariableRegexp.replaceVariables(input, variables, reporter)
+    settings.set(MainOps.InputKey, Some(textWithVariables))
     val parser = Parser.builder(settings).build
     val formatter = Formatter.builder(settings).build
-    val ast = parser.parse(input)
+    val ast = parser.parse(textWithVariables.text)
     formatter.render(ast)
   }
 

@@ -16,6 +16,7 @@ import scala.util.control.NonFatal
 import vork.Reporter
 import vork.internal.io.IO
 import vork.internal.io.FileWatcher
+import vork.internal.markdown.Markdown
 
 final class MainOps(
     settings: Settings,
@@ -28,10 +29,7 @@ final class MainOps(
     val source = FileIO.slurp(file.in, settings.encoding)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(MainOps.InputKey, Some(input))
-    val parser = Parser.builder(markdown).build
-    val formatter = Formatter.builder(markdown).build
-    val ast = parser.parse(source)
-    val md = formatter.render(ast)
+    val md = Markdown.toMarkdown(input, markdown, reporter)
     if (reporter.hasErrors) {
       reporter.error(s"Failed to generate ${file.out}")
     } else {
@@ -103,4 +101,5 @@ final class MainOps(
 
 object MainOps {
   val InputKey = new DataKey[Option[Input.VirtualFile]]("scalametaInput", None)
+  val VariablesKey = new DataKey[Option[Map[String, String]]]("siteVariables", None)
 }

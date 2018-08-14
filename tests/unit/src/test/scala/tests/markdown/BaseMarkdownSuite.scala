@@ -26,9 +26,9 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
         )
       )
   private val myStdout = new ByteArrayOutputStream()
-  private val logger = new ConsoleReporter(new PrintStream(myStdout))
+  private val reporter = new ConsoleReporter(new PrintStream(myStdout))
   private val compiler = MarkdownCompiler.fromClasspath(settings.classpath)
-  private val context = Context(settings, logger, compiler)
+  private val context = Context(settings, reporter, compiler)
 
   def getSettings(input: Input.VirtualFile): MutableDataSet = {
     myStdout.reset()
@@ -43,9 +43,10 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       expected: String
   ): Unit = {
     test(name) {
+      reporter.reset()
       val input = Input.VirtualFile(name + ".md", original)
-      Markdown.toMarkdown(original, getSettings(input))
-      assert(logger.hasErrors, "Expected errors but reporter.hasErrors=false")
+      Markdown.toMarkdown(input, getSettings(input), reporter)
+      assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
       assertNoDiff(obtainedErrors, expected)
     }
@@ -53,10 +54,11 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
 
   def check(name: String, original: String, expected: String): Unit = {
     test(name) {
+      reporter.reset()
       val input = Input.VirtualFile(name + ".md", original)
-      val obtained = Markdown.toMarkdown(original, getSettings(input)).trimLineEnds
+      val obtained = Markdown.toMarkdown(input, getSettings(input), reporter).trimLineEnds
       val stdout = fansi.Str(myStdout.toString()).plainText
-      assert(!logger.hasErrors, stdout)
+      assert(!reporter.hasErrors, stdout)
       assertNoDiff(obtained, expected)
     }
   }

@@ -67,4 +67,5 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
       |[standard-url]: https://standardjs.com
     """.stripMargin
   )
+
 }
