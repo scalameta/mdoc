@@ -133,4 +133,22 @@ class FailSuite extends BaseMarkdownSuite {
       |              ^^^^^^
     """.stripMargin
   )
+
+  checkError(
+    "silent",
+    """
+      |```scala vork:passthrough
+      |import scala.util._
+      |```
+      |
+      |```scala vork:fail
+      |List(1)
+      |```
+    """.stripMargin,
+    """
+      |error: silent.md:7:1: error: Expected compile error but statement type-checked successfully
+      |List(1)
+      |^^^^^^^
+    """.stripMargin
+  )
 }

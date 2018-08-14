@@ -52,12 +52,12 @@ object MarkdownCompiler {
         instrumented,
         edit,
         document.sections.zip(trees).map {
-          case (a, b) => EvaluatedSection(a, b.source, b.mod)
+          case (a, b) => EvaluatedSection(a, b.input, b.source, b.mod)
         }
       )
     }
   }
-  case class EvaluatedSection(section: Section, source: Source, mod: VorkModifier) {
+  case class EvaluatedSection(section: Section, input: Input, source: Source, mod: VorkModifier) {
     def out: String = section.statements.map(_.out).mkString
   }
 
@@ -141,10 +141,10 @@ object MarkdownCompiler {
           section.mod match {
             case VorkModifier.Fail =>
               binder.value match {
-                case CompileResult.TypecheckedOK(code, tpe, pos) =>
+                case CompileResult.TypecheckedOK(_, tpe, pos) =>
                   val mpos = Position
                     .Range(
-                      doc.edit.originalInput,
+                      section.input,
                       pos.startLine,
                       pos.startColumn,
                       pos.endLine,
