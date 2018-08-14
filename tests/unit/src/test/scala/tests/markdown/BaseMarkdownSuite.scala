@@ -17,13 +17,14 @@ import vork.internal.markdown.MarkdownCompiler
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   private val tmp = AbsolutePath(Files.createTempDirectory("vork"))
-  protected def settings: Settings = Settings
-    .default(tmp)
-    .copy(
-      site = Map(
-        "version" -> "1.0"
+  protected def settings: Settings =
+    Settings
+      .default(tmp)
+      .copy(
+        site = Map(
+          "version" -> "1.0"
+        )
       )
-    )
   private val myStdout = new ByteArrayOutputStream()
   private val logger = new ConsoleReporter(new PrintStream(myStdout))
   private val compiler = MarkdownCompiler.fromClasspath(settings.classpath)
