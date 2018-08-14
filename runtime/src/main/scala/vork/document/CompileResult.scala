@@ -21,5 +21,5 @@ object CompileResult {
     * @param pos the range position inside the code fence
     */
   final case class ParseError(message: String, pos: RangePosition) extends CompileError
-  
+
 }

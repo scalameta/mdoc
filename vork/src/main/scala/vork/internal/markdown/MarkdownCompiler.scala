@@ -143,13 +143,15 @@ object MarkdownCompiler {
             case VorkModifier.Fail =>
               binder.value match {
                 case CompileResult.TypecheckedOK(code, tpe, pos) =>
-                  val mpos = Position.Range(
-                    doc.edit.originalInput,
-                    pos.startLine,
-                    pos.startColumn,
-                    pos.endLine,
-                    pos.endColumn
-                  ).toUnslicedPosition
+                  val mpos = Position
+                    .Range(
+                      doc.edit.originalInput,
+                      pos.startLine,
+                      pos.startColumn,
+                      pos.endLine,
+                      pos.endColumn
+                    )
+                    .toUnslicedPosition
                   logger.error(
                     mpos,
                     s"Expected compile error but statement type-checked successfully"
@@ -401,7 +403,7 @@ class MarkdownCompiler(
     } else {
       reporter.infos.foreach {
         case reporter.Info(pos, msg, severity) =>
-          val mpos= edit.toOriginal(pos.point) match {
+          val mpos = edit.toOriginal(pos.point) match {
             case Left(err) =>
               pprint.log(err)
               Position.None
