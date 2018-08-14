@@ -12,6 +12,7 @@ import com.vladsch.flexmark.util.sequence.CharSubSequence
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.util.control.NonFatal
+import scala.collection.JavaConverters._
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.document.VorkExceptions
@@ -20,118 +21,93 @@ import vork.internal.markdown.VorkModifier._
 
 class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
-  case class CustomBlockInput(block: FencedCodeBlock, input: Input, mod: Custom)
-  case class BlockInput(block: FencedCodeBlock, input: Input, mod: VorkModifier)
-
-  class VorkCodeFence(baseInput: Input) {
-    def getModifier(block: FencedCodeBlock): Option[VorkModifier] = {
-      val string = block.getInfo.toString
-      if (!string.startsWith("scala vork")) None
-      else {
-        if (!string.contains(':')) Some(Default)
-        else {
-          val mode = string.stripPrefix("scala vork:")
-          VorkModifier(mode)
-            .orElse {
-              val (name, info) = mode.split(":", 2) match {
-                case Array(a) => (a, "")
-                case Array(a, b) => (a, b)
-              }
-              ctx.settings.modifiers.collectFirst {
-                case mod if mod.name == name =>
-                  Custom(mod, info)
-              }
-            }
-            .orElse {
-              val expected = VorkModifier.all.map(_.toString.toLowerCase()).mkString(", ")
-              val msg = s"Invalid mode '$mode'. Expected one of: $expected"
-              val offset = "scala vork:".length
-              val start = block.getInfo.getStartOffset + offset
-              val end = block.getInfo.getEndOffset
-              val pos = Position.Range(baseInput, start, end)
-              ctx.reporter.error(pos, msg)
-              None
-            }
-        }
-      }
-    }
-    def unapply(block: FencedCodeBlock): Option[BlockInput] = {
-      getModifier(block) match {
-        case Some(mod) =>
-          val child = block.getFirstChild
-          val start = child.getStartOffset
-          val end = child.getEndOffset
-          val input = Input.Slice(baseInput, start, end)
-          Some(BlockInput(block, input, mod))
-        case _ => None
-      }
-    }
-  }
-
   override def processDocument(doc: Document): Document = {
     import scala.collection.JavaConverters._
-    val baseInput = doc
+    val docInput = doc
       .get(MainOps.InputKey)
       .getOrElse(sys.error(s"Missing DataKey ${MainOps.InputKey}"))
-    val filename = baseInput.path
-    val VorkCodeFence = new VorkCodeFence(baseInput)
-
-    val fences = Markdown.collect[FencedCodeBlock, BlockInput](doc) {
-      case VorkCodeFence(input) => input
+    val (scalaInputs, customInputs) = collectBlockInputs(doc, docInput)
+    customInputs.foreach { block =>
+      processCustomInput(doc, block)
     }
-    val custom = fences.collect {
-      case BlockInput(a, b, c: Custom) => CustomBlockInput(a, b, c)
-    }
-    custom.foreach {
-      case CustomBlockInput(block, input, Custom(mod, info)) =>
-        try {
-          val newText = mod.process(info, input, ctx.reporter)
-          replace(doc, block, newText)
-        } catch {
-          case NonFatal(e) =>
-            val length = math.max(0, input.chars.length - 1)
-            val pos = Position.Range(input, 0, length)
-            VorkExceptions.trimStacktrace(e)
-            val exception = new CustomModifierException(mod, e)
-            ctx.reporter.error(pos, exception)
-        }
-    }
-    val toCompile = fences.collect {
-      case i if !i.mod.isCustom => i
-    }
-    if (toCompile.nonEmpty) {
-      val code = toCompile.map {
-        case BlockInput(_, input, mod) =>
-          import scala.meta._
-          val source = dialects.Sbt1(input).parse[Source].get
-          SectionInput(input, source, mod)
-      }
-      val rendered =
-        MarkdownCompiler.renderInputs(code, ctx.compiler, ctx.reporter, filename)
-      rendered.sections.zip(toCompile).foreach {
-        case (section, BlockInput(block, _, mod)) =>
-          block.setInfo(CharSubSequence.of("scala"))
-          mod match {
-            case VorkModifier.Default | VorkModifier.Fail =>
-              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, ctx.reporter)
-              val content: BasedSequence = CharSubSequence.of(str)
-              block.setContent(List(content).asJava)
-            case VorkModifier.Passthrough =>
-              replace(doc, block, section.out)
-            case c: VorkModifier.Custom =>
-              throw new IllegalArgumentException(c.toString)
-          }
-      }
+    if (scalaInputs.nonEmpty) {
+      processScalaInputs(doc, scalaInputs, docInput.path)
     }
     doc
   }
 
-  def replace(doc: Document, node: Node, text: String): Unit = {
+  def processCustomInput(doc: Document, custom: CustomBlockInput): Unit = {
+    val CustomBlockInput(block, input, Custom(mod, info)) = custom
+    try {
+      val newText = mod.process(info, input, ctx.reporter)
+      replaceNodeWithText(doc, block, newText)
+    } catch {
+      case NonFatal(e) =>
+        val pos = Position.Range(input, 0, input.chars.length)
+        VorkExceptions.trimStacktrace(e)
+        val exception = new CustomModifierException(mod, e)
+        ctx.reporter.error(pos, exception)
+    }
+  }
+
+  def processScalaInputs(
+      doc: Document,
+      inputs: List[ScalaBlockInput],
+      filename: String
+  ): Unit = {
+    val code = inputs.map {
+      case ScalaBlockInput(_, input, mod) =>
+        import scala.meta._
+        dialects.Sbt1(input).parse[Source] match {
+          case parsers.Parsed.Success(source) =>
+            SectionInput(input, source, mod)
+          case parsers.Parsed.Error(pos, msg, _) =>
+            ctx.reporter.error(pos, msg)
+            SectionInput(input, Source(Nil), mod)
+        }
+    }
+    val rendered = MarkdownCompiler.renderInputs(code, ctx.compiler, ctx.reporter, filename)
+    rendered.sections.zip(inputs).foreach {
+      case (section, ScalaBlockInput(block, _, mod)) =>
+        block.setInfo(CharSubSequence.of("scala"))
+        mod match {
+          case VorkModifier.Default | VorkModifier.Fail =>
+            val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, ctx.reporter)
+            val content: BasedSequence = CharSubSequence.of(str)
+            block.setContent(List(content).asJava)
+          case VorkModifier.Passthrough =>
+            replaceNodeWithText(doc, block, section.out)
+          case c: VorkModifier.Custom =>
+            throw new IllegalArgumentException(c.toString)
+        }
+    }
+  }
+
+  def replaceNodeWithText(enclosingDoc: Document, toReplace: Node, text: String): Unit = {
     val markdownOptions = new MutableDataSet()
-    markdownOptions.setAll(doc)
+    markdownOptions.setAll(enclosingDoc)
     val child = Markdown.parse(CharSubSequence.of(text), markdownOptions)
-    node.insertAfter(child)
-    node.unlink()
+    toReplace.insertAfter(child)
+    toReplace.unlink()
+  }
+
+  def collectBlockInputs(
+      doc: Document,
+      docInput: Input.VirtualFile
+  ): (List[ScalaBlockInput], List[CustomBlockInput]) = {
+    val InterestingCodeFence = new BlockCollector(ctx, docInput)
+    val inputs = List.newBuilder[ScalaBlockInput]
+    val customs = List.newBuilder[CustomBlockInput]
+    Markdown.traverse[FencedCodeBlock](doc) {
+      case InterestingCodeFence(input) =>
+        input.mod match {
+          case custom: Custom =>
+            customs += CustomBlockInput(input.block, input.input, custom)
+          case _ =>
+            inputs += input
+        }
+    }
+    (inputs.result(), customs.result())
   }
 }
 

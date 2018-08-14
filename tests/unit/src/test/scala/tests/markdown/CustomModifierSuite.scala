@@ -6,7 +6,7 @@ import vork.CustomModifier
 import vork.Reporter
 import vork.internal.cli.Settings
 
-class ModifierSuite extends BaseMarkdownSuite {
+class CustomModifierSuite extends BaseMarkdownSuite {
   override def settings: Settings = super.settings.copy(
     modifiers = List(
       new CustomModifier {
@@ -72,7 +72,7 @@ class ModifierSuite extends BaseMarkdownSuite {
       |^^^^^
       |vork.internal.markdown.CustomModifierException: exception
       |Caused by: java.lang.IllegalArgumentException: boom
-      |	at tests.markdown.ModifierSuite$$anon$3.process(ModifierSuite.scala:30)
+      |	at tests.markdown.CustomModifierSuite$$anon$3.process(CustomModifierSuite.scala:30)
     """.stripMargin
   )
 
