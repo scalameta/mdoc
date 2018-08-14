@@ -59,7 +59,7 @@ trait DocumentBuilder {
       e
     }
 
-    def build(): Document = {
+    def build(input: InstrumentedInput): Document = {
       val backupStdout = System.out
       val backupStderr = System.err
       try {
@@ -81,7 +81,7 @@ trait DocumentBuilder {
         System.setOut(backupStdout)
         System.setErr(backupStderr)
       }
-      val document = Document(mySections.toList)
+      val document = Document(input, mySections.toList)
       mySections.clear()
       document
     }

@@ -54,9 +54,9 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: fail-error.md not found: value foobar
+      |error: fail-error.md:3:1: error: not found: value foobar
       |foobar
-      |^
+      |^^^^^^
       |""".stripMargin
   )
 
@@ -68,14 +68,15 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: Expected compile error but the statement type-checked successfully to type scala.collection.immutable.Range.Inclusive:
+      |error: fail-success.md:3:1: error: Expected compile error but statement type-checked successfully
       |1.to(2)
+      |^^^^^^^
       |""".stripMargin
   )
 
   // Compile-error causes nothing to run
   checkError(
-    "mixed-fail-success-error",
+    "mixed-error",
     """
       |```scala vork
       |val x = foobar
@@ -86,9 +87,9 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: mixed-fail-success-error.md not found: value foobar
+      |error: mixed-error.md:3:9: error: not found: value foobar
       |val x = foobar
-      |        ^
+      |        ^^^^^^
       |""".stripMargin
   )
 

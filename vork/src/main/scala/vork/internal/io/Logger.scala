@@ -26,8 +26,14 @@ class Logger(ps: PrintStream) {
     myErrors += 1
     ps.println(myError ++ s": $msg")
   }
+  def info(pos: Position , msg: String): Unit = {
+    info(pos.formatMessage("info", msg))
+  }
   def info(msg: String): Unit = {
     ps.println(myInfo ++ s": $msg")
+  }
+  def warning(pos: Position , msg: String): Unit = {
+    warning(pos.formatMessage("warning", msg))
   }
   def warning(msg: String): Unit = {
     ps.println(myWarning ++ s": $msg")

@@ -8,17 +8,12 @@ import PositionSyntax._
 
 /** Helper to map between position between two similar strings. */
 final class TokenEditDistance private (matching: Array[MatchingToken]) {
-  private val isEmpty: Boolean = matching.length == 0
-
-  private val ThisUri: String = originalInput match {
-    case Input.VirtualFile(uri, _) => uri
-    case _ => originalInput.syntax
-  }
-  private def originalInput: Input =
+  private def isEmpty: Boolean = matching.length == 0
+  def originalInput: Input =
     if (isEmpty) Input.None
     else matching(0).original.input
 
-  private def revisedInput: Input =
+  def revisedInput: Input =
     if (isEmpty) Input.None
     else matching(0).revised.input
 
@@ -63,12 +58,14 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
   }
 
   private def compare(
-      pos: Position,
+      position: Position,
       offset: Int
-  ): BinarySearch.ComparisonResult =
+  ): BinarySearch.ComparisonResult = {
+    val pos = position.toUnslicedPosition
     if (pos.contains(offset)) BinarySearch.Equal
     else if (pos.end <= offset) BinarySearch.Smaller
     else BinarySearch.Greater
+  }
 
 }
 
@@ -84,7 +81,7 @@ object TokenEditDistance {
     * @param revised The current snapshot of a string, for example open buffer
     *                in an editor.
     */
-  def apply(original: Tokens, revised: Tokens): TokenEditDistance = {
+  def apply(original: IndexedSeq[Token], revised: IndexedSeq[Token]): TokenEditDistance = {
     val buffer = Array.newBuilder[MatchingToken]
     buffer.sizeHint(math.max(original.length, revised.length))
     @tailrec

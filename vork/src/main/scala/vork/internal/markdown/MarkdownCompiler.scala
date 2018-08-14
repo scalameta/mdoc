@@ -20,17 +20,43 @@ import vork.document.Section
 import vork.internal.io.Logger
 import vork.document.{Document, _}
 import vork.internal.document.DocumentBuilder
+import PositionSyntax._
+import scalafix.internal.util.PositionSyntax._
 
 object MarkdownCompiler {
 
-  case class EvaluatedDocument(sections: List[EvaluatedSection])
+  def toTokenEdit(original: Seq[Tree], instrumented: Input): TokenEditDistance = {
+    val instrumentedTokens = instrumented.tokenize.get
+    val originalTokens: Array[Token] = {
+      val buf = Array.newBuilder[Token]
+      original.foreach { tree =>
+        tree.tokens.foreach { token =>
+          buf += token
+        }
+      }
+      buf.result()
+    }
+    TokenEditDistance(originalTokens, instrumentedTokens)
+  }
+
+  case class EvaluatedDocument(
+      instrumented: Input,
+      edit: TokenEditDistance,
+      sections: List[EvaluatedSection]
+  )
   object EvaluatedDocument {
-    def apply(document: Document, trees: List[SectionInput]): EvaluatedDocument =
+    def apply(document: Document, trees: List[SectionInput]): EvaluatedDocument = {
+      val instrumented =
+        Input.VirtualFile(document.instrumented.filename, document.instrumented.text)
+      val edit = toTokenEdit(trees.map(_.source), instrumented)
       EvaluatedDocument(
+        instrumented,
+        edit,
         document.sections.zip(trees).map {
           case (a, b) => EvaluatedSection(a, b.source, b.mod)
         }
       )
+    }
   }
   case class EvaluatedSection(section: Section, source: Source, mod: VorkModifier) {
     def out: String = section.statements.map(_.out).mkString
@@ -84,13 +110,16 @@ object MarkdownCompiler {
       filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val inputs = sections.map(_.input)
-    val doc = document(compiler, inputs, instrumented, logger, filename)
+    val doc = document(compiler, sections, instrumented, logger, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
 
-  def renderEvaluatedSection(section: EvaluatedSection, logger: Logger): String = {
+  def renderEvaluatedSection(
+      doc: EvaluatedDocument,
+      section: EvaluatedSection,
+      logger: Logger
+  ): String = {
     val sb = new StringBuilder
     var first = true
     section.section.statements.zip(section.source.stats).foreach {
@@ -113,15 +142,24 @@ object MarkdownCompiler {
           section.mod match {
             case VorkModifier.Fail =>
               binder.value match {
-                case CompileResult.TypecheckedOK(code, tpe) =>
-                  // TODO(olafur) retrieve original position of source code
+                case CompileResult.TypecheckedOK(code, tpe, pos) =>
+                  val mpos = Position.Range(
+                    doc.edit.originalInput,
+                    pos.startLine,
+                    pos.startColumn,
+                    pos.endLine,
+                    pos.endColumn
+                  ).toUnslicedPosition
                   logger.error(
-                    s"Expected compile error but the statement type-checked successfully to type $tpe:\n$code"
+                    mpos,
+                    s"Expected compile error but statement type-checked successfully"
                   )
                   sb.append(s"// $tpe")
-                case CompileResult.ParseError(msg) =>
+                case CompileResult.ParseError(msg, pos) =>
+                  logger.error(pos.toOriginal(doc.edit), msg)
                   sb.append(msg)
-                case CompileResult.TypeError(msg) =>
+                case CompileResult.TypeError(msg, pos) =>
+                  logger.error(pos.toOriginal(doc.edit), msg)
                   sb.append(msg)
                 case _ =>
                   val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
@@ -148,11 +186,12 @@ object MarkdownCompiler {
 
   def document(
       compiler: MarkdownCompiler,
-      original: List[Input],
+      original: List[SectionInput],
       instrumented: String,
       logger: Logger,
       filename: String
   ): Document = {
+    // Use string builder to avoid accidental stripMargin processing
     val wrapped = new StringBuilder()
       .append("package repl\n")
       .append("class Session extends _root_.vork.internal.document.DocumentBuilder {\n")
@@ -161,15 +200,18 @@ object MarkdownCompiler {
       .append("  }\n")
       .append("}\n")
       .toString()
-    compiler.compile(Input.VirtualFile(filename, wrapped), logger) match {
+    val instrumentedInput = InstrumentedInput(filename, wrapped)
+    val compileInput = Input.VirtualFile(filename, wrapped)
+    val edit = toTokenEdit(original.map(_.source), compileInput)
+    compiler.compile(compileInput, logger, edit) match {
       case Some(loader) =>
         val cls = loader.loadClass("repl.Session")
         val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
         try {
-          doc.build()
+          doc.build(instrumentedInput)
         } catch {
           case e: PositionedException =>
-            val input = original(e.section - 1)
+            val input = original(e.section - 1).input
             val pos =
               if (e.pos.isEmpty) {
                 Position.Range(input, 0, 0)
@@ -181,18 +223,14 @@ object MarkdownCompiler {
                   e.pos.endLine,
                   e.pos.endColumn
                 )
-                input match {
-                  case Input.Slice(underlying, a, b) =>
-                    Position.Range(underlying, a + slice.start, a + slice.end)
-                  case _ => slice
-                }
+                slice.toUnslicedPosition
               }
             logger.error(pos, e.getCause)
-            Document.empty
+            Document.empty(instrumentedInput)
         }
       case None =>
         // An empty document will render as the original markdown
-        Document.empty
+        Document.empty(instrumentedInput)
     }
   }
 
@@ -291,10 +329,11 @@ object MarkdownCompiler {
             val name = freshBinder()
             List(Term.Name(name)) -> ctx.addLeft(stat, s"${WIDTH_INDENT}val $name = \n")
         }
+        val statPositions = position(stat.pos)
         val failPatch = section.mod match {
           case VorkModifier.Fail =>
             val newCode =
-              s"_root_.vork.internal.document.Macros.fail(${literal(stat.syntax)}); "
+              s"_root_.vork.internal.document.Macros.fail(${literal(stat.syntax)}, $statPositions); "
             ctx.replaceTree(stat, newCode)
           case _ =>
             Patch.empty
@@ -302,7 +341,7 @@ object MarkdownCompiler {
         val rightIndent = " " * (WIDTH - stat.pos.endColumn)
         val positionPatch =
           if (section.mod.isDefault) {
-            val statPosition = s"$$doc.position(${position(stat.pos)}); \n"
+            val statPosition = s"$$doc.position($statPositions); \n"
             ctx.addLeft(stat, statPosition)
           } else {
             Patch.empty
@@ -349,7 +388,7 @@ class MarkdownCompiler(
     case _ =>
   }
 
-  def compile(input: Input, logger: Logger): Option[ClassLoader] = {
+  def compile(input: Input, logger: Logger, edit: TokenEditDistance): Option[ClassLoader] = {
     clearTarget()
     reporter.reset()
     val run = new global.Run
@@ -364,22 +403,16 @@ class MarkdownCompiler(
     } else {
       reporter.infos.foreach {
         case reporter.Info(pos, msg, severity) =>
-          // We don't include line:column because we'd need to source-map
-          // instrumented code positions to the original source.
-          val formatted = new StringBuilder()
-            .append(input.syntax)
-            .append(" ")
-            .append(msg)
-            .append("\n")
-            .append(MarkdownCompiler.stripVorkSuffix(pos.lineContent))
-            .append("\n")
-            .append(pos.lineCaret)
-            .append("\n")
-            .toString
+          val mpos= edit.toOriginal(pos.point) match {
+            case Left(err) =>
+              pprint.log(err)
+              Position.None
+            case Right(p) => p.toUnslicedPosition
+          }
           severity match {
-            case reporter.ERROR => logger.error(formatted)
-            case reporter.INFO => logger.info(formatted)
-            case reporter.WARNING => logger.warning(formatted)
+            case reporter.ERROR => logger.error(mpos, msg)
+            case reporter.INFO => logger.info(mpos, msg)
+            case reporter.WARNING => logger.warning(mpos, msg)
           }
         case _ =>
       }

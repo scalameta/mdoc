@@ -2,6 +2,7 @@ package tests.markdown
 
 import org.scalatest.FunSuite
 import scala.meta.testkit.DiffAssertions
+import vork.document.InstrumentedInput
 import vork.internal.document.DocumentBuilder
 import vork.internal.document.Macros
 
@@ -29,7 +30,8 @@ class RuntimeApp extends DocumentBuilder {
                     val user @ User(x, y) = User(42, "Susan"); binder(user); binder(x); binder(y);
                     statement {
                       section {
-                        val compiled = Macros.fail("val z: String = 42"); binder(compiled);
+                        val compiled = Macros.fail("val z: String = 42", 1, 1, 1, 1);
+                        binder(compiled);
                         statement { section { () } }
                       }
                     }
@@ -49,7 +51,7 @@ class RuntimeSuite extends FunSuite with DiffAssertions {
   test("app") {
     val app = new RuntimeApp()
 
-    app.$doc.build()
+    app.$doc.build(InstrumentedInput.empty)
   }
 
 }

@@ -75,7 +75,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
             case VorkModifier.Default | VorkModifier.Fail =>
-              val str = MarkdownCompiler.renderEvaluatedSection(section, logger)
+              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, logger)
               val content: BasedSequence = CharSubSequence.of(str)
               block.setContent(List(content).asJava)
             case VorkModifier.Passthrough =>

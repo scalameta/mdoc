@@ -20,11 +20,10 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val obtained = MarkdownCompiler
-        .render(inputs, logger, compiler)
-        .sections
+      val doc = MarkdownCompiler.render(inputs, logger, compiler)
+      val obtained = doc.sections
         .map(s => s"""```scala
-                     |${MarkdownCompiler.renderEvaluatedSection(s, logger)}
+                     |${MarkdownCompiler.renderEvaluatedSection(doc, s, logger)}
                      |```""".stripMargin)
         .mkString("\n")
       assertNoDiff(obtained, expected)
