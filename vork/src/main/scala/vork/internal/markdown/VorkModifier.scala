@@ -33,19 +33,5 @@ object VorkModifier {
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends VorkModifier
 
-  def unapply(string: String)(implicit ctx: Context): Option[VorkModifier] = {
-    if (!string.startsWith("scala vork")) None
-    else {
-      if (!string.contains(':')) Some(Default)
-      else {
-        val mode = string.stripPrefix("scala vork:")
-        VorkModifier(mode).orElse {
-          val msg = s"Invalid mode '$mode'. Expected one of ${all.mkString(", ")}"
-          ctx.logger.error(msg)
-          None
-        }
-      }
-    }
-  }
 
 }

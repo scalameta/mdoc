@@ -9,31 +9,52 @@ import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 import scala.meta.inputs.Input
+import scala.meta.inputs.Position
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.markdown.MarkdownCompiler.SectionInput
+import vork.internal.markdown.VorkModifier._
 
 class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._
 
-  object VorkCodeFence {
+  class VorkCodeFence(input: Input) {
+    def getModifier(block: FencedCodeBlock): Option[VorkModifier] = {
+      val string = block.getInfo.toString
+      if (!string.startsWith("scala vork")) None
+      else {
+        if (!string.contains(':')) Some(Default)
+        else {
+          val mode = string.stripPrefix("scala vork:")
+          VorkModifier(mode).orElse {
+            val expected = VorkModifier.all.map(_.toString.toLowerCase()).mkString(", ")
+            val msg = s"Invalid mode '$mode'. Expected one of: $expected"
+            val start = block.getInfo.getStartOffset + 11
+            val end =  block.getInfo.getEndOffset
+            val pos = Position.Range(input, start, end)
+            context.logger.error(pos, msg)
+            None
+          }
+        }
+      }
+    }
     def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, VorkModifier)] = {
-      block.getInfo.toString match {
-        case VorkModifier(mod) =>
+      getModifier(block) match {
+        case Some(mod) =>
           Some(block -> mod)
         case _ => None
       }
     }
   }
   override def processDocument(doc: Document): Document = {
-    import Markdown._
     import scala.collection.JavaConverters._
     val baseInput = doc
       .get(MainOps.InputKey)
       .getOrElse(sys.error(s"Missing DataKey ${MainOps.InputKey}"))
     val filename = baseInput.path
+    val VorkCodeFence = new VorkCodeFence(baseInput)
 
-    val fences = collect[FencedCodeBlock, (FencedCodeBlock, VorkModifier)](doc) {
+    val fences = Markdown.collect[FencedCodeBlock, (FencedCodeBlock, VorkModifier)](doc) {
       case VorkCodeFence(block, mod) =>
         block -> mod
     }

@@ -118,4 +118,18 @@ class FailSuite extends BaseMarkdownSuite {
       |	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
       |""".stripMargin
   )
+
+  checkError(
+    "invalid-mod",
+    """
+      |```scala vork:foobaz
+      |val x: Int = "String"
+      |```
+    """.stripMargin,
+    """
+      |error: invalid-mod.md:2:15: error: Invalid mode 'foobaz'. Expected one of: default, passthrough, fail
+      |```scala vork:foobaz
+      |              ^^^^^^
+    """.stripMargin
+  )
 }
