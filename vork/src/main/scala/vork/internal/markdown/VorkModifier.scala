@@ -1,6 +1,6 @@
 package vork.internal.markdown
 
-import vork.internal.cli.CustomModifier
+import vork.CustomModifier
 
 /**
   * A vork code fence modifier.

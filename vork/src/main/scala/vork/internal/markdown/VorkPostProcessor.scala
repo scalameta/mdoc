@@ -19,7 +19,10 @@ import vork.internal.markdown.VorkModifier._
 class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._
 
-  class VorkCodeFence(input: Input) {
+  case class CustomBlockInput(block: FencedCodeBlock, input: Input, mod: Custom)
+  case class BlockInput(block: FencedCodeBlock, input: Input, mod: VorkModifier)
+
+  class VorkCodeFence(baseInput: Input) {
     def getModifier(block: FencedCodeBlock): Option[VorkModifier] = {
       val string = block.getInfo.toString
       if (!string.startsWith("scala vork")) None
@@ -44,17 +47,21 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
               val offset = "scala vork:".length
               val start = block.getInfo.getStartOffset + offset
               val end = block.getInfo.getEndOffset
-              val pos = Position.Range(input, start, end)
+              val pos = Position.Range(baseInput, start, end)
               context.reporter.error(pos, msg)
               None
             }
         }
       }
     }
-    def unapply(block: FencedCodeBlock): Option[(FencedCodeBlock, VorkModifier)] = {
+    def unapply(block: FencedCodeBlock): Option[BlockInput] = {
       getModifier(block) match {
         case Some(mod) =>
-          Some(block -> mod)
+          val child = block.getFirstChild
+          val start = child.getStartOffset
+          val end = child.getEndOffset
+          val input = Input.Slice(baseInput, start, end)
+          Some(BlockInput(block, input, mod))
         case _ => None
       }
     }
@@ -67,36 +74,30 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
     val filename = baseInput.path
     val VorkCodeFence = new VorkCodeFence(baseInput)
 
-    val fences = Markdown.collect[FencedCodeBlock, (FencedCodeBlock, VorkModifier)](doc) {
-      case VorkCodeFence(block, mod) =>
-        block -> mod
+    val fences = Markdown.collect[FencedCodeBlock, BlockInput](doc) {
+      case VorkCodeFence(input) => input
     }
     val custom = fences.collect {
-      case (f, c: Custom) => (f, c)
+      case BlockInput(a, b, c: Custom) => CustomBlockInput(a, b, c)
     }
     custom.foreach {
-      case (block, Custom(mod, info)) =>
-        val oldText = block.getContentChars().toString
-        val newText = mod.process(info, oldText)
+      case CustomBlockInput(block, input, Custom(mod, info)) =>
+        val newText = mod.process(info, input, reporter)
         replace(doc, block, newText)
     }
     val toCompile = fences.collect {
-      case (f, c) if !c.isCustom => (f, c)
+      case i if !i.mod.isCustom => i
     }
     if (toCompile.nonEmpty) {
       val code = toCompile.map {
-        case (block, mod) =>
-          val child = block.getFirstChild
-          val start = child.getStartOffset
-          val end = child.getEndOffset
-          val input = Input.Slice(baseInput, start, end)
+        case BlockInput(block, input, mod) =>
           import scala.meta._
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(input, source, mod)
       }
       val rendered = MarkdownCompiler.renderInputs(code, compiler, reporter, filename)
       rendered.sections.zip(toCompile).foreach {
-        case (section, (block, mod)) =>
+        case (section, BlockInput(block, _, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
             case VorkModifier.Default | VorkModifier.Fail =>

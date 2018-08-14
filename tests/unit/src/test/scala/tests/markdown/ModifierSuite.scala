@@ -1,6 +1,8 @@
 package tests.markdown
 
-import vork.internal.cli.CustomModifier
+import scala.meta.inputs.Input
+import vork.CustomModifier
+import vork.Reporter
 import vork.internal.cli.Settings
 
 class ModifierSuite extends BaseMarkdownSuite {
@@ -8,8 +10,8 @@ class ModifierSuite extends BaseMarkdownSuite {
     modifiers = List(
       new CustomModifier {
         override val name: String = "hello"
-        override def process(info: String, code: String): String = {
-          code.trim + " " + info
+        override def process(info: String, code: Input, reporter: Reporter): String = {
+          code.text.trim + " " + info
         }
       }
     )
