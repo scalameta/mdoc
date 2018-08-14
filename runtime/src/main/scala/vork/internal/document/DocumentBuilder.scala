@@ -58,6 +58,22 @@ trait DocumentBuilder {
       }
       e
     }
+    def crash(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int)(
+        thunk: => Any
+    ): Unit = {
+      val pos = new RangePosition(startLine, startColumn, endLine, endColumn)
+      pprint.log(pos)
+      val result =
+        try {
+          thunk
+          CrashResult.Success(pos)
+        } catch {
+          case NonFatal(e) =>
+            CrashResult.Crashed(e, pos)
+        }
+      myBinders.append(Binder.generate(result, pos))
+      statement { () }
+    }
 
     def build(input: InstrumentedInput): Document = {
       val backupStdout = System.out

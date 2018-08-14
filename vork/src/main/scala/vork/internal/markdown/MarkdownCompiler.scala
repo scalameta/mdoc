@@ -1,6 +1,9 @@
 package vork.internal.markdown
 
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.PrintStream
+import java.io.PrintWriter
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
@@ -14,13 +17,17 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
+import scala.util.Try
 import scalafix.v0._
 import vork.Reporter
 import vork.document.CompileResult
+import vork.document.CrashResult
+import vork.document.CrashResult.Crashed
 import vork.document.Section
 import vork.document.Document
 import vork.document._
 import vork.internal.document.DocumentBuilder
+import vork.internal.document.VorkExceptions
 import vork.internal.pos.PositionSyntax._
 import vork.internal.pos.TokenEditDistance
 
@@ -116,6 +123,32 @@ object MarkdownCompiler {
     evaluated
   }
 
+  def renderCrashSection(
+      section: EvaluatedSection,
+      reporter: Reporter,
+      edit: TokenEditDistance
+  ): String = {
+    require(section.mod.isCrash, section.mod)
+    val out = new ByteArrayOutputStream()
+    val ps = new PrintStream(out)
+    ps.println("```scala")
+    ps.println(section.source.syntax)
+    val crashes = for {
+      statement <- section.section.statements
+      binder <- statement.binders
+      if binder.value.isInstanceOf[Crashed]
+    } yield binder.value.asInstanceOf[Crashed]
+    crashes.headOption match {
+      case Some(CrashResult.Crashed(e, _)) =>
+        VorkExceptions.trimStacktrace(e)
+        e.printStackTrace(new PrintStream(out))
+      case None =>
+        val mpos = section.source.pos
+        reporter.error(mpos, "Expected runtime exception but program completed successfully")
+    }
+    ps.println("```")
+    out.toString()
+  }
   def renderEvaluatedSection(
       doc: EvaluatedDocument,
       section: EvaluatedSection,
@@ -135,7 +168,7 @@ object MarkdownCompiler {
         if (statement.out.nonEmpty) {
           sb.append("\n").append(statement.out)
         }
-        if (sb.charAt(sb.size - 1) != '\n') {
+        if (sb.charAt(sb.length() - 1) != '\n') {
           sb.append("\n")
         }
 
@@ -178,13 +211,15 @@ object MarkdownCompiler {
                   .append(pprint.PPrinter.BlackWhite.apply(binder.value))
                   .append("\n")
               }
+            case VorkModifier.Crash =>
+              throw new IllegalArgumentException(VorkModifier.Crash.toString)
             case c: VorkModifier.Custom =>
               throw new IllegalArgumentException(c.toString)
           }
         }
     }
     if (sb.nonEmpty && sb.last == '\n') sb.setLength(sb.length - 1)
-    sb.toString()
+    sb.toString
   }
 
   def document(
@@ -359,7 +394,13 @@ object MarkdownCompiler {
           ctx.addRight(stat, binders)
       }
       val patch = patches.asPatch
-      patch
+      if (section.mod.isCrash) {
+        ctx.addLeft(ctx.tree, s"$$doc.crash(${position(ctx.tree.pos)}) {") +
+          ctx.addRight(ctx.tree, s"}") +
+          patch
+      } else {
+        patch
+      }
     }
     val out = rule.apply(ctx)
     out -> counter
@@ -407,8 +448,7 @@ class MarkdownCompiler(
       sreporter.infos.foreach {
         case sreporter.Info(pos, msg, severity) =>
           val mpos = edit.toOriginal(pos.point) match {
-            case Left(err) =>
-              pprint.log(err)
+            case Left(_) =>
               Position.None
             case Right(p) => p.toUnslicedPosition
           }

@@ -19,9 +19,10 @@ sealed trait VorkModifier {
   def isFail: Boolean = this == Fail
   def isPassthrough: Boolean = this == Passthrough
   def isCustom: Boolean = this.isInstanceOf[Custom]
+  def isCrash: Boolean = this == Crash
 }
 object VorkModifier {
-  def all: List[VorkModifier] = List(Default, Passthrough, Fail)
+  def all: List[VorkModifier] = List(Default, Passthrough, Fail, Crash)
   def apply(string: String): Option[VorkModifier] =
     all.find(_.toString.equalsIgnoreCase(string))
 
@@ -30,6 +31,9 @@ object VorkModifier {
 
   /** Expect error and fail build if code block succeeds. */
   case object Fail extends VorkModifier
+
+  /** Expect a runtime exception from evaluating the block. */
+  case object Crash extends VorkModifier
 
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends VorkModifier

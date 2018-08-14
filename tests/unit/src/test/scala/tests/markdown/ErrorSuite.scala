@@ -37,7 +37,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: invalid-mod.md:2:15: error: Invalid mode 'foobaz'. Expected one of: default, passthrough, fail
+      |error: invalid-mod.md:2:15: error: Invalid mode 'foobaz'. Expected one of: default, passthrough, fail, crash
       |```scala vork:foobaz
       |              ^^^^^^
     """.stripMargin

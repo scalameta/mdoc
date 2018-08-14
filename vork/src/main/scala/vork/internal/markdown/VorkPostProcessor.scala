@@ -77,6 +77,10 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             block.setContent(List(content).asJava)
           case VorkModifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)
+          case VorkModifier.Crash =>
+            val stacktrace =
+              MarkdownCompiler.renderCrashSection(section, ctx.reporter, rendered.edit)
+            replaceNodeWithText(doc, block, stacktrace)
           case c: VorkModifier.Custom =>
             throw new IllegalArgumentException(c.toString)
         }
