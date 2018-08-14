@@ -15,8 +15,11 @@ object Macros {
     val string = code match {
       case Literal(Constant(str: String)) => str
       case els =>
-        c.abort(c.enclosingPosition, s"Expe" +
-          s"cted string literal, obtained $els")
+        c.abort(
+          c.enclosingPosition,
+          s"Expe" +
+            s"cted string literal, obtained $els"
+        )
     }
 
     def lit(s: String) = c.literal(s)

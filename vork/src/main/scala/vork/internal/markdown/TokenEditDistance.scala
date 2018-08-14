@@ -1,21 +1,10 @@
-package scala.meta.metals.search
+package vork.internal.markdown
 
 import scala.annotation.tailrec
 import scala.meta._
-import scala.meta.metals.ScalametaEnrichments._
-import scala.meta.metals.{index => i}
-import com.typesafe.scalalogging.LazyLogging
 import difflib._
 import difflib.myers.Equalizer
-import org.langmeta.languageserver.InputEnrichments._
-
-sealed trait EmptyResult
-object EmptyResult {
-  case object Unchanged extends EmptyResult
-  case object NoMatch extends EmptyResult
-  def unchanged: Either[EmptyResult, Position] = Left(Unchanged)
-  def noMatch: Either[EmptyResult, Position] = Left(NoMatch)
-}
+import PositionSyntax._
 
 /** Helper to map between position between two similar strings. */
 final class TokenEditDistance private (matching: Array[MatchingToken]) {
@@ -37,7 +26,7 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
       originalLine: Int,
       originalColumn: Int
   ): Either[EmptyResult, Position] = {
-    toRevised(originalInput.toOffset(originalLine, originalColumn))
+    toRevised(originalInput.toOffset(originalLine, originalColumn).start)
   }
 
   /** Convert from offset in original string to offset in revised string */
@@ -53,56 +42,11 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
     }
   }
 
-  private object RevisedRange {
-    def unapply(range: i.Range): Option[i.Range] =
-      toRevised(range.startLine, range.startColumn) match {
-        case Left(EmptyResult.NoMatch) => None
-        case Left(EmptyResult.Unchanged) => Some(range)
-        case Right(newPos) => Some(newPos.toIndexRange)
-      }
-  }
-
-  /** Convert the reference positions to match the revised input. */
-  def toRevisedReferences(data: i.SymbolData): i.SymbolData = {
-    val referencesAdjusted = data.references.get(ThisUri) match {
-      case Some(i.Ranges(ranges)) =>
-        val newRanges = ranges.collect { case RevisedRange(range) => range }
-        val newData = data.copy(
-          references = data.references + (ThisUri -> i.Ranges(newRanges))
-        )
-        newData
-      case _ => data
-    }
-    toRevisedDefinition(referencesAdjusted)
-  }
-
-  /** Convert the definition position to match the revised input. */
-  def toRevisedDefinition(data: i.SymbolData): i.SymbolData = {
-    data.definition match {
-      case Some(i.Position(ThisUri, Some(range))) =>
-        toRevised(range.startLine, range.startColumn) match {
-          case Left(EmptyResult.NoMatch) => data.copy(definition = None)
-          case Left(EmptyResult.Unchanged) => data
-          case Right(newPos) =>
-            val newData = data.copy(
-              definition = Some(
-                i.Position(
-                  ThisUri,
-                  Some(newPos.toIndexRange)
-                )
-              )
-            )
-            newData
-        }
-      case _ => data
-    }
-  }
-
   def toOriginal(
       revisedLine: Int,
       revisedColumn: Int
   ): Either[EmptyResult, Position] = {
-    toOriginal(revisedInput.toOffset(revisedLine, revisedColumn))
+    toOriginal(revisedInput.toOffset(revisedLine, revisedColumn).start)
   }
 
   /** Convert from offset in revised string to offset in original string */
@@ -128,18 +72,18 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
 
 }
 
-object TokenEditDistance extends LazyLogging {
+object TokenEditDistance {
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 
   /**
-   * Build utility to map offsets between two slightly different strings.
-   *
-   * @param original The original snapshot of a string, for example the latest
-   *                 semanticdb snapshot.
-   * @param revised The current snapshot of a string, for example open buffer
-   *                in an editor.
-   */
+    * Build utility to map offsets between two slightly different strings.
+    *
+    * @param original The original snapshot of a string, for example the latest
+    *                 semanticdb snapshot.
+    * @param revised The current snapshot of a string, for example open buffer
+    *                in an editor.
+    */
   def apply(original: Tokens, revised: Tokens): TokenEditDistance = {
     val buffer = Array.newBuilder[MatchingToken]
     buffer.sizeHint(math.max(original.length, revised.length))

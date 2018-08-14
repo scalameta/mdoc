@@ -31,5 +31,4 @@ object VorkModifier {
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends VorkModifier
 
-
 }

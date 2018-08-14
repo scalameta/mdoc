@@ -1,4 +1,4 @@
-package scala.meta.metals.search
+package vork.internal.markdown
 
 import scala.annotation.tailrec
 
