@@ -5,7 +5,7 @@ jdk:
 stages:
   - name: test
   - name: release
-    if: (type = push)
+    if: (branch = master AND type = push) OR (tag IS present)
 
 jobs:
   include:
@@ -15,7 +15,7 @@ jobs:
     - env: TEST="sbt test"
       script: sbt test
     - stage: release
-      script: ./bin/ci-publish.sh
+      script: sbt ci-release
 
 cache:
   directories:
