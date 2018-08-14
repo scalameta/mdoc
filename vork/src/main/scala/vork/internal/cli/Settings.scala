@@ -10,13 +10,11 @@ import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
 import metaconfig.Conf
 import metaconfig.ConfDecoder
-import metaconfig.ConfEncoder
 import metaconfig.ConfError
 import metaconfig.Configured
 import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
-import scala.meta.inputs.Input
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
 import vork.CustomModifier

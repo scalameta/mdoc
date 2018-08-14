@@ -15,12 +15,14 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
 import scalafix.v0._
+import vork.Reporter
 import vork.document.CompileResult
 import vork.document.Section
-import vork.document.{Document, _}
+import vork.document.Document
+import vork.document._
 import vork.internal.document.DocumentBuilder
-import PositionSyntax._
-import vork.Reporter
+import vork.internal.pos.PositionSyntax._
+import vork.internal.pos.TokenEditDistance
 
 object MarkdownCompiler {
 

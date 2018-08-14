@@ -4,8 +4,8 @@ import fansi.Color._
 import java.io.PrintStream
 import scala.meta.Position
 import scalafix.internal.util.PositionSyntax._
-import vork.internal.markdown.PositionSyntax._
 import vork.Reporter
+import vork.internal.pos.PositionSyntax._
 
 class ConsoleReporter(ps: PrintStream) extends Reporter {
 

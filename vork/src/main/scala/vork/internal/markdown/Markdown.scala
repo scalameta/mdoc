@@ -1,17 +1,12 @@
 package vork.internal.markdown
 
-import com.vladsch.flexmark.ast
-import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.formatter.internal.Formatter
-import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
-import java.nio.file.Path
-import scala.annotation.tailrec
 import scala.language.dynamics
 import scala.meta.inputs.Input
 import scala.reflect.ClassTag

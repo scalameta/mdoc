@@ -1,9 +1,9 @@
-package vork.internal.markdown
+package vork.internal.pos
 
 import scala.meta.Input
 import scala.meta.Position
-import vork.document.RangePosition
 import scalafix.internal.util.PositionSyntax._
+import vork.document.RangePosition
 
 object PositionSyntax {
   implicit class XtensionInputVork(input: Input) {

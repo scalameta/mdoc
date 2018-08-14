@@ -1,14 +1,14 @@
 package vork.internal.io
 
 import java.io.IOException
-import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
 import scala.meta.io.AbsolutePath
-import vork.internal.cli.Settings
 import vork.internal.cli.InputFile
+import vork.internal.cli.Settings
 
 object IO {
 

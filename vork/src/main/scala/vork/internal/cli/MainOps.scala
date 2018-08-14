@@ -1,7 +1,5 @@
 package vork.internal.cli
 
-import com.vladsch.flexmark.formatter.internal.Formatter
-import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
@@ -12,11 +10,10 @@ import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
-import scala.util.control.NoStackTrace
 import scala.util.control.NonFatal
 import vork.Reporter
-import vork.internal.io.IO
 import vork.internal.io.FileWatcher
+import vork.internal.io.IO
 import vork.internal.markdown.Markdown
 
 final class MainOps(
@@ -60,19 +57,13 @@ final class MainOps(
       }
     } catch {
       case NonFatal(e) =>
-        new FileError(file.in, e).printStackTrace()
+        new FileException(file.in, e).printStackTrace()
     }
   }
 
   def writePath(file: InputFile, string: String): Unit = {
     Files.createDirectories(file.out.toNIO.getParent)
     Files.write(file.out.toNIO, string.getBytes(settings.encoding))
-  }
-
-  private class FileError(path: AbsolutePath, cause: Throwable)
-      extends Exception(path.toString)
-      with NoStackTrace {
-    override def getCause: Throwable = cause
   }
 
   def generateCompleteSite(): Unit = {

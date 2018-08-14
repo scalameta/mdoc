@@ -11,21 +11,14 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import scala.util.control.NoStackTrace
 import scala.util.control.NonFatal
-import vork.CustomModifier
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.document.VorkExceptions
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 import vork.internal.markdown.VorkModifier._
 
-final class CustomModifierException(mod: CustomModifier, cause: Throwable)
-    extends Exception(mod.name, cause)
-    with NoStackTrace
-
-class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor {
-  import context._
+class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
   case class CustomBlockInput(block: FencedCodeBlock, input: Input, mod: Custom)
   case class BlockInput(block: FencedCodeBlock, input: Input, mod: VorkModifier)
@@ -44,7 +37,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
                 case Array(a) => (a, "")
                 case Array(a, b) => (a, b)
               }
-              context.settings.modifiers.collectFirst {
+              ctx.settings.modifiers.collectFirst {
                 case mod if mod.name == name =>
                   Custom(mod, info)
               }
@@ -56,7 +49,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
               val start = block.getInfo.getStartOffset + offset
               val end = block.getInfo.getEndOffset
               val pos = Position.Range(baseInput, start, end)
-              context.reporter.error(pos, msg)
+              ctx.reporter.error(pos, msg)
               None
             }
         }
@@ -92,7 +85,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
     custom.foreach {
       case CustomBlockInput(block, input, Custom(mod, info)) =>
         try {
-          val newText = mod.process(info, input, reporter)
+          val newText = mod.process(info, input, ctx.reporter)
           replace(doc, block, newText)
         } catch {
           case NonFatal(e) =>
@@ -100,7 +93,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
             val pos = Position.Range(input, 0, length)
             VorkExceptions.trimStacktrace(e)
             val exception = new CustomModifierException(mod, e)
-            reporter.error(pos, exception)
+            ctx.reporter.error(pos, exception)
         }
     }
     val toCompile = fences.collect {
@@ -108,18 +101,19 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
     }
     if (toCompile.nonEmpty) {
       val code = toCompile.map {
-        case BlockInput(block, input, mod) =>
+        case BlockInput(_, input, mod) =>
           import scala.meta._
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(input, source, mod)
       }
-      val rendered = MarkdownCompiler.renderInputs(code, compiler, reporter, filename)
+      val rendered =
+        MarkdownCompiler.renderInputs(code, ctx.compiler, ctx.reporter, filename)
       rendered.sections.zip(toCompile).foreach {
         case (section, BlockInput(block, _, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
             case VorkModifier.Default | VorkModifier.Fail =>
-              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, reporter)
+              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, ctx.reporter)
               val content: BasedSequence = CharSubSequence.of(str)
               block.setContent(List(content).asJava)
             case VorkModifier.Passthrough =>

@@ -1,10 +1,10 @@
-package vork.internal.markdown
+package vork.internal.pos
 
-import scala.annotation.tailrec
-import scala.meta._
 import difflib._
 import difflib.myers.Equalizer
-import PositionSyntax._
+import scala.annotation.tailrec
+import scala.meta._
+import vork.internal.pos.PositionSyntax._
 
 /** Helper to map between position between two similar strings. */
 final class TokenEditDistance private (matching: Array[MatchingToken]) {

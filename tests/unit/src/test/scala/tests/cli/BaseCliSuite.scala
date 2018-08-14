@@ -1,6 +1,7 @@
 package tests.cli
 
 import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
 import org.scalatest.FunSuite
@@ -37,7 +38,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
         "--site.version",
         "\"1.0\""
       )
-      val code = Main.process(args ++ extraArgs, myStdout, in.toNIO)
+      val code = Main.process(args ++ extraArgs, new PrintStream(myStdout), in.toNIO)
       val stdout = fansi.Str(myStdout.toString()).plainText
       assert(code == expectedExitCode, stdout)
       val obtained = StringFS.asString(AbsolutePath(out))
