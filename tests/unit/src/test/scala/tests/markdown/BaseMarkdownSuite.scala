@@ -11,7 +11,7 @@ import tests.markdown.StringSyntax._
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.cli.Settings
-import vork.internal.io.ConsoleLogger
+import vork.internal.io.ConsoleReporter
 import vork.internal.markdown.Markdown
 import vork.internal.markdown.MarkdownCompiler
 
@@ -25,7 +25,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       )
     )
   private val myStdout = new ByteArrayOutputStream()
-  private val logger = new ConsoleLogger(new PrintStream(myStdout))
+  private val logger = new ConsoleReporter(new PrintStream(myStdout))
   private val compiler = MarkdownCompiler.fromClasspath(settings.classpath)
   private val context = Context(settings, logger, compiler)
 
@@ -44,7 +44,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     test(name) {
       val input = Input.VirtualFile(name + ".md", original)
       Markdown.toMarkdown(original, getSettings(input))
-      assert(logger.hasErrors, "Expected errors but logger.hasErrors=false")
+      assert(logger.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
       assertNoDiff(obtainedErrors, expected)
     }

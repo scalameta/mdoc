@@ -20,7 +20,7 @@ import vork.document.Section
 import vork.document.{Document, _}
 import vork.internal.document.DocumentBuilder
 import PositionSyntax._
-import vork.Logger
+import vork.Reporter
 
 object MarkdownCompiler {
 
@@ -80,22 +80,22 @@ object MarkdownCompiler {
   def default(): MarkdownCompiler = fromClasspath("")
   def render(
       sections: List[Input],
-      logger: Logger,
+      reporter: Reporter,
       compiler: MarkdownCompiler
   ): EvaluatedDocument = {
-    render(sections, compiler, logger, "<input>")
+    render(sections, compiler, reporter, "<input>")
   }
 
   def render(
       sections: List[Input],
       compiler: MarkdownCompiler,
-      logger: Logger,
+      reporter: Reporter,
       filename: String
   ): EvaluatedDocument = {
     renderInputs(
       sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, VorkModifier.Default)),
       compiler,
-      logger,
+      reporter,
       filename
     )
   }
@@ -105,11 +105,11 @@ object MarkdownCompiler {
   def renderInputs(
       sections: List[SectionInput],
       compiler: MarkdownCompiler,
-      logger: Logger,
+      reporter: Reporter,
       filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val doc = document(compiler, sections, instrumented, logger, filename)
+    val doc = document(compiler, sections, instrumented, reporter, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -117,7 +117,7 @@ object MarkdownCompiler {
   def renderEvaluatedSection(
       doc: EvaluatedDocument,
       section: EvaluatedSection,
-      logger: Logger
+      reporter: Reporter
   ): String = {
     val sb = new StringBuilder
     var first = true
@@ -151,7 +151,7 @@ object MarkdownCompiler {
                       pos.endColumn
                     )
                     .toUnslicedPosition
-                  logger.error(
+                  reporter.error(
                     mpos,
                     s"Expected compile error but statement type-checked successfully"
                   )
@@ -189,7 +189,7 @@ object MarkdownCompiler {
       compiler: MarkdownCompiler,
       original: List[SectionInput],
       instrumented: String,
-      logger: Logger,
+      reporter: Reporter,
       filename: String
   ): Document = {
     // Use string builder to avoid accidental stripMargin processing
@@ -204,7 +204,7 @@ object MarkdownCompiler {
     val instrumentedInput = InstrumentedInput(filename, wrapped)
     val compileInput = Input.VirtualFile(filename, wrapped)
     val edit = toTokenEdit(original.map(_.source), compileInput)
-    compiler.compile(compileInput, logger, edit) match {
+    compiler.compile(compileInput, reporter, edit) match {
       case Some(loader) =>
         val cls = loader.loadClass("repl.Session")
         val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
@@ -226,7 +226,7 @@ object MarkdownCompiler {
                 )
                 slice.toUnslicedPosition
               }
-            logger.error(pos, e.getCause)
+            reporter.error(pos, e.getCause)
             Document.empty(instrumentedInput)
         }
       case None =>
@@ -373,8 +373,8 @@ class MarkdownCompiler(
   settings.unchecked.value = true // enable detailed unchecked warnings
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
-  lazy val reporter = new StoreReporter
-  private val global = new Global(settings, reporter)
+  lazy val sreporter = new StoreReporter
+  private val global = new Global(settings, sreporter)
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)
     .map(path => new File(path).toURI.toURL)
@@ -389,9 +389,9 @@ class MarkdownCompiler(
     case _ =>
   }
 
-  def compile(input: Input, logger: Logger, edit: TokenEditDistance): Option[ClassLoader] = {
+  def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
     clearTarget()
-    reporter.reset()
+    sreporter.reset()
     val run = new global.Run
     val label = input match {
       case Input.File(path, _) => path.toString()
@@ -399,11 +399,11 @@ class MarkdownCompiler(
       case _ => "(input)"
     }
     run.compileSources(List(new BatchSourceFile(label, new String(input.chars))))
-    if (!reporter.hasErrors) {
+    if (!sreporter.hasErrors) {
       Some(classLoader)
     } else {
-      reporter.infos.foreach {
-        case reporter.Info(pos, msg, severity) =>
+      sreporter.infos.foreach {
+        case sreporter.Info(pos, msg, severity) =>
           val mpos = edit.toOriginal(pos.point) match {
             case Left(err) =>
               pprint.log(err)
@@ -411,9 +411,9 @@ class MarkdownCompiler(
             case Right(p) => p.toUnslicedPosition
           }
           severity match {
-            case reporter.ERROR => logger.error(mpos, msg)
-            case reporter.INFO => logger.info(mpos, msg)
-            case reporter.WARNING => logger.warning(mpos, msg)
+            case sreporter.ERROR => vreporter.error(mpos, msg)
+            case sreporter.INFO => vreporter.info(mpos, msg)
+            case sreporter.WARNING => vreporter.warning(mpos, msg)
           }
         case _ =>
       }

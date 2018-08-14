@@ -45,7 +45,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
               val start = block.getInfo.getStartOffset + offset
               val end = block.getInfo.getEndOffset
               val pos = Position.Range(input, start, end)
-              context.logger.error(pos, msg)
+              context.reporter.error(pos, msg)
               None
             }
         }
@@ -94,13 +94,13 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
           val source = dialects.Sbt1(input).parse[Source].get
           SectionInput(input, source, mod)
       }
-      val rendered = MarkdownCompiler.renderInputs(code, compiler, logger, filename)
+      val rendered = MarkdownCompiler.renderInputs(code, compiler, reporter, filename)
       rendered.sections.zip(toCompile).foreach {
         case (section, (block, mod)) =>
           block.setInfo(CharSubSequence.of("scala"))
           mod match {
             case VorkModifier.Default | VorkModifier.Fail =>
-              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, logger)
+              val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, reporter)
               val content: BasedSequence = CharSubSequence.of(str)
               block.setContent(List(content).asJava)
             case VorkModifier.Passthrough =>

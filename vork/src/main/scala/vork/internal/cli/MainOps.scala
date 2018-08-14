@@ -13,18 +13,18 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NoStackTrace
 import scala.util.control.NonFatal
-import vork.Logger
+import vork.Reporter
 import vork.internal.io.IO
 import vork.internal.io.FileWatcher
 
 final class MainOps(
     settings: Settings,
     markdown: MutableDataSet,
-    logger: Logger
+    reporter: Reporter
 ) {
 
   def handleMarkdown(file: InputFile): Unit = {
-    logger.reset()
+    reporter.reset()
     val source = FileIO.slurp(file.in, settings.encoding)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(MainOps.InputKey, Some(input))
@@ -32,18 +32,18 @@ final class MainOps(
     val formatter = Formatter.builder(markdown).build
     val ast = parser.parse(source)
     val md = formatter.render(ast)
-    if (logger.hasErrors) {
-      logger.error(s"Failed to generate ${file.out}")
+    if (reporter.hasErrors) {
+      reporter.error(s"Failed to generate ${file.out}")
     } else {
       writePath(file, md)
-      logger.info(s"Generated ${file.out}")
+      reporter.info(s"Generated ${file.out}")
     }
   }
 
   def handleRegularFile(file: InputFile): Unit = {
     Files.createDirectories(file.out.toNIO.getParent)
     Files.copy(file.in.toNIO, file.out.toNIO, StandardCopyOption.REPLACE_EXISTING)
-    logger.info(s"Copied    ${file.out.toNIO}")
+    reporter.info(s"Copied    ${file.out.toNIO}")
   }
 
   def handleFile(file: InputFile): Unit = {
@@ -79,7 +79,7 @@ final class MainOps(
       handleFile(file)
     }
     if (isEmpty) {
-      logger.error(s"no input files: ${settings.in}")
+      reporter.error(s"no input files: ${settings.in}")
     }
   }
 

@@ -18,7 +18,7 @@ import metaconfig.generic
 import metaconfig.generic.Surface
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import vork.Logger
+import vork.Reporter
 import vork.internal.markdown.MarkdownCompiler
 
 trait CustomModifier {
@@ -70,7 +70,7 @@ case class Settings(
     (includeFiles.isEmpty || includeFiles.exists(_.matches(path.toNIO))) &&
     !excludeFiles.exists(_.matches(path.toNIO))
   }
-  def validate(logger: Logger): Configured[Context] = {
+  def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {
       val compiler = MarkdownCompiler.fromClasspath(classpath)
       Configured.ok(Context(this, logger, compiler))
@@ -93,7 +93,7 @@ object Settings {
     out = cwd.resolve("out"),
     cwd = cwd
   )
-  def fromCliArgs(args: List[String], logger: Logger, base: Settings): Configured[Context] = {
+  def fromCliArgs(args: List[String], logger: Reporter, base: Settings): Configured[Context] = {
     Conf
       .parseCliArgs[Settings](args)
       .andThen(_.as[Settings](decoder(base)))

@@ -3,13 +3,13 @@ package tests.markdown
 import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
-import vork.internal.io.ConsoleLogger
+import vork.internal.io.ConsoleReporter
 import vork.internal.markdown.MarkdownCompiler
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
   private val compiler = MarkdownCompiler.default()
-  private val logger = ConsoleLogger.default
+  private val reporter = ConsoleReporter.default
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     ignore(name) {}
@@ -20,10 +20,10 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val doc = MarkdownCompiler.render(inputs, logger, compiler)
+      val doc = MarkdownCompiler.render(inputs, reporter, compiler)
       val obtained = doc.sections
         .map(s => s"""```scala
-                     |${MarkdownCompiler.renderEvaluatedSection(doc, s, logger)}
+                     |${MarkdownCompiler.renderEvaluatedSection(doc, s, reporter)}
                      |```""".stripMargin)
         .mkString("\n")
       assertNoDiff(obtained, expected)
