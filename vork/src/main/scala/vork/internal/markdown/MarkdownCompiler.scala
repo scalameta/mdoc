@@ -156,11 +156,9 @@ object MarkdownCompiler {
                   )
                   sb.append(s"// $tpe")
                 case CompileResult.ParseError(msg, pos) =>
-                  logger.error(pos.toOriginal(doc.edit), msg)
-                  sb.append(msg)
+                  sb.append(pos.formatMessage(doc.edit, msg))
                 case CompileResult.TypeError(msg, pos) =>
-                  logger.error(pos.toOriginal(doc.edit), msg)
-                  sb.append(msg)
+                  sb.append(pos.formatMessage(doc.edit, msg))
                 case _ =>
                   val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
                   throw new IllegalArgumentException(

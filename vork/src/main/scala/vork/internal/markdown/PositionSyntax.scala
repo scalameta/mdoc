@@ -3,7 +3,7 @@ package vork.internal.markdown
 import scala.meta.Input
 import scala.meta.Position
 import vork.document.RangePosition
-import scala.reflect.api.{Position => ReflectPosition}
+import scalafix.internal.util.PositionSyntax._
 
 object PositionSyntax {
   implicit class XtensionInputVork(input: Input) {
@@ -12,6 +12,28 @@ object PositionSyntax {
     }
   }
   implicit class XtensionRangePositionVork(pos: RangePosition) {
+    def formatMessage(edit: TokenEditDistance, message: String): String = {
+      val mpos = pos.toMeta(edit)
+      new StringBuilder()
+        .append(message)
+        .append("\n")
+        .append(mpos.lineContent)
+        .append("\n")
+        .append(mpos.lineCaret)
+        .append("\n")
+        .toString()
+    }
+    def toMeta(edit: TokenEditDistance): Position = {
+      Position
+        .Range(
+          edit.originalInput,
+          pos.startLine,
+          pos.startColumn,
+          pos.endLine,
+          pos.endColumn
+        )
+        .toUnslicedPosition
+    }
     def toOriginal(edit: TokenEditDistance): Position = {
       val Right(x) = edit.toOriginal(pos.startLine, pos.startColumn)
       x.toUnslicedPosition

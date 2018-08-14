@@ -36,24 +36,17 @@ object Macros {
         )
     }
 
-    def lit(s: String) = c.literal(s)
-
-    def formatPosition(message: String, pos: scala.reflect.api.Position): c.Expr[String] =
-      lit(
-        new StringBuilder()
-          .append(message)
-          .append("\n")
-          .append(pos.lineContent)
-          .append("\n")
-          .append(" " * (pos.column - 1))
-          .append("^")
-          .toString
-      )
     def rangePos(pos: scala.reflect.api.Position): c.Expr[RangePosition] = {
-      val line = c.literal(pos.line)
-      val column = c.literal(pos.column)
       reify {
-        new RangePosition(line.splice, column.splice, line.splice, column.splice)
+        val line = startLine.splice + c.literal(pos.line - 1).splice
+        val column = startColumn.splice + c.literal(pos.column - 1).splice
+        new RangePosition(line, column, line, column)
+      }
+    }
+
+    def codePosition: c.Expr[RangePosition] = {
+      reify {
+        new RangePosition(startLine.splice, startColumn.splice, endLine.splice, endColumn.splice)
       }
     }
 
@@ -61,19 +54,19 @@ object Macros {
       val typechecked = c.typecheck(c.parse(string))
       reify {
         TypecheckedOK(
-          lit(string).splice,
-          lit(typechecked.tpe.toString).splice,
-          new RangePosition(startLine.splice, startColumn.splice, endLine.splice, endColumn.splice)
+          c.literal(string).splice,
+          c.literal(typechecked.tpe.toString).splice,
+          codePosition.splice
         )
       }.tree
     } catch {
       case e: ParseException =>
-        val msg = formatPosition(e.getMessage, e.pos)
+        val msg = c.literal(e.getMessage)
         reify {
           ParseError(msg.splice, rangePos(e.pos).splice)
         }.tree
       case e: TypecheckException =>
-        val msg = formatPosition(e.getMessage, e.pos)
+        val msg = c.literal(e.getMessage)
         reify {
           TypeError(msg.splice, rangePos(e.pos).splice)
         }.tree
