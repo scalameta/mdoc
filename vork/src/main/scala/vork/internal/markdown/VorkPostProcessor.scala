@@ -29,7 +29,8 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
           VorkModifier(mode).orElse {
             val expected = VorkModifier.all.map(_.toString.toLowerCase()).mkString(", ")
             val msg = s"Invalid mode '$mode'. Expected one of: $expected"
-            val start = block.getInfo.getStartOffset + 11
+            val offset = "scala vork:".length
+            val start = block.getInfo.getStartOffset + offset
             val end = block.getInfo.getEndOffset
             val pos = Position.Range(input, start, end)
             context.logger.error(pos, msg)
