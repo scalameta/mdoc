@@ -11,10 +11,18 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
+import scala.util.control.NoStackTrace
+import scala.util.control.NonFatal
+import vork.CustomModifier
 import vork.internal.cli.Context
 import vork.internal.cli.MainOps
+import vork.internal.document.VorkExceptions
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 import vork.internal.markdown.VorkModifier._
+
+final class CustomModifierException(mod: CustomModifier, cause: Throwable)
+    extends Exception(mod.name, cause)
+    with NoStackTrace
 
 class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor {
   import context._
@@ -66,6 +74,7 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
       }
     }
   }
+
   override def processDocument(doc: Document): Document = {
     import scala.collection.JavaConverters._
     val baseInput = doc
@@ -82,8 +91,17 @@ class VorkPostProcessor(implicit context: Context) extends DocumentPostProcessor
     }
     custom.foreach {
       case CustomBlockInput(block, input, Custom(mod, info)) =>
-        val newText = mod.process(info, input, reporter)
-        replace(doc, block, newText)
+        try {
+          val newText = mod.process(info, input, reporter)
+          replace(doc, block, newText)
+        } catch {
+          case NonFatal(e) =>
+            val length = math.max(0, input.chars.length - 1)
+            val pos = Position.Range(input, 0, length)
+            VorkExceptions.trimStacktrace(e)
+            val exception = new CustomModifierException(mod, e)
+            reporter.error(pos, exception)
+        }
     }
     val toCompile = fences.collect {
       case i if !i.mod.isCustom => i

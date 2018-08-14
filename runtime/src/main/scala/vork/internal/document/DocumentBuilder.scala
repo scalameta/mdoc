@@ -74,8 +74,7 @@ trait DocumentBuilder {
         }
       } catch {
         case NonFatal(e) =>
-          val stacktrace = e.getStackTrace.takeWhile(!_.getClassName.startsWith("vork"))
-          e.setStackTrace(stacktrace)
+          VorkExceptions.trimStacktrace(e)
           throw new PositionedException(sectionCount, lastPosition, e)
       } finally {
         System.setOut(backupStdout)

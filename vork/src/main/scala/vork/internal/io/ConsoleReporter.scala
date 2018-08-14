@@ -4,6 +4,7 @@ import fansi.Color._
 import java.io.PrintStream
 import scala.meta.Position
 import scalafix.internal.util.PositionSyntax._
+import vork.internal.markdown.PositionSyntax._
 import vork.Reporter
 
 class ConsoleReporter(ps: PrintStream) extends Reporter {
@@ -16,25 +17,29 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
   def hasErrors: Boolean = myErrors > 0
   def reset(): Unit = myErrors = 0
 
+  def error(throwable: Throwable): Unit = {
+    error(Position.None, throwable)
+  }
+
   def error(pos: Position, throwable: Throwable): Unit = {
     error(pos, throwable.getMessage)
     throwable.printStackTrace(ps)
   }
   def error(pos: Position, msg: String): Unit = {
-    error(pos.formatMessage("error", msg))
+    error(pos.toUnslicedPosition.formatMessage("error", msg))
   }
   def error(msg: String): Unit = {
     myErrors += 1
     ps.println(myError ++ s": $msg")
   }
   def info(pos: Position, msg: String): Unit = {
-    info(pos.formatMessage("info", msg))
+    info(pos.toUnslicedPosition.formatMessage("info", msg))
   }
   def info(msg: String): Unit = {
     ps.println(myInfo ++ s": $msg")
   }
   def warning(pos: Position, msg: String): Unit = {
-    warning(pos.formatMessage("warning", msg))
+    warning(pos.toUnslicedPosition.formatMessage("warning", msg))
   }
   def warning(msg: String): Unit = {
     ps.println(myWarning ++ s": $msg")
