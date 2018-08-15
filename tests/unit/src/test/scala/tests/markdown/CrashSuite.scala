@@ -22,6 +22,20 @@ class CrashSuite extends BaseMarkdownSuite {
   )
 
   checkError(
+    "definition",
+    """
+      |```scala vork:crash
+      |case class User(name: String)
+      |```
+    """.stripMargin,
+    """
+      |error: definition.md:3:1: error: Expected runtime exception but program completed successfully
+      |case class User(name: String)
+      |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
+
+  checkError(
     "false-positive",
     """
       |```scala vork:crash
