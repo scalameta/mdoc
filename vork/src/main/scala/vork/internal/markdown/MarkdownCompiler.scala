@@ -5,6 +5,7 @@ import java.io.File
 import java.io.PrintStream
 import java.net.URL
 import java.net.URLClassLoader
+import java.nio.file.Path
 import java.nio.file.Paths
 import scala.meta._
 import scala.meta.inputs.Input
@@ -24,6 +25,7 @@ import vork.document.CrashResult.Crashed
 import vork.document.Document
 import vork.document.Section
 import vork.document._
+import vork.internal.cli.Semantics
 import vork.internal.document.DocumentBuilder
 import vork.internal.document.VorkExceptions
 import vork.internal.pos.PositionSyntax._
@@ -50,7 +52,7 @@ object MarkdownCompiler {
           doc.build(instrumentedInput)
         } catch {
           case e: PositionedException =>
-            val input = original(e.section - 1).input
+            val input = original(e.section).input
             val pos =
               if (e.pos.isEmpty) {
                 Position.Range(input, 0, 0)
@@ -111,20 +113,16 @@ object MarkdownCompiler {
   }
 
   def fromClasspath(classpath: String): MarkdownCompiler = {
-    val fullClasspath = if (classpath.isEmpty) defaultClasspath else classpath
-    new MarkdownCompiler(fullClasspath)
+    val base = Classpath(classpath)
+    val runtime = defaultClasspath(path => path.toString.contains("vork-runtime"))
+    val fullClasspath = base ++ runtime
+    new MarkdownCompiler(fullClasspath.syntax)
   }
 
   def default(): MarkdownCompiler = fromClasspath("")
-  def render(
-      sections: List[Input],
-      reporter: Reporter,
-      compiler: MarkdownCompiler
-  ): EvaluatedDocument = {
-    render(sections, compiler, reporter, "<input>")
-  }
 
   def render(
+            semantics: Semantics,
       sections: List[Input],
       compiler: MarkdownCompiler,
       reporter: Reporter,
@@ -132,10 +130,9 @@ object MarkdownCompiler {
   ): EvaluatedDocument = {
     val inputs =
       sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default))
-    val instrumented = instrumentSections(inputs)
-    val wrapped = Instrumenter.wrapBody(instrumented)
+    val instrumented = Instrumenter.instrument(semantics, inputs)
     renderInputs(
-      wrapped,
+      instrumented,
       inputs,
       compiler,
       reporter,
@@ -254,13 +251,14 @@ object MarkdownCompiler {
     sb.toString
   }
 
-  def defaultClasspath: String = {
-    getClass.getClassLoader
-      .asInstanceOf[URLClassLoader]
-      .getURLs
-      .iterator
-      .map(url => Paths.get(url.toURI))
-      .mkString(File.pathSeparator)
+  def defaultClasspath(fn: Path => Boolean): Classpath = {
+    val paths =
+      getClass.getClassLoader
+        .asInstanceOf[URLClassLoader]
+        .getURLs
+        .iterator
+        .map(url => AbsolutePath(Paths.get(url.toURI)))
+    Classpath(paths.toList)
   }
 
   def instrumentSections(sections: List[SectionInput]): String = {

@@ -81,7 +81,8 @@ lazy val unit = project
       "org.scalatest" %% "scalatest" % "3.2.0-SNAP10" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
-    fork := true,
+    // forking causes https://github.com/scalatest/scalatest/issues/556
+    //    fork := true,
     buildInfoPackage := "vork.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value

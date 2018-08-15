@@ -31,7 +31,7 @@ class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
     sections.foreach { section =>
       sb.println("\n$doc.startSection();")
       section.source.stats.foreach { stat =>
-        sb.println("$doc.startStatement();")
+        sb.println(s"$$doc.startStatement(${position(stat.pos)});")
         printStatement(stat, section.mod, sb)
         sb.println("\n$doc.endStatement();")
       }
@@ -83,7 +83,7 @@ class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
 object Instrumenter {
   def instrument(semantics: Semantics, sections: List[SectionInput]): String = {
     val body = new Instrumenter(semantics, sections).instrument()
-    pprint.log(body)
+//    pprint.log(body)
     wrapBody(body)
   }
 

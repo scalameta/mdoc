@@ -3,6 +3,7 @@ package tests.markdown
 import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
+import vork.internal.cli.Semantics
 import vork.internal.io.ConsoleReporter
 import vork.internal.markdown.MarkdownCompiler
 
@@ -20,7 +21,7 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val doc = MarkdownCompiler.render(inputs, reporter, compiler)
+      val doc = MarkdownCompiler.render(Semantics.Script, inputs, compiler, reporter, name + ".md")
       val obtained = doc.sections
         .map(s => s"""```scala
                      |${MarkdownCompiler.renderEvaluatedSection(doc, s, reporter)}
@@ -71,7 +72,6 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
       |  2
       |}
       |42
-      |err
       |52
       |x: Int = 2
       |```

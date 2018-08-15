@@ -15,7 +15,7 @@ class CliArgsSuite extends FunSuite with DiffAssertions {
 
   def checkError(args: List[String], expected: String): Unit = {
     test(args.mkString(" ")) {
-      Settings.fromCliArgs(args, base).toEither match {
+      Settings.fromCliArgs(args, base).andThen(_.validate(reporter)).toEither match {
         case Left(obtained) =>
           assertNoDiff(obtained.toString(), expected)
         case Right(ok) =>
