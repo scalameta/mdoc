@@ -89,3 +89,10 @@ lazy val unit = project
   )
   .dependsOn(vork, testsInput)
   .enablePlugins(BuildInfoPlugin)
+
+lazy val website = project
+  .in(file("website"))
+  .settings(
+    cancelable in Global := true
+  )
+  .dependsOn(vork)

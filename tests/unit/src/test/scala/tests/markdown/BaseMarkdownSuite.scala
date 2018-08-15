@@ -33,7 +33,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
   def getSettings(input: Input.VirtualFile): MutableDataSet = {
     myStdout.reset()
     val settings = Markdown.default(context)
-    settings.set(MainOps.InputKey, Some(input))
+    settings.set(Markdown.InputKey, Some(input))
     settings
   }
 

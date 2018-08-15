@@ -7,6 +7,8 @@ import java.io.PrintWriter
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URLDecoder
+import java.nio.file.Path
+import java.nio.file.Paths
 import scala.meta._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
@@ -32,6 +34,48 @@ import vork.internal.pos.PositionSyntax._
 import vork.internal.pos.TokenEditDistance
 
 object MarkdownCompiler {
+
+  def buildDocument(
+      compiler: MarkdownCompiler,
+      original: List[SectionInput],
+      instrumented: String,
+      reporter: Reporter,
+      filename: String
+  ): Document = {
+    // Use string builder to avoid accidental stripMargin processing
+    val instrumentedInput = InstrumentedInput(filename, instrumented)
+    val compileInput = Input.VirtualFile(filename, instrumented)
+    val edit = toTokenEdit(original.map(_.source), compileInput)
+    compiler.compile(compileInput, reporter, edit) match {
+      case Some(loader) =>
+        val cls = loader.loadClass("repl.Session")
+        val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
+        try {
+          doc.build(instrumentedInput)
+        } catch {
+          case e: PositionedException =>
+            val input = original(e.section - 1).input
+            val pos =
+              if (e.pos.isEmpty) {
+                Position.Range(input, 0, 0)
+              } else {
+                val slice = Position.Range(
+                  input,
+                  e.pos.startLine,
+                  e.pos.startColumn,
+                  e.pos.endLine,
+                  e.pos.endColumn
+                )
+                slice.toUnslicedPosition
+              }
+            reporter.error(pos, e.getCause)
+            Document.empty(instrumentedInput)
+        }
+      case None =>
+        // An empty document will render as the original markdown
+        Document.empty(instrumentedInput)
+    }
+  }
 
   def toTokenEdit(original: Seq[Tree], instrumented: Input): TokenEditDistance = {
     val instrumentedTokens = instrumented.tokenize.get
@@ -70,20 +114,9 @@ object MarkdownCompiler {
     def out: String = section.statements.map(_.out).mkString
   }
 
-  def fromClasspath(cp: String): MarkdownCompiler = {
-    val prefix = if (cp.isEmpty) "" else cp + File.pathSeparator
-    val runtimeOnly = defaultClasspath { path =>
-      Set(
-        "scala-library",
-        "scala-reflect",
-        "pprint",
-        "vork-runtime"
-      ).contains(path)
-    }
-    val finalRuntime =
-      if (runtimeOnly.isEmpty) defaultClasspath
-      else runtimeOnly
-    new MarkdownCompiler(prefix + finalRuntime)
+  def fromClasspath(classpath: String): MarkdownCompiler = {
+    val fullClasspath = if (classpath.isEmpty) defaultClasspath else classpath
+    new MarkdownCompiler(fullClasspath)
   }
 
   def default(): MarkdownCompiler = fromClasspath("")
@@ -118,7 +151,8 @@ object MarkdownCompiler {
       filename: String
   ): EvaluatedDocument = {
     val instrumented = instrumentSections(sections)
-    val doc = document(compiler, sections, instrumented, reporter, filename)
+    val wrapped = Instrumenter.wrapBody(instrumented)
+    val doc = buildDocument(compiler, sections, wrapped, reporter, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -222,83 +256,15 @@ object MarkdownCompiler {
     sb.toString
   }
 
-  def document(
-      compiler: MarkdownCompiler,
-      original: List[SectionInput],
-      instrumented: String,
-      reporter: Reporter,
-      filename: String
-  ): Document = {
-    // Use string builder to avoid accidental stripMargin processing
-    val wrapped = new StringBuilder()
-      .append("package repl\n")
-      .append("class Session extends _root_.vork.internal.document.DocumentBuilder {\n")
-      .append("  def app(): Unit = {\n")
-      .append(instrumented)
-      .append("  }\n")
-      .append("}\n")
-      .toString()
-    val instrumentedInput = InstrumentedInput(filename, wrapped)
-    val compileInput = Input.VirtualFile(filename, wrapped)
-    val edit = toTokenEdit(original.map(_.source), compileInput)
-    compiler.compile(compileInput, reporter, edit) match {
-      case Some(loader) =>
-        val cls = loader.loadClass("repl.Session")
-        val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
-        try {
-          doc.build(instrumentedInput)
-        } catch {
-          case e: PositionedException =>
-            val input = original(e.section - 1).input
-            val pos =
-              if (e.pos.isEmpty) {
-                Position.Range(input, 0, 0)
-              } else {
-                val slice = Position.Range(
-                  input,
-                  e.pos.startLine,
-                  e.pos.startColumn,
-                  e.pos.endLine,
-                  e.pos.endColumn
-                )
-                slice.toUnslicedPosition
-              }
-            reporter.error(pos, e.getCause)
-            Document.empty(instrumentedInput)
-        }
-      case None =>
-        // An empty document will render as the original markdown
-        Document.empty(instrumentedInput)
-    }
+  def defaultClasspath: String = {
+    getClass.getClassLoader
+      .asInstanceOf[URLClassLoader]
+      .getURLs
+      .iterator
+      .map(url => Paths.get(url.toURI))
+      .mkString(File.pathSeparator)
   }
 
-  // Copy paste from scalafix
-  def defaultClasspath: String = defaultClasspath(_ => true)
-  def defaultClasspath(filter: String => Boolean): String = {
-    getClass.getClassLoader match {
-      case u: URLClassLoader =>
-        val paths = u.getURLs.iterator
-          .map(sanitizeURL)
-          .filter(path => filter(path))
-          .toList
-        paths.mkString(File.pathSeparator)
-      case _ => ""
-    }
-  }
-
-  def sanitizeURL(u: URL): String = {
-    if (u.getProtocol.startsWith("bootstrap")) {
-      import java.io._
-      import java.nio.file._
-      val stream = u.openStream
-      val tmp = File.createTempFile("bootstrap-" + u.getPath, ".jar")
-      Files
-        .copy(stream, Paths.get(tmp.getAbsolutePath), StandardCopyOption.REPLACE_EXISTING)
-      tmp.getAbsolutePath
-    } else {
-      URLDecoder.decode(u.getPath, "UTF-8")
-    }
-  }
   def instrumentSections(sections: List[SectionInput]): String = {
     var counter = 0
     val totalStats = sections.map(_.source.stats.length).sum

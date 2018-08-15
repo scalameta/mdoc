@@ -31,7 +31,7 @@ case class Settings(
     @Description("The current working directory")
     cwd: AbsolutePath,
     cleanTarget: Boolean = false,
-    encoding: Charset = StandardCharsets.UTF_8,
+    charset: Charset = StandardCharsets.UTF_8,
     @Description("Optional classpath to compile Scala code examples")
     classpath: String = "",
     @ExtraName("w")
@@ -41,7 +41,8 @@ case class Settings(
     @Description("Glob to filter which files from --in directory to exclude.")
     excludePath: List[PathMatcher] = Nil,
     site: Map[String, String] = Map.empty,
-    stringModifiers: List[StringModifier] = Nil
+    stringModifiers: List[StringModifier] = Nil,
+    semantics: Semantics = Semantics.Script
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
@@ -80,11 +81,10 @@ object Settings {
     out = cwd.resolve("out"),
     cwd = cwd
   )
-  def fromCliArgs(args: List[String], logger: Reporter, base: Settings): Configured[Context] = {
+  def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
       .andThen(_.as[Settings](decoder(base)))
-      .andThen(_.validate(logger))
   }
   implicit val surface: Surface[Settings] =
     generic.deriveSurface[Settings]

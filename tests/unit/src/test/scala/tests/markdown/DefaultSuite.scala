@@ -140,4 +140,42 @@ class DefaultSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "script",
+    """
+      |```scala vork
+      |val x = 1
+      |val y = 2
+      |x + y
+      |```
+      |```scala vork
+      |val List(z, zz) = List(3, 4)
+      |x + y + z + zz
+      |```
+    """.stripMargin,
+    """
+      |```scala
+      |@ val x = 1
+      |x: Int = 1
+      |
+      |@ val y = 2
+      |y: Int = 2
+      |
+      |@ x + y
+      |res0: Int = 3
+      |```
+      |
+      |```scala
+      |@ val List(z, zz) = List(3, 4)
+      |z: Int = 3
+      |zz: Int = 4
+      |z: Int = 3
+      |zz: Int = 4
+      |
+      |@ x + y + z + zz
+      |res1: Int = 10
+      |```
+    """.stripMargin
+  )
+
 }

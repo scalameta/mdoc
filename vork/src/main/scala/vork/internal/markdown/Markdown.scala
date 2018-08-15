@@ -5,6 +5,7 @@ import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.formatter.internal.Formatter
 import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import scala.language.dynamics
@@ -15,6 +16,8 @@ import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 
 object Markdown {
+  val InputKey = new DataKey[Option[Input.VirtualFile]]("scalametaInput", None)
+  val SiteVariables = new DataKey[Option[Map[String, String]]]("siteVariables", None)
 
   /**
     * Defines the default markdown settings.
@@ -29,13 +32,13 @@ object Markdown {
       .set(Parser.BLANK_LINES_IN_AST, Boolean.box(true))
       .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
       .set(Parser.EXTENSIONS, VorkExtensions.default(context))
-      .set(MainOps.VariablesKey, Some(context.settings.site))
+      .set(SiteVariables, Some(context.settings.site))
   }
 
   def toMarkdown(input: Input.VirtualFile, settings: MutableDataSet, reporter: Reporter): String = {
-    val variables = settings.get(MainOps.VariablesKey).getOrElse(Map.empty)
+    val variables = settings.get(SiteVariables).getOrElse(Map.empty)
     val textWithVariables = SiteVariableRegexp.replaceVariables(input, variables, reporter)
-    settings.set(MainOps.InputKey, Some(textWithVariables))
+    settings.set(InputKey, Some(textWithVariables))
     val parser = Parser.builder(settings).build
     val formatter = Formatter.builder(settings).build
     val ast = parser.parse(textWithVariables.text)

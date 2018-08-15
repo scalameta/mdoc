@@ -14,7 +14,6 @@ import scala.meta.inputs.Position
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
 import vork.internal.cli.Context
-import vork.internal.cli.MainOps
 import vork.internal.document.VorkExceptions
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 import vork.internal.markdown.Modifier._
@@ -24,8 +23,8 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
   override def processDocument(doc: Document): Document = {
     import scala.collection.JavaConverters._
     val docInput = doc
-      .get(MainOps.InputKey)
-      .getOrElse(sys.error(s"Missing DataKey ${MainOps.InputKey}"))
+      .get(Markdown.InputKey)
+      .getOrElse(sys.error(s"Missing DataKey ${Markdown.InputKey}"))
     val (scalaInputs, customInputs) = collectBlockInputs(doc, docInput)
     customInputs.foreach { block =>
       processCustomInput(doc, block)
@@ -66,6 +65,8 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             SectionInput(input, Source(Nil), mod)
         }
     }
+    val out = Instrumenter.script(code)
+    pprint.log(out)
     val rendered = MarkdownCompiler.renderInputs(code, ctx.compiler, ctx.reporter, filename)
     rendered.sections.zip(inputs).foreach {
       case (section, ScalaBlockInput(block, _, mod)) =>

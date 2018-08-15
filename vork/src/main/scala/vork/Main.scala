@@ -20,22 +20,14 @@ object Main {
   def process(args: Array[String], out: PrintStream, cwd: Path): Int = {
     process(args, new ConsoleReporter(out), cwd)
   }
-
   def process(args: Array[String], reporter: Reporter, cwd: Path): Int = {
     val base = Settings.default(AbsolutePath(cwd))
-    Settings.fromCliArgs(args.toList, reporter, base) match {
-      case Configured.NotOk(error) =>
-        error.all.foreach(message => reporter.error(message))
-        1
-      case Configured.Ok(context) =>
-        val markdown = Markdown.default(context)
-        val runner = new MainOps(context.settings, markdown, reporter)
-        runner.run()
-        if (context.reporter.hasErrors) {
-          1 // error
-        } else {
-          0
-        }
-    }
+    val ctx = Settings.fromCliArgs(args.toList, base).andThen(_.validate(reporter))
+    MainOps.process(ctx, reporter)
   }
+
+  def process(settings: MainSettings): Int = {
+    MainOps.process(settings.settings.validate(settings.reporter), settings.reporter)
+  }
+
 }

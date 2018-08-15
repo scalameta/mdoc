@@ -6,6 +6,7 @@ import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.TimeUnit
+import metaconfig.Configured
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
@@ -22,13 +23,13 @@ final class MainOps(
     reporter: Reporter
 ) {
 
-  def handleMarkdown(file: InputFile): Unit = {
+  def handleMarkdown(file: InputFile): Unit = synchronized {
     reporter.reset()
     reporter.info(s"Compiling ${file.in}")
     val start = System.nanoTime()
-    val source = FileIO.slurp(file.in, settings.encoding)
+    val source = FileIO.slurp(file.in, settings.charset)
     val input = Input.VirtualFile(file.in.toString(), source)
-    markdown.set(MainOps.InputKey, Some(input))
+    markdown.set(Markdown.InputKey, Some(input))
     val md = Markdown.toMarkdown(input, markdown, reporter)
     if (reporter.hasErrors) {
       reporter.error(s"Failed to generate ${file.out}")
@@ -63,7 +64,7 @@ final class MainOps(
 
   def writePath(file: InputFile, string: String): Unit = {
     Files.createDirectories(file.out.toNIO.getParent)
-    Files.write(file.out.toNIO, string.getBytes(settings.encoding))
+    Files.write(file.out.toNIO, string.getBytes(settings.charset))
   }
 
   def generateCompleteSite(): Unit = {
@@ -96,6 +97,20 @@ final class MainOps(
 }
 
 object MainOps {
-  val InputKey = new DataKey[Option[Input.VirtualFile]]("scalametaInput", None)
-  val VariablesKey = new DataKey[Option[Map[String, String]]]("siteVariables", None)
+  def process(context: Configured[Context], reporter: Reporter): Int = {
+    context match {
+      case Configured.NotOk(error) =>
+        error.all.foreach(message => reporter.error(message))
+        1
+      case Configured.Ok(ctx) =>
+        val markdown = Markdown.default(ctx)
+        val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
+        runner.run()
+        if (ctx.reporter.hasErrors) {
+          1 // error
+        } else {
+          0
+        }
+    }
+  }
 }

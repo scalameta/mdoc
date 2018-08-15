@@ -40,15 +40,18 @@ trait DocumentBuilder {
       e.value
     }
 
-    def statement[T](e: => T): T = {
+    def stat(): Unit = {
       val out = myOut.toString()
       myOut.reset()
       myStatements.append(Statement(myBinders.toList, out))
       myBinders.clear()
+    }
+    def statement[T](e: => T): T = {
+      stat()
       e
     }
 
-    def section[T](e: => T): T = {
+    def sect(): Unit = {
       sectionCount += 1
       if (first) {
         first = false
@@ -56,6 +59,10 @@ trait DocumentBuilder {
         mySections.append(Section(myStatements.toList))
         myStatements.clear()
       }
+    }
+
+    def section[T](e: => T): T = {
+      sect()
       e
     }
     def crash(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int)(
