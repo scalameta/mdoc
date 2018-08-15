@@ -60,12 +60,12 @@ class VariableRegexpSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "tag 2",
+    "tag-2",
     """
-      |This to @olafurpg @
+      |This to @@olafurpg@
     """.stripMargin,
     """
-      |This to @olafurpg @
+      |This to @olafurpg@
     """.stripMargin,
   )
 

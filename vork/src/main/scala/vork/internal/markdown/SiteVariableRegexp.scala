@@ -19,9 +19,14 @@ object SiteVariableRegexp {
         map.get(key) match {
           case Some(value) => value
           case None =>
-            val pos = Position.Range(input, m.start, m.end)
-            reporter.error(pos, s"key not found: $key")
-            pos.text
+            input.chars.lift(m.start - 1) match {
+              case Some('@') =>
+                Position.Range(input, m.start + 1, m.end).text
+              case _ =>
+                val pos = Position.Range(input, m.start, m.end)
+                reporter.error(pos, s"key not found: $key")
+                pos.text
+            }
         }
       }
     )

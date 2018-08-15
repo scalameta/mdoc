@@ -113,16 +113,20 @@ object MarkdownCompiler {
   }
 
   def fromClasspath(classpath: String): MarkdownCompiler = {
-    val base = Classpath(classpath)
-    val runtime = defaultClasspath(path => path.toString.contains("vork-runtime"))
-    val fullClasspath = base ++ runtime
+    val fullClasspath =
+      if (classpath.isEmpty) defaultClasspath(_ => true)
+      else {
+        val base = defaultClasspath(_ => true)
+        val runtime = defaultClasspath(path => path.toString.contains("vork-runtime"))
+        base ++ runtime
+      }
     new MarkdownCompiler(fullClasspath.syntax)
   }
 
   def default(): MarkdownCompiler = fromClasspath("")
 
   def render(
-            semantics: Semantics,
+      semantics: Semantics,
       sections: List[Input],
       compiler: MarkdownCompiler,
       reporter: Reporter,
