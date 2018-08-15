@@ -37,9 +37,9 @@ case class Settings(
     @ExtraName("w")
     watch: Boolean = false,
     @Description("Glob to filter which files from --in directory to include.")
-    includeFiles: List[PathMatcher] = Nil,
+    includePath: List[PathMatcher] = Nil,
     @Description("Glob to filter which files from --in directory to exclude.")
-    excludeFiles: List[PathMatcher] = Nil,
+    excludePath: List[PathMatcher] = Nil,
     site: Map[String, String] = Map.empty,
     stringModifiers: List[StringModifier] = Nil
 ) {
@@ -54,8 +54,8 @@ case class Settings(
     }
   }
   def matches(path: RelativePath): Boolean = {
-    (includeFiles.isEmpty || includeFiles.exists(_.matches(path.toNIO))) &&
-    !excludeFiles.exists(_.matches(path.toNIO))
+    (includePath.isEmpty || includePath.exists(_.matches(path.toNIO))) &&
+    !excludePath.exists(_.matches(path.toNIO))
   }
   def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {

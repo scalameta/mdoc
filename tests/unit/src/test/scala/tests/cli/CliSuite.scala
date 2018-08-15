@@ -41,10 +41,30 @@ class CliSuite extends BaseCliSuite {
       |# Include
     """.stripMargin,
     extraArgs = Array(
-      "--include-files",
+      "--include-path",
       "include.md",
-      "--exclude-files",
+      "--exclude-path",
       "exclude.md"
+    )
+  )
+
+  checkCli(
+    "exclude-dir",
+    """
+      |/index.md
+      |# Index @version@
+      |/src/Foo.md
+      |# Foo @version@
+      |/src/Bar.md
+      |# Bar @version@
+    """.stripMargin,
+    """
+      |/index.md
+      |# Index 1.0.0
+    """.stripMargin,
+    extraArgs = Array(
+      "--exclude-path",
+      "src"
     )
   )
 

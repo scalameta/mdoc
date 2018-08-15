@@ -36,7 +36,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
         "--cwd",
         in.toString,
         "--site.version",
-        "\"1.0\""
+        "1.0.0"
       )
       val code = Main.process(args ++ extraArgs, new PrintStream(myStdout), in.toNIO)
       val stdout = fansi.Str(myStdout.toString()).plainText
