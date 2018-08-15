@@ -17,7 +17,7 @@ import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 import vork.internal.document.VorkExceptions
 import vork.internal.markdown.MarkdownCompiler.SectionInput
-import vork.internal.markdown.VorkModifier._
+import vork.internal.markdown.Modifier._
 
 class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
@@ -36,8 +36,8 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     doc
   }
 
-  def processCustomInput(doc: Document, custom: CustomBlockInput): Unit = {
-    val CustomBlockInput(block, input, Custom(mod, info)) = custom
+  def processCustomInput(doc: Document, custom: StringBlockInput): Unit = {
+    val StringBlockInput(block, input, Str(mod, info)) = custom
     try {
       val newText = mod.process(info, input, ctx.reporter)
       replaceNodeWithText(doc, block, newText)
@@ -45,7 +45,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       case NonFatal(e) =>
         val pos = Position.Range(input, 0, input.chars.length)
         VorkExceptions.trimStacktrace(e)
-        val exception = new CustomModifierException(mod, e)
+        val exception = new StringModifierException(mod, e)
         ctx.reporter.error(pos, exception)
     }
   }
@@ -71,17 +71,17 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       case (section, ScalaBlockInput(block, _, mod)) =>
         block.setInfo(CharSubSequence.of("scala"))
         mod match {
-          case VorkModifier.Default | VorkModifier.Fail =>
+          case Modifier.Default | Modifier.Fail =>
             val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, ctx.reporter)
             val content: BasedSequence = CharSubSequence.of(str)
             block.setContent(List(content).asJava)
-          case VorkModifier.Passthrough =>
+          case Modifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)
-          case VorkModifier.Crash =>
+          case Modifier.Crash =>
             val stacktrace =
               MarkdownCompiler.renderCrashSection(section, ctx.reporter, rendered.edit)
             replaceNodeWithText(doc, block, stacktrace)
-          case c: VorkModifier.Custom =>
+          case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)
         }
     }
@@ -98,20 +98,20 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
   def collectBlockInputs(
       doc: Document,
       docInput: Input.VirtualFile
-  ): (List[ScalaBlockInput], List[CustomBlockInput]) = {
+  ): (List[ScalaBlockInput], List[StringBlockInput]) = {
     val InterestingCodeFence = new BlockCollector(ctx, docInput)
     val inputs = List.newBuilder[ScalaBlockInput]
-    val customs = List.newBuilder[CustomBlockInput]
+    val strings = List.newBuilder[StringBlockInput]
     Markdown.traverse[FencedCodeBlock](doc) {
       case InterestingCodeFence(input) =>
         input.mod match {
-          case custom: Custom =>
-            customs += CustomBlockInput(input.block, input.input, custom)
+          case string: Str =>
+            strings += StringBlockInput(input.block, input.input, string)
           case _ =>
             inputs += input
         }
     }
-    (inputs.result(), customs.result())
+    (inputs.result(), strings.result())
   }
 }
 

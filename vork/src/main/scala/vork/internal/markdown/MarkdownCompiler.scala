@@ -66,7 +66,7 @@ object MarkdownCompiler {
       )
     }
   }
-  case class EvaluatedSection(section: Section, input: Input, source: Source, mod: VorkModifier) {
+  case class EvaluatedSection(section: Section, input: Input, source: Source, mod: Modifier) {
     def out: String = section.statements.map(_.out).mkString
   }
 
@@ -102,14 +102,14 @@ object MarkdownCompiler {
       filename: String
   ): EvaluatedDocument = {
     renderInputs(
-      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, VorkModifier.Default)),
+      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default)),
       compiler,
       reporter,
       filename
     )
   }
 
-  case class SectionInput(input: Input, source: Source, mod: VorkModifier)
+  case class SectionInput(input: Input, source: Source, mod: Modifier)
 
   def renderInputs(
       sections: List[SectionInput],
@@ -174,7 +174,7 @@ object MarkdownCompiler {
 
         statement.binders.foreach { binder =>
           section.mod match {
-            case VorkModifier.Fail =>
+            case Modifier.Fail =>
               binder.value match {
                 case CompileResult.TypecheckedOK(_, tpe, pos) =>
                   val mpos = Position
@@ -202,7 +202,7 @@ object MarkdownCompiler {
                       s"Obtained $obtained"
                   )
               }
-            case VorkModifier.Default | VorkModifier.Passthrough =>
+            case Modifier.Default | Modifier.Passthrough =>
               statement.binders.foreach { binder =>
                 sb.append(binder.name)
                   .append(": ")
@@ -211,9 +211,9 @@ object MarkdownCompiler {
                   .append(pprint.PPrinter.BlackWhite.apply(binder.value))
                   .append("\n")
               }
-            case VorkModifier.Crash =>
-              throw new IllegalArgumentException(VorkModifier.Crash.toString)
-            case c: VorkModifier.Custom =>
+            case Modifier.Crash =>
+              throw new IllegalArgumentException(Modifier.Crash.toString)
+            case c: Modifier.Str =>
               throw new IllegalArgumentException(c.toString)
           }
         }
@@ -361,7 +361,7 @@ object MarkdownCompiler {
     val rule = Rule.syntactic("Vork") { ctx =>
       val patches = stats.map { stat =>
         val (names, freshBinderPatch) = Binders.unapply(stat) match {
-          case Some(b) if section.mod != VorkModifier.Fail =>
+          case Some(b) if section.mod != Modifier.Fail =>
             b -> Patch.empty
           case _ =>
             val name = freshBinder()
@@ -369,7 +369,7 @@ object MarkdownCompiler {
         }
         val statPositions = position(stat.pos)
         val failPatch = section.mod match {
-          case VorkModifier.Fail =>
+          case Modifier.Fail =>
             val newCode =
               s"_root_.vork.internal.document.Macros.fail(${literal(stat.syntax)}, $statPositions); "
             ctx.replaceTree(stat, newCode)

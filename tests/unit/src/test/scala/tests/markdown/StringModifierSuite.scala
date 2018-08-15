@@ -2,20 +2,20 @@ package tests.markdown
 
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import vork.CustomModifier
+import vork.StringModifier
 import vork.Reporter
 import vork.internal.cli.Settings
 
-class CustomModifierSuite extends BaseMarkdownSuite {
+class StringModifierSuite extends BaseMarkdownSuite {
   override def settings: Settings = super.settings.copy(
-    modifiers = List(
-      new CustomModifier {
+    stringModifiers = List(
+      new StringModifier {
         override val name: String = "hello"
         override def process(info: String, code: Input, reporter: Reporter): String = {
           code.text.trim + " " + info
         }
       },
-      new CustomModifier {
+      new StringModifier {
         override val name: String = "reporter"
         override def process(info: String, code: Input, reporter: Reporter): String = {
           val length = code.text.trim.length
@@ -24,7 +24,7 @@ class CustomModifierSuite extends BaseMarkdownSuite {
           "reported"
         }
       },
-      new CustomModifier {
+      new StringModifier {
         override val name: String = "exception"
         override def process(info: String, code: Input, reporter: Reporter): String = {
           throw new IllegalArgumentException(info)
@@ -70,9 +70,9 @@ class CustomModifierSuite extends BaseMarkdownSuite {
       |error: exception.md:3:1: error: exception
       |hello
       |^^^^^
-      |vork.internal.markdown.CustomModifierException: exception
+      |vork.internal.markdown.StringModifierException: exception
       |Caused by: java.lang.IllegalArgumentException: boom
-      |	at tests.markdown.CustomModifierSuite$$anon$3.process(CustomModifierSuite.scala:30)
+      |	at tests.markdown.StringModifierSuite$$anon$3.process(StringModifierSuite.scala:30)
     """.stripMargin
   )
 

@@ -17,7 +17,7 @@ import metaconfig.generic
 import metaconfig.generic.Surface
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import vork.CustomModifier
+import vork.StringModifier
 import vork.Reporter
 import vork.internal.markdown.MarkdownCompiler
 
@@ -41,7 +41,7 @@ case class Settings(
     @Description("Glob to filter which files from --in directory to exclude.")
     excludeFiles: List[PathMatcher] = Nil,
     site: Map[String, String] = Map.empty,
-    modifiers: List[CustomModifier] = Nil
+    stringModifiers: List[StringModifier] = Nil
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {

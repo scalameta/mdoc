@@ -1,6 +1,6 @@
 package vork.internal.markdown
 
-import vork.CustomModifier
+import vork.StringModifier
 
 /**
   * A vork code fence modifier.
@@ -13,32 +13,32 @@ import vork.CustomModifier
   *
   * Currently, only supports parsing one modifier per code block.
   */
-sealed trait VorkModifier {
-  import VorkModifier._
+sealed trait Modifier {
+  import Modifier._
   def isDefault: Boolean = this == Default
   def isFail: Boolean = this == Fail
   def isPassthrough: Boolean = this == Passthrough
-  def isCustom: Boolean = this.isInstanceOf[Custom]
+  def isString: Boolean = this.isInstanceOf[Str]
   def isCrash: Boolean = this == Crash
 }
-object VorkModifier {
-  def all: List[VorkModifier] = List(Default, Passthrough, Fail, Crash)
-  def apply(string: String): Option[VorkModifier] =
+object Modifier {
+  def all: List[Modifier] = List(Default, Passthrough, Fail, Crash)
+  def apply(string: String): Option[Modifier] =
     all.find(_.toString.equalsIgnoreCase(string))
 
   /** Render output as if in a normal repl. */
-  case object Default extends VorkModifier
+  case object Default extends Modifier
 
   /** Expect error and fail build if code block succeeds. */
-  case object Fail extends VorkModifier
+  case object Fail extends Modifier
 
   /** Expect a runtime exception from evaluating the block. */
-  case object Crash extends VorkModifier
+  case object Crash extends Modifier
 
   /** Render stdout as raw markdown and remove code block. */
-  case object Passthrough extends VorkModifier
+  case object Passthrough extends Modifier
 
-  /** Render this code fence according to this custom modifier */
-  case class Custom(mod: CustomModifier, info: String) extends VorkModifier
+  /** Render this code fence according to this string modifier */
+  case class Str(mod: StringModifier, info: String) extends Modifier
 
 }
