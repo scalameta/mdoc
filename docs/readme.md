@@ -1,109 +1,35 @@
 # Vork - markdown worksheets
 
-Vork is a tool to turn markdown into markdown with Scala code examples evaluated, site variables such as version numbers expanded, and links checked against 404s.
-Vork is greatly inspired by [tut](https://github.com/tpolecat/tut), but distinguishes itself by:
+Vork is a documentation tool for Scala inspired by
+[tut](http://tpolecat.github.io/tut/). Like tut, Vork interprets Scala code
+examples in markdown files allowing you to compile markdown documentation as
+part of your build. Distinguishing features of Vork include:
 
-* using [Ammonite](http://ammonite.io/) instead of the default Scala compiler REPL, enabling powerful features such as importing libraries on the fly and prettier formatted output.
-* replacing variables such as `![version]` with the configured version of your project, implemented using standard markdown AST processing as opposed to regex search and replace.
-* (on the roadmap) supporting single page markdown generation from multiple pages to generate PDF and EPUB files with pandoc.
-* (on the roadmap) checking cross-section and external links for 404s
-* (on the roadmap) rendering instant preview in VS Code as you type
+- fast edit/preview workflow: each markdown file is compiled into a single
+  source file and executed as a single program.
+- variable injection: use variables like `@@VERSION@` to make sure the
+  documentation always shows the latest version.
+- extensible: library APIs expose hooks to customize rendering of code fences.
+- good error messages: compile errors and crashes are reported with positions of
+  the original markdown source.
 
-Like tut, vork generates markdown files and supports a number of modifiers such as `:fail` and `:passthrough`.
+## Quickstart
+
+### Command-line
+
+First, install the
+[coursier command-line interface](https://github.com/coursier/coursier/#command-line).
+Then run
+
+```
+coursier launch com.geirsson:vork_2.12:@VERSION@ -- --watch
+```
 
 ## Team
 
 The current maintainers (people who can merge pull requests) are:
 
-* Jorge Vicente Cantero - [`@jvican`](https://github.com/jvican)
-* Ólafur Páll Geirsson - [`@olafurpg`](https://github.com/olafurpg)
+- Jorge Vicente Cantero - [`@jvican`](https://github.com/jvican)
+- Ólafur Páll Geirsson - [`@olafurpg`](https://github.com/olafurpg)
 
 Contributions are welcome!
-
-
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
-```scala vork
-val x = 1
-val x = 2
-x * 4
-x * 4
-x * 4
-x * 4
-x * 4
-```
