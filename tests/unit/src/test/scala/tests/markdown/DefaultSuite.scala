@@ -148,6 +148,15 @@ class DefaultSuite extends BaseMarkdownSuite {
       |val y = 2
       |x + y
       |```
+      |
+      |```scala vork:fail
+      |val x: Int = ""
+      |```
+      |
+      |```scala vork:crash
+      |???
+      |```
+      |
       |```scala vork
       |val List(z, zz) = List(3, 4)
       |x + y + z + zz
@@ -166,14 +175,28 @@ class DefaultSuite extends BaseMarkdownSuite {
       |```
       |
       |```scala
+      |@ val x: Int = ""
+      |type mismatch;
+      | found   : String("")
+      | required: Int
+      |val x = 1
+      |         ^
+      |```
+      |
+      |```scala
+      |???
+      |scala.NotImplementedError: an implementation is missing
+      |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
+      |	at repl.Session.$anonfun$app$5(script.md:26)
+      |```
+      |
+      |```scala
       |@ val List(z, zz) = List(3, 4)
-      |z: Int = 3
-      |zz: Int = 4
       |z: Int = 3
       |zz: Int = 4
       |
       |@ x + y + z + zz
-      |res1: Int = 10
+      |res2: Int = 10
       |```
     """.stripMargin
   )

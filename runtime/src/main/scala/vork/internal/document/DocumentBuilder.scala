@@ -51,6 +51,20 @@ trait DocumentBuilder {
       e
     }
 
+    def startStatement(): Unit = {
+      myBinders.clear()
+      myOut.reset()
+    }
+    def endStatement(): Unit = {
+      val out = myOut.toString()
+      myStatements.append(Statement(myBinders.toList, out))
+    }
+    def startSection(): Unit = {
+      myStatements.clear()
+    }
+    def endSection(): Unit = {
+      mySections.append(Section(myStatements.toList))
+    }
     def sect(): Unit = {
       sectionCount += 1
       if (first) {

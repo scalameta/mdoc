@@ -3,11 +3,8 @@ package vork.internal.markdown
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
-import java.io.PrintWriter
 import java.net.URL
 import java.net.URLClassLoader
-import java.net.URLDecoder
-import java.nio.file.Path
 import java.nio.file.Paths
 import scala.meta._
 import scala.meta.inputs.Input
@@ -19,14 +16,13 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
-import scala.util.Try
 import scalafix.v0._
 import vork.Reporter
 import vork.document.CompileResult
 import vork.document.CrashResult
 import vork.document.CrashResult.Crashed
-import vork.document.Section
 import vork.document.Document
+import vork.document.Section
 import vork.document._
 import vork.internal.document.DocumentBuilder
 import vork.internal.document.VorkExceptions
@@ -134,8 +130,13 @@ object MarkdownCompiler {
       reporter: Reporter,
       filename: String
   ): EvaluatedDocument = {
+    val inputs =
+      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default))
+    val instrumented = instrumentSections(inputs)
+    val wrapped = Instrumenter.wrapBody(instrumented)
     renderInputs(
-      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default)),
+      wrapped,
+      inputs,
       compiler,
       reporter,
       filename
@@ -145,14 +146,13 @@ object MarkdownCompiler {
   case class SectionInput(input: Input, source: Source, mod: Modifier)
 
   def renderInputs(
+      instrumented: String,
       sections: List[SectionInput],
       compiler: MarkdownCompiler,
       reporter: Reporter,
       filename: String
   ): EvaluatedDocument = {
-    val instrumented = instrumentSections(sections)
-    val wrapped = Instrumenter.wrapBody(instrumented)
-    val doc = buildDocument(compiler, sections, wrapped, reporter, filename)
+    val doc = buildDocument(compiler, sections, instrumented, reporter, filename)
     val evaluated = EvaluatedDocument(doc, sections)
     evaluated
   }
@@ -237,14 +237,12 @@ object MarkdownCompiler {
                   )
               }
             case Modifier.Default | Modifier.Passthrough =>
-              statement.binders.foreach { binder =>
-                sb.append(binder.name)
-                  .append(": ")
-                  .append(binder.tpe.render)
-                  .append(" = ")
-                  .append(pprint.PPrinter.BlackWhite.apply(binder.value))
-                  .append("\n")
-              }
+              sb.append(binder.name)
+                .append(": ")
+                .append(binder.tpe.render)
+                .append(" = ")
+                .append(pprint.PPrinter.BlackWhite.apply(binder.value))
+                .append("\n")
             case Modifier.Crash =>
               throw new IllegalArgumentException(Modifier.Crash.toString)
             case c: Modifier.Str =>

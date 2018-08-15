@@ -2,52 +2,94 @@ package vork.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import scala.meta.Lit
 import scala.meta.Name
+import scala.meta.Stat
+import scala.meta.inputs.Position
 import vork.internal.cli.Semantics
 import vork.internal.markdown.MarkdownCompiler.Binders
 import vork.internal.markdown.MarkdownCompiler.position
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 
+class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
+  def instrument(): String = {
+    semantics match {
+      case Semantics.REPL => script()
+      case Semantics.Script => script()
+    }
+    out.toString
+  }
+  private val out = new ByteArrayOutputStream()
+  private val sb = new PrintStream(out)
+  private var counter = 0
+  private def freshBinder(): String = {
+    val name = s"res$counter"
+    counter += 1
+    name
+  }
+  private def script(): Unit = {
+    sections.foreach { section =>
+      sb.println("\n$doc.startSection();")
+      section.source.stats.foreach { stat =>
+        sb.println("$doc.startStatement();")
+        printStatement(stat, section.mod, sb)
+        sb.println("\n$doc.endStatement();")
+      }
+      sb.println("$doc.endSection();")
+    }
+  }
+
+  private def printBinder(name: String, pos: Position): Unit = {
+    sb.print(s"; $$doc.binder($name, ${position(pos)})")
+  }
+  private def printStatement(stat: Stat, mod: Modifier, sb: PrintStream): Unit = mod match {
+    case Modifier.Default | Modifier.Passthrough =>
+      val binders = stat match {
+        case Binders(names) =>
+          names.map(name => name -> name.pos)
+        case _ =>
+          val fresh = freshBinder()
+          sb.print(s"val $fresh = ")
+          List(Name(fresh) -> stat.pos)
+      }
+      sb.print(stat.syntax)
+      binders.foreach {
+        case (name, pos) =>
+          printBinder(name.syntax, pos)
+      }
+
+    case Modifier.Fail =>
+      val literal = Instrumenter.stringLiteral(stat.syntax)
+      val binder = freshBinder()
+      sb.append("val ")
+        .append(binder)
+        .append(" = _root_.vork.internal.document.Macros.fail(")
+        .append(literal)
+        .append(", ")
+        .append(position(stat.pos))
+        .append(");")
+      printBinder(binder, stat.pos)
+
+    case Modifier.Crash =>
+      sb.append("$doc.crash(")
+        .append(position(stat.pos))
+        .append(") {\n")
+        .append(stat.syntax)
+        .append("\n}")
+    case Modifier.Str(_, _) =>
+      throw new IllegalArgumentException(stat.syntax)
+  }
+}
 object Instrumenter {
   def instrument(semantics: Semantics, sections: List[SectionInput]): String = {
-    val body = semantics match {
-      case Semantics.REPL => ???
-      case Semantics.Script => script(sections)
-    }
+    val body = new Instrumenter(semantics, sections).instrument()
+    pprint.log(body)
     wrapBody(body)
   }
 
-  def script(sections: List[SectionInput]): String = {
-    val out = new ByteArrayOutputStream()
-    val sb = new PrintStream(out)
-    var i = 0
-    def freshBinder(): String = {
-      val name = s"res$i"
-      i += 1
-      name
-    }
-    sections.foreach { section =>
-      sb.println()
-      sb.println("$doc.sect();")
-      section.source.stats.foreach { stat =>
-        sb.println("$doc.stat();")
-        val binders = stat match {
-          case Binders(names) =>
-            names.map(name => name -> name.pos)
-          case _ =>
-            val fresh = freshBinder()
-            sb.print(s"val $fresh = ")
-            List(Name(fresh) -> stat.pos)
-        }
-        sb.print(stat.syntax)
-        binders.foreach {
-          case (name, pos) =>
-            sb.print(s"; $$doc.binder($name, ${position(pos)})")
-        }
-        sb.println()
-      }
-    }
-    out.toString()
+  def stringLiteral(string: String): String = {
+    import scala.meta.internal.prettyprinters._
+    enquote(string, DoubleQuotes)
   }
 
   def wrapBody(body: String): String = {
