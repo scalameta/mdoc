@@ -1,17 +1,38 @@
-# Vork - markdown worksheets
+# Vork: markdown worksheets
 
 Vork is a documentation tool for Scala inspired by
 [tut](http://tpolecat.github.io/tut/). Like tut, Vork interprets Scala code
 examples in markdown files allowing you to compile markdown documentation as
 part of your build. Distinguishing features of Vork include:
 
-- fast edit/preview workflow: each markdown file is compiled into a single
-  source file and executed as a single program.
+- [good performance](#performance): a tight edit/render/preview feedback loop
+  makes it fun to write documentation.
+- [script semantics](#script-semantics): markdown documents are compiled into
+  regular Scala programs making code examples copy-paste friendly.
+- [good error messages](#good-error-messages): compile errors and crashes are
+  reported with positions of the original markdown source.
 - variable injection: instead of hardcoding constants, use variables like
   `@@VERSION@` to make sure the documentation remains up-to-date.
 - extensible: library APIs expose hooks to customize rendering of code fences.
-- good error messages: compile errors and crashes are reported with positions of
-  the original markdown source.
+
+<!-- TOC -->
+
+- [Vork: markdown worksheets](#vork-markdown-worksheets)
+  - [Quickstart](#quickstart)
+    - [Command-line](#command-line)
+    - [Library](#library)
+  - [Modifiers](#modifiers)
+    - [Default](#default)
+    - [Fail](#fail)
+    - [Crash](#crash)
+    - [Passthrough](#passthrough)
+  - [Key features](#key-features)
+    - [Performance](#performance)
+    - [Good error messages](#good-error-messages)
+    - [Script semantics](#script-semantics)
+  - [Team](#team)
+
+<!-- /TOC -->
 
 ## Quickstart
 
@@ -160,7 +181,23 @@ $table
 ```
 ````
 
-## Error messages
+## Key features
+
+### Performance
+
+Vork is designed to provide a tight edit/render/preview feedback loop. Vork
+achieves good performance through
+
+- [script semantics](#script-semantics): each markdown file compiles into a
+  single Scala program that executes in one run.
+- being incremental: with `--watch`, Vork compiles individual files as they
+  change avoiding unnecessary work re-generating the full site.
+- keeping the compiler hot: with `--watch`, Vork re-uses the same Scala compiler
+  instance for subsequent runs making compilation faster after a few iterations.
+  A medium sized document can go from compiling in ~5 seconds with a cold
+  compiler down to 500ms with a hot compiler.
+
+### Good error messages
 
 Vork tries to report helpful error messages when things go wrong
 
@@ -173,7 +210,7 @@ val noCrash = "success"
 ```
 ````
 
-## Script semantics
+### Script semantics
 
 Vork interprets code fences as normal Scala programs instead of as if they're
 evaluated in the REPL. This behavior is different from tut that interprets
