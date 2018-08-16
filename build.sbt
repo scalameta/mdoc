@@ -1,11 +1,7 @@
 inThisBuild(
   List(
-    scalaVersion := "2.12.4",
+    scalaVersion := "2.12.6",
     organization := "com.geirsson",
-    publishTo := Some {
-      if (version.value.endsWith("-SNAPSHOT")) Opts.resolver.sonatypeSnapshots
-      else Opts.resolver.sonatypeStaging
-    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
@@ -23,27 +19,30 @@ inThisBuild(
         "olafurpg@gmail.com",
         url("https://geirsson.com")
       )
-    ),
-    version ~= { old =>
-      val suffix = if (sys.props.contains("vork.snapshot")) "-SNAPSHOT" else ""
-      old.replace('+', '-') + suffix
-    }
+    )
   )
 )
 
-commands += Command.command("ci-release") { s =>
-  "vork/publishSigned" ::
-    s
+name := "vorkRoot"
+skip in publish := true
+val V = new {
+  val scalameta = "4.0.0-M8"
+  val scalafix = "0.6.0-M14"
 }
 
-lazy val root = project
-  .in(file("."))
-  .settings(name := "vorkRoot")
-  .aggregate(vork)
+lazy val runtime = project
+  .settings(
+    moduleName := "vork-runtime",
+    libraryDependencies ++= List(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+      "com.lihaoyi" %% "pprint" % "0.5.2"
+    )
+  )
 
 lazy val vork = project
   .settings(
-    mainClass in assembly := Some("vork.Cli"),
+    moduleName := "vork",
+    mainClass in assembly := Some("vork.Main"),
     assemblyJarName in assembly := "vork.jar",
     test in assembly := {},
     assemblyMergeStrategy.in(assembly) ~= { old =>
@@ -53,44 +52,55 @@ lazy val vork = project
       }
     },
     fork in run := true,
-    cancelable in Global := true,
-    libraryDependencies ++= List(
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
-      "com.geirsson" %% "metaconfig-core" % "0.6.0",
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.6.0",
-      "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
-      "com.lihaoyi" %% "fansi" % "0.2.5",
-      "com.lihaoyi" %% "pprint" % "0.5.2",
-      "com.lihaoyi" %% "ammonite-ops" % "1.0.3-32-3c3d657",
-      "io.methvin" % "directory-watcher" % "0.4.0",
-      ("com.lihaoyi" %% "ammonite-repl" % "1.0.3-32-3c3d657").cross(CrossVersion.full)
-    ),
-    libraryDependencies ++= List(
-      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
-      "org.scalameta" %% "testkit" % "2.1.7" % Test
-    ),
     buildInfoPackage := "vork.internal",
     buildInfoKeys := Seq[BuildInfoKey](
-      "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
+      version
     ),
-    compile.in(Test) := compile.in(Test).dependsOn(compile.in(testsInput, Compile)).value
+    libraryDependencies ++= List(
+      "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.scalameta" %% "scalameta" % V.scalameta,
+      "com.geirsson" %% "metaconfig-typesafe-config" % "0.8.3",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
+      "com.lihaoyi" %% "fansi" % "0.2.5",
+      "io.methvin" % "directory-watcher" % "0.6.0",
+      "ch.epfl.scala" %% "scalafix-core" % V.scalafix
+    ),
   )
+  .dependsOn(runtime)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val testsInput = project.in(file("tests/input"))
-
-inScope(Global)(
-  Seq(
-    credentials ++= (for {
-      username <- sys.env.get("SONATYPE_USERNAME")
-      password <- sys.env.get("SONATYPE_PASSWORD")
-    } yield
-      Credentials(
-        "Sonatype Nexus Repository Manager",
-        "oss.sonatype.org",
-        username,
-        password
-      )).toSeq,
-    PgpKeys.pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray())
+lazy val testsInput = project
+  .in(file("tests/input"))
+  .settings(
+    skip in publish := true
   )
-)
+
+lazy val unit = project
+  .in(file("tests/unit"))
+  .settings(
+    skip in publish := true,
+    libraryDependencies ++= List(
+      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.0-SNAP10" % Test,
+      "org.scalameta" %% "testkit" % V.scalameta % Test
+    ),
+    // forking causes https://github.com/scalatest/scalatest/issues/556
+    //    fork := true,
+    buildInfoPackage := "tests",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
+    )
+  )
+  .dependsOn(vork, testsInput)
+  .enablePlugins(BuildInfoPlugin)
+
+lazy val website = project
+  .in(file("website"))
+  .settings(
+    test := run.in(Compile).toTask(" test").value,
+    watchSources += baseDirectory.in(ThisBuild).value / "docs",
+    cancelable in Global := true
+  )
+  .dependsOn(vork)
