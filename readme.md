@@ -69,7 +69,7 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 
 ```
-$ coursier launch com.geirsson:vork_2.12:0.1.1+80-b12cdfb6+20180816-0212-SNAPSHOT -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:vork_2.12:<VERSION> -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -80,7 +80,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" %% "vork" % "0.1.1+80-b12cdfb6+20180816-0212-SNAPSHOT"
+libraryDependencies += "com.geirsson" %% "vork" % "<VERSION>"
 ```
 
 Then write a main function that invokes Vork as a library

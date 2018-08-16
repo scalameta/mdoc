@@ -11,6 +11,7 @@ import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
+import scalafix.internal.diff.DiffUtils
 import vork.Reporter
 import vork.internal.io.FileWatcher
 import vork.internal.io.IO
@@ -69,8 +70,25 @@ final class MainOps(
   }
 
   def writePath(file: InputFile, string: String): Unit = {
-    Files.createDirectories(file.out.toNIO.getParent)
-    Files.write(file.out.toNIO, string.getBytes(settings.charset))
+    if (settings.test) {
+      if (!file.out.isFile) return
+      val expected = FileIO.slurp(file.out, settings.charset)
+      pprint.log(expected)
+      if (expected != string) {
+        val filename = file.out.toString()
+        val diff = DiffUtils.unifiedDiff(
+          s"$filename (on disk)",
+          s"$filename (expected output)",
+          expected.lines.toList,
+          string.lines.toList,
+          3
+        )
+        reporter.error(s"--test failed! To fix this problem, re-generate the documentation\n$diff")
+      }
+    } else {
+      Files.createDirectories(file.out.toNIO.getParent)
+      Files.write(file.out.toNIO, string.getBytes(settings.charset))
+    }
   }
 
   def generateCompleteSite(): Unit = {

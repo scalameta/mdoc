@@ -99,7 +99,7 @@ lazy val unit = project
 lazy val website = project
   .in(file("website"))
   .settings(
-    test := run.in(Compile).toTask("").value,
+    test := run.in(Compile).toTask(" test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true
   )

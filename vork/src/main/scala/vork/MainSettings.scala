@@ -42,6 +42,9 @@ final class MainSettings private (
   def withWatch(watch: Boolean): MainSettings = {
     copy(settings.copy(watch = watch))
   }
+  def withTest(test: Boolean): MainSettings = {
+    copy(settings.copy(test = test))
+  }
   def withCharset(charset: Charset): MainSettings = {
     copy(settings.copy(charset = charset))
   }
