@@ -79,7 +79,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" %% "vork" % "0.2.0"
+libraryDependencies += "com.geirsson" % "vork" % "0.2.0" cross CrossVersion.full
 ```
 
 Then write a main function that invokes Vork as a library
