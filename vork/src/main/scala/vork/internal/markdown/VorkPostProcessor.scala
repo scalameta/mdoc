@@ -15,7 +15,6 @@ import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
 import vork.internal.cli.Context
 import vork.internal.document.VorkExceptions
-import vork.internal.markdown.MarkdownCompiler.SectionInput
 import vork.internal.markdown.Modifier._
 import vork.internal.pos.PositionSyntax._
 
@@ -28,7 +27,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       .getOrElse(sys.error(s"Missing DataKey ${Markdown.InputKey}"))
     val (scalaInputs, customInputs) = collectBlockInputs(doc, docInput)
     customInputs.foreach { block =>
-      processCustomInput(doc, block)
+      processStringInput(doc, block)
     }
     if (scalaInputs.nonEmpty) {
       processScalaInputs(doc, scalaInputs, docInput.filename)
@@ -36,7 +35,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     doc
   }
 
-  def processCustomInput(doc: Document, custom: StringBlockInput): Unit = {
+  def processStringInput(doc: Document, custom: StringBlockInput): Unit = {
     val StringBlockInput(block, input, Str(mod, info)) = custom
     try {
       val newText = mod.process(info, input, ctx.reporter)
@@ -50,12 +49,8 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     }
   }
 
-  def processScalaInputs(
-      doc: Document,
-      inputs: List[ScalaBlockInput],
-      filename: String
-  ): Unit = {
-    val code = inputs.map {
+  def processScalaInputs(doc: Document, inputs: List[ScalaBlockInput], filename: String): Unit = {
+    val sectionInputs = inputs.map {
       case ScalaBlockInput(_, input, mod) =>
         import scala.meta._
         dialects.Sbt1(input).parse[Source] match {
@@ -66,21 +61,27 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             SectionInput(input, Source(Nil), mod)
         }
     }
-    val out = Instrumenter.instrument(code)
-    val rendered = MarkdownCompiler.renderInputs(out, code, ctx.compiler, ctx.reporter, filename)
+    val instrumented = Instrumenter.instrument(sectionInputs)
+    val rendered = MarkdownCompiler.buildDocument(
+      ctx.compiler,
+      ctx.reporter,
+      sectionInputs,
+      instrumented,
+      filename
+    )
     rendered.sections.zip(inputs).foreach {
       case (section, ScalaBlockInput(block, _, mod)) =>
         block.setInfo(CharSubSequence.of("scala"))
         mod match {
           case Modifier.Default | Modifier.Fail =>
-            val str = MarkdownCompiler.renderEvaluatedSection(rendered, section, ctx.reporter)
+            val str = Renderer.renderEvaluatedSection(rendered, section, ctx.reporter)
             val content: BasedSequence = CharSubSequence.of(str)
             block.setContent(List(content).asJava)
           case Modifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)
           case Modifier.Crash =>
             val stacktrace =
-              MarkdownCompiler.renderCrashSection(section, ctx.reporter, rendered.edit)
+              Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)
             replaceNodeWithText(doc, block, stacktrace)
           case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)
@@ -100,7 +101,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       doc: Document,
       docInput: Input
   ): (List[ScalaBlockInput], List[StringBlockInput]) = {
-    val InterestingCodeFence = new BlockCollector(ctx, docInput)
+    val InterestingCodeFence = new BlockInput(ctx, docInput)
     val inputs = List.newBuilder[ScalaBlockInput]
     val strings = List.newBuilder[StringBlockInput]
     Markdown.traverse[FencedCodeBlock](doc) {

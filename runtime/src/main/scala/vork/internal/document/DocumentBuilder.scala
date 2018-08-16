@@ -72,7 +72,7 @@ trait DocumentBuilder {
       try {
         Console.withOut(myPs) {
           Console.withErr(myPs) {
-           app()
+            app()
           }
         }
       } catch {

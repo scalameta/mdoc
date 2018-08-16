@@ -10,7 +10,7 @@ import vork.internal.markdown.Modifier.Default
 case class StringBlockInput(block: FencedCodeBlock, input: Input, mod: Str)
 case class ScalaBlockInput(block: FencedCodeBlock, input: Input, mod: Modifier)
 
-class BlockCollector(ctx: Context, baseInput: Input) {
+class BlockInput(ctx: Context, baseInput: Input) {
   def getModifier(block: FencedCodeBlock): Option[Modifier] = {
     val string = block.getInfo.toString
     if (!string.startsWith("scala vork")) None

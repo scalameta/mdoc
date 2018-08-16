@@ -147,4 +147,18 @@ object TokenEditDistance {
         original.pos.text == revised.pos.text
   }
 
+  def toTokenEdit(original: Seq[Tree], instrumented: Input): TokenEditDistance = {
+    val instrumentedTokens = instrumented.tokenize.get
+    val originalTokens: Array[Token] = {
+      val buf = Array.newBuilder[Token]
+      original.foreach { tree =>
+        tree.tokens.foreach { token =>
+          buf += token
+        }
+      }
+      buf.result()
+    }
+    TokenEditDistance(originalTokens, instrumentedTokens)
+  }
+
 }

@@ -2,12 +2,10 @@ package vork.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import scala.meta.Name
-import scala.meta.Stat
+import scala.meta._
 import scala.meta.inputs.Position
-import vork.internal.markdown.MarkdownCompiler.Binders
-import vork.internal.markdown.MarkdownCompiler.position
-import vork.internal.markdown.MarkdownCompiler.SectionInput
+import Instrumenter.position
+import vork.internal.markdown.Instrumenter.Binders
 
 class Instrumenter(sections: List[SectionInput]) {
   def instrument(): String = {
@@ -81,6 +79,10 @@ object Instrumenter {
     wrapBody(body)
   }
 
+  def position(pos: Position): String = {
+    s"${pos.startLine}, ${pos.startColumn}, ${pos.endLine}, ${pos.endColumn}"
+  }
+
   def stringLiteral(string: String): String = {
     import scala.meta.internal.prettyprinters._
     enquote(string, DoubleQuotes)
@@ -97,4 +99,16 @@ object Instrumenter {
       .toString()
     wrapped
   }
+  object Binders {
+    def binders(pat: Pat): List[Name] =
+      pat.collect { case m: Member => m.name }
+    def unapply(tree: Tree): Option[List[Name]] = tree match {
+      case Defn.Val(_, pats, _, _) => Some(pats.flatMap(binders))
+      case Defn.Var(_, pats, _, _) => Some(pats.flatMap(binders))
+      case _: Defn => Some(Nil)
+      case _: Import => Some(Nil)
+      case _ => None
+    }
+  }
+
 }

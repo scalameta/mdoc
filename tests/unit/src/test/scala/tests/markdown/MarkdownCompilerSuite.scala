@@ -5,6 +5,7 @@ import scala.meta._
 import scala.meta.testkit.DiffAssertions
 import vork.internal.io.ConsoleReporter
 import vork.internal.markdown.MarkdownCompiler
+import vork.internal.markdown.Renderer
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
@@ -20,12 +21,7 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val doc = MarkdownCompiler.render(inputs, compiler, reporter, name + ".md")
-      val obtained = doc.sections
-        .map(s => s"""```scala
-                     |${MarkdownCompiler.renderEvaluatedSection(doc, s, reporter)}
-                     |```""".stripMargin)
-        .mkString("\n")
+      val obtained = Renderer.render(inputs, compiler, reporter, name + ".md")
       assertNoDiff(obtained, expected)
     }
   }
