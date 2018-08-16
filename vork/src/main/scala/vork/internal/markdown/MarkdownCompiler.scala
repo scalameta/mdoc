@@ -25,7 +25,6 @@ import vork.document.CrashResult.Crashed
 import vork.document.Document
 import vork.document.Section
 import vork.document._
-import vork.internal.cli.Semantics
 import vork.internal.document.DocumentBuilder
 import vork.internal.document.VorkExceptions
 import vork.internal.pos.PositionSyntax._
@@ -126,7 +125,6 @@ object MarkdownCompiler {
   def default(): MarkdownCompiler = fromClasspath("")
 
   def render(
-      semantics: Semantics,
       sections: List[Input],
       compiler: MarkdownCompiler,
       reporter: Reporter,
@@ -134,7 +132,7 @@ object MarkdownCompiler {
   ): EvaluatedDocument = {
     val inputs =
       sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default))
-    val instrumented = Instrumenter.instrument(semantics, inputs)
+    val instrumented = Instrumenter.instrument(inputs)
     renderInputs(
       instrumented,
       inputs,
@@ -184,6 +182,7 @@ object MarkdownCompiler {
     ps.println("```")
     out.toString()
   }
+
   def renderEvaluatedSection(
       doc: EvaluatedDocument,
       section: EvaluatedSection,

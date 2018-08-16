@@ -41,8 +41,7 @@ case class Settings(
     @Description("Glob to filter which files from --in directory to exclude.")
     excludePath: List[PathMatcher] = Nil,
     site: Map[String, String] = Map.empty,
-    stringModifiers: List[StringModifier] = Nil,
-    semantics: Semantics = Semantics.Script
+    stringModifiers: List[StringModifier] = Nil
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {

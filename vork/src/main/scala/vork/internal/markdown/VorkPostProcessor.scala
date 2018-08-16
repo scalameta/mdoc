@@ -66,7 +66,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             SectionInput(input, Source(Nil), mod)
         }
     }
-    val out = Instrumenter.instrument(ctx.settings.semantics, code)
+    val out = Instrumenter.instrument(code)
     val rendered = MarkdownCompiler.renderInputs(out, code, ctx.compiler, ctx.reporter, filename)
     rendered.sections.zip(inputs).foreach {
       case (section, ScalaBlockInput(block, _, mod)) =>

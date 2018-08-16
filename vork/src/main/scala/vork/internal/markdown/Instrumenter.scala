@@ -2,21 +2,16 @@ package vork.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import scala.meta.Lit
 import scala.meta.Name
 import scala.meta.Stat
 import scala.meta.inputs.Position
-import vork.internal.cli.Semantics
 import vork.internal.markdown.MarkdownCompiler.Binders
 import vork.internal.markdown.MarkdownCompiler.position
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 
-class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
+class Instrumenter(sections: List[SectionInput]) {
   def instrument(): String = {
-    semantics match {
-      case Semantics.REPL => script()
-      case Semantics.Script => script()
-    }
+    printAsScript()
     out.toString
   }
   private val out = new ByteArrayOutputStream()
@@ -27,7 +22,7 @@ class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
     counter += 1
     name
   }
-  private def script(): Unit = {
+  private def printAsScript(): Unit = {
     sections.foreach { section =>
       sb.println("\n$doc.startSection();")
       section.source.stats.foreach { stat =>
@@ -81,8 +76,8 @@ class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
   }
 }
 object Instrumenter {
-  def instrument(semantics: Semantics, sections: List[SectionInput]): String = {
-    val body = new Instrumenter(semantics, sections).instrument()
+  def instrument(sections: List[SectionInput]): String = {
+    val body = new Instrumenter(sections).instrument()
     wrapBody(body)
   }
 
