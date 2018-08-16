@@ -54,7 +54,8 @@ lazy val vork = project
     fork in run := true,
     buildInfoPackage := "vork.internal",
     buildInfoKeys := Seq[BuildInfoKey](
-      version
+      version,
+      "stableVersion" -> "0.2.0"
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
@@ -66,7 +67,7 @@ lazy val vork = project
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "io.methvin" % "directory-watcher" % "0.6.0",
       "ch.epfl.scala" %% "scalafix-core" % V.scalafix
-    ),
+    )
   )
   .dependsOn(runtime)
   .enablePlugins(BuildInfoPlugin)
@@ -99,6 +100,7 @@ lazy val unit = project
 lazy val website = project
   .in(file("website"))
   .settings(
+    skip in publish := true,
     test := run.in(Compile).toTask(" test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true

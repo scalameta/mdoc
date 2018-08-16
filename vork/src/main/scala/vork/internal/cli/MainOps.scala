@@ -73,7 +73,6 @@ final class MainOps(
     if (settings.test) {
       if (!file.out.isFile) return
       val expected = FileIO.slurp(file.out, settings.charset)
-      pprint.log(expected)
       if (expected != string) {
         val filename = file.out.toString()
         val diff = DiffUtils.unifiedDiff(
