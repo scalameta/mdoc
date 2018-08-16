@@ -7,6 +7,10 @@ import vork.document.RangePosition
 
 object PositionSyntax {
   implicit class XtensionInputVork(input: Input) {
+    def filename: String = input match {
+      case s: Input.Slice => s.input.filename
+      case _ => input.syntax
+    }
     def toOffset(line: Int, column: Int): Position = {
       Position.Range(input, line, column, line, column)
     }
@@ -42,7 +46,7 @@ object PositionSyntax {
   implicit class XtensionPositionVork(pos: Position) {
     def toUnslicedPosition: Position = pos.input match {
       case Input.Slice(underlying, a, _) =>
-        Position.Range(underlying, a + pos.start, a + pos.end)
+        Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition
       case _ =>
         pos
     }

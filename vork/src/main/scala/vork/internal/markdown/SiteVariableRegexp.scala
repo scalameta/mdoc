@@ -3,12 +3,13 @@ package vork.internal.markdown
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import vork.Reporter
+import vork.internal.pos.PositionSyntax._
 
 object SiteVariableRegexp {
   private val Variable = """@(\w+)@""".r
   private val defaultReplacements = Map("" -> "@")
   def replaceVariables(
-      input: Input.VirtualFile,
+      input: Input,
       variables: Map[String, String],
       reporter: Reporter
   ): Input.VirtualFile = {
@@ -30,6 +31,6 @@ object SiteVariableRegexp {
         }
       }
     )
-    Input.VirtualFile(input.path, text)
+    Input.VirtualFile(input.filename, text)
   }
 }

@@ -16,7 +16,7 @@ import vork.internal.cli.Context
 import vork.internal.cli.MainOps
 
 object Markdown {
-  val InputKey = new DataKey[Option[Input.VirtualFile]]("scalametaInput", None)
+  val InputKey = new DataKey[Option[Input]]("scalametaInput", None)
   val SiteVariables = new DataKey[Option[Map[String, String]]]("siteVariables", None)
 
   /**
@@ -35,7 +35,8 @@ object Markdown {
       .set(SiteVariables, Some(context.settings.site))
   }
 
-  def toMarkdown(input: Input.VirtualFile, settings: MutableDataSet, reporter: Reporter): String = {
+  def toMarkdown(input: Input, settings: MutableDataSet, reporter: Reporter): String = {
+    settings.set(InputKey, Some(input))
     val variables = settings.get(SiteVariables).getOrElse(Map.empty)
     val textWithVariables = SiteVariableRegexp.replaceVariables(input, variables, reporter)
     settings.set(InputKey, Some(textWithVariables))

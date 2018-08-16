@@ -97,6 +97,116 @@ object Website {
 }
 ```
 
+## Modifiers
+
+Vorks supports several modifiers to control the output of code fences.
+
+### Default
+
+The default modifier compiles and executes the code fence as normal
+
+````scala vork:vork
+```scala vork
+val x = 1
+val y = 2
+x + y
+```
+````
+
+### Fail
+
+The `fail` modifier asserts that the code block will not compile
+
+````scala vork:vork
+```scala vork:fail
+val x: Int = ""
+```
+````
+
+Note that `fail` does not assert that the program compiles but crashes at
+runtime. To assert runtime exceptions, use the `crash` modifier.
+
+### Crash
+
+The `crash` modifier asserts that the code block throws an exception at runtime
+
+````scala vork:vork
+```scala vork:crash
+val y = ???
+```
+````
+
+### Passthrough
+
+The `passthrough` modifier collects the stdout and stderr output from the
+program and embeds it verbatim in the markdown file.
+
+````scala vork:vork
+```scala vork:passthrough
+val matrix = Array.tabulate(4, 4) { (a, b) =>
+  val multiplied = (a + 1) * (b + 1)
+  f"$multiplied%2s"
+}
+val table = matrix.map(_.mkString("| ", " | ", " |")).mkString("\n")
+println(s"""
+This will be rendered as markdown.
+
+* Bullet 1
+* Bullet 2
+
+Look at the table:
+
+$table
+""")
+```
+````
+
+## Error messages
+
+Vork tries to report helpful error messages when things go wrong
+
+````scala vork:vork:crash
+```scala vork:fail
+val noFail = "success"
+```
+```scala vork:crash
+val noCrash = "success"
+```
+````
+
+## Script semantics
+
+Vork interprets code fences as normal Scala programs instead of as if they're
+evaluated in the REPL. This behavior is different from tut that interprets
+statements as if they were typed in a REPL session. Using "script semantics"
+instead of "repl semantics" has both benefits and downsides.
+
+**Downside**: It's not possible to bind the same variable twice, for example the
+code below input fails compilation with Vork but compiles successfully with tut
+
+````
+```scala vork
+val x = 1
+val x = 1
+```
+````
+
+**Downside**: Vork is not a drop-in replacement for tut. If you have an existing
+tut-site that relies on REPL semantics then the code examples need to be
+refactored to avoid duplicate variable names.
+
+**Upside**: Companion objects Just Work™️
+
+````scala vork:vork
+```scala vork
+case class User(name: String)
+object User {
+  implicit val ordering: Ordering[User] = Ordering.by(_.name)
+}
+List(User("John"), User("Susan")).sorted
+```
+````
+
 ## Team
 
 The current maintainers (people who can merge pull requests) are:

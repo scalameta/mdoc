@@ -19,9 +19,6 @@ trait DocumentBuilder {
   private val myOut = new ByteArrayOutputStream()
   private val myPs = new PrintStream(myOut)
   private var lastPosition = RangePosition.empty
-  final def println(a: Any): Unit = myPs.println(a)
-  final def print(a: Any): Unit = myPs.print(a)
-  final def printf(text: String, xs: Any*): Unit = myPs.printf(text.format(xs))
 
   object $doc {
 
@@ -73,7 +70,11 @@ trait DocumentBuilder {
 
     def build(input: InstrumentedInput): Document = {
       try {
-        app()
+        Console.withOut(myPs) {
+          Console.withErr(myPs) {
+           app()
+          }
+        }
       } catch {
         case NonFatal(e) =>
           VorkExceptions.trimStacktrace(e)

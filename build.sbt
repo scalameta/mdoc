@@ -99,6 +99,7 @@ lazy val unit = project
 lazy val website = project
   .in(file("website"))
   .settings(
+    watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true
   )
   .dependsOn(vork)

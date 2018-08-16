@@ -36,7 +36,6 @@ final class MainOps(
       writePath(file, md)
       val end = System.nanoTime()
       val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
-      pprint.log(elapsed)
       reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
     }
   }

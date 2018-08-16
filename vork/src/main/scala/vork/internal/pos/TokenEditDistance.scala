@@ -140,9 +140,6 @@ object TokenEditDistance {
     } yield apply(original, revised)
   }
 
-  def apply(original: String, revised: String): Option[TokenEditDistance] =
-    apply(Input.String(original), Input.String(revised))
-
   /** Compare tokens only by their text and token category. */
   private object TokenEqualizer extends Equalizer[Token] {
     override def equals(original: Token, revised: Token): Boolean =

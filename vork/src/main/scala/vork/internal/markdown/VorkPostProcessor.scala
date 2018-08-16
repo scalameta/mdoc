@@ -17,6 +17,7 @@ import vork.internal.cli.Context
 import vork.internal.document.VorkExceptions
 import vork.internal.markdown.MarkdownCompiler.SectionInput
 import vork.internal.markdown.Modifier._
+import vork.internal.pos.PositionSyntax._
 
 class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
@@ -30,7 +31,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       processCustomInput(doc, block)
     }
     if (scalaInputs.nonEmpty) {
-      processScalaInputs(doc, scalaInputs, docInput.path)
+      processScalaInputs(doc, scalaInputs, docInput.filename)
     }
     doc
   }
@@ -97,7 +98,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
   def collectBlockInputs(
       doc: Document,
-      docInput: Input.VirtualFile
+      docInput: Input
   ): (List[ScalaBlockInput], List[StringBlockInput]) = {
     val InterestingCodeFence = new BlockCollector(ctx, docInput)
     val inputs = List.newBuilder[ScalaBlockInput]

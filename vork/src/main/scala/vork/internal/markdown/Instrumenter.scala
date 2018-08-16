@@ -83,7 +83,6 @@ class Instrumenter(semantics: Semantics, sections: List[SectionInput]) {
 object Instrumenter {
   def instrument(semantics: Semantics, sections: List[SectionInput]): String = {
     val body = new Instrumenter(semantics, sections).instrument()
-//    pprint.log(body)
     wrapBody(body)
   }
 

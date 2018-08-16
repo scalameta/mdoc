@@ -178,7 +178,7 @@ object MarkdownCompiler {
         VorkExceptions.trimStacktrace(e)
         e.printStackTrace(new PrintStream(out))
       case None =>
-        val mpos = section.source.pos
+        val mpos = section.source.pos.toUnslicedPosition
         reporter.error(mpos, "Expected runtime exception but program completed successfully")
     }
     ps.println("```")

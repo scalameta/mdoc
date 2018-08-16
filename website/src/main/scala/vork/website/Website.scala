@@ -8,13 +8,15 @@ import vork.internal.BuildInfo
 
 object Website {
   def main(args: Array[String]): Unit = {
+    val cwd = PathIO.workingDirectory.toNIO
     val settings = MainSettings()
       .withIn(Paths.get("docs"))
-      .withOut(Paths.get("out"))
+      .withOut(cwd)
       .withSiteVariables(Map("VERSION" -> BuildInfo.version))
-      .withWatch(true)
       .withCleanTarget(false)
-    val exitCode = Main.process(settings)
+    val context = settings.settings.validate(settings.reporter).get
+    val stringModifier = new VorkStringModifier(context)
+    val exitCode = Main.process(settings.withStringModifiers(List(stringModifier)))
     sys.exit(exitCode)
   }
 }
