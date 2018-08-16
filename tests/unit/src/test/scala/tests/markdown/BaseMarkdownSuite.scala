@@ -47,7 +47,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       Markdown.toMarkdown(input, getSettings, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
-      assertNoDiff(obtainedErrors, expected)
+      assertNoDiffOrPrintExpected(obtainedErrors, expected)
     }
   }
 
@@ -58,7 +58,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       val obtained = Markdown.toMarkdown(input, getSettings, reporter, settings).trimLineEnds
       val stdout = fansi.Str(myStdout.toString()).plainText
       assert(!reporter.hasErrors, stdout)
-      assertNoDiff(obtained, expected)
+      assertNoDiffOrPrintExpected(obtained, expected)
     }
   }
 }

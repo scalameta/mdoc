@@ -40,11 +40,11 @@ class VariableRegexSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |```scala
-      |@ val x = "1.0"
-      |x: String = "1.0"
+      |val x = "1.0"
+      |// x: String = "1.0"
       |
-      |@ x.length
-      |res0: Int = 3
+      |x.length
+      |// res0: Int = 3
       |```
     """.stripMargin,
   )
