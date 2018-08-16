@@ -1,6 +1,6 @@
 package tests.markdown
 
-class VariableRegexpSuite extends BaseMarkdownSuite {
+class VariableRegexSuite extends BaseMarkdownSuite {
 
   check(
     "basic",
@@ -62,10 +62,10 @@ class VariableRegexpSuite extends BaseMarkdownSuite {
   check(
     "tag-2",
     """
-      |This to @@olafurpg@
+      |This to @@version@
     """.stripMargin,
     """
-      |This to @olafurpg@
+      |This to @version@
     """.stripMargin,
   )
 

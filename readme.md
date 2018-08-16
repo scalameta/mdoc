@@ -7,7 +7,7 @@ part of your build. Distinguishing features of Vork include:
 
 - fast edit/preview workflow: each markdown file is compiled into a single
   source file and executed as a single program.
-- variable injection: use variables like `@0.1.1+77-d672dbb0+20180816-0113-SNAPSHOT` to make sure the
+- variable injection: use variables like `@VERSION@` to make sure the
   documentation always shows the latest version.
 - extensible: library APIs expose hooks to customize rendering of code fences.
 - good error messages: compile errors and crashes are reported with positions of
@@ -69,7 +69,7 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 
 ```
-$ coursier launch com.geirsson:vork_2.12:0.1.1+77-d672dbb0+20180816-0113-SNAPSHOT -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:vork_2.12:0.1.1+80-b12cdfb6+20180816-0212-SNAPSHOT -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -80,7 +80,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" %% "vork" % "0.1.1+77-d672dbb0+20180816-0113-SNAPSHOT"
+libraryDependencies += "com.geirsson" %% "vork" % "0.1.1+80-b12cdfb6+20180816-0212-SNAPSHOT"
 ```
 
 Then write a main function that invokes Vork as a library
