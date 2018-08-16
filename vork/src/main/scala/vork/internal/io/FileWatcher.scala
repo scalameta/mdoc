@@ -5,21 +5,14 @@ import io.methvin.watcher.DirectoryChangeEvent.EventType
 import io.methvin.watcher.DirectoryChangeListener
 import io.methvin.watcher.DirectoryWatcher
 import java.nio.file.Files
-import java.nio.file.Path
 import scala.collection.JavaConverters._
+import scala.meta.io.AbsolutePath
 
 object FileWatcher {
-  def watch(dirs0: Seq[Path], runAction: DirectoryChangeEvent => Unit): Unit = {
-    val dirs = dirs0.distinct
-    val dirsAsJava: java.util.List[Path] = dirs.asJava
-
-    // Report on non-existing source directories
-    val nonExisting = dirs.filterNot(d => Files.exists(d))
-    if (nonExisting.nonEmpty)
-      sys.error(s"Expected existing directories ${nonExisting.mkString(", ")}.")
+  def watch(dir: AbsolutePath, runAction: DirectoryChangeEvent => Unit): Unit = {
 
     val watcher = DirectoryWatcher.create(
-      dirsAsJava,
+      List(dir.toNIO).asJava,
       new DirectoryChangeListener {
         override def onEvent(event: DirectoryChangeEvent): Unit = {
           val targetFile = event.path()
@@ -32,7 +25,8 @@ object FileWatcher {
             }
           }
         }
-      }
+      },
+      true
     )
 
     try watcher.watch()

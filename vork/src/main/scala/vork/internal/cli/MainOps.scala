@@ -1,6 +1,5 @@
 package vork.internal.cli
 
-import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
@@ -37,6 +36,7 @@ final class MainOps(
       writePath(file, md)
       val end = System.nanoTime()
       val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
+      pprint.log(elapsed)
       reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
     }
   }
@@ -47,6 +47,13 @@ final class MainOps(
     reporter.info(s"Copied    ${file.out.toNIO}")
   }
 
+  def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
+    val path = AbsolutePath(event.path())
+    settings.toInputFile(path) match {
+      case Some(inputFile) => handleFile(inputFile)
+      case None => ()
+    }
+  }
   def handleFile(file: InputFile): Unit = {
     try {
       if (!settings.matches(file.relpath)) ()
@@ -79,18 +86,12 @@ final class MainOps(
   }
 
   def run(): Unit = {
-    IO.cleanTarget(settings)
+    if (settings.cleanTarget && Files.exists(settings.out.toNIO)) {
+      IO.cleanTarget(settings.out)
+    }
     generateCompleteSite()
     if (settings.watch) {
-      FileWatcher.watch(
-        List(settings.in.toNIO),
-        (event: DirectoryChangeEvent) => {
-          settings.toInputFile(AbsolutePath(event.path())) match {
-            case Some(inputFile) => handleFile(inputFile)
-            case None => ()
-          }
-        }
-      )
+      FileWatcher.watch(settings.in, handleWatchEvent)
     }
   }
 

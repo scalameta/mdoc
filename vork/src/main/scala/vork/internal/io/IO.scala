@@ -56,8 +56,7 @@ object IO {
     }
   }
 
-  def cleanTarget(options: Settings): Unit = {
-    if (!options.cleanTarget || !Files.exists(options.out.toNIO)) return
-    Files.walkFileTree(options.out.toNIO, deleteVisitor)
+  def cleanTarget(dir: AbsolutePath): Unit = {
+    Files.walkFileTree(dir.toNIO, deleteVisitor)
   }
 }

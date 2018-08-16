@@ -52,6 +52,10 @@ lazy val vork = project
       }
     },
     fork in run := true,
+    buildInfoPackage := "vork.internal",
+    buildInfoKeys := Seq[BuildInfoKey](
+      version
+    ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
@@ -60,11 +64,12 @@ lazy val vork = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.8.3",
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "com.lihaoyi" %% "fansi" % "0.2.5",
-      "io.methvin" % "directory-watcher" % "0.4.0",
+      "io.methvin" % "directory-watcher" % "0.6.0",
       "ch.epfl.scala" %% "scalafix-core" % V.scalafix
     ),
   )
   .dependsOn(runtime)
+  .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project
   .in(file("tests/input"))
@@ -83,7 +88,7 @@ lazy val unit = project
     ),
     // forking causes https://github.com/scalatest/scalatest/issues/556
     //    fork := true,
-    buildInfoPackage := "vork.internal",
+    buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     )

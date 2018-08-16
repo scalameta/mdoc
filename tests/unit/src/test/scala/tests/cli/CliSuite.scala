@@ -22,7 +22,7 @@ class CliSuite extends BaseCliSuite {
     """.stripMargin,
     extraArgs = Array(
       "--classpath",
-      BuildInfo.testsInputClassDirectory.getAbsolutePath
+      tests.BuildInfo.testsInputClassDirectory.getAbsolutePath
     )
   )
 
