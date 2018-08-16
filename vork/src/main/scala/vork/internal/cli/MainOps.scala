@@ -30,7 +30,7 @@ final class MainOps(
     val source = FileIO.slurp(file.in, settings.charset)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(Markdown.InputKey, Some(input))
-    val md = Markdown.toMarkdown(input, markdown, reporter)
+    val md = Markdown.toMarkdown(input, markdown, reporter, settings)
     if (reporter.hasErrors) {
       reporter.error(s"Failed to generate ${file.out}")
     } else {

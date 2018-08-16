@@ -1,9 +1,13 @@
 package vork.internal.pos
 
+import java.nio.file.Paths
 import scala.meta.Input
 import scala.meta.Position
+import scala.meta.io.AbsolutePath
+import scala.meta.io.RelativePath
 import scalafix.internal.util.PositionSyntax._
 import vork.document.RangePosition
+import vork.internal.cli.Settings
 
 object PositionSyntax {
   implicit class XtensionInputVork(input: Input) {
@@ -11,6 +15,15 @@ object PositionSyntax {
       case s: Input.Slice => s.input.filename
       case _ => input.syntax
     }
+    def relativeFilename(sourceroot: AbsolutePath): RelativePath = input match {
+      case s: Input.Slice =>
+        s.input.relativeFilename(sourceroot)
+      case _ =>
+        AbsolutePath(input.syntax).toRelative(sourceroot)
+    }
+    def toFilename(settings: Settings): String =
+      if (settings.reportRelativePaths) Paths.get(input.filename).getFileName.toString
+      else filename
     def toOffset(line: Int, column: Int): Position = {
       Position.Range(input, line, column, line, column)
     }

@@ -13,6 +13,7 @@ import scala.meta.inputs.Input
 import scala.reflect.ClassTag
 import vork.Reporter
 import vork.internal.cli.Context
+import vork.internal.cli.Settings
 
 object Markdown {
   val InputKey = new DataKey[Option[Input]]("scalametaInput", None)
@@ -34,13 +35,18 @@ object Markdown {
       .set(SiteVariables, Some(context.settings.site))
   }
 
-  def toMarkdown(input: Input, settings: MutableDataSet, reporter: Reporter): String = {
-    settings.set(InputKey, Some(input))
-    val variables = settings.get(SiteVariables).getOrElse(Map.empty)
-    val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter)
-    settings.set(InputKey, Some(textWithVariables))
-    val parser = Parser.builder(settings).build
-    val formatter = Formatter.builder(settings).build
+  def toMarkdown(
+      input: Input,
+      markdownSettings: MutableDataSet,
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    markdownSettings.set(InputKey, Some(input))
+    val variables = markdownSettings.get(SiteVariables).getOrElse(Map.empty)
+    val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter, settings)
+    markdownSettings.set(InputKey, Some(textWithVariables))
+    val parser = Parser.builder(markdownSettings).build
+    val formatter = Formatter.builder(markdownSettings).build
     val ast = parser.parse(textWithVariables.text)
     formatter.render(ast)
   }

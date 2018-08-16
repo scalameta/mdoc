@@ -183,7 +183,7 @@ After:
 val y = ???
 scala.NotImplementedError: an implementation is missing
 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
-	at repl.Session.$anonfun$app$1(/Users/ollie/dev/vork/docs/readme.md:8)
+	at repl.Session.$anonfun$app$1(readme.md:8)
 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
 ```
 ````
@@ -253,10 +253,10 @@ val noCrash = "success"
 Error:
 
 ````
-error: /Users/ollie/dev/vork/docs/readme.md:2:1: error: Expected compile error but statement type-checked successfully
+error: readme.md:2:1: error: Expected compile error but statement type-checked successfully
 val noFail = "success"
 ^^^^^^^^^^^^^^^^^^^^^^
-error: /Users/ollie/dev/vork/docs/readme.md:5:1: error: Expected runtime exception but program completed successfully
+error: readme.md:5:1: error: Expected runtime exception but program completed successfully
 val noCrash = "success"
 ^^^^^^^^^^^^^^^^^^^^^^^
 ````

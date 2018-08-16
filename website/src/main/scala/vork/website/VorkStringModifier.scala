@@ -17,7 +17,7 @@ class VorkStringModifier(context: Context) extends StringModifier {
   override def process(info: String, code: Input, reporter: Reporter): String = {
     myStdout.reset()
     myReporter.reset()
-    val markdown = Markdown.toMarkdown(code, markdownSettings, myReporter)
+    val markdown = Markdown.toMarkdown(code, markdownSettings, myReporter, context.settings)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors) {
       if (info != "crash") {

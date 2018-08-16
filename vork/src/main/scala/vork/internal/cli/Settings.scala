@@ -42,7 +42,8 @@ case class Settings(
     excludePath: List[PathMatcher] = Nil,
     site: Map[String, String] = Map.empty,
     stringModifiers: List[StringModifier] = Nil,
-    test: Boolean = false
+    test: Boolean = false,
+    reportRelativePaths: Boolean = false
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {

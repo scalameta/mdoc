@@ -15,6 +15,7 @@ object Website {
       .withSiteVariables(Map("VERSION" -> BuildInfo.version))
       .withCleanTarget(false)
       .withTest(args.toList == List("test"))
+      .withReportRelativePaths(true)
     val context = settings.settings.validate(settings.reporter).get
     val stringModifier = new VorkStringModifier(context)
     val exitCode = Main.process(settings.withStringModifiers(List(stringModifier)))

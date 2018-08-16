@@ -44,7 +44,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name + ".md", original)
-      Markdown.toMarkdown(input, getSettings, reporter)
+      Markdown.toMarkdown(input, getSettings, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
       assertNoDiff(obtainedErrors, expected)
@@ -55,7 +55,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name + ".md", original)
-      val obtained = Markdown.toMarkdown(input, getSettings, reporter).trimLineEnds
+      val obtained = Markdown.toMarkdown(input, getSettings, reporter, settings).trimLineEnds
       val stdout = fansi.Str(myStdout.toString()).plainText
       assert(!reporter.hasErrors, stdout)
       assertNoDiff(obtained, expected)

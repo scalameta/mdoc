@@ -30,7 +30,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       processStringInput(doc, block)
     }
     if (scalaInputs.nonEmpty) {
-      processScalaInputs(doc, scalaInputs, docInput.filename)
+      processScalaInputs(doc, scalaInputs, docInput.toFilename(ctx.settings))
     }
     doc
   }

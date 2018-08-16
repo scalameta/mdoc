@@ -3,6 +3,7 @@ package vork.internal.markdown
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import vork.Reporter
+import vork.internal.cli.Settings
 import vork.internal.pos.PositionSyntax._
 
 object VariableRegex {
@@ -10,7 +11,8 @@ object VariableRegex {
   def replaceVariables(
       input: Input,
       variables: Map[String, String],
-      reporter: Reporter
+      reporter: Reporter,
+      settings: Settings
   ): Input.VirtualFile = {
     val text = Variable.replaceAllIn(
       input.text, { m =>
@@ -29,6 +31,6 @@ object VariableRegex {
         }
       }
     )
-    Input.VirtualFile(input.filename, text)
+    Input.VirtualFile(input.toFilename(settings), text)
   }
 }

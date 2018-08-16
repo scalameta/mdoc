@@ -45,6 +45,9 @@ final class MainSettings private (
   def withTest(test: Boolean): MainSettings = {
     copy(settings.copy(test = test))
   }
+  def withReportRelativePaths(reportRelativePaths: Boolean): MainSettings = {
+    copy(settings.copy(reportRelativePaths = reportRelativePaths))
+  }
   def withCharset(charset: Charset): MainSettings = {
     copy(settings.copy(charset = charset))
   }
