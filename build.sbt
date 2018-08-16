@@ -42,6 +42,7 @@ lazy val runtime = project
 lazy val vork = project
   .settings(
     moduleName := "vork",
+    crossVersion := CrossVersion.full,
     mainClass in assembly := Some("vork.Main"),
     assemblyJarName in assembly := "vork.jar",
     test in assembly := {},
