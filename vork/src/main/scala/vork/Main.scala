@@ -22,12 +22,12 @@ object Main {
   }
   def process(args: Array[String], reporter: Reporter, cwd: Path): Int = {
     val base = Settings.default(AbsolutePath(cwd))
-    val ctx = Settings.fromCliArgs(args.toList, base).andThen(_.validate(reporter))
+    val ctx = Settings.fromCliArgs(args.toList, base)
     MainOps.process(ctx, reporter)
   }
 
   def process(settings: MainSettings): Int = {
-    MainOps.process(settings.settings.validate(settings.reporter), settings.reporter)
+    MainOps.process(Configured.ok(settings.settings), settings.reporter)
   }
 
 }
