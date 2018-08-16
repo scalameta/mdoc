@@ -38,12 +38,12 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
     ),
     """
       |```scala
-      |@ val x = 1.to(10)
-      |x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      |val x = 1.to(10)
+      |// x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
       |```
       |```scala
-      |@ val y = x.length
-      |y: Int = 10
+      |val y = x.length
+      |// y: Int = 10
       |```
     """.stripMargin
   )
@@ -60,15 +60,15 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
     """.stripMargin,
     """
       |```scala
-      |@ val x = {
+      |val x = {
       |  println(42)
       |  System.err.println("err")
       |  println(52)
       |  2
       |}
-      |42
-      |52
-      |x: Int = 2
+      |// 42
+      |// 52
+      |// x: Int = 2
       |```
     """.stripMargin
   )
@@ -78,9 +78,8 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
     """println("hello world!") """,
     """
       |```scala
-      |@ println("hello world!")
-      |hello world!
-      |res0: Unit = ()
+      |println("hello world!")
+      |// hello world!
       |```
       |""".stripMargin
   )

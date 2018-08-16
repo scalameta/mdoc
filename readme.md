@@ -7,8 +7,8 @@ part of your build. Distinguishing features of Vork include:
 
 - fast edit/preview workflow: each markdown file is compiled into a single
   source file and executed as a single program.
-- variable injection: use variables like `@VERSION@` to make sure the
-  documentation always shows the latest version.
+- variable injection: instead of hardcoding constants, use variables like
+  `@VERSION@` to make sure the documentation remains up-to-date.
 - extensible: library APIs expose hooks to customize rendering of code fences.
 - good error messages: compile errors and crashes are reported with positions of
   the original markdown source.
@@ -51,11 +51,10 @@ libraryDependencies += "com" % "lib" % "1.0.0"
 ```
 
 ```scala
-@ val x = 1
-x: Int = 1
-
-@ List(x, x)
-res0: List[Int] = List(1, 1)
+val x = 1
+// x: Int = 1
+List(x, x)
+// res0: List[Int] = List(1, 1)
 ```
 ````
 
@@ -122,14 +121,14 @@ After:
 
 ````
 ```scala
-@ val x = 1
-x: Int = 1
+val x = 1
+// x: Int = 1
 
-@ val y = 2
-y: Int = 2
+val y = 2
+// y: Int = 2
 
-@ x + y
-res0: Int = 3
+x + y
+// res0: Int = 3
 ```
 ````
 
@@ -151,12 +150,12 @@ After:
 
 ````
 ```scala
-@ val x: Int = ""
-type mismatch;
- found   : String("")
- required: Int
 val x: Int = ""
-             ^
+// type mismatch;
+//  found   : String("")
+//  required: Int
+// val x: Int = ""
+//              ^
 ```
 ````
 
@@ -181,10 +180,10 @@ After:
 ````
 ```scala
 val y = ???
-scala.NotImplementedError: an implementation is missing
-	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
-	at repl.Session.$anonfun$app$1(readme.md:8)
-	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
+// scala.NotImplementedError: an implementation is missing
+// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:284)
+// 	at repl.Session.$anonfun$app$1(readme.md:8)
+// 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:12)
 ```
 ````
 
@@ -278,9 +277,8 @@ val x = 1
 ```
 ````
 
-**Downside**: Vork is not a drop-in replacement for tut. If you have an existing
-tut-site that relies on REPL semantics then the code examples need to be
-refactored to avoid duplicate variable names.
+**Upside**: Code examples can be copy-pasted into normal Scala programs and
+compile.
 
 **Upside**: Companion objects Just Work™️
 
@@ -301,12 +299,12 @@ After:
 
 ````
 ```scala
-@ case class User(name: String)
+case class User(name: String)
 
-@ object User { implicit val ordering: Ordering[User] = Ordering.by(_.name) }
+object User { implicit val ordering: Ordering[User] = Ordering.by(_.name) }
 
-@ List(User("John"), User("Susan")).sorted
-res0: List[User] = List(User("John"), User("Susan"))
+List(User("John"), User("Susan")).sorted
+// res0: List[User] = List(User("John"), User("Susan"))
 ```
 ````
 

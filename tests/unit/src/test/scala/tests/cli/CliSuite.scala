@@ -16,8 +16,8 @@ class CliSuite extends BaseCliSuite {
     """
       |/index.md
       |```scala
-      |@ test.Test.greeting
-      |res0: String = "Hello world!"
+      |test.Test.greeting
+      |// res0: String = "Hello world!"
       |```
     """.stripMargin,
     extraArgs = Array(

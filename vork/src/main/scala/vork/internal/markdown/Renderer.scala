@@ -2,6 +2,9 @@ package vork.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.nio.charset.StandardCharsets
 import scala.meta._
 import scala.meta.inputs.Position
 import vork.Reporter
@@ -50,7 +53,10 @@ object Renderer {
     crashes.headOption match {
       case Some(CrashResult.Crashed(e, _)) =>
         VorkExceptions.trimStacktrace(e)
-        e.printStackTrace(new PrintStream(out))
+        val stacktrace = new ByteArrayOutputStream()
+        e.printStackTrace(new PrintStream(stacktrace))
+        appendFreshMultiline(ps, stacktrace.toString())
+        ps.append('\n')
       case None =>
         val mpos = section.source.pos.toUnslicedPosition
         reporter.error(mpos, "Expected runtime exception but program completed successfully")
@@ -59,12 +65,32 @@ object Renderer {
     out.toString()
   }
 
+  def appendMultiline(sb: PrintStream, string: String): Unit = {
+    val isTrailing = string.endsWith("\n")
+    var i = 0
+    val N = if (isTrailing) string.length - 1 else string.length
+    while (i < N) {
+      string.charAt(i) match {
+        case '\n' =>
+          sb.append("\n// ")
+        case ch => sb.append(ch)
+      }
+      i += 1
+    }
+  }
+
+  def appendFreshMultiline(sb: PrintStream, string: String): Unit = {
+    sb.append("// ")
+    appendMultiline(sb, string)
+  }
+
   def renderEvaluatedSection(
       doc: EvaluatedDocument,
       section: EvaluatedSection,
       reporter: Reporter
   ): String = {
-    val sb = new StringBuilder
+    val baos = new ByteArrayOutputStream()
+    val sb = new PrintStream(baos)
     var first = true
     section.section.statements.zip(section.source.stats).foreach {
       case (statement, tree) =>
@@ -73,14 +99,12 @@ object Renderer {
         } else {
           sb.append("\n")
         }
-        sb.append("@ ")
-          .append(tree.syntax)
+        sb.append(tree.syntax)
         if (statement.out.nonEmpty) {
-          sb.append("\n").append(statement.out)
-        }
-        if (sb.charAt(sb.length() - 1) != '\n') {
           sb.append("\n")
+          appendFreshMultiline(sb, statement.out)
         }
+        sb.append("\n")
 
         statement.binders.foreach { binder =>
           section.mod match {
@@ -100,11 +124,11 @@ object Renderer {
                     mpos,
                     s"Expected compile error but statement type-checked successfully"
                   )
-                  sb.append(s"// $tpe")
+                  appendMultiline(sb, tpe)
                 case CompileResult.ParseError(msg, pos) =>
-                  sb.append(pos.formatMessage(doc.edit, msg))
+                  appendFreshMultiline(sb, pos.formatMessage(doc.edit, msg))
                 case CompileResult.TypeError(msg, pos) =>
-                  sb.append(pos.formatMessage(doc.edit, msg))
+                  appendFreshMultiline(sb, pos.formatMessage(doc.edit, msg))
                 case _ =>
                   val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
                   throw new IllegalArgumentException(
@@ -113,12 +137,22 @@ object Renderer {
                   )
               }
             case Modifier.Default | Modifier.Passthrough =>
-              sb.append(binder.name)
-                .append(": ")
-                .append(binder.tpe.render)
-                .append(" = ")
-                .append(pprint.PPrinter.BlackWhite.apply(binder.value))
-                .append("\n")
+              val lines = pprint.PPrinter.BlackWhite.tokenize(binder.value)
+              if (binder.name.startsWith("res") && binder.tpe.render == "Unit") {
+                () // do nothing
+              } else {
+                sb.append("// ")
+                  .append(binder.name)
+                  .append(": ")
+                  .append(binder.tpe.render)
+                  .append(" = ")
+                lines.foreach { lineStr =>
+                  val line = lineStr.plainText
+                  appendMultiline(sb, line)
+                }
+                sb.append("\n")
+              }
+
             case Modifier.Crash =>
               throw new IllegalArgumentException(Modifier.Crash.toString)
             case c: Modifier.Str =>
@@ -126,8 +160,7 @@ object Renderer {
           }
         }
     }
-    if (sb.nonEmpty && sb.last == '\n') sb.setLength(sb.length - 1)
-    sb.toString
+    baos.toString.trim
   }
 
 }

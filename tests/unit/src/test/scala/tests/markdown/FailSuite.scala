@@ -13,12 +13,12 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |```scala
-      |@ val x: Int = "String"
-      |type mismatch;
-      | found   : String("String")
-      | required: Int
       |val x: Int = "String"
-      |             ^
+      |// type mismatch;
+      |//  found   : String("String")
+      |//  required: Int
+      |// val x: Int = "String"
+      |//              ^
       |```
     """.stripMargin
   )
@@ -34,14 +34,14 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin.triplequoted,
     """
       |```scala
-      |@ val y: Int = '''Triplequote
+      |val y: Int = '''Triplequote
       |newlines
       |'''
-      |type mismatch;
-      | found   : String("Triplequote\nnewlines\n")
-      | required: Int
-      |val y: Int = '''Triplequote
-      |             ^
+      |// type mismatch;
+      |//  found   : String("Triplequote\nnewlines\n")
+      |//  required: Int
+      |// val y: Int = '''Triplequote
+      |//              ^
       |```
       |""".stripMargin.triplequoted
   )
