@@ -100,4 +100,24 @@ class CliSuite extends BaseCliSuite {
     }
   )
 
+  checkCli(
+    "help",
+    "",
+    "",
+    extraArgs = Array("--help"),
+    onStdout = { out =>
+      assert(out.contains("Vork is a documentation tool"))
+    }
+  )
+
+  checkCli(
+    "usage",
+    "",
+    "",
+    extraArgs = Array("--usage"),
+    onStdout = { out =>
+      assert(out.contains("vork [<option> ...]"))
+    }
+  )
+
 }

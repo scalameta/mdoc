@@ -114,19 +114,31 @@ final class MainOps(
 }
 
 object MainOps {
-  def process(context: Configured[Context], reporter: Reporter): Int = {
-    context match {
-      case Configured.NotOk(error) =>
-        error.all.foreach(message => reporter.error(message))
-        1
-      case Configured.Ok(ctx) =>
-        val markdown = Markdown.default(ctx)
-        val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
-        runner.run()
-        if (ctx.reporter.hasErrors) {
-          1 // error
-        } else {
-          0
+  def process(settings: Configured[Settings], reporter: Reporter): Int = {
+    settings match {
+      case Configured.Ok(setting) if setting.help =>
+        reporter.println(Settings.help.helpMessage(80))
+        0
+      case Configured.Ok(setting) if setting.usage =>
+        reporter.println(Settings.usage)
+        0
+      case Configured.Ok(setting) if setting.version =>
+        reporter.println(Settings.version)
+        0
+      case els =>
+        els.andThen(_.validate(reporter)) match {
+          case Configured.NotOk(error) =>
+            error.all.foreach(message => reporter.error(message))
+            1
+          case Configured.Ok(ctx) =>
+            val markdown = Markdown.default(ctx)
+            val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
+            runner.run()
+            if (ctx.reporter.hasErrors) {
+              1 // error
+            } else {
+              0
+            }
         }
     }
   }

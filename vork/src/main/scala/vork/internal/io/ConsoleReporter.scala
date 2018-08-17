@@ -44,6 +44,13 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
   def warning(msg: String): Unit = {
     ps.println(myWarning ++ s": $msg")
   }
+
+  override def print(msg: String): Unit = {
+    ps.print(msg)
+  }
+  override def println(msg: String): Unit = {
+    ps.println(msg)
+  }
 }
 
 object ConsoleReporter {

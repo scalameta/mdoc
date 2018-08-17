@@ -11,6 +11,8 @@ trait Reporter {
   def warning(msg: String): Unit
   def info(pos: Position, msg: String): Unit
   def info(msg: String): Unit
+  def print(msg: String): Unit
+  def println(msg: String): Unit
 
   private[vork] def hasErrors: Boolean
   private[vork] def reset(): Unit
