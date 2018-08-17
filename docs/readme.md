@@ -1,5 +1,7 @@
 # Vork: markdown worksheets
 
+[![Build Status](https://travis-ci.org/olafurpg/vork.svg?branch=master)](https://travis-ci.org/olafurpg/vork)
+
 Vork is a documentation tool for Scala inspired by
 [tut](http://tpolecat.github.io/tut/). Like tut, Vork interprets Scala code
 examples in markdown files allowing you to compile markdown documentation as
@@ -90,6 +92,7 @@ Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 
 Add the following dependency to your build
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12)
 ```scala
 // build.sbt
 libraryDependencies += "com.geirsson" % "vork" % "@VERSION@" cross CrossVersion.full
@@ -123,6 +126,7 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12)
 ```
 $ coursier launch com.geirsson:vork_2.12:@VERSION@ -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
