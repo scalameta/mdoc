@@ -56,7 +56,7 @@ lazy val vork = project
     buildInfoPackage := "vork.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
-      "stableVersion" -> "0.2.0"
+      "stableVersion" -> "0.3.0"
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
