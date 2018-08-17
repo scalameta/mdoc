@@ -3,6 +3,8 @@ package vork.internal.cli
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.TimeUnit
 import metaconfig.Configured
@@ -16,12 +18,19 @@ import vork.Reporter
 import vork.internal.io.FileWatcher
 import vork.internal.io.IO
 import vork.internal.markdown.Markdown
+import vork.internal.markdown.MarkdownLinks
+import vork.internal.markdown.MarkdownLinter
 
 final class MainOps(
     settings: Settings,
     markdown: MutableDataSet,
     reporter: Reporter
 ) {
+
+  def lint(): Unit = {
+    val links = MarkdownLinks.fromGeneratedSite(settings, reporter)
+    MarkdownLinter.lint(links, reporter)
+  }
 
   def handleMarkdown(file: InputFile): Unit = synchronized {
     reporter.reset()
@@ -53,6 +62,7 @@ final class MainOps(
       case Some(inputFile) => handleFile(inputFile)
       case None => ()
     }
+    lint()
   }
   def handleFile(file: InputFile): Unit = {
     try {
@@ -92,13 +102,14 @@ final class MainOps(
 
   def generateCompleteSite(): Unit = {
     var isEmpty = true
-    IO.foreachFile(settings) { file =>
+    IO.foreachInputFile(settings) { file =>
       isEmpty = false
       handleFile(file)
     }
     if (isEmpty) {
       reporter.error(s"no input files: ${settings.in}")
     }
+    lint()
   }
 
   def run(): Unit = {
@@ -131,7 +142,7 @@ object MainOps {
             error.all.foreach(message => reporter.error(message))
             1
           case Configured.Ok(ctx) =>
-            val markdown = Markdown.default(ctx)
+            val markdown = Markdown.vorkSettings(ctx)
             val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
             runner.run()
             if (ctx.reporter.hasErrors) {

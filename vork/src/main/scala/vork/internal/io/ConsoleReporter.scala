@@ -13,9 +13,14 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
   private val myWarning = Yellow("warning")
   private val myError = Red("error")
 
+  private var myWarnings = 0
   private var myErrors = 0
+  def hasWarnings: Boolean = myWarnings > 0
   def hasErrors: Boolean = myErrors > 0
-  def reset(): Unit = myErrors = 0
+  def reset(): Unit = {
+    myWarnings = 0
+    myErrors = 0
+  }
 
   def error(throwable: Throwable): Unit = {
     error(Position.None, throwable)
@@ -42,6 +47,7 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
     warning(pos.toUnslicedPosition.formatMessage("warning", msg))
   }
   def warning(msg: String): Unit = {
+    myWarnings += 1
     ps.println(myWarning ++ s": $msg")
   }
 

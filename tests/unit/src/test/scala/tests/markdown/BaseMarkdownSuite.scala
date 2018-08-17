@@ -32,7 +32,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
 
   def getSettings: MutableDataSet = {
     myStdout.reset()
-    val settings = Markdown.default(context)
+    val settings = Markdown.vorkSettings(context)
     settings
   }
 
