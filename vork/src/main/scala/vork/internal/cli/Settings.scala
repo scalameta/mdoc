@@ -127,7 +127,7 @@ object Settings extends MetaconfigScalametaImplicits {
       .andThen(_.as[Settings](decoder(base)))
   }
   def version =
-    s"Vork v${BuildInfo.version}"
+    s"Vork v${BuildInfo.stableVersion}"
   def usage: String =
     """|Usage:   vork [<option> ...]
        |Example: vork --in <path> --out <path> (customize input/output directories)
@@ -176,7 +176,10 @@ object Settings extends MetaconfigScalametaImplicits {
     }
 
   implicit val pathEncoder: ConfEncoder[AbsolutePath] =
-    ConfEncoder.StringEncoder.contramap(_.toString())
+    ConfEncoder.StringEncoder.contramap { path =>
+      if (path == PathIO.workingDirectory) "<current working directory>"
+      else path.toRelative(PathIO.workingDirectory).toString()
+    }
   implicit val pathMatcherEncoder: ConfEncoder[PathMatcher] =
     ConfEncoder.StringEncoder.contramap(_.toString())
   implicit val charsetEncoder: ConfEncoder[Charset] =

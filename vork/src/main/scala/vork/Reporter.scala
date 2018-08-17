@@ -14,6 +14,7 @@ trait Reporter {
   def print(msg: String): Unit
   def println(msg: String): Unit
 
+  private[vork] def hasWarnings: Boolean
   private[vork] def hasErrors: Boolean
   private[vork] def reset(): Unit
 }

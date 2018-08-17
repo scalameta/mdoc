@@ -23,13 +23,17 @@ object VorkExtensions {
     *
     * @return A sequence of extensions to be applied to Flexmark's options.
     */
-  def default(context: Context): java.lang.Iterable[Extension] = {
-    import scala.collection.JavaConverters._
+  def vork(context: Context): List[Extension] = {
+    plain ++ List(
+      VorkParserExtension.create(context),
+      VorkFormatterExtension.create(context.settings)
+    )
+  }
+
+  def plain: List[Extension] = {
     List(
       DefinitionExtension.create(),
       AutolinkExtension.create(),
-      VorkParserExtension.create(context),
-      VorkFormatterExtension.create(context.settings),
       TablesExtension.create(),
       EmojiExtension.create(),
       FootnoteExtension.create(),
@@ -37,8 +41,8 @@ object VorkExtensions {
       TocExtension.create(),
       InsExtension.create(),
       SimTocExtension.create(),
-      WikiLinkExtension.create(),
-    ).asJava
+      WikiLinkExtension.create()
+    )
   }
 
 }

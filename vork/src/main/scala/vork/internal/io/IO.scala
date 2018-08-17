@@ -13,7 +13,7 @@ import vork.internal.cli.Settings
 
 object IO {
 
-  def foreachFile(settings: Settings)(fn: InputFile => Unit): Unit = {
+  def foreachInputFile(settings: Settings)(fn: InputFile => Unit): Unit = {
     implicit val cwd = settings.cwd
     val root = settings.in.toNIO
     val visitor = new SimpleFileVisitor[Path] {
