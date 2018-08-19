@@ -17,6 +17,7 @@ object Website {
       .withCleanTarget(false)
       .withTest(isTest)
       .withReportRelativePaths(true)
+      .withWatch(true)
     val context = settings.settings.validate(settings.reporter).get
     val stringModifier = new VorkStringModifier(context)
     val exitCode = Main.process(settings.withStringModifiers(List(stringModifier)))

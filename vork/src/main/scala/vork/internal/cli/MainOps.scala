@@ -3,9 +3,8 @@ package vork.internal.cli
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import metaconfig.Configured
 import scala.meta.Input
@@ -15,8 +14,8 @@ import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scalafix.internal.diff.DiffUtils
 import vork.Reporter
-import vork.internal.io.FileWatcher
 import vork.internal.io.IO
+import vork.internal.io.VorkFileListener
 import vork.internal.markdown.Markdown
 import vork.internal.markdown.MarkdownLinks
 import vork.internal.markdown.MarkdownLinter
@@ -33,6 +32,7 @@ final class MainOps(
   }
 
   def handleMarkdown(file: InputFile): Unit = synchronized {
+    clearScreen()
     reporter.reset()
     reporter.info(s"Compiling ${file.in}")
     val start = System.nanoTime()
@@ -47,6 +47,7 @@ final class MainOps(
       val end = System.nanoTime()
       val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
       reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
+      waitingForFileChanges()
     }
   }
 
@@ -56,14 +57,6 @@ final class MainOps(
     reporter.info(s"Copied    ${file.out.toNIO}")
   }
 
-  def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
-    val path = AbsolutePath(event.path())
-    settings.toInputFile(path) match {
-      case Some(inputFile) => handleFile(inputFile)
-      case None => ()
-    }
-    lint()
-  }
   def handleFile(file: InputFile): Unit = {
     try {
       if (!settings.matches(file.relpath)) ()
@@ -117,8 +110,35 @@ final class MainOps(
       IO.cleanTarget(settings.out)
     }
     generateCompleteSite()
+    runFileWatcher()
+  }
+
+  def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
+    val path = AbsolutePath(event.path())
+    settings.toInputFile(path) match {
+      case Some(inputFile) => handleFile(inputFile)
+      case None => ()
+    }
+    lint()
+  }
+
+  def runFileWatcher(): Unit = {
     if (settings.watch) {
-      FileWatcher.watch(settings.in, handleWatchEvent)
+      val executor = Executors.newFixedThreadPool(1)
+      val watcher = VorkFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
+      watcher.watchUntilInterrupted()
+    }
+  }
+
+  def clearScreen(): Unit = {
+    if (settings.watch) {
+      print("\033[H\033[2J")
+    }
+  }
+
+  def waitingForFileChanges(): Unit = {
+    if (settings.watch) {
+      reporter.println(s"Waiting for file changes (press enter to interrupt)")
     }
   }
 
