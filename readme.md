@@ -7,16 +7,18 @@ Vork is a documentation tool for Scala inspired by
 examples in markdown files allowing you to compile markdown documentation as
 part of your build. Distinguishing features of Vork include:
 
-- [good performance](#performance): a tight edit/render/preview feedback loop
-  makes it fun to write documentation.
+- [good performance](#performance): incremental, hot compilation gives you
+  snappy feedback while writing documentation.
 - [script semantics](#script-semantics): markdown documents are compiled into
-  regular Scala programs making code examples copy-paste friendly.
+  normal Scala programs making examples copy-paste friendly.
 - [good error messages](#good-error-messages): compile errors and crashes are
-  reported with positions of the original markdown source.
-- [link hygiene](#link-hygiene): compile errors and crashes are reported with
-  positions of the original markdown source.
-- variable injection: instead of hardcoding constants, use variables like
-  `@VERSION@` to make sure the documentation remains up-to-date.
+  reported with positions of the original markdown source making it easy to
+  track down where things went wrong.
+- [link hygiene](#link-hygiene): catch broken links to non-existing sections
+  while generating the site.
+- variable injection: instead of hardcoding constants like versions numbers, use
+  variables like `@VERSION@` to make sure the documentation stays up-to-date
+  with new releases.
 - extensible: library APIs expose hooks to customize rendering of code fences.
 
 Table of contents:
@@ -98,7 +100,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" % "vork" % "0.2.0" cross CrossVersion.full
+libraryDependencies += "com.geirsson" % "vork" % "0.3.0" cross CrossVersion.full
 ```
 
 Then write a main function that invokes Vork as a library
@@ -118,8 +120,8 @@ object Website {
 ```
 
 Consult the Vork
-[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/0.2.0) to
-learn more how to use the library API. Note that code in the package
+[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/0.3.0)
+to learn more how to use the library API. Note that code in the package
 `vork.internal` is subject to binary and source breaking changes between any
 release, including PATCH versions.
 
@@ -132,7 +134,7 @@ Then run the following command:
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
 
 ```
-$ coursier launch com.geirsson:vork_2.12.6:0.2.0 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:vork_2.12.6:0.3.0 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -371,7 +373,7 @@ Link to [old section](#doesnotexist).
 Error:
 
 ````
-warning: readme.md:263:9: warning: Section '#doesnotexist' does not exist
+warning: readme.md:267:9: warning: Section '#doesnotexist' does not exist
 Link to [old section](#doesnotexist).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ````
@@ -438,7 +440,7 @@ Contributions are welcome!
 ## --help
 
 ```
-Vork v0.2.0
+Vork v0.3.0
 Usage:   vork [<option> ...]
 Example: vork --in <path> --out <path> (customize input/output directories)
          vork --watch                  (watch for file changes)

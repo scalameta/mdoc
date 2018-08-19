@@ -7,16 +7,18 @@ Vork is a documentation tool for Scala inspired by
 examples in markdown files allowing you to compile markdown documentation as
 part of your build. Distinguishing features of Vork include:
 
-- [good performance](#performance): a tight edit/render/preview feedback loop
-  makes it fun to write documentation.
+- [good performance](#performance): incremental, hot compilation gives you
+  snappy feedback while writing documentation.
 - [script semantics](#script-semantics): markdown documents are compiled into
-  regular Scala programs making code examples copy-paste friendly.
+  normal Scala programs making examples copy-paste friendly.
 - [good error messages](#good-error-messages): compile errors and crashes are
-  reported with positions of the original markdown source.
-- [link hygiene](#link-hygiene): compile errors and crashes are reported with
-  positions of the original markdown source.
-- variable injection: instead of hardcoding constants, use variables like
-  `@@VERSION@` to make sure the documentation remains up-to-date.
+  reported with positions of the original markdown source making it easy to
+  track down where things went wrong.
+- [link hygiene](#link-hygiene): catch broken links to non-existing sections
+  while generating the site.
+- variable injection: instead of hardcoding constants like versions numbers, use
+  variables like `@@VERSION@` to make sure the documentation stays up-to-date
+  with new releases.
 - extensible: library APIs expose hooks to customize rendering of code fences.
 
 Table of contents:
@@ -93,6 +95,7 @@ Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 Add the following dependency to your build
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
+
 ```scala
 // build.sbt
 libraryDependencies += "com.geirsson" % "vork" % "@VERSION@" cross CrossVersion.full
@@ -115,8 +118,8 @@ object Website {
 ```
 
 Consult the Vork
-[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/@VERSION@) to
-learn more how to use the library API. Note that code in the package
+[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/@VERSION@)
+to learn more how to use the library API. Note that code in the package
 `vork.internal` is subject to binary and source breaking changes between any
 release, including PATCH versions.
 
@@ -127,6 +130,7 @@ First, install the
 Then run the following command:
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
+
 ```
 $ coursier launch com.geirsson:vork_2.12.6:@VERSION@ -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
