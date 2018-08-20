@@ -100,7 +100,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" % "vork" % "0.3.0" cross CrossVersion.full
+libraryDependencies += "com.geirsson" % "vork" % "0.3.1" cross CrossVersion.full
 ```
 
 Then write a main function that invokes Vork as a library
@@ -120,7 +120,7 @@ object Website {
 ```
 
 Consult the Vork
-[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/0.3.0)
+[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/0.3.1)
 to learn more how to use the library API. Note that code in the package
 `vork.internal` is subject to binary and source breaking changes between any
 release, including PATCH versions.
@@ -134,7 +134,7 @@ Then run the following command:
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
 
 ```
-$ coursier launch com.geirsson:vork_2.12.6:0.3.0 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:vork_2.12.6:0.3.1 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -440,7 +440,7 @@ Contributions are welcome!
 ## --help
 
 ```
-Vork v0.3.0
+Vork v0.3.1
 Usage:   vork [<option> ...]
 Example: vork --in <path> --out <path> (customize input/output directories)
          vork --watch                  (watch for file changes)
