@@ -1,5 +1,6 @@
 package vork
 
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.Path
 import java.nio.file.PathMatcher
@@ -53,6 +54,9 @@ final class MainSettings private (
   }
   def withReporter(reporter: Reporter): MainSettings = {
     copy(reporter = reporter)
+  }
+  def withInputStream(inputStream: InputStream): MainSettings = {
+    copy(settings.copy(inputStream = inputStream))
   }
 
   private[this] implicit def cwd: AbsolutePath = settings.cwd

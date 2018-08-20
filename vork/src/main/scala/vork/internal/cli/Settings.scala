@@ -1,5 +1,6 @@
 package vork.internal.cli
 
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.charset.IllegalCharsetNameException
 import java.nio.charset.StandardCharsets
@@ -82,7 +83,10 @@ case class Settings(
     @Description("The working directory to use for making relative paths absolute.")
     cwd: AbsolutePath,
     @Hidden()
-    stringModifiers: List[StringModifier] = Nil
+    stringModifiers: List[StringModifier] = Nil,
+    @Hidden()
+    @Description("The input stream to listen for enter key during file watching.")
+    inputStream: InputStream = System.in
 ) {
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
@@ -174,6 +178,8 @@ object Settings extends MetaconfigScalametaImplicits {
           ConfError.message(s"Charset name '$str' is illegal").notOk
       }
     }
+  implicit val inputStreamDecoder: ConfDecoder[InputStream] =
+    ConfDecoder.stringConfDecoder.map(_ => System.in)
 
   implicit val pathEncoder: ConfEncoder[AbsolutePath] =
     ConfEncoder.StringEncoder.contramap { path =>
@@ -184,5 +190,7 @@ object Settings extends MetaconfigScalametaImplicits {
     ConfEncoder.StringEncoder.contramap(_.toString())
   implicit val charsetEncoder: ConfEncoder[Charset] =
     ConfEncoder.StringEncoder.contramap(_.name())
+  implicit val inputStreamEncoder: ConfEncoder[InputStream] =
+    ConfEncoder.StringEncoder.contramap(_ => "<input stream>")
 
 }
