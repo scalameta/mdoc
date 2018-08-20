@@ -78,7 +78,6 @@ object MarkdownLinks {
     val ast = parser.parse(input.text)
     val definitions = List.newBuilder[String]
     val links = List.newBuilder[MarkdownReference]
-    val reluri = relpath.toURI(false).toString
     Markdown.foreach(ast) {
       case heading: Heading =>
         definitions += HeaderIdGenerator.generateId(heading.getText, dashChars, false)
