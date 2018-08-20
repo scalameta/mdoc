@@ -11,6 +11,7 @@ import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.ext.toc.SimTocExtension
 import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.ext.wikilink.WikiLinkExtension
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension
 import vork.internal.cli.Context
 
 object VorkExtensions {
@@ -32,6 +33,7 @@ object VorkExtensions {
 
   def plain: List[Extension] = {
     List(
+      YamlFrontMatterExtension.create(),
       DefinitionExtension.create(),
       AutolinkExtension.create(),
       TablesExtension.create(),
