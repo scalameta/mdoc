@@ -131,8 +131,8 @@ object Settings extends MetaconfigScalametaImplicits {
       .parseCliArgs[Settings](args)
       .andThen(_.as[Settings](decoder(base)))
   }
-  def version =
-    s"Mdoc v${BuildInfo.stableVersion}"
+  def version(displayVersion: String) =
+    s"Mdoc v$displayVersion"
   def usage: String =
     """|Usage:   mdoc [<option> ...]
        |Example: mdoc --in <path> --out <path> (customize input/output directories)
@@ -146,8 +146,9 @@ object Settings extends MetaconfigScalametaImplicits {
          |code fences allowing you to compile and test documentation as part your build.
          |""".stripMargin
     )
-  def help: HelpMessage[Settings] =
-    new HelpMessage[Settings](default(PathIO.workingDirectory), version, usage, description)
+  def help(displayVersion: String, width: Int): String =
+    new HelpMessage[Settings](default(PathIO.workingDirectory), version(displayVersion), usage, description)
+      .helpMessage(width)
   implicit val surface: Surface[Settings] =
     generic.deriveSurface[Settings]
   implicit val encoder: ConfEncoder[Settings] =

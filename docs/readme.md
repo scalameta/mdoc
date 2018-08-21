@@ -401,6 +401,6 @@ Contributions are welcome!
 
 ````scala mdoc:passthrough
 println("```")
-println(mdoc.internal.cli.Settings.help.helpMessage(80))
+println(mdoc.internal.cli.Settings.help(mdoc.internal.BuildInfo.stableVersion, 80))
 println("```")
 ````

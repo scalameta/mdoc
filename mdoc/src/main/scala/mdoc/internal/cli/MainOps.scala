@@ -14,6 +14,7 @@ import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scalafix.internal.diff.DiffUtils
 import mdoc.Reporter
+import mdoc.internal.BuildInfo
 import mdoc.internal.io.IO
 import mdoc.internal.io.MdocFileListener
 import mdoc.internal.markdown.Markdown
@@ -148,13 +149,13 @@ object MainOps {
   def process(settings: Configured[Settings], reporter: Reporter): Int = {
     settings match {
       case Configured.Ok(setting) if setting.help =>
-        reporter.println(Settings.help.helpMessage(80))
+        reporter.println(Settings.help(BuildInfo.version, 80))
         0
       case Configured.Ok(setting) if setting.usage =>
         reporter.println(Settings.usage)
         0
       case Configured.Ok(setting) if setting.version =>
-        reporter.println(Settings.version)
+        reporter.println(Settings.version(BuildInfo.version))
         0
       case els =>
         els.andThen(_.validate(reporter)) match {
