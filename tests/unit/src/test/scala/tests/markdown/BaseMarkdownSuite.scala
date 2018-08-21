@@ -8,15 +8,15 @@ import scala.meta.inputs.Input
 import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
 import tests.markdown.StringSyntax._
-import vork.internal.cli.Context
-import vork.internal.cli.MainOps
-import vork.internal.cli.Settings
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.Markdown
-import vork.internal.markdown.MarkdownCompiler
+import mdoc.internal.cli.Context
+import mdoc.internal.cli.MainOps
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.Markdown
+import mdoc.internal.markdown.MarkdownCompiler
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
-  private val tmp = AbsolutePath(Files.createTempDirectory("vork"))
+  private val tmp = AbsolutePath(Files.createTempDirectory("mdoc"))
   protected def settings: Settings =
     Settings
       .default(tmp)
@@ -32,7 +32,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
 
   def getSettings: MutableDataSet = {
     myStdout.reset()
-    val settings = Markdown.vorkSettings(context)
+    val settings = Markdown.mdocSettings(context)
     settings
   }
 

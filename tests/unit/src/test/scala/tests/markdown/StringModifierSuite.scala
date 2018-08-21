@@ -2,9 +2,9 @@ package tests.markdown
 
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import vork.StringModifier
-import vork.Reporter
-import vork.internal.cli.Settings
+import mdoc.StringModifier
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
 
 class StringModifierSuite extends BaseMarkdownSuite {
   override def settings: Settings = super.settings.copy(
@@ -36,7 +36,7 @@ class StringModifierSuite extends BaseMarkdownSuite {
   check(
     "hello-world",
     """
-      |```scala vork:hello:world!
+      |```scala mdoc:hello:world!
       |Hello
       |```
     """.stripMargin,
@@ -48,7 +48,7 @@ class StringModifierSuite extends BaseMarkdownSuite {
   checkError(
     "reporter",
     """
-      |```scala vork:reporter
+      |```scala mdoc:reporter
       |hello
       |```
     """.stripMargin,
@@ -62,7 +62,7 @@ class StringModifierSuite extends BaseMarkdownSuite {
   checkError(
     "exception",
     """
-      |```scala vork:exception:boom
+      |```scala mdoc:exception:boom
       |hello
       |```
     """.stripMargin,
@@ -70,7 +70,7 @@ class StringModifierSuite extends BaseMarkdownSuite {
       |error: exception.md:3:1: error: exception
       |hello
       |^^^^^
-      |vork.internal.markdown.StringModifierException: exception
+      |mdoc.internal.markdown.StringModifierException: exception
       |Caused by: java.lang.IllegalArgumentException: boom
       |	at tests.markdown.StringModifierSuite$$anon$3.process(StringModifierSuite.scala:30)
     """.stripMargin

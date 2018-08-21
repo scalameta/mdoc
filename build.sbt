@@ -5,7 +5,7 @@ inThisBuild(
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
-    homepage := Some(url("https://github.com/olafurpg/vork")),
+    homepage := Some(url("https://github.com/olafurpg/mdoc")),
     developers := List(
       Developer(
         "jvican",
@@ -23,7 +23,7 @@ inThisBuild(
   )
 )
 
-name := "vorkRoot"
+name := "mdocRoot"
 skip in publish := true
 val V = new {
   val scalameta = "4.0.0-M8"
@@ -32,19 +32,19 @@ val V = new {
 
 lazy val runtime = project
   .settings(
-    moduleName := "vork-runtime",
+    moduleName := "mdoc-runtime",
     libraryDependencies ++= List(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
       "com.lihaoyi" %% "pprint" % "0.5.2"
     )
   )
 
-lazy val vork = project
+lazy val mdoc = project
   .settings(
-    moduleName := "vork",
+    moduleName := "mdoc",
     crossVersion := CrossVersion.full,
-    mainClass in assembly := Some("vork.Main"),
-    assemblyJarName in assembly := "vork.jar",
+    mainClass in assembly := Some("mdoc.Main"),
+    assemblyJarName in assembly := "mdoc.jar",
     test in assembly := {},
     assemblyMergeStrategy.in(assembly) ~= { old =>
       {
@@ -53,7 +53,7 @@ lazy val vork = project
       }
     },
     fork in run := true,
-    buildInfoPackage := "vork.internal",
+    buildInfoPackage := "mdoc.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
       "stableVersion" -> "0.3.1"
@@ -95,7 +95,7 @@ lazy val unit = project
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     )
   )
-  .dependsOn(vork, testsInput)
+  .dependsOn(mdoc, testsInput)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val website = project
@@ -106,4 +106,4 @@ lazy val website = project
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true
   )
-  .dependsOn(vork)
+  .dependsOn(mdoc)

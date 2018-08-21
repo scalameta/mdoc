@@ -33,7 +33,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
   check(
     "eval",
     """
-      |```scala vork
+      |```scala mdoc
       |val x = "@version@"
       |x.length // should match "1.0".length
       |```

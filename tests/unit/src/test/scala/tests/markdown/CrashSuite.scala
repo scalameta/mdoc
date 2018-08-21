@@ -4,7 +4,7 @@ class CrashSuite extends BaseMarkdownSuite {
   check(
     "basic",
     """
-      |```scala vork:crash
+      |```scala mdoc:crash
       |val x = 1
       |???
       |```
@@ -23,7 +23,7 @@ class CrashSuite extends BaseMarkdownSuite {
   checkError(
     "definition",
     """
-      |```scala vork:crash
+      |```scala mdoc:crash
       |case class User(name: String)
       |```
     """.stripMargin,
@@ -37,7 +37,7 @@ class CrashSuite extends BaseMarkdownSuite {
   checkError(
     "false-positive",
     """
-      |```scala vork:crash
+      |```scala mdoc:crash
       |"ab".length
       |```
   """.stripMargin,

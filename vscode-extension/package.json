@@ -1,9 +1,9 @@
 {
-  "name": "vork",
-  "displayName": "vork",
+  "name": "mdoc",
+  "displayName": "mdoc",
   "description": "Markdown Scala Worksheets",
   "version": "0.0.1",
-  "publisher": "vork",
+  "publisher": "mdoc",
   "engines": {
     "vscode": "^1.19.0"
   },

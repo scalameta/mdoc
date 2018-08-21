@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
-import vork.Main
+import mdoc.Main
 
 case class CliFixture(in: Path, out: Path)
 
@@ -26,7 +26,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
     test(name) {
       myStdout.reset()
       val in = StringFS.fromString(original)
-      val out = Files.createTempDirectory("vork")
+      val out = Files.createTempDirectory("mdoc")
       setup(CliFixture(in.toNIO, out))
       val args = Array[String](
         "--in",

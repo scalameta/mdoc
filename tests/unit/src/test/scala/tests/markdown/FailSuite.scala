@@ -7,7 +7,7 @@ class FailSuite extends BaseMarkdownSuite {
   check(
     "mismatch",
     """
-      |```scala vork:fail
+      |```scala mdoc:fail
       |val x: Int = "String"
       |```
     """.stripMargin,
@@ -26,7 +26,7 @@ class FailSuite extends BaseMarkdownSuite {
   check(
     "triplequote",
     """
-      |```scala vork:fail
+      |```scala mdoc:fail
       |val y: Int = '''Triplequote
       |newlines
       |'''
@@ -49,7 +49,7 @@ class FailSuite extends BaseMarkdownSuite {
   checkError(
     "fail-error",
     """
-      |```scala vork
+      |```scala mdoc
       |foobar
       |```
     """.stripMargin,
@@ -63,7 +63,7 @@ class FailSuite extends BaseMarkdownSuite {
   checkError(
     "fail-success",
     """
-      |```scala vork:fail
+      |```scala mdoc:fail
       |1.to(2)
       |```
     """.stripMargin,
@@ -78,11 +78,11 @@ class FailSuite extends BaseMarkdownSuite {
   checkError(
     "mixed-error",
     """
-      |```scala vork
+      |```scala mdoc
       |val x = foobar
       |```
       |
-      |```scala vork:fail
+      |```scala mdoc:fail
       |1.to(2)
       |```
     """.stripMargin,

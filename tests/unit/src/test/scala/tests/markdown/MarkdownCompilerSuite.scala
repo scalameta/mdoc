@@ -3,9 +3,9 @@ package tests.markdown
 import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.MarkdownCompiler
-import vork.internal.markdown.Renderer
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.Renderer
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
