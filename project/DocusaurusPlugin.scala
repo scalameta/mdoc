@@ -17,9 +17,10 @@ object DocusaurusPlugin extends AutoPlugin {
     val userName = s"$travisBuildNumber@$traviscommit"
     val githubDeployKey = env("GITHUB_DEPLOY_KEY")
     val ssh = file(sys.props("user.home")) / ".ssh"
+    val knownHosts = ssh / "known_hosts"
     ssh.mkdirs()
     "mkdir -p $HOME/.ssh".!
-    "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts".!
+    (s"ssh-keyscan -t rsa github.com" #>> knownHosts).!
     s"git config --global user.email '$email'".!
     s"git config --global user.name '$userName'".!
     "git config --global push.default simple".!
