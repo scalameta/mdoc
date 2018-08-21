@@ -3,8 +3,11 @@ package ghpages
 import sbt.Keys._
 import sbt._
 import sys.process._
+import sbt.plugins.JvmPlugin
 
 object Ghpages extends AutoPlugin {
+  override def trigger = allRequirements
+  override def requires = JvmPlugin
   def installGithubToken(): Unit = {
     println("Setting up ssh...")
     val email = sys.env("USER_EMAIL")
