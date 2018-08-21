@@ -5,14 +5,17 @@ import sbt._
 import sys.process._
 import sbt.plugins.JvmPlugin
 
-object Ghpages extends AutoPlugin {
+object DocusaurusPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = JvmPlugin
   def installGithubToken(): Unit = {
     println("Setting up ssh...")
-    val email = sys.env("USER_EMAIL")
-    val userName = sys.env("USER_NAME")
-    val githubDeployKey = sys.env("GITHUB_DEPLOY_KEY")
+    val env = sys.env
+    val email = env("USER_EMAIL")
+    val travisBuildNumber = env("TRAVIS_BUILD_NUMBER")
+    val traviscommit = env("TRAVIS_COMMIT")
+    val userName = s"$travisBuildNumber@$traviscommit"
+    val githubDeployKey = env("GITHUB_DEPLOY_KEY")
     val ssh = file(sys.props("user.home")) / ".ssh"
     ssh.mkdirs()
     "mkdir -p $HOME/.ssh".!
