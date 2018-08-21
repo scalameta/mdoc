@@ -16,10 +16,11 @@ part of your build. Distinguishing features of mdoc include:
   track down where things went wrong.
 - [link hygiene](#link-hygiene): catch broken links to non-existing sections
   while generating the site.
-- variable injection: instead of hardcoding constants like versions numbers, use
-  variables like `@VERSION@` to make sure the documentation stays up-to-date
-  with new releases.
-- extensible: library APIs expose hooks to customize rendering of code fences.
+- [variable injection](#variable-injection): instead of hardcoding constants
+  like versions numbers, use variables like `@VERSION@` to make sure the
+  documentation stays up-to-date with new releases.
+- [extensible](#extensible): library APIs expose hooks to customize rendering of
+  code fences.
 
 Table of contents:
 
@@ -38,6 +39,8 @@ Table of contents:
   - [Good error messages](#good-error-messages)
   - [Link hygiene](#link-hygiene)
   - [Script semantics](#script-semantics)
+  - [Variable injection](#variable-injection)
+  - [Extensible](#extensible)
 - [Team](#team)
 - [--help](#--help)
 
@@ -430,6 +433,127 @@ List(User("John"), User("Susan")).sorted
 ```
 ````
 
+
+### Variable injection
+
+Mdoc renders constants like `0.3.1` in markdown with variables provided at
+runtime. This makes it easy to keep documentation up-to-date as new releases are
+published. Variables can be passed from the command-line interface with the
+syntax
+
+```
+mdoc --site.VERSION 1.0.0 --site.SCALA_VERSION 2.12.6
+```
+
+When using the library API, variables are passed with the
+`MainSettings.withSiteVariables(Map[String, String])` method
+
+```scala
+val settings = mdoc.MainSettings()
+  .withSiteVariables(Map(
+    "VERSION" -> "1.0.0",
+    "SCALA_VERSION" -> "2.12.6"
+  ))
+```
+
+Variables are replaced with the regular expression `@(\w+)@`. An error is
+reported when a variable that matches this pattern is not provided.
+
+
+Before:
+
+````
+Install version @DOES_NOT_EXIST@
+````
+
+Error:
+
+````
+error: readme.md:1:17: error: key not found: DOES_NOT_EXIST
+Install version @DOES_NOT_EXIST@
+                ^^^^^^^^^^^^^^^^
+````
+
+Use double `@@` to escape variable injection.
+
+
+Before:
+
+````
+Install version @@OLD_VERSION@
+````
+
+After:
+
+````
+Install version @OLD_VERSION@
+````
+
+### Extensible
+
+When using the library API, it's possible to implement custom modifiers by
+extending `mdoc.StringModifier`.
+
+```scala
+import mdoc.StringModifier
+import mdoc.Reporter
+import scala.meta.Input
+class FooModifier extends StringModifier {
+  override val name = "foo"
+  override def process(info: String, code: Input, reporter: Reporter): String = {
+    val originalCodeFenceText = code.text
+    val isCrash = info == "crash"
+    if (isCrash) "BOOM"
+    else "OK: " + originalCodeFenceText
+  }
+}
+```
+
+Pass the custom modifier to `MainSettings.withStringModifiers(List(...))`.
+
+```scala
+val settings = mdoc.MainSettings()
+  .withStringModifiers(List(
+    new FooModifier
+  ))
+```
+
+Code blocks with the `mdoc:foo` modifier will then render as follows.
+
+
+Before:
+
+````
+```scala mdoc:foo
+Hello world!
+```
+````
+
+After:
+
+````
+OK: Hello world!
+````
+
+We can also add the argument `:crash` to render "BOOM".
+
+
+Before:
+
+````
+```scala mdoc:foo:crash
+Hello world!
+```
+````
+
+After:
+
+````
+BOOM
+````
+
+⚠️ This feature is under development and is likely to have breaking changes in
+future releases.
 
 ## Team
 

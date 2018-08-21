@@ -30,7 +30,10 @@ class BlockInput(ctx: Context, baseInput: Input) {
             }
           }
           .orElse {
-            val expected = Modifier.all.map(_.toString.toLowerCase()).mkString(", ")
+            val allModifiers =
+              Modifier.all.map(_.toString.toLowerCase()) ++
+                ctx.settings.stringModifiers.map(_.name)
+            val expected = allModifiers.mkString(", ")
             val msg = s"Invalid mode '$mode'. Expected one of: $expected"
             val offset = "scala mdoc:".length
             val start = block.getInfo.getStartOffset + offset
