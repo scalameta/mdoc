@@ -5,16 +5,17 @@ jdk:
 stages:
   - name: test
   - name: release
+    if: (branch = master AND type = push) OR (tag IS present)
 
 jobs:
   include:
     # default stage is test
-    # - env: TEST="scalafmt"
-    #   script: ./bin/scalafmt --test
-    # - env: TEST="sbt test"
-    #   script: sbt test
+    - env: TEST="scalafmt"
+      script: ./bin/scalafmt --test
+    - env: TEST="sbt test"
+      script: sbt test
     - stage: release
-      script: sbt ci-release-docs
+      script: sbt ci-release
 
 cache:
   directories:
