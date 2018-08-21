@@ -1,11 +1,11 @@
-# Mdoc: markdown worksheets
+# Mdoc: compiled markdown documentation
 
 [![Build Status](https://travis-ci.org/olafurpg/mdoc.svg?branch=master)](https://travis-ci.org/olafurpg/mdoc)
 
 Mdoc is a documentation tool for Scala inspired by
-[tut](http://tpolecat.github.io/tut/). Like tut, Mdoc interprets Scala code
+[tut](http://tpolecat.github.io/tut/). Like tut, mdoc interprets Scala code
 examples in markdown files allowing you to compile markdown documentation as
-part of your build. Distinguishing features of Mdoc include:
+part of your build. Distinguishing features of mdoc include:
 
 - [good performance](#performance): incremental, hot compilation gives you
   snappy feedback while writing documentation.
@@ -103,12 +103,12 @@ Add the following dependency to your build
 libraryDependencies += "com.geirsson" % "mdoc" % "0.3.1" cross CrossVersion.full
 ```
 
-Then write a main function that invokes Mdoc as a library
+Then write a main function that invokes mdoc as a library
 
 ```scala
 object Main {
   def main(args: Array[String]): Unit = {
-    // build arguments for Mdoc
+    // build arguments for mdoc
     val settings = mdoc.MainSettings()
       .withSiteVariables(Map("MY_VERSION" -> "1.0.0"))
       .withArgs(args.toList)
@@ -122,7 +122,7 @@ object Main {
 
 Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
-Consult the Mdoc source to learn more how to use the library API. Scaladocs are
+Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/0.3.1)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
@@ -291,9 +291,9 @@ writing documentation. Mdoc achieves good performance through
 
 - [script semantics](#script-semantics): each markdown file compiles into a
   single Scala program that executes in one run.
-- being incremental: with `--watch`, Mdoc compiles individual files as they
+- being incremental: with `--watch`, mdoc compiles individual files as they
   change avoiding unnecessary work re-generating the full site.
-- keeping the compiler hot: with `--watch`, Mdoc re-uses the same Scala compiler
+- keeping the compiler hot: with `--watch`, mdoc re-uses the same Scala compiler
   instance for subsequent runs making compilation faster after a few iterations.
   A medium sized document can go from compiling in ~5 seconds with a cold
   compiler down to 500ms with a hot compiler.
@@ -325,7 +325,7 @@ val typeError: Int = "should be int"
 
 Here below, the programs are supposed to fail due to the `fail` and `crash`
 modifiers but they succeed so the build is stopped with an error message from
-Mdoc.
+mdoc.
 
 
 Before:
@@ -351,7 +351,7 @@ val noCrash = "success"
 ````
 
 Observe that positions of the reported diagnostics point to line numbers and
-columns in the original markdown document. Internally, Mdoc instruments code
+columns in the original markdown document. Internally, mdoc instruments code
 fences to extract metadata like variable types and runtime values. Positions of
 error messages in the instrumented code are translated into positions in the
 markdown document.
@@ -359,8 +359,8 @@ markdown document.
 ### Link hygiene
 
 Docs get quickly out date, in particular links to different sections. After
-generating a site, Mdoc analyzes links for references to non-existent sections.
-For the example below, Mdoc reports a warning that the `doesnotexist` link is
+generating a site, mdoc analyzes links for references to non-existent sections.
+For the example below, mdoc reports a warning that the `doesnotexist` link is
 invalid.
 
 
@@ -390,7 +390,7 @@ statements as if they were typed in a REPL session. Using "script semantics"
 instead of "repl semantics" has both benefits and downsides.
 
 **Downside**: It's not possible to bind the same variable twice, for example the
-code below input fails compilation with Mdoc but compiles successfully with tut
+code below input fails compilation with mdoc but compiles successfully with tut
 
 ````
 ```scala mdoc
