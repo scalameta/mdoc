@@ -56,7 +56,7 @@ lazy val mdoc = project
     buildInfoPackage := "mdoc.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
-      "stableVersion" -> "0.3.1"
+      "stableVersion" -> "0.4.0"
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
