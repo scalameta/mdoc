@@ -1,4 +1,4 @@
-package vork
+package mdoc
 
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -8,12 +8,12 @@ import metaconfig.Conf
 import metaconfig.Configured
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
-import vork.internal.cli.Settings
-import vork.internal.io.ConsoleReporter
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
 
 final class MainSettings private (
-    private[vork] val settings: Settings,
-    private[vork] val reporter: Reporter
+    private[mdoc] val settings: Settings,
+    private[mdoc] val reporter: Reporter
 ) {
   def withArgs(args: List[String]): MainSettings = {
     if (args.isEmpty) this

@@ -4,12 +4,12 @@ import java.nio.file.Files
 import org.scalatest.FunSuite
 import scala.meta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
-import vork.internal.cli.Settings
-import vork.internal.io.ConsoleReporter
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
 
 class CliArgsSuite extends FunSuite with DiffAssertions {
   private val reporter = ConsoleReporter.default
-  private val tmp = Files.createTempDirectory("vork")
+  private val tmp = Files.createTempDirectory("mdoc")
   Files.delete(tmp)
   private val base = Settings.default(PathIO.workingDirectory)
 

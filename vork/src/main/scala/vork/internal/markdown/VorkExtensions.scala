@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
@@ -12,22 +12,22 @@ import com.vladsch.flexmark.ext.toc.SimTocExtension
 import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.ext.wikilink.WikiLinkExtension
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension
-import vork.internal.cli.Context
+import mdoc.internal.cli.Context
 
-object VorkExtensions {
+object MdocExtensions {
 
   /**
-    * Defines vork's markdown extensions.
+    * Defines mdoc's markdown extensions.
     *
     *  Inspired by CommonMark formatter options so that pandoc understands it.
     *  https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/samples/FormatConverterCommonMark.java#L27-L37
     *
     * @return A sequence of extensions to be applied to Flexmark's options.
     */
-  def vork(context: Context): List[Extension] = {
+  def mdoc(context: Context): List[Extension] = {
     plain ++ List(
-      VorkParserExtension.create(context),
-      VorkFormatterExtension.create(context.settings)
+      MdocParserExtension.create(context),
+      MdocFormatterExtension.create(context.settings)
     )
   }
 

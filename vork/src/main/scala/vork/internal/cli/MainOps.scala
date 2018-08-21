@@ -1,4 +1,4 @@
-package vork.internal.cli
+package mdoc.internal.cli
 
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
@@ -13,12 +13,12 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scalafix.internal.diff.DiffUtils
-import vork.Reporter
-import vork.internal.io.IO
-import vork.internal.io.VorkFileListener
-import vork.internal.markdown.Markdown
-import vork.internal.markdown.MarkdownLinks
-import vork.internal.markdown.MarkdownLinter
+import mdoc.Reporter
+import mdoc.internal.io.IO
+import mdoc.internal.io.MdocFileListener
+import mdoc.internal.markdown.Markdown
+import mdoc.internal.markdown.MarkdownLinks
+import mdoc.internal.markdown.MarkdownLinter
 
 final class MainOps(
     settings: Settings,
@@ -125,7 +125,7 @@ final class MainOps(
   def runFileWatcher(): Unit = {
     if (settings.isFileWatching) {
       val executor = Executors.newFixedThreadPool(1)
-      val watcher = VorkFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
+      val watcher = MdocFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
       watcher.watchUntilInterrupted()
     }
   }
@@ -162,7 +162,7 @@ object MainOps {
             error.all.foreach(message => reporter.error(message))
             1
           case Configured.Ok(ctx) =>
-            val markdown = Markdown.vorkSettings(ctx)
+            val markdown = Markdown.mdocSettings(ctx)
             val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
             runner.run()
             if (ctx.reporter.hasErrors) {

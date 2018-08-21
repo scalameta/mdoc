@@ -5,10 +5,10 @@ import java.io.PrintStream
 import org.scalatest.FunSuite
 import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
-import vork.internal.cli.Settings
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.MarkdownLinks
-import vork.internal.markdown.MarkdownLinter
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.MarkdownLinks
+import mdoc.internal.markdown.MarkdownLinter
 
 class LinterSuite extends FunSuite with DiffAssertions {
   private val myOut = new ByteArrayOutputStream()

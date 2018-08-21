@@ -1,4 +1,4 @@
-package vork.document
+package mdoc.document
 
 import pprint.PPrinter
 import pprint.TPrint

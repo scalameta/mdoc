@@ -1,11 +1,11 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import scala.meta._
 import scala.meta.inputs.Position
 import Instrumenter.position
-import vork.internal.markdown.Instrumenter.Binders
+import mdoc.internal.markdown.Instrumenter.Binders
 
 class Instrumenter(sections: List[SectionInput]) {
   def instrument(): String = {
@@ -56,7 +56,7 @@ class Instrumenter(sections: List[SectionInput]) {
       val binder = freshBinder()
       sb.append("val ")
         .append(binder)
-        .append(" = _root_.vork.internal.document.Macros.fail(")
+        .append(" = _root_.mdoc.internal.document.Macros.fail(")
         .append(literal)
         .append(", ")
         .append(position(stat.pos))
@@ -91,7 +91,7 @@ object Instrumenter {
   def wrapBody(body: String): String = {
     val wrapped = new StringBuilder()
       .append("package repl\n")
-      .append("class Session extends _root_.vork.internal.document.DocumentBuilder {\n")
+      .append("class Session extends _root_.mdoc.internal.document.DocumentBuilder {\n")
       .append("  def app(): Unit = {\n")
       .append(body)
       .append("  }\n")

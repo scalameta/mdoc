@@ -1,7 +1,7 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
-import vork.Reporter
-import vork.internal.cli.Settings
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
 
 object MarkdownLinter {
   def lint(links: List[MarkdownLinks], reporter: Reporter): Unit = {

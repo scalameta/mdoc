@@ -1,4 +1,4 @@
-package vork.document
+package mdoc.document
 
 sealed trait CompileResult
 object CompileResult {

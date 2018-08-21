@@ -1,8 +1,8 @@
-package vork.internal.document
+package mdoc.internal.document
 
-object VorkExceptions {
+object MdocExceptions {
   def trimStacktrace(e: Throwable): Unit = {
-    val stacktrace = e.getStackTrace.takeWhile(!_.getClassName.startsWith("vork"))
+    val stacktrace = e.getStackTrace.takeWhile(!_.getClassName.startsWith("mdoc"))
     e.setStackTrace(stacktrace)
   }
 }

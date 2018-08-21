@@ -1,4 +1,4 @@
-package vork.internal.cli
+package mdoc.internal.cli
 
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath

@@ -1,11 +1,11 @@
-package vork
+package mdoc
 
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
 import metaconfig.ConfError
 import metaconfig.generic.Surface
 import scala.meta.inputs.Input
-import vork.internal.cli.Settings
+import mdoc.internal.cli.Settings
 
 trait StringModifier {
   val name: String

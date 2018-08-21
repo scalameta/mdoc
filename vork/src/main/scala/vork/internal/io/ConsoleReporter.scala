@@ -1,11 +1,11 @@
-package vork.internal.io
+package mdoc.internal.io
 
 import fansi.Color._
 import java.io.PrintStream
 import scala.meta.Position
 import scalafix.internal.util.PositionSyntax._
-import vork.Reporter
-import vork.internal.pos.PositionSyntax._
+import mdoc.Reporter
+import mdoc.internal.pos.PositionSyntax._
 
 class ConsoleReporter(ps: PrintStream) extends Reporter {
 

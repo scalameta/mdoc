@@ -1,4 +1,4 @@
-# vork Visual Studio Code extension
+# Mdoc Visual Studio Code extension
 
 Live preview of Scala code snippets in VSCode markdown preview.
 

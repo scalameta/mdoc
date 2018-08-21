@@ -1,4 +1,4 @@
-package vork.internal.document
+package mdoc.internal.document
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.language.experimental.macros
 import scala.util.control.NonFatal
 import sourcecode.Text
-import vork.document._
+import mdoc.document._
 
 trait DocumentBuilder {
 
@@ -77,7 +77,7 @@ trait DocumentBuilder {
         }
       } catch {
         case NonFatal(e) =>
-          VorkExceptions.trimStacktrace(e)
+          MdocExceptions.trimStacktrace(e)
           throw new PositionedException(mySections.length, lastPosition, e)
       }
       val document = Document(input, mySections.toList)

@@ -1,4 +1,4 @@
-package vork.document
+package mdoc.document
 
 object RangePosition {
   def empty: RangePosition = new RangePosition(-1, -1, -1, -1)

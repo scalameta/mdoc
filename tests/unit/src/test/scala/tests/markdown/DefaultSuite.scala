@@ -5,7 +5,7 @@ class DefaultSuite extends BaseMarkdownSuite {
   check(
     "one",
     """
-      |```scala vork
+      |```scala mdoc
       |val x = List(1).map(_ + 1)
       |```
     """.stripMargin,
@@ -21,11 +21,11 @@ class DefaultSuite extends BaseMarkdownSuite {
     """
       |# Hey Scala!
       |
-      |```scala vork
+      |```scala mdoc
       |val xs = List(1, 2, 3)
       |```
       |
-      |```scala vork
+      |```scala mdoc
       |val ys = xs.map(_ * 2)
       |```
     """.stripMargin,
@@ -46,12 +46,12 @@ class DefaultSuite extends BaseMarkdownSuite {
   check(
     "res0",
     """
-      |```scala vork
+      |```scala mdoc
       |List(1).map(_ + 1)
       |res0.length
       |```
       |
-      |```scala vork
+      |```scala mdoc
       |println(1)
       |```
       """.stripMargin,
@@ -73,7 +73,7 @@ class DefaultSuite extends BaseMarkdownSuite {
   check(
     "defn",
     """
-      |```scala vork
+      |```scala mdoc
       |case class User(name: String, age: Int)
       |User("John", 42)
       |```
@@ -90,7 +90,7 @@ class DefaultSuite extends BaseMarkdownSuite {
   check(
     "import",
     """
-      |```scala vork
+      |```scala mdoc
       |import scala.concurrent.Future
       |Future.successful(1)
       |```
@@ -107,12 +107,12 @@ class DefaultSuite extends BaseMarkdownSuite {
   check(
     "many",
     """
-      |```scala vork
+      |```scala mdoc
       |println(1)
       |val x = 42
       |```
       |
-      |```scala vork
+      |```scala mdoc
       |println(x)
       |```
     """.stripMargin.replace("'''", "\"\"\""),

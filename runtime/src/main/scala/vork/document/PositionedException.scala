@@ -1,4 +1,4 @@
-package vork.document
+package mdoc.document
 
 import scala.util.control.NoStackTrace
 

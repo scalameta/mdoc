@@ -1,14 +1,14 @@
-package vork
+package mdoc
 
 import java.io.PrintStream
 import java.nio.file.Path
 import metaconfig.Configured
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
-import vork.internal.cli.MainOps
-import vork.internal.cli.Settings
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.Markdown
+import mdoc.internal.cli.MainOps
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.Markdown
 
 object Main {
 

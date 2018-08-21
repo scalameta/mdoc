@@ -1,4 +1,4 @@
-package vork.internal.pos
+package mdoc.internal.pos
 
 import java.nio.file.Paths
 import scala.meta.Input
@@ -6,11 +6,11 @@ import scala.meta.Position
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
 import scalafix.internal.util.PositionSyntax._
-import vork.document.RangePosition
-import vork.internal.cli.Settings
+import mdoc.document.RangePosition
+import mdoc.internal.cli.Settings
 
 object PositionSyntax {
-  implicit class XtensionInputVork(input: Input) {
+  implicit class XtensionInputMdoc(input: Input) {
     def filename: String = input match {
       case s: Input.Slice => s.input.filename
       case _ => input.syntax
@@ -28,7 +28,7 @@ object PositionSyntax {
       Position.Range(input, line, column, line, column)
     }
   }
-  implicit class XtensionRangePositionVork(pos: RangePosition) {
+  implicit class XtensionRangePositionMdoc(pos: RangePosition) {
     def formatMessage(edit: TokenEditDistance, message: String): String = {
       val mpos = pos.toMeta(edit)
       new StringBuilder()
@@ -56,7 +56,7 @@ object PositionSyntax {
       x.toUnslicedPosition
     }
   }
-  implicit class XtensionPositionVork(pos: Position) {
+  implicit class XtensionPositionMdoc(pos: Position) {
     def toUnslicedPosition: Position = pos.input match {
       case Input.Slice(underlying, a, _) =>
         Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition

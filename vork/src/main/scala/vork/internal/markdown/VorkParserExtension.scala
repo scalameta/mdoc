@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ast
@@ -9,9 +9,9 @@ import com.vladsch.flexmark.util.options.DataHolder
 import com.vladsch.flexmark.util.options.MutableDataHolder
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.PrefixedSubSequence
-import vork.internal.cli.Context
+import mdoc.internal.cli.Context
 
-class VorkParserExtension(context: Context) extends Parser.ParserExtension {
+class MdocParserExtension(context: Context) extends Parser.ParserExtension {
   class SiteVariableInjector(site: Map[String, String], document: ast.Document)
       extends LinkRefProcessor {
 
@@ -66,14 +66,14 @@ class VorkParserExtension(context: Context) extends Parser.ParserExtension {
   override def extend(parserBuilder: Parser.Builder): Unit = {
     parserBuilder.linkRefProcessorFactory(new SiteVariableInjectorFactory)
     parserBuilder.postProcessorFactory(
-      new VorkPostProcessor.Factory(context)
+      new MdocPostProcessor.Factory(context)
     )
   }
   override def parserOptions(options: MutableDataHolder): Unit = ()
 }
 
-object VorkParserExtension {
+object MdocParserExtension {
   def create(context: Context): Extension = {
-    new VorkParserExtension(context)
+    new MdocParserExtension(context)
   }
 }

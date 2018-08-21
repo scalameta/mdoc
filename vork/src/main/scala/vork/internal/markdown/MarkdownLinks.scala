@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.HtmlInline
@@ -14,8 +14,8 @@ import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.RelativePath
 import scala.util.matching.Regex
-import vork.Reporter
-import vork.internal.cli.Settings
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
 
 case class MarkdownReference(url: String, pos: Position) {
   def toAbsolute(enclosingDocument: String): String = {

@@ -1,8 +1,8 @@
-package vork.internal.cli
+package mdoc.internal.cli
 
-import vork.Reporter
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.MarkdownCompiler
+import mdoc.Reporter
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.MarkdownCompiler
 
 case class Context(settings: Settings, reporter: Reporter, compiler: MarkdownCompiler)
 

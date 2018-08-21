@@ -5,10 +5,10 @@ class ErrorSuite extends BaseMarkdownSuite {
   checkError(
     "crash",
     """
-      |```scala vork
+      |```scala mdoc
       |val x = 1
       |```
-      |```scala vork
+      |```scala mdoc
       |val y = 2
       |def crash() = ???
       |def z: Int = crash()
@@ -31,13 +31,13 @@ class ErrorSuite extends BaseMarkdownSuite {
   checkError(
     "invalid-mod",
     """
-      |```scala vork:foobaz
+      |```scala mdoc:foobaz
       |val x: Int = "String"
       |```
     """.stripMargin,
     """
       |error: invalid-mod.md:2:15: error: Invalid mode 'foobaz'. Expected one of: default, passthrough, fail, crash
-      |```scala vork:foobaz
+      |```scala mdoc:foobaz
       |              ^^^^^^
     """.stripMargin
   )
@@ -45,11 +45,11 @@ class ErrorSuite extends BaseMarkdownSuite {
   checkError(
     "silent",
     """
-      |```scala vork:passthrough
+      |```scala mdoc:passthrough
       |import scala.util._
       |```
       |
-      |```scala vork:fail
+      |```scala mdoc:fail
       |List(1)
       |```
     """.stripMargin,
@@ -62,7 +62,7 @@ class ErrorSuite extends BaseMarkdownSuite {
   checkError(
     "parse-error",
     """
-      |```scala vork
+      |```scala mdoc
       |val x =
       |```
     """.stripMargin,

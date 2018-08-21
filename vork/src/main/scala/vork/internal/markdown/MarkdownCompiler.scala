@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import java.io.File
 import java.net.URL
@@ -15,12 +15,12 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
-import vork.Reporter
-import vork.document.Document
-import vork.document._
-import vork.internal.document.DocumentBuilder
-import vork.internal.pos.PositionSyntax._
-import vork.internal.pos.TokenEditDistance
+import mdoc.Reporter
+import mdoc.document.Document
+import mdoc.document._
+import mdoc.internal.document.DocumentBuilder
+import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.pos.TokenEditDistance
 
 object MarkdownCompiler {
 
@@ -74,7 +74,7 @@ object MarkdownCompiler {
       if (classpath.isEmpty) defaultClasspath(_ => true)
       else {
         val base = defaultClasspath(_ => true)
-        val runtime = defaultClasspath(path => path.toString.contains("vork-runtime"))
+        val runtime = defaultClasspath(path => path.toString.contains("mdoc-runtime"))
         base ++ runtime
       }
     new MarkdownCompiler(fullClasspath.syntax)

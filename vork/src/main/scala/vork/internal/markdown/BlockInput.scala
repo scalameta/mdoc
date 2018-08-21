@@ -1,11 +1,11 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.ast.FencedCodeBlock
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import vork.internal.cli.Context
-import vork.internal.markdown.Modifier.Str
-import vork.internal.markdown.Modifier.Default
+import mdoc.internal.cli.Context
+import mdoc.internal.markdown.Modifier.Str
+import mdoc.internal.markdown.Modifier.Default
 
 case class StringBlockInput(block: FencedCodeBlock, input: Input, mod: Str)
 case class ScalaBlockInput(block: FencedCodeBlock, input: Input, mod: Modifier)
@@ -13,11 +13,11 @@ case class ScalaBlockInput(block: FencedCodeBlock, input: Input, mod: Modifier)
 class BlockInput(ctx: Context, baseInput: Input) {
   def getModifier(block: FencedCodeBlock): Option[Modifier] = {
     val string = block.getInfo.toString
-    if (!string.startsWith("scala vork")) None
+    if (!string.startsWith("scala mdoc")) None
     else {
       if (!string.contains(':')) Some(Default)
       else {
-        val mode = string.stripPrefix("scala vork:")
+        val mode = string.stripPrefix("scala mdoc:")
         Modifier(mode)
           .orElse {
             val (name, info) = mode.split(":", 2) match {
@@ -32,7 +32,7 @@ class BlockInput(ctx: Context, baseInput: Input) {
           .orElse {
             val expected = Modifier.all.map(_.toString.toLowerCase()).mkString(", ")
             val msg = s"Invalid mode '$mode'. Expected one of: $expected"
-            val offset = "scala vork:".length
+            val offset = "scala mdoc:".length
             val start = block.getInfo.getStartOffset + offset
             val end = block.getInfo.getEndOffset
             val pos = Position.Range(baseInput, start, end)

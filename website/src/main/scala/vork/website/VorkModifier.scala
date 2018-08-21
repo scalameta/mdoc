@@ -1,23 +1,23 @@
-package vork.website
+package mdoc.website
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath
-import vork.Reporter
-import vork.StringModifier
-import vork.internal.cli.Context
-import vork.internal.io.ConsoleReporter
-import vork.internal.markdown.Markdown
-import vork.internal.markdown.MarkdownLinks
-import vork.internal.markdown.MarkdownLinter
-import vork.internal.pos.PositionSyntax._
+import mdoc.Reporter
+import mdoc.StringModifier
+import mdoc.internal.cli.Context
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.Markdown
+import mdoc.internal.markdown.MarkdownLinks
+import mdoc.internal.markdown.MarkdownLinter
+import mdoc.internal.pos.PositionSyntax._
 
-class VorkModifier(context: Context) extends StringModifier {
+class MdocModifier(context: Context) extends StringModifier {
   private val myStdout = new ByteArrayOutputStream()
   private val myReporter = new ConsoleReporter(new PrintStream(myStdout))
-  private val markdownSettings = Markdown.vorkSettings(context.copy(reporter = myReporter))
-  override val name: String = "vork"
+  private val markdownSettings = Markdown.mdocSettings(context.copy(reporter = myReporter))
+  override val name: String = "mdoc"
   override def process(info: String, code: Input, reporter: Reporter): String = {
     myStdout.reset()
     myReporter.reset()

@@ -1,7 +1,7 @@
 package tests.cli
 
 import java.nio.file.Files
-import vork.internal.BuildInfo
+import mdoc.internal.BuildInfo
 
 class CliSuite extends BaseCliSuite {
 
@@ -9,7 +9,7 @@ class CliSuite extends BaseCliSuite {
     "classpath",
     """
       |/index.md
-      |```scala vork
+      |```scala mdoc
       |test.Test.greeting
       |```
     """.stripMargin,
@@ -89,7 +89,7 @@ class CliSuite extends BaseCliSuite {
     """
       |/index.md
       |# Hello
-      |```scala vork:foobar
+      |```scala mdoc:foobar
       |foobar
       |```
     """.stripMargin,
@@ -106,7 +106,7 @@ class CliSuite extends BaseCliSuite {
     "",
     extraArgs = Array("--help"),
     onStdout = { out =>
-      assert(out.contains("Vork is a documentation tool"))
+      assert(out.contains("Mdoc is a documentation tool"))
     }
   )
 
@@ -116,7 +116,7 @@ class CliSuite extends BaseCliSuite {
     "",
     extraArgs = Array("--usage"),
     onStdout = { out =>
-      assert(out.contains("vork [<option> ...]"))
+      assert(out.contains("mdoc [<option> ...]"))
     }
   )
 

@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -7,13 +7,13 @@ import java.nio.CharBuffer
 import java.nio.charset.StandardCharsets
 import scala.meta._
 import scala.meta.inputs.Position
-import vork.Reporter
-import vork.document.CompileResult
-import vork.document.CrashResult
-import vork.document.CrashResult.Crashed
-import vork.internal.document.VorkExceptions
-import vork.internal.pos.PositionSyntax._
-import vork.internal.pos.TokenEditDistance
+import mdoc.Reporter
+import mdoc.document.CompileResult
+import mdoc.document.CrashResult
+import mdoc.document.CrashResult.Crashed
+import mdoc.internal.document.MdocExceptions
+import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.pos.TokenEditDistance
 
 object Renderer {
 
@@ -52,7 +52,7 @@ object Renderer {
     } yield binder.value.asInstanceOf[Crashed]
     crashes.headOption match {
       case Some(CrashResult.Crashed(e, _)) =>
-        VorkExceptions.trimStacktrace(e)
+        MdocExceptions.trimStacktrace(e)
         val stacktrace = new ByteArrayOutputStream()
         e.printStackTrace(new PrintStream(stacktrace))
         appendFreshMultiline(ps, stacktrace.toString())

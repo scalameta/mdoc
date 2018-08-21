@@ -1,12 +1,12 @@
-package vork.internal.document
+package mdoc.internal.document
 
 import scala.language.experimental.macros
 import scala.reflect.macros.ParseException
 import scala.reflect.macros.TypecheckException
 import scala.reflect.macros.blackbox
-import vork.document.CompileResult
-import vork.document.CompileResult._
-import vork.document.RangePosition
+import mdoc.document.CompileResult
+import mdoc.document.CompileResult._
+import mdoc.document.RangePosition
 
 object Macros {
 

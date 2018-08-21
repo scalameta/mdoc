@@ -5,7 +5,7 @@ class PassthroughSuite extends BaseMarkdownSuite {
   check(
     "passthrough",
     """
-      |```scala vork:passthrough
+      |```scala mdoc:passthrough
       |val x = println("# Header\n\nparagraph\n\n* bullet")
       |```
       """.stripMargin,
@@ -21,7 +21,7 @@ class PassthroughSuite extends BaseMarkdownSuite {
   check(
     "no-val",
     """
-      |```scala vork:passthrough
+      |```scala mdoc:passthrough
       |println("# Header")
       |```
     """.stripMargin,
@@ -33,7 +33,7 @@ class PassthroughSuite extends BaseMarkdownSuite {
   check(
     "stripMargin",
     """
-```scala vork:passthrough
+```scala mdoc:passthrough
 println('''|* Bullet 1
            |* Bullet 2
      |* Bullet 3

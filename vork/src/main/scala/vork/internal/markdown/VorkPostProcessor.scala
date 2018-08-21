@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.ast
 import com.vladsch.flexmark.ast.Document
@@ -13,12 +13,12 @@ import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
-import vork.internal.cli.Context
-import vork.internal.document.VorkExceptions
-import vork.internal.markdown.Modifier._
-import vork.internal.pos.PositionSyntax._
+import mdoc.internal.cli.Context
+import mdoc.internal.document.MdocExceptions
+import mdoc.internal.markdown.Modifier._
+import mdoc.internal.pos.PositionSyntax._
 
-class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
+class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
   override def processDocument(doc: Document): Document = {
     import scala.collection.JavaConverters._
@@ -43,7 +43,7 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     } catch {
       case NonFatal(e) =>
         val pos = Position.Range(input, 0, input.chars.length)
-        VorkExceptions.trimStacktrace(e)
+        MdocExceptions.trimStacktrace(e)
         val exception = new StringModifierException(mod, e)
         ctx.reporter.error(pos, exception)
     }
@@ -117,10 +117,10 @@ class VorkPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
   }
 }
 
-object VorkPostProcessor {
+object MdocPostProcessor {
   class Factory(context: Context) extends DocumentPostProcessorFactory {
     override def create(document: ast.Document): DocumentPostProcessor = {
-      new VorkPostProcessor()(context)
+      new MdocPostProcessor()(context)
     }
   }
 }

@@ -1,13 +1,13 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
-import vork.StringModifier
+import mdoc.StringModifier
 
 /**
-  * A vork code fence modifier.
+  * A mdoc code fence modifier.
   *
   * Modifiers are parsed from code blocks like here
   *
-  * ```scala vork:passthrough
+  * ```scala mdoc:passthrough
   * println("# Header")
   * ```
   *

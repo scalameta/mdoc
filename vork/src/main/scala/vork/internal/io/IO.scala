@@ -1,4 +1,4 @@
-package vork.internal.io
+package mdoc.internal.io
 
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -8,8 +8,8 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import vork.internal.cli.InputFile
-import vork.internal.cli.Settings
+import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.Settings
 
 object IO {
 

@@ -1,8 +1,8 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import scala.meta.inputs.Input
-import vork.document.Document
-import vork.internal.pos.TokenEditDistance
+import mdoc.document.Document
+import mdoc.internal.pos.TokenEditDistance
 
 case class EvaluatedDocument(
     instrumented: Input,

@@ -1,4 +1,4 @@
-package vork.internal.cli
+package mdoc.internal.cli
 
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -22,10 +22,10 @@ import scala.annotation.StaticAnnotation
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import vork.StringModifier
-import vork.Reporter
-import vork.internal.BuildInfo
-import vork.internal.markdown.MarkdownCompiler
+import mdoc.StringModifier
+import mdoc.Reporter
+import mdoc.internal.BuildInfo
+import mdoc.internal.markdown.MarkdownCompiler
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -33,12 +33,12 @@ case class Settings(
     @Section("Common options")
     @Description(
       "The input directory containing markdown and other documentation sources. " +
-        "Markdown files will be processed by vork while other files will be copied " +
+        "Markdown files will be processed by mdoc while other files will be copied " +
         "verbatim to the output directory."
     )
     @ExtraName("i")
     in: AbsolutePath,
-    @Description("The output directory to generate the vork site.")
+    @Description("The output directory to generate the mdoc site.")
     @ExtraName("o")
     out: AbsolutePath,
     @Description("Start a file watcher and incrementally re-generate the site on file save.")
@@ -132,17 +132,17 @@ object Settings extends MetaconfigScalametaImplicits {
       .andThen(_.as[Settings](decoder(base)))
   }
   def version =
-    s"Vork v${BuildInfo.stableVersion}"
+    s"Mdoc v${BuildInfo.stableVersion}"
   def usage: String =
-    """|Usage:   vork [<option> ...]
-       |Example: vork --in <path> --out <path> (customize input/output directories)
-       |         vork --watch                  (watch for file changes)
-       |         vork --site.VERSION 1.0.0     (pass in site variables)
-       |         vork --exclude-path <glob>    (exclude files matching patterns)
+    """|Usage:   mdoc [<option> ...]
+       |Example: mdoc --in <path> --out <path> (customize input/output directories)
+       |         mdoc --watch                  (watch for file changes)
+       |         mdoc --site.VERSION 1.0.0     (pass in site variables)
+       |         mdoc --exclude-path <glob>    (exclude files matching patterns)
        |""".stripMargin
   def description: Doc =
     Doc.paragraph(
-      """|Vork is a documentation tool that interprets Scala code examples within markdown
+      """|Mdoc is a documentation tool that interprets Scala code examples within markdown
          |code fences allowing you to compile and test documentation as part your build.
          |""".stripMargin
     )

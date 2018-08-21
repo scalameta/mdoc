@@ -1,11 +1,11 @@
-# Vork: markdown worksheets
+# Mdoc: markdown worksheets
 
-[![Build Status](https://travis-ci.org/olafurpg/vork.svg?branch=master)](https://travis-ci.org/olafurpg/vork)
+[![Build Status](https://travis-ci.org/olafurpg/mdoc.svg?branch=master)](https://travis-ci.org/olafurpg/mdoc)
 
-Vork is a documentation tool for Scala inspired by
-[tut](http://tpolecat.github.io/tut/). Like tut, Vork interprets Scala code
+Mdoc is a documentation tool for Scala inspired by
+[tut](http://tpolecat.github.io/tut/). Like tut, Mdoc interprets Scala code
 examples in markdown files allowing you to compile markdown documentation as
-part of your build. Distinguishing features of Vork include:
+part of your build. Distinguishing features of Mdoc include:
 
 - [good performance](#performance): incremental, hot compilation gives you
   snappy feedback while writing documentation.
@@ -61,7 +61,7 @@ To install my project
 libraryDependencies += "com" % "lib" % "@MY_VERSION@"
 ```
 
-```scala vork
+```scala mdoc
 val x = 1
 List(x, x)
 ```
@@ -90,30 +90,30 @@ List(x, x)
 
 
 Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
-`scala vork` code fence has been interpreted by the Scala compiler.
+`scala mdoc` code fence has been interpreted by the Scala compiler.
 
 ### Library
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" % "vork" % "0.3.1" cross CrossVersion.full
+libraryDependencies += "com.geirsson" % "mdoc" % "0.3.1" cross CrossVersion.full
 ```
 
-Then write a main function that invokes Vork as a library
+Then write a main function that invokes Mdoc as a library
 
 ```scala
 object Main {
   def main(args: Array[String]): Unit = {
-    // build arguments for Vork
-    val settings = vork.MainSettings()
+    // build arguments for Mdoc
+    val settings = mdoc.MainSettings()
       .withSiteVariables(Map("MY_VERSION" -> "1.0.0"))
       .withArgs(args.toList)
     // generate out/readme.md from working directory
-    val exitCode = vork.Main.process(settings)
+    val exitCode = mdoc.Main.process(settings)
     // (optional) exit the main function with exit code 0 (success) or 1 (error)
     sys.exit(exitCode)
   }
@@ -122,10 +122,10 @@ object Main {
 
 Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
-Consult the Vork source to learn more how to use the library API. Scaladocs are
-available [here](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/0.3.1)
+Consult the Mdoc source to learn more how to use the library API. Scaladocs are
+available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/0.3.1)
 but beware there are limited docstrings for classes and methods. Keep in mind
-that code in the package `vork.internal` is subject to binary and source
+that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
 
 ### Command-line
@@ -134,10 +134,10 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/vork_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
 
 ```
-$ coursier launch com.geirsson:vork_2.12.6:0.3.1 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_2.12.6:0.3.1 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -149,7 +149,7 @@ Consult [`--help`](#--help) to learn more about the command-line interface.
 
 ## Modifiers
 
-Vorks supports several modifiers to control the output of code fences.
+Mdocs supports several modifiers to control the output of code fences.
 
 ### Default
 
@@ -159,7 +159,7 @@ The default modifier compiles and executes the code fence as normal
 Before:
 
 ````
-```scala vork
+```scala mdoc
 val x = 1
 val y = 2
 x + y
@@ -190,7 +190,7 @@ The `fail` modifier asserts that the code block will not compile
 Before:
 
 ````
-```scala vork:fail
+```scala mdoc:fail
 val x: Int = ""
 ```
 ````
@@ -219,7 +219,7 @@ The `crash` modifier asserts that the code block throws an exception at runtime
 Before:
 
 ````
-```scala vork:crash
+```scala mdoc:crash
 val y = ???
 ```
 ````
@@ -245,7 +245,7 @@ program and embeds it verbatim in the markdown file.
 Before:
 
 ````
-```scala vork:passthrough
+```scala mdoc:passthrough
 val matrix = Array.tabulate(4, 4) { (a, b) =>
   val multiplied = (a + 1) * (b + 1)
   f"$multiplied%2s"
@@ -286,21 +286,21 @@ Look at the table:
 
 ### Performance
 
-Vork is designed to provide a tight edit/render/preview feedback loop while
-writing documentation. Vork achieves good performance through
+Mdoc is designed to provide a tight edit/render/preview feedback loop while
+writing documentation. Mdoc achieves good performance through
 
 - [script semantics](#script-semantics): each markdown file compiles into a
   single Scala program that executes in one run.
-- being incremental: with `--watch`, Vork compiles individual files as they
+- being incremental: with `--watch`, Mdoc compiles individual files as they
   change avoiding unnecessary work re-generating the full site.
-- keeping the compiler hot: with `--watch`, Vork re-uses the same Scala compiler
+- keeping the compiler hot: with `--watch`, Mdoc re-uses the same Scala compiler
   instance for subsequent runs making compilation faster after a few iterations.
   A medium sized document can go from compiling in ~5 seconds with a cold
   compiler down to 500ms with a hot compiler.
 
 ### Good error messages
 
-Vork tries to report helpful error messages when things go wrong. Here below,
+Mdoc tries to report helpful error messages when things go wrong. Here below,
 the program that is supposed to compile successfully but it has a type error so
 the build is stopped with an error message from the Scala compiler.
 
@@ -308,7 +308,7 @@ the build is stopped with an error message from the Scala compiler.
 Before:
 
 ````
-```scala vork
+```scala mdoc
 val typeError: Int = "should be int"
 ```
 ````
@@ -325,16 +325,16 @@ val typeError: Int = "should be int"
 
 Here below, the programs are supposed to fail due to the `fail` and `crash`
 modifiers but they succeed so the build is stopped with an error message from
-Vork.
+Mdoc.
 
 
 Before:
 
 ````
-```scala vork:fail
+```scala mdoc:fail
 val noFail = "success"
 ```
-```scala vork:crash
+```scala mdoc:crash
 val noCrash = "success"
 ```
 ````
@@ -351,7 +351,7 @@ val noCrash = "success"
 ````
 
 Observe that positions of the reported diagnostics point to line numbers and
-columns in the original markdown document. Internally, Vork instruments code
+columns in the original markdown document. Internally, Mdoc instruments code
 fences to extract metadata like variable types and runtime values. Positions of
 error messages in the instrumented code are translated into positions in the
 markdown document.
@@ -359,8 +359,8 @@ markdown document.
 ### Link hygiene
 
 Docs get quickly out date, in particular links to different sections. After
-generating a site, Vork analyzes links for references to non-existent sections.
-For the example below, Vork reports a warning that the `doesnotexist` link is
+generating a site, Mdoc analyzes links for references to non-existent sections.
+For the example below, Mdoc reports a warning that the `doesnotexist` link is
 invalid.
 
 
@@ -384,16 +384,16 @@ Link to [old section](#doesnotexist).
 
 ### Script semantics
 
-Vork interprets code fences as normal Scala programs instead of as if they're
+Mdoc interprets code fences as normal Scala programs instead of as if they're
 evaluated in the REPL. This behavior is different from tut that interprets
 statements as if they were typed in a REPL session. Using "script semantics"
 instead of "repl semantics" has both benefits and downsides.
 
 **Downside**: It's not possible to bind the same variable twice, for example the
-code below input fails compilation with Vork but compiles successfully with tut
+code below input fails compilation with Mdoc but compiles successfully with tut
 
 ````
-```scala vork
+```scala mdoc
 val x = 1
 val x = 1
 ```
@@ -408,7 +408,7 @@ compile.
 Before:
 
 ````
-```scala vork
+```scala mdoc
 case class User(name: String)
 object User {
   implicit val ordering: Ordering[User] = Ordering.by(_.name)
@@ -443,25 +443,25 @@ Contributions are welcome!
 ## --help
 
 ```
-Vork v0.3.1
-Usage:   vork [<option> ...]
-Example: vork --in <path> --out <path> (customize input/output directories)
-         vork --watch                  (watch for file changes)
-         vork --site.VERSION 1.0.0     (pass in site variables)
-         vork --exclude-path <glob>    (exclude files matching patterns)
+Mdoc v0.3.1
+Usage:   mdoc [<option> ...]
+Example: mdoc --in <path> --out <path> (customize input/output directories)
+         mdoc --watch                  (watch for file changes)
+         mdoc --site.VERSION 1.0.0     (pass in site variables)
+         mdoc --exclude-path <glob>    (exclude files matching patterns)
 
-Vork is a documentation tool that interprets Scala code examples within markdown
+Mdoc is a documentation tool that interprets Scala code examples within markdown
 code fences allowing you to compile and test documentation as part your build. 
 
 Common options:
 
   --in | -i <path> (default: "docs")
     The input directory containing markdown and other documentation sources.
-    Markdown files will be processed by vork while other files will be copied
+    Markdown files will be processed by mdoc while other files will be copied
     verbatim to the output directory.
 
   --out | -o <path> (default: "out")
-    The output directory to generate the vork site.
+    The output directory to generate the mdoc site.
 
   --watch | -w
     Start a file watcher and incrementally re-generate the site on file save.

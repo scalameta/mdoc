@@ -1,4 +1,4 @@
-package vork.internal.cli
+package mdoc.internal.cli
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

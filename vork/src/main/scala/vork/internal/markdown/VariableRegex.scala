@@ -1,10 +1,10 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import vork.Reporter
-import vork.internal.cli.Settings
-import vork.internal.pos.PositionSyntax._
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
+import mdoc.internal.pos.PositionSyntax._
 
 object VariableRegex {
   private val Variable = """@(\w+)@""".r

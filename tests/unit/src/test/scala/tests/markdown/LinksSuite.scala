@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath
 import scala.meta.testkit.DiffAssertions
-import vork.internal.markdown.MarkdownLinks
+import mdoc.internal.markdown.MarkdownLinks
 
 class LinksSuite extends FunSuite with DiffAssertions {
 

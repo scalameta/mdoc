@@ -1,10 +1,10 @@
-package vork.website
+package mdoc.website
 
 import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
-import vork.Main
-import vork.MainSettings
-import vork.internal.BuildInfo
+import mdoc.Main
+import mdoc.MainSettings
+import mdoc.internal.BuildInfo
 
 object Website {
   def main(args: Array[String]): Unit = {
@@ -18,7 +18,7 @@ object Website {
       .withReportRelativePaths(true)
       .withWatch(true)
     val context = settings.settings.validate(settings.reporter).get
-    val stringModifier = new VorkModifier(context)
+    val stringModifier = new MdocModifier(context)
     val exitCode = Main.process(settings.withStringModifiers(List(stringModifier)))
     sys.exit(exitCode)
   }

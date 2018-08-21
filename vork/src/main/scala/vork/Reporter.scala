@@ -1,4 +1,4 @@
-package vork
+package mdoc
 
 import scala.meta.inputs.Position
 
@@ -14,7 +14,7 @@ trait Reporter {
   def print(msg: String): Unit
   def println(msg: String): Unit
 
-  private[vork] def hasWarnings: Boolean
-  private[vork] def hasErrors: Boolean
-  private[vork] def reset(): Unit
+  private[mdoc] def hasWarnings: Boolean
+  private[mdoc] def hasErrors: Boolean
+  private[mdoc] def reset(): Unit
 }

@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
@@ -17,9 +17,9 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import scala.language.dynamics
 import scala.meta.inputs.Input
 import scala.reflect.ClassTag
-import vork.Reporter
-import vork.internal.cli.Context
-import vork.internal.cli.Settings
+import mdoc.Reporter
+import mdoc.internal.cli.Context
+import mdoc.internal.cli.Settings
 import com.vladsch.flexmark.parser.Parser
 
 object Markdown {
@@ -30,18 +30,18 @@ object Markdown {
     * Defines the default markdown settings.
     *
     * Do not use directly. The default flexmark settings have special keys set
-    * up by vork to keep track of certain document-specific information like path.
+    * up by mdoc to keep track of certain document-specific information like path.
     */
-  def vorkSettings(context: Context): MutableDataSet = {
+  def mdocSettings(context: Context): MutableDataSet = {
     // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
     baseSettings()
-      .set(Parser.EXTENSIONS, VorkExtensions.vork(context).asJava)
+      .set(Parser.EXTENSIONS, MdocExtensions.mdoc(context).asJava)
       .set(SiteVariables, Some(context.settings.site))
   }
 
   def plainSettings(): MutableDataSet = {
     baseSettings()
-      .set(Parser.EXTENSIONS, VorkExtensions.plain.asJava)
+      .set(Parser.EXTENSIONS, MdocExtensions.plain.asJava)
   }
 
   def baseSettings(): MutableDataSet = {

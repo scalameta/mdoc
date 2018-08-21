@@ -1,4 +1,4 @@
-package vork.internal.io
+package mdoc.internal.io
 
 import io.methvin.watcher.DirectoryChangeEvent
 import io.methvin.watcher.DirectoryChangeEvent.EventType
@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService
 import scala.meta.io.AbsolutePath
 import scala.collection.JavaConverters._
 
-final class VorkFileListener(
+final class MdocFileListener(
     executor: ExecutorService,
     in: InputStream,
     runAction: DirectoryChangeEvent => Unit
@@ -47,11 +47,11 @@ final class VorkFileListener(
   }
 }
 
-object VorkFileListener {
+object MdocFileListener {
   def create(dir: AbsolutePath, executor: ExecutorService, in: InputStream)(
       runAction: DirectoryChangeEvent => Unit
-  ): VorkFileListener = {
-    val listener = new VorkFileListener(executor, in, runAction)
+  ): MdocFileListener = {
+    val listener = new MdocFileListener(executor, in, runAction)
     val watcher = DirectoryWatcher.create(List(dir.toNIO).asJava, listener, true)
     listener.watcher = watcher
     listener

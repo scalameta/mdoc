@@ -1,4 +1,4 @@
-package vork.internal.pos
+package mdoc.internal.pos
 
 import scala.meta.Token
 

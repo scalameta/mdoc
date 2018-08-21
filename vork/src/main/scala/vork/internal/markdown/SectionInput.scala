@@ -1,4 +1,4 @@
-package vork.internal.markdown
+package mdoc.internal.markdown
 
 import scala.meta.Source
 import scala.meta.inputs.Input
