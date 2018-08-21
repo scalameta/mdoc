@@ -102,7 +102,7 @@ lazy val website = project
   .in(file("website"))
   .settings(
     skip in publish := true,
-    test := run.in(Compile).toTask(" test").value,
+    test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true
   )

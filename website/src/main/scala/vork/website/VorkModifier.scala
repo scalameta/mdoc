@@ -11,8 +11,9 @@ import vork.internal.io.ConsoleReporter
 import vork.internal.markdown.Markdown
 import vork.internal.markdown.MarkdownLinks
 import vork.internal.markdown.MarkdownLinter
+import vork.internal.pos.PositionSyntax._
 
-class VorkStringModifier(context: Context) extends StringModifier {
+class VorkModifier(context: Context) extends StringModifier {
   private val myStdout = new ByteArrayOutputStream()
   private val myReporter = new ConsoleReporter(new PrintStream(myStdout))
   private val markdownSettings = Markdown.vorkSettings(context.copy(reporter = myReporter))
@@ -20,8 +21,9 @@ class VorkStringModifier(context: Context) extends StringModifier {
   override def process(info: String, code: Input, reporter: Reporter): String = {
     myStdout.reset()
     myReporter.reset()
-    val markdown = Markdown.toMarkdown(code, markdownSettings, myReporter, context.settings)
-    val links = MarkdownLinks.fromMarkdown(RelativePath("readme.md"), code)
+    val cleanInput = Input.VirtualFile(code.filename, code.text)
+    val markdown = Markdown.toMarkdown(cleanInput, markdownSettings, myReporter, context.settings)
+    val links = MarkdownLinks.fromMarkdown(RelativePath("readme.md"), cleanInput)
     MarkdownLinter.lint(List(links), myReporter)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {
@@ -31,7 +33,7 @@ class VorkStringModifier(context: Context) extends StringModifier {
       s"""
 Before:
 ````
-${code.text}
+${cleanInput.text}
 ````
 Error:
 ````
@@ -42,7 +44,7 @@ ${stdout.trim}
       s"""
 Before:
 ````
-${code.text}
+${cleanInput.text}
 ````
 After:
 ````

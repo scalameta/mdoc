@@ -104,11 +104,12 @@ libraryDependencies += "com.geirsson" % "vork" % "@VERSION@" cross CrossVersion.
 Then write a main function that invokes Vork as a library
 
 ```scala
-object Website {
+object Main {
   def main(args: Array[String]): Unit = {
     // build arguments for Vork
     val settings = vork.MainSettings()
       .withSiteVariables(Map("MY_VERSION" -> "1.0.0"))
+      .withArgs(args.toList)
     // generate out/readme.md from working directory
     val exitCode = vork.Main.process(settings)
     // (optional) exit the main function with exit code 0 (success) or 1 (error)
@@ -117,11 +118,13 @@ object Website {
 }
 ```
 
-Consult the Vork
-[documentation](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/@VERSION@)
-to learn more how to use the library API. Note that code in the package
-`vork.internal` is subject to binary and source breaking changes between any
-release, including PATCH versions.
+Consult [--help](#--help) to see what arguments are valid for `withArgs`.
+
+Consult the Vork source to learn more how to use the library API. Scaladocs are
+available [here](https://www.javadoc.io/doc/com.geirsson/vork_2.12.6/@VERSION@)
+but beware there are limited docstrings for classes and methods. Keep in mind
+that code in the package `vork.internal` is subject to binary and source
+breaking changes between any release, including PATCH versions.
 
 ### Command-line
 

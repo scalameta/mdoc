@@ -88,6 +88,7 @@ case class Settings(
     @Description("The input stream to listen for enter key during file watching.")
     inputStream: InputStream = System.in
 ) {
+  def isFileWatching: Boolean = watch && !test
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = infile.toRelative(in)

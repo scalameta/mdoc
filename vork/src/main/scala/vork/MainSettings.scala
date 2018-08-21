@@ -4,6 +4,8 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.Path
 import java.nio.file.PathMatcher
+import metaconfig.Conf
+import metaconfig.Configured
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import vork.internal.cli.Settings
@@ -13,6 +15,17 @@ final class MainSettings private (
     private[vork] val settings: Settings,
     private[vork] val reporter: Reporter
 ) {
+  def withArgs(args: List[String]): MainSettings = {
+    if (args.isEmpty) this
+    else {
+      Settings.fromCliArgs(args, settings) match {
+        case Configured.Ok(newSettings) =>
+          copy(settings = newSettings)
+        case Configured.NotOk(error) =>
+          throw new IllegalArgumentException(error.toString())
+      }
+    }
+  }
   def withExcludePath(excludePath: List[PathMatcher]): MainSettings = {
     copy(settings.copy(excludePath = excludePath))
   }

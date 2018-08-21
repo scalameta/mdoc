@@ -123,7 +123,7 @@ final class MainOps(
   }
 
   def runFileWatcher(): Unit = {
-    if (settings.watch) {
+    if (settings.isFileWatching) {
       val executor = Executors.newFixedThreadPool(1)
       val watcher = VorkFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
       watcher.watchUntilInterrupted()
@@ -131,13 +131,13 @@ final class MainOps(
   }
 
   def clearScreen(): Unit = {
-    if (settings.watch) {
+    if (settings.isFileWatching) {
       print("\033[H\033[2J")
     }
   }
 
   def waitingForFileChanges(): Unit = {
-    if (settings.watch) {
+    if (settings.isFileWatching) {
       reporter.println(s"Waiting for file changes (press enter to interrupt)")
     }
   }
