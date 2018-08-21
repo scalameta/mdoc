@@ -17,9 +17,21 @@ object Website {
       .withArgs(args.toList)
       .withReportRelativePaths(true)
       .withWatch(true)
+      .withStringModifiers(
+        List(
+          new FooModifier
+        )
+      )
     val context = settings.settings.validate(settings.reporter).get
-    val stringModifier = new MdocModifier(context)
-    val exitCode = Main.process(settings.withStringModifiers(List(stringModifier)))
+    val exitCode = Main.process(
+      settings
+        .withStringModifiers(
+          List(
+            new FooModifier,
+            new MdocModifier(context)
+          )
+        )
+    )
     sys.exit(exitCode)
   }
 }
