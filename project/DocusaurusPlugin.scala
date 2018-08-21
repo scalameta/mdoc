@@ -26,7 +26,7 @@ object DocusaurusPlugin extends AutoPlugin {
     val deployKeyFile = ssh / "id_rsa"
     (s"echo $githubDeployKey" #| "base64 --decode" #> deployKeyFile).!
     s"chmod 600 $deployKeyFile".!
-    "eval '$(ssh-agent -s)'".!
+    """bash -c 'eval "$(ssh-agent -s)"' """.!
     s"ssh-add $deployKeyFile".!
   }
 
