@@ -147,8 +147,12 @@ object Settings extends MetaconfigScalametaImplicits {
          |""".stripMargin
     )
   def help(displayVersion: String, width: Int): String =
-    new HelpMessage[Settings](default(PathIO.workingDirectory), version(displayVersion), usage, description)
-      .helpMessage(width)
+    new HelpMessage[Settings](
+      default(PathIO.workingDirectory),
+      version(displayVersion),
+      usage,
+      description
+    ).helpMessage(width)
   implicit val surface: Surface[Settings] =
     generic.deriveSurface[Settings]
   implicit val encoder: ConfEncoder[Settings] =
