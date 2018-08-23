@@ -9,6 +9,8 @@ import java.nio.file.Files
 import java.util.Scanner
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
+import org.slf4j.Logger
+import org.slf4j.helpers.NOPLogger
 import scala.meta.io.AbsolutePath
 import scala.collection.JavaConverters._
 
@@ -52,7 +54,13 @@ object MdocFileListener {
       runAction: DirectoryChangeEvent => Unit
   ): MdocFileListener = {
     val listener = new MdocFileListener(executor, in, runAction)
-    val watcher = DirectoryWatcher.create(List(dir.toNIO).asJava, listener, true)
+    val watcher = DirectoryWatcher
+      .builder()
+      .path(dir.toNIO)
+      .listener(listener)
+      .fileHashing(true)
+      .logger(NOPLogger.NOP_LOGGER)
+      .build()
     listener.watcher = watcher
     listener
   }
