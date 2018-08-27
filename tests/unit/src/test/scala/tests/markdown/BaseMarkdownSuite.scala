@@ -61,4 +61,23 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       assertNoDiffOrPrintExpected(obtained, expected)
     }
   }
+
+  def checkWithSettings(
+      settings: Settings
+  )(name: String, original: String, expected: String): Unit = {
+    val context = Context(settings, reporter, compiler)
+    val mdSettings = {
+      myStdout.reset()
+      Markdown.mdocSettings(context)
+    }
+    test(name) {
+      reporter.reset()
+      val input = Input.VirtualFile(name + ".md", original)
+      val obtained = Markdown.toMarkdown(input, mdSettings, reporter, settings).trimLineEnds
+      val stdout = fansi.Str(myStdout.toString()).plainText
+      assert(!reporter.hasErrors, stdout)
+      assertNoDiffOrPrintExpected(obtained, expected)
+    }
+  }
+
 }
