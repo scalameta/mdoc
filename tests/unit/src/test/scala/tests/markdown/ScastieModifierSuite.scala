@@ -1,6 +1,6 @@
 package tests.markdown
 
-import mdoc.modifier.ScastieModifier
+import mdoc.modifiers.ScastieModifier
 import mdoc.StringModifier
 import mdoc.internal.cli.Settings
 
@@ -8,19 +8,24 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
 
   private val debugClassSuffix = "test"
 
-  def settingsWithModifier(s: StringModifier): Settings =
-    settings.copy(stringModifiers = settings.stringModifiers :+ s)
+  override val baseSettings: Settings = super.baseSettings.copy(
+    stringModifiers = List(
+      new ScastieModifier(
+        debugClassSuffix = Some(debugClassSuffix)
+      )
+    )
+  )
 
-  val defaultSettings: Settings = settingsWithModifier(new ScastieModifier(
-    debugClassSuffix = Some(debugClassSuffix)
-  ))
+  val darkThemeSettings: Settings = super.baseSettings.copy(
+    stringModifiers = List(
+      new ScastieModifier(
+        theme = "dark",
+        debugClassSuffix = Some(debugClassSuffix)
+      )
+    )
+  )
 
-  val darkThemeSettings: Settings = settingsWithModifier(new ScastieModifier(
-    theme = "dark",
-    debugClassSuffix = Some(debugClassSuffix)
-  ))
-
-  checkWithSettings(defaultSettings)(
+  check(
     "inline",
     """
       |```scala mdoc:scastie
@@ -44,7 +49,7 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-  checkWithSettings(darkThemeSettings)(
+  check(
     "inline with dark theme",
     """
       |```scala mdoc:scastie
@@ -65,10 +70,11 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
        |scalaVersion: '2.12.6'
        |})
        |})</script>
-    """.stripMargin
+    """.stripMargin,
+    settings = darkThemeSettings
   )
 
-  checkWithSettings(defaultSettings)(
+  check(
     "snippet",
     """
       |```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
@@ -80,7 +86,7 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-  checkWithSettings(darkThemeSettings)(
+  check(
     "snippet with dark theme",
     """
       |```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
@@ -89,7 +95,8 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
     """.stripMargin,
     s"""
        |<script src='https://scastie.scala-lang.org/xbrvky6fTjysG32zK6kzRQ.js?theme=dark'></script>
-    """.stripMargin
+    """.stripMargin,
+    settings = darkThemeSettings
   )
 
 }

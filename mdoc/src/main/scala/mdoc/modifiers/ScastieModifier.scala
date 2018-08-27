@@ -1,4 +1,4 @@
-package mdoc.modifier
+package mdoc.modifiers
 
 import mdoc.Reporter
 import mdoc.StringModifier
