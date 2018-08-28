@@ -5,6 +5,7 @@ import scala.meta.internal.io.PathIO
 import mdoc.Main
 import mdoc.MainSettings
 import mdoc.internal.BuildInfo
+import mdoc.modifiers.ScastieModifier
 
 object Website {
   def main(args: Array[String]): Unit = {
@@ -19,7 +20,8 @@ object Website {
       .withWatch(true)
       .withStringModifiers(
         List(
-          new FooModifier
+          new FooModifier,
+          new ScastieModifier(debugClassSuffix = Some("<a_random_uuid>"))
         )
       )
     val context = settings.settings.validate(settings.reporter).get

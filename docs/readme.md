@@ -34,6 +34,7 @@ Table of contents:
   - [Fail](#fail)
   - [Crash](#crash)
   - [Passthrough](#passthrough)
+  - [Scastie](#scastie)
 - [Key features](#key-features)
   - [Performance](#performance)
   - [Good error messages](#good-error-messages)
@@ -211,6 +212,55 @@ $table
 """)
 ```
 ````
+
+### Scastie
+
+The `scastie` modifier transforms a Scala code block into a
+[Scastie](https://scastie.scala-lang.org/) snippet.
+
+> ℹ️ This modifier will work only in environments that support embedding a
+> `<script>` tag. For example, it won't work in GitHub readmes, but it will work
+> when building a static website from Markdown (e.g., with
+> [Docusaurus](https://docusaurus.io/))
+
+You can embed an existing Scastie snippet by its id:
+
+````scala mdoc:mdoc
+```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
+
+```
+````
+
+or in case of a user's snippet:
+
+````scala mdoc:mdoc
+```scala mdoc:scastie:MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg
+
+```
+````
+
+> ⚠️ The empty line in the block can't be omitted due to how the Markdown parser
+> works
+
+Moreover, you can quickly translate any Scala code block block into a Scastie
+snippet on the fly.
+
+````scala mdoc:mdoc
+```scala mdoc:scastie
+val x = 1 + 2
+println(x)
+```
+````
+
+> ⚠️ Inline snippets are slower to run than embedded ones, since they won't be
+> cached. You should prefer embedding existing snippets whenever possible.
+
+You can choose the Scastie theme when initializing the Scastie modifier:
+
+```scala mdoc
+import mdoc.modifiers.ScastieModifier
+new ScastieModifier(theme = "dark") // default is "light"
+```
 
 ## Key features
 
