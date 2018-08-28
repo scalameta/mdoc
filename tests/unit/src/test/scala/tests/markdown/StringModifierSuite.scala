@@ -7,7 +7,7 @@ import mdoc.Reporter
 import mdoc.internal.cli.Settings
 
 class StringModifierSuite extends BaseMarkdownSuite {
-  override def settings: Settings = super.settings.copy(
+  override def baseSettings: Settings = super.baseSettings.copy(
     stringModifiers = List(
       new StringModifier {
         override val name: String = "hello"
