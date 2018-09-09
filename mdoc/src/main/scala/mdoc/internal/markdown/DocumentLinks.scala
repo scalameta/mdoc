@@ -4,61 +4,50 @@ import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.HtmlInline
 import com.vladsch.flexmark.ast.Link
 import com.vladsch.flexmark.ast.Paragraph
-import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
 import java.net.URI
-import java.nio.file.Paths
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.RelativePath
 import scala.util.matching.Regex
-import mdoc.Reporter
-import mdoc.internal.cli.Settings
 
 case class MarkdownReference(url: String, pos: Position) {
-  def toAbsolute(enclosingDocument: String): String = {
-    // Best-effort to reproduce link-generation in browsers and site-generators.
-    // Probably wrong on many levels, will likely need more sophisticated
-    if (url.startsWith("http") ||
-      url.startsWith("/")) {
-      url
-    } else if (url.startsWith("#")) {
-      enclosingDocument + url
-    } else if (url.contains("..")) {
-      URI.create(enclosingDocument + "/" + url).normalize().toString
-    } else {
-      url
-    }
-  }
-  def isExternal: Boolean = url.startsWith("http")
+  def isExternal: Boolean = url.startsWith("http") || url.startsWith("//")
   def isInternal: Boolean = !isExternal
 }
 
-case class MarkdownLinks(
+case class DocumentLinks(
     relpath: RelativePath,
     definitions: List[String],
     references: List[MarkdownReference]
 ) {
-  def absoluteDefinitions: Set[String] = {
-    val prefix = relpath.toURI(false).toString
-    val buf = Set.newBuilder[String]
+  def absoluteDefinitions: Set[URI] = {
+    val prefix = relpath.toURI(false)
+    val buf = Set.newBuilder[URI]
     buf += prefix
     definitions.foreach { defn =>
-      buf += prefix + "#" + defn
+      try {
+        buf += prefix.resolve("#" + defn)
+      } catch {
+        case _: IllegalArgumentException => // Ignore, invalid URI
+      }
     }
     buf.result()
   }
 }
-object MarkdownLinks {
+
+object DocumentLinks {
   private def dashChars = " -_"
   // Poor man's html parser.
   private val HtmlName = "name=\"([^\"]+)\"".r
   private val HtmlId = "id=\"([^\"]+)\"".r
 
-  def fromGeneratedSite(settings: Settings, reporter: Reporter): List[MarkdownLinks] = {
-    val links = List.newBuilder[MarkdownLinks]
+  def fromGeneratedSite(settings: Settings, reporter: Reporter): List[DocumentLinks] = {
+    val links = List.newBuilder[DocumentLinks]
     val ls = FileIO.listAllFilesRecursively(settings.out)
     ls.files.foreach { relpath =>
       val isMarkdown = PathIO.extension(relpath.toNIO) == "md"
@@ -66,21 +55,25 @@ object MarkdownLinks {
       if (isMarkdown && hasMatchingInputFile) {
         val abspath = ls.root.resolve(relpath)
         val input = Input.VirtualFile(relpath.toString(), FileIO.slurp(abspath, settings.charset))
-        links += MarkdownLinks.fromMarkdown(relpath, input)
+        links += DocumentLinks.fromMarkdown(settings.headerIdGenerator, relpath, input)
       }
     }
     links.result()
   }
 
-  def fromMarkdown(relpath: RelativePath, input: Input): MarkdownLinks = {
-    val settings = Markdown.plainSettings()
-    val parser = Parser.builder(settings).build
+  def fromMarkdown(
+      headerIdGenerator: String => String,
+      relpath: RelativePath,
+      input: Input
+  ): DocumentLinks = {
+    val markdownSettings = Markdown.plainSettings()
+    val parser = Parser.builder(markdownSettings).build
     val ast = parser.parse(input.text)
     val definitions = List.newBuilder[String]
     val links = List.newBuilder[MarkdownReference]
     Markdown.foreach(ast) {
       case heading: Heading =>
-        definitions += HeaderIdGenerator.generateId(heading.getText, dashChars, false)
+        definitions += headerIdGenerator(heading.getText.toString)
       case p: Paragraph if p.getChars.startsWith("<a name=") =>
         p.getChars.toString.lines.next() match {
           case HtmlName(id) =>
@@ -100,7 +93,7 @@ object MarkdownLinks {
       case els =>
         ()
     }
-    MarkdownLinks(relpath, definitions.result(), links.result())
+    DocumentLinks(relpath, definitions.result(), links.result())
   }
 
 }

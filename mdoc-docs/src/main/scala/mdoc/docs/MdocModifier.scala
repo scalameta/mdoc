@@ -9,8 +9,9 @@ import mdoc.StringModifier
 import mdoc.internal.cli.Context
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.Markdown
-import mdoc.internal.markdown.MarkdownLinks
-import mdoc.internal.markdown.MarkdownLinter
+import mdoc.internal.markdown.DocumentLinks
+import mdoc.internal.markdown.GitHubIdGenerator
+import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.pos.PositionSyntax._
 
 class MdocModifier(context: Context) extends StringModifier {
@@ -23,8 +24,8 @@ class MdocModifier(context: Context) extends StringModifier {
     myReporter.reset()
     val cleanInput = Input.VirtualFile(code.filename, code.text)
     val markdown = Markdown.toMarkdown(cleanInput, markdownSettings, myReporter, context.settings)
-    val links = MarkdownLinks.fromMarkdown(RelativePath("readme.md"), cleanInput)
-    MarkdownLinter.lint(List(links), myReporter)
+    val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, RelativePath("readme.md"), cleanInput)
+    LinkHygiene.lint(List(links), myReporter)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {
       if (info != "crash") {

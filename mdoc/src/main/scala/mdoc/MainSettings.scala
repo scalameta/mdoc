@@ -56,8 +56,12 @@ final class MainSettings private (
   def withWatch(watch: Boolean): MainSettings = {
     copy(settings.copy(watch = watch))
   }
+  @deprecated("Use withCheck instead", "0.4.1")
   def withTest(test: Boolean): MainSettings = {
-    copy(settings.copy(test = test))
+    copy(settings.copy(check = test))
+  }
+  def withCheck(check: Boolean): MainSettings = {
+    copy(settings.copy(check = check))
   }
   def withReportRelativePaths(reportRelativePaths: Boolean): MainSettings = {
     copy(settings.copy(reportRelativePaths = reportRelativePaths))
@@ -70,6 +74,9 @@ final class MainSettings private (
   }
   def withInputStream(inputStream: InputStream): MainSettings = {
     copy(settings.copy(inputStream = inputStream))
+  }
+  def withHeaderIdGenerator(headerIdGenerator: String => String): MainSettings = {
+    copy(settings.copy(headerIdGenerator = headerIdGenerator))
   }
 
   private[this] implicit def cwd: AbsolutePath = settings.cwd

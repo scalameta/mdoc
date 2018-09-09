@@ -25,6 +25,7 @@ import scala.meta.io.RelativePath
 import mdoc.StringModifier
 import mdoc.Reporter
 import mdoc.internal.BuildInfo
+import mdoc.internal.markdown.GitHubIdGenerator
 import mdoc.internal.markdown.MarkdownCompiler
 
 class Section(val name: String) extends StaticAnnotation
@@ -48,7 +49,8 @@ case class Settings(
       "Instead of generating a new site, report an error if generating the site would produce a diff " +
         "against an existing site. Useful for asserting in CI that a site is up-to-date."
     )
-    test: Boolean = false,
+    @ExtraName("test")
+    check: Boolean = false,
     @Description(
       "Classpath to use when compiling Scala code examples. " +
         "Defaults to the current thread's classpath."
@@ -86,9 +88,12 @@ case class Settings(
     stringModifiers: List[StringModifier] = Nil,
     @Hidden()
     @Description("The input stream to listen for enter key during file watching.")
-    inputStream: InputStream = System.in
+    inputStream: InputStream = System.in,
+    @Hidden()
+    @Description("The generator for header IDs, defaults to GitHub ID generator")
+    headerIdGenerator: String => String = GitHubIdGenerator
 ) {
-  def isFileWatching: Boolean = watch && !test
+  def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = infile.toRelative(in)
@@ -186,6 +191,8 @@ object Settings extends MetaconfigScalametaImplicits {
     }
   implicit val inputStreamDecoder: ConfDecoder[InputStream] =
     ConfDecoder.stringConfDecoder.map(_ => System.in)
+  implicit val headerIdGeneratorDecoder: ConfDecoder[String => String] =
+    ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
 
   implicit val pathEncoder: ConfEncoder[AbsolutePath] =
     ConfEncoder.StringEncoder.contramap { path =>
@@ -198,5 +205,7 @@ object Settings extends MetaconfigScalametaImplicits {
     ConfEncoder.StringEncoder.contramap(_.name())
   implicit val inputStreamEncoder: ConfEncoder[InputStream] =
     ConfEncoder.StringEncoder.contramap(_ => "<input stream>")
+  implicit val headerIdGeneratorEncoder: ConfEncoder[String => String] =
+    ConfEncoder.StringEncoder.contramap(_ => "<String => String>")
 
 }

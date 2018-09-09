@@ -18,8 +18,8 @@ import mdoc.internal.BuildInfo
 import mdoc.internal.io.IO
 import mdoc.internal.io.MdocFileListener
 import mdoc.internal.markdown.Markdown
-import mdoc.internal.markdown.MarkdownLinks
-import mdoc.internal.markdown.MarkdownLinter
+import mdoc.internal.markdown.DocumentLinks
+import mdoc.internal.markdown.LinkHygiene
 
 final class MainOps(
     settings: Settings,
@@ -28,8 +28,8 @@ final class MainOps(
 ) {
 
   def lint(): Unit = {
-    val links = MarkdownLinks.fromGeneratedSite(settings, reporter)
-    MarkdownLinter.lint(links, reporter)
+    val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
+    LinkHygiene.lint(docs, reporter)
   }
 
   def handleMarkdown(file: InputFile): Unit = synchronized {
@@ -74,7 +74,7 @@ final class MainOps(
   }
 
   def writePath(file: InputFile, string: String): Unit = {
-    if (settings.test) {
+    if (settings.check) {
       if (!file.out.isFile) return
       val expected = FileIO.slurp(file.out, settings.charset)
       if (expected != string) {
