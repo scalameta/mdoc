@@ -93,4 +93,31 @@ class FailSuite extends BaseMarkdownSuite {
       |""".stripMargin
   )
 
+  check(
+    "order",
+    """
+      |```scala mdoc
+      |println(42)
+      |```
+      |```scala mdoc:fail
+      |val x: Int = "String"
+      |```
+    """.stripMargin,
+    """
+      |```scala
+      |println(42)
+      |// 42
+      |```
+      |
+      |```scala
+      |val x: Int = "String"
+      |// type mismatch;
+      |//  found   : String("String")
+      |//  required: Int
+      |// val x: Int = "String"
+      |//              ^
+      |```
+    """.stripMargin
+  )
+
 }

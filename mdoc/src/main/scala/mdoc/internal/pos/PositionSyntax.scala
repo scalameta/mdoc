@@ -8,6 +8,7 @@ import scala.meta.io.RelativePath
 import scalafix.internal.util.PositionSyntax._
 import mdoc.document.RangePosition
 import mdoc.internal.cli.Settings
+import mdoc.internal.markdown.EvaluatedSection
 
 object PositionSyntax {
   implicit class XtensionInputMdoc(input: Input) {
@@ -29,8 +30,8 @@ object PositionSyntax {
     }
   }
   implicit class XtensionRangePositionMdoc(pos: RangePosition) {
-    def formatMessage(edit: TokenEditDistance, message: String): String = {
-      val mpos = pos.toMeta(edit)
+    def formatMessage(section: EvaluatedSection, message: String): String = {
+      val mpos = pos.toMeta(section)
       new StringBuilder()
         .append(message)
         .append("\n")
@@ -39,6 +40,16 @@ object PositionSyntax {
         .append(mpos.lineCaret)
         .append("\n")
         .toString()
+    }
+    def toMeta(section: EvaluatedSection): Position = {
+      val mpos = Position.Range(
+        section.input,
+        pos.startLine,
+        pos.startColumn,
+        pos.endLine,
+        pos.endColumn
+      )
+      mpos.toUnslicedPosition
     }
     def toMeta(edit: TokenEditDistance): Position = {
       Position
