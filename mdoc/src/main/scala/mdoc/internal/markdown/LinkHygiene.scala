@@ -14,7 +14,11 @@ object LinkHygiene {
       if uri.getScheme == null && uri.getHost == null
       if !isValidHeading(uri)
     } {
-      reporter.warning(reference.pos, s"Reference '$uri' does not exist")
+      val isAbsolutePath = uri.getPath.startsWith("/")
+      val hint =
+        if (isAbsolutePath) ". To fix this problem, make the link relative."
+        else ""
+      reporter.warning(reference.pos, s"Reference '$uri' does not exist$hint")
     }
   }
 

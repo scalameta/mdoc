@@ -74,7 +74,7 @@ final class MainOps(
   }
 
   def writePath(file: InputFile, string: String): Unit = {
-    if (settings.test) {
+    if (settings.check) {
       if (!file.out.isFile) return
       val expected = FileIO.slurp(file.out, settings.charset)
       if (expected != string) {

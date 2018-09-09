@@ -48,7 +48,8 @@ case class Settings(
       "Instead of generating a new site, report an error if generating the site would produce a diff " +
         "against an existing site. Useful for asserting in CI that a site is up-to-date."
     )
-    test: Boolean = false,
+    @ExtraName("test")
+    check: Boolean = false,
     @Description(
       "Classpath to use when compiling Scala code examples. " +
         "Defaults to the current thread's classpath."
@@ -88,7 +89,7 @@ case class Settings(
     @Description("The input stream to listen for enter key during file watching.")
     inputStream: InputStream = System.in
 ) {
-  def isFileWatching: Boolean = watch && !test
+  def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = infile.toRelative(in)
