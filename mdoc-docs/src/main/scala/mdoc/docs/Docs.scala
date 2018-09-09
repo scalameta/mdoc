@@ -1,4 +1,4 @@
-package mdoc.website
+package mdoc.docs
 
 import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
@@ -7,7 +7,7 @@ import mdoc.MainSettings
 import mdoc.internal.BuildInfo
 import mdoc.modifiers.ScastieModifier
 
-object Website {
+object Docs {
   def main(args: Array[String]): Unit = {
     val cwd = PathIO.workingDirectory.toNIO
     val settings = MainSettings()
@@ -15,15 +15,14 @@ object Website {
       .withOut(cwd)
       .withSiteVariables(Map("VERSION" -> BuildInfo.stableVersion))
       .withCleanTarget(false)
-      .withArgs(args.toList)
       .withReportRelativePaths(true)
-      .withWatch(true)
       .withStringModifiers(
         List(
           new FooModifier,
           new ScastieModifier(debugClassSuffix = Some("<a_random_uuid>"))
         )
       )
+      .withArgs(args.toList)
     val context = settings.settings.validate(settings.reporter).get
     val exitCode = Main.process(
       settings

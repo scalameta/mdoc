@@ -1,4 +1,4 @@
-package mdoc.website
+package mdoc.docs
 
 import mdoc.StringModifier
 import mdoc.Reporter

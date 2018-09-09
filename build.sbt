@@ -97,20 +97,12 @@ lazy val unit = project
   .dependsOn(mdoc, testsInput)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val website = project
-  .in(file("website"))
+lazy val docs = project
+  .in(file("mdoc-docs"))
   .settings(
     skip in publish := true,
     test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
-    git.remoteRepo := "git@github.com:olafurpg/mdoc.git",
-    siteSourceDirectory := baseDirectory.in(ThisBuild).value / "project" / "site"
-    // publishLocal := {
-    //   ghpagesPushSite
-    //     .dependsOn(run.in(Compile).toTask(""))
-    //     .value
-    // }
   )
   .dependsOn(mdoc)
-  .enablePlugins(GhpagesPlugin)
