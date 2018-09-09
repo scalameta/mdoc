@@ -16,9 +16,10 @@ object LinkHygiene {
     } {
       val isAbsolutePath = uri.getPath.startsWith("/")
       val hint =
-        if (isAbsolutePath) ". To fix this problem, make the link relative."
+        if (isAbsolutePath)
+          s". To fix this problem, either make the link relative or turn it into complete URL such as http://example.com$uri."
         else ""
-      reporter.warning(reference.pos, s"Reference '$uri' does not exist$hint")
+      reporter.warning(reference.pos, s"Unknown link '$uri'$hint")
     }
   }
 

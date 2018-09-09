@@ -55,10 +55,10 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       |* [name](a.md#name)
       |
     """.stripMargin,
-    """|warning: a.md:3:7: warning: Reference 'a.md#does-not-exist' does not exist
+    """|warning: a.md:3:7: warning: Unknown link 'a.md#does-not-exist'
        |Error [link](#does-not-exist) failed.
        |      ^^^^^^^^^^^^^^^^^^^^^^^
-       |warning: a.md:4:6: warning: Reference 'a.md#sectionn' does not exist
+       |warning: a.md:4:6: warning: Unknown link 'a.md#sectionn'
        |Typo [section](#sectionn) failed.
        |     ^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -107,7 +107,7 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       |/a.md
       |[absolute](/absolute.md)
     """.stripMargin,
-    """|warning: a.md:1:1: warning: Reference '/absolute.md' does not exist. To fix this problem, make the link relative.
+    """|warning: a.md:1:1: warning: Unknown link '/absolute.md'. To fix this problem, either make the link relative or turn it into complete URL such as http://example.com/absolute.md.
        |[absolute](/absolute.md)
        |^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin

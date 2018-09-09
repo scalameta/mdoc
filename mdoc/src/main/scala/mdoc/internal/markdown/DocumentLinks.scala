@@ -4,17 +4,16 @@ import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.HtmlInline
 import com.vladsch.flexmark.ast.Link
 import com.vladsch.flexmark.ast.Paragraph
-import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.parser.Parser
 import java.net.URI
+import mdoc.Reporter
+import mdoc.internal.cli.Settings
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.RelativePath
 import scala.util.matching.Regex
-import mdoc.Reporter
-import mdoc.internal.cli.Settings
 
 case class MarkdownReference(url: String, pos: Position) {
   def isExternal: Boolean = url.startsWith("http") || url.startsWith("//")
