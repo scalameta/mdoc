@@ -19,7 +19,11 @@ object Document {
 
 final case class Section(statements: List[Statement])
 
-final case class Statement(binders: List[Binder[_]], out: String)
+final case class Statement(
+    binders: List[Binder[_]],
+    out: String,
+    position: RangePosition
+)
 
 final class Binder[T](val value: T, val name: String, val tpe: TPrint[T], pos: RangePosition) {
   override def toString: String = {

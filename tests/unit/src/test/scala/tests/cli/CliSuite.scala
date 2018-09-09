@@ -6,6 +6,25 @@ import mdoc.internal.BuildInfo
 class CliSuite extends BaseCliSuite {
 
   checkCli(
+    "formatting",
+    """
+      |/index.md
+      |```scala mdoc
+      |List(1,
+      |  2, 3, 4) // comment
+      |```
+    """.stripMargin,
+    """
+      |/index.md
+      |```scala
+      |List(1,
+      |  2, 3, 4) // comment
+      |// res0: List[Int] = List(1, 2, 3, 4)
+      |```
+    """.stripMargin
+  )
+
+  checkCli(
     "classpath",
     """
       |/index.md

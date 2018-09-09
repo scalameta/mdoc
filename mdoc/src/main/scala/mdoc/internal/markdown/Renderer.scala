@@ -99,7 +99,10 @@ object Renderer {
         } else {
           sb.append("\n")
         }
-        sb.append(tree.syntax)
+        val pos = tree.pos
+        val endOfLinePosition =
+          Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
+        sb.append(endOfLinePosition.text)
         if (statement.out.nonEmpty) {
           sb.append("\n")
           appendFreshMultiline(sb, statement.out)

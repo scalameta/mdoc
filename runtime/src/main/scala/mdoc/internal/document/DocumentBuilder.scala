@@ -18,6 +18,7 @@ trait DocumentBuilder {
   private val mySections = ArrayBuffer.empty[Section]
   private val myOut = new ByteArrayOutputStream()
   private val myPs = new PrintStream(myOut)
+  private var statementPosition = RangePosition.empty
   private var lastPosition = RangePosition.empty
 
   object $doc {
@@ -37,13 +38,13 @@ trait DocumentBuilder {
     }
 
     def startStatement(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int): Unit = {
-      position(startLine, startColumn, endLine, endColumn)
+      statementPosition = position(startLine, startColumn, endLine, endColumn)
       myBinders.clear()
       myOut.reset()
     }
     def endStatement(): Unit = {
       val out = myOut.toString()
-      myStatements.append(Statement(myBinders.toList, out))
+      myStatements.append(Statement(myBinders.toList, out, statementPosition))
     }
 
     def startSection(): Unit = {

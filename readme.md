@@ -376,7 +376,7 @@ You can choose the Scastie theme when initializing the Scastie modifier:
 ```scala
 import mdoc.modifiers.ScastieModifier
 
-new ScastieModifier(theme = "dark")
+new ScastieModifier(theme = "dark") // default is "light"
 // res0: ScastieModifier = StringModifier(mdoc:scastie)
 ```
 
@@ -521,7 +521,9 @@ After:
 ```scala
 case class User(name: String)
 
-object User { implicit val ordering: Ordering[User] = Ordering.by(_.name) }
+object User {
+  implicit val ordering: Ordering[User] = Ordering.by(_.name)
+}
 
 List(User("John"), User("Susan")).sorted
 // res0: List[User] = List(User("John"), User("Susan"))
