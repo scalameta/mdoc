@@ -113,25 +113,17 @@ object Renderer {
           section.mod match {
             case Modifier.Fail =>
               binder.value match {
-                case CompileResult.TypecheckedOK(_, tpe, pos) =>
-                  val mpos = Position
-                    .Range(
-                      section.input,
-                      pos.startLine,
-                      pos.startColumn,
-                      pos.endLine,
-                      pos.endColumn
-                    )
-                    .toUnslicedPosition
+                case CompileResult.TypecheckedOK(_, tpe, tpos) =>
                   reporter.error(
-                    mpos,
+                    tpos.toMeta(section),
                     s"Expected compile error but statement type-checked successfully"
                   )
                   appendMultiline(sb, tpe)
-                case CompileResult.ParseError(msg, pos) =>
-                  appendFreshMultiline(sb, pos.formatMessage(doc.edit, msg))
-                case CompileResult.TypeError(msg, pos) =>
-                  appendFreshMultiline(sb, pos.formatMessage(doc.edit, msg))
+                case CompileResult.ParseError(msg, tpos) =>
+                  appendFreshMultiline(sb, tpos.formatMessage(section, msg))
+                case CompileResult.TypeError(msg, tpos) =>
+                  val mpos = tpos.toMeta(section)
+                  appendFreshMultiline(sb, tpos.formatMessage(section, msg))
                 case _ =>
                   val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
                   throw new IllegalArgumentException(

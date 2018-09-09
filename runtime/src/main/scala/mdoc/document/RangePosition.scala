@@ -10,6 +10,13 @@ final class RangePosition(
     val endLine: Int,
     val endColumn: Int
 ) {
+  def add(other: RangePosition): RangePosition =
+    new RangePosition(
+      other.startLine + startLine,
+      other.startColumn + startColumn,
+      other.endLine + endLine,
+      other.endColumn + endColumn
+    )
   def isEmpty: Boolean =
     startLine == -1 &&
       startColumn == -1 &&
