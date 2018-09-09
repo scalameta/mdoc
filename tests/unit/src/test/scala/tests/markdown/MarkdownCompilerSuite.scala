@@ -75,7 +75,7 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
   check(
     "non-val",
-    """println("hello world!") """,
+    """println("hello world!")""",
     """
       |```scala
       |println("hello world!")
@@ -84,4 +84,14 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
       |""".stripMargin
   )
 
+  check(
+    "comment1",
+    """val x = 2 // comment""",
+    """
+      |```scala
+      |val x = 2 // comment
+      |// x: Int = 2
+      |```
+      |""".stripMargin
+  )
 }

@@ -43,7 +43,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
       |val x = "1.0"
       |// x: String = "1.0"
       |
-      |x.length
+      |x.length // should match "1.0".length
       |// res0: Int = 3
       |```
     """.stripMargin,
