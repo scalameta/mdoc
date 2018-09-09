@@ -474,7 +474,7 @@ Link to [old section](#doesnotexist).
 Error:
 
 ````
-warning: readme.md:4:9: warning: Section '#doesnotexist' does not exist
+warning: readme.md:4:9: warning: Unknown link 'readme.md#doesnotexist'
 Link to [old section](#doesnotexist).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ````
@@ -685,7 +685,7 @@ Common options:
   --watch | -w
     Start a file watcher and incrementally re-generate the site on file save.
 
-  --test
+  --check
     Instead of generating a new site, report an error if generating the site would
     produce a diff against an existing site. Useful for asserting in CI that a
     site is up-to-date.
