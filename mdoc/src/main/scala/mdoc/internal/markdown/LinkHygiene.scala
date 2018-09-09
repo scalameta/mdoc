@@ -4,7 +4,7 @@ import java.net.URI
 import mdoc.Reporter
 
 object LinkHygiene {
-  def lint(docs: List[DocumentLinks], reporter: Reporter): Unit = {
+  def lint(docs: List[DocumentLinks], reporter: Reporter, verbose: Boolean): Unit = {
     val isValidHeading = docs.iterator.flatMap(_.absoluteDefinitions).toSet
     for {
       doc <- docs
@@ -15,11 +15,14 @@ object LinkHygiene {
       if !isValidHeading(uri)
     } {
       val isAbsolutePath = uri.getPath.startsWith("/")
+      val debug =
+        if (verbose) s". isValidHeading=$isValidHeading"
+        else ""
       val hint =
         if (isAbsolutePath)
           s". To fix this problem, either make the link relative or turn it into complete URL such as http://example.com$uri."
         else ""
-      reporter.warning(reference.pos, s"Unknown link '$uri'$hint")
+      reporter.warning(reference.pos, s"Unknown link '$uri'$hint$debug")
     }
   }
 

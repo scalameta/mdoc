@@ -727,6 +727,9 @@ Common options:
     produce a diff against an existing site. Useful for asserting in CI that a
     site is up-to-date.
 
+  --verbose
+    Include additional diagnostics for debuggin potential problems.
+
   --classpath String (default: "")
     Classpath to use when compiling Scala code examples. Defaults to the current
     thread's classpath.

@@ -25,7 +25,7 @@ class MdocModifier(context: Context) extends StringModifier {
     val cleanInput = Input.VirtualFile(code.filename, code.text)
     val markdown = Markdown.toMarkdown(cleanInput, markdownSettings, myReporter, context.settings)
     val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, RelativePath("readme.md"), cleanInput)
-    LinkHygiene.lint(List(links), myReporter)
+    LinkHygiene.lint(List(links), myReporter, verbose = false)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {
       if (info != "crash") {

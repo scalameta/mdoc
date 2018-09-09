@@ -13,7 +13,7 @@ import mdoc.internal.markdown.LinkHygiene
 class LinkHygieneSuite extends FunSuite with DiffAssertions {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
-  def check(name: String, original: String, expected: String): Unit = {
+  def check(name: String, original: String, expected: String, verbose: Boolean = false): Unit = {
     test(name) {
       myOut.reset()
       reporter.reset()
@@ -22,7 +22,7 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
         .default(root)
         .copy(reportRelativePaths = true, in = root, out = root)
       val links = DocumentLinks.fromGeneratedSite(settings, reporter)
-      LinkHygiene.lint(links, reporter)
+      LinkHygiene.lint(links, reporter, verbose)
       val obtained = fansi.Str(myOut.toString()).plainText
       assertNoDiffOrPrintExpected(obtained, expected)
     }
@@ -111,6 +111,22 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
        |[absolute](/absolute.md)
        |^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
+  )
+
+  check(
+    "verbose",
+    """
+      |/a.md
+      |# Header 1
+      |[2](b.md#header)
+      |/b.md
+      |# Header 2
+    """.stripMargin,
+    """|warning: a.md:2:1: warning: Unknown link 'b.md#header'. isValidHeading=Set(b.md, b.md#header-2, a.md, a.md#header-1)
+       |[2](b.md#header)
+       |^^^^^^^^^^^^^^^^
+       |""".stripMargin,
+    verbose = true
   )
 
 }
