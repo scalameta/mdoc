@@ -10,6 +10,7 @@ import mdoc.internal.cli.Settings
 trait StringModifier {
   val name: String
   def process(info: String, code: Input, reporter: Reporter): String
+  override def toString: String = s"StringModifier(mdoc:$name)"
 }
 
 object StringModifier {

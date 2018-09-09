@@ -34,6 +34,7 @@ Table of contents:
   - [Fail](#fail)
   - [Crash](#crash)
   - [Passthrough](#passthrough)
+  - [Scastie](#scastie)
 - [Key features](#key-features)
   - [Performance](#performance)
   - [Good error messages](#good-error-messages)
@@ -284,6 +285,100 @@ Look at the table:
 |  4 |  8 | 12 | 16 |
 ````
 
+
+### Scastie
+
+The `scastie` modifier transforms a Scala code block into a
+[Scastie](https://scastie.scala-lang.org/) snippet.
+
+> ℹ️ This modifier will work only in environments that support embedding a
+> `<script>` tag. For example, it won't work in GitHub readmes, but it will work
+> when building a static website from Markdown (e.g., with
+> [Docusaurus](https://docusaurus.io/))
+
+You can embed an existing Scastie snippet by its id:
+
+
+Before:
+
+````
+```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
+
+```
+````
+
+After:
+
+````
+<script src='https://scastie.scala-lang.org/xbrvky6fTjysG32zK6kzRQ.js?theme=light'></script>
+````
+
+
+or in case of a user's snippet:
+
+
+Before:
+
+````
+```scala mdoc:scastie:MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg
+
+```
+````
+
+After:
+
+````
+<script src='https://scastie.scala-lang.org/MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg.js?theme=light'></script>
+````
+
+
+> ⚠️ The empty line in the block can't be omitted due to how the Markdown parser
+> works
+
+Moreover, you can quickly translate any Scala code block block into a Scastie
+snippet on the fly.
+
+
+Before:
+
+````
+```scala mdoc:scastie
+val x = 1 + 2
+println(x)
+```
+````
+
+After:
+
+````
+<script src="https://scastie.scala-lang.org/embedded.js"></script>
+
+<pre class='scastie-snippet-<a_random_uuid>'></pre>
+
+<script>window.addEventListener('load', function() {
+scastie.Embedded('.scastie-snippet-<a_random_uuid>', {
+code: `val x = 1 + 2
+println(x)`,
+theme: 'light',
+isWorksheetMode: true,
+targetType: 'jvm',
+scalaVersion: '2.12.6'
+})
+})</script>
+````
+
+
+> ⚠️ Inline snippets are slower to run than embedded ones, since they won't be
+> cached. You should prefer embedding existing snippets whenever possible.
+
+You can choose the Scastie theme when initializing the Scastie modifier:
+
+```scala
+import mdoc.modifiers.ScastieModifier
+
+new ScastieModifier(theme = "dark")
+// res0: ScastieModifier = StringModifier(mdoc:scastie)
+```
 
 ## Key features
 
