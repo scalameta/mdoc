@@ -92,8 +92,13 @@ class CliSuite extends BaseCliSuite {
       |```scala mdoc:foobar
       |foobar
       |```
+      |/before-index.md
+      |# Header
     """.stripMargin,
-    "", // empty site, did not generate
+    """
+      |/before-index.md
+      |# Header
+    """.stripMargin, // did not generate index.md
     expectedExitCode = 1,
     onStdout = { out =>
       assert(out.contains("Invalid mode 'foobar'"))
