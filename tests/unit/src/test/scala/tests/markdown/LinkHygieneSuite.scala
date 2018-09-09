@@ -7,10 +7,10 @@ import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
-import mdoc.internal.markdown.MarkdownLinks
-import mdoc.internal.markdown.MarkdownLinter
+import mdoc.internal.markdown.DocumentLinks
+import mdoc.internal.markdown.LinkHygiene
 
-class LinterSuite extends FunSuite with DiffAssertions {
+class LinkHygieneSuite extends FunSuite with DiffAssertions {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
   def check(name: String, original: String, expected: String): Unit = {
@@ -21,8 +21,8 @@ class LinterSuite extends FunSuite with DiffAssertions {
       val settings = Settings
         .default(root)
         .copy(reportRelativePaths = true, in = root, out = root)
-      val links = MarkdownLinks.fromGeneratedSite(settings, reporter)
-      MarkdownLinter.lint(links, reporter)
+      val links = DocumentLinks.fromGeneratedSite(settings, reporter)
+      LinkHygiene.lint(links, reporter)
       val obtained = fansi.Str(myOut.toString()).plainText
       assertNoDiffOrPrintExpected(obtained, expected)
     }
@@ -48,23 +48,17 @@ class LinterSuite extends FunSuite with DiffAssertions {
       |* [id](#id)
       |* [name](#name)
       |
-      |Relative path:
-      |* [section](../a.md#section)
-      |* [sub](../a.md#sub-section)
-      |* [id](../a.md#id)
-      |* [name](../a.md#name)
-      |
-      |Absolute paths:
+      |Explicit file path:
       |* [section](a.md#section)
       |* [sub](a.md#sub-section)
       |* [id](a.md#id)
       |* [name](a.md#name)
       |
     """.stripMargin,
-    """|warning: a.md:3:7: warning: Section '#does-not-exist' does not exist
+    """|warning: a.md:3:7: warning: Reference 'a.md#does-not-exist' does not exist
        |Error [link](#does-not-exist) failed.
        |      ^^^^^^^^^^^^^^^^^^^^^^^
-       |warning: a.md:4:6: warning: Section '#sectionn' does not exist
+       |warning: a.md:4:6: warning: Reference 'a.md#sectionn' does not exist
        |Typo [section](#sectionn) failed.
        |     ^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -82,6 +76,41 @@ class LinterSuite extends FunSuite with DiffAssertions {
       |
     """.stripMargin,
     ""
+  )
+
+  check(
+    "nested-directories",
+    """
+      |/a/a.md
+      |[b](../b/b.md#b)
+      |[i](../index.md)
+      |/index.md
+      |Index
+      |/b/b.md
+      |# B
+    """.stripMargin,
+    ""
+  )
+
+  check(
+    "img",
+    """
+      |/a.md
+      |![i](/static/logo.png)
+    """.stripMargin,
+    ""
+  )
+
+  check(
+    "absolute",
+    """
+      |/a.md
+      |[absolute](/absolute.md)
+    """.stripMargin,
+    """|warning: a.md:1:1: warning: Reference '/absolute.md' does not exist. To fix this problem, make the link relative.
+       |[absolute](/absolute.md)
+       |^^^^^^^^^^^^^^^^^^^^^^^^
+    """.stripMargin
   )
 
 }
