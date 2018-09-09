@@ -51,8 +51,7 @@ object DocumentLinks {
     val ls = FileIO.listAllFilesRecursively(settings.out)
     ls.files.foreach { relpath =>
       val isMarkdown = PathIO.extension(relpath.toNIO) == "md"
-      val hasMatchingInputFile = settings.in.resolve(relpath).isFile
-      if (isMarkdown && hasMatchingInputFile) {
+      if (isMarkdown) {
         val abspath = ls.root.resolve(relpath)
         val input = Input.VirtualFile(relpath.toString(), FileIO.slurp(abspath, settings.charset))
         links += DocumentLinks.fromMarkdown(settings.headerIdGenerator, relpath, input)
