@@ -13,7 +13,7 @@ import mdoc.internal.markdown.LinkHygiene
 class LinkHygieneSuite extends FunSuite with DiffAssertions {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
-  def check(name: String, original: String, expected: String): Unit = {
+  def check(name: String, original: String, expected: String, verbose: Boolean = false): Unit = {
     test(name) {
       myOut.reset()
       reporter.reset()
@@ -22,7 +22,7 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
         .default(root)
         .copy(reportRelativePaths = true, in = root, out = root)
       val links = DocumentLinks.fromGeneratedSite(settings, reporter)
-      LinkHygiene.lint(links, reporter)
+      LinkHygiene.lint(links, reporter, verbose)
       val obtained = fansi.Str(myOut.toString()).plainText
       assertNoDiffOrPrintExpected(obtained, expected)
     }
@@ -55,10 +55,10 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       |* [name](a.md#name)
       |
     """.stripMargin,
-    """|warning: a.md:3:7: warning: Unknown link 'a.md#does-not-exist'
+    """|warning: a.md:3:7: warning: Unknown link 'a.md#does-not-exist'.
        |Error [link](#does-not-exist) failed.
        |      ^^^^^^^^^^^^^^^^^^^^^^^
-       |warning: a.md:4:6: warning: Unknown link 'a.md#sectionn'
+       |warning: a.md:4:6: warning: Unknown link 'a.md#sectionn', did you mean 'a.md#section'?
        |Typo [section](#sectionn) failed.
        |     ^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -111,6 +111,27 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
        |[absolute](/absolute.md)
        |^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
+  )
+
+  check(
+    "verbose",
+    """
+      |/a.md
+      |# Header 1
+      |[2](b.md#header)
+      |/b.md
+      |# Header 2
+    """.stripMargin,
+    """|warning: a.md:2:1: warning: Unknown link 'b.md#header', did you mean 'b.md#header-2'?
+       |isValidHeading:
+       |  92  b.md#header-2
+       |  83  a.md#header-1
+       |  53  b.md
+       |  40  a.md
+       |[2](b.md#header)
+       |^^^^^^^^^^^^^^^^
+       |""".stripMargin,
+    verbose = true
   )
 
 }

@@ -51,6 +51,8 @@ case class Settings(
     )
     @ExtraName("test")
     check: Boolean = false,
+    @Description("Include additional diagnostics for debuggin potential problems.")
+    verbose: Boolean = false,
     @Description(
       "Classpath to use when compiling Scala code examples. " +
         "Defaults to the current thread's classpath."

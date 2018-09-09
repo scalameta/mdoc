@@ -503,17 +503,24 @@ Before:
 # My title
 
 Link to [my title](#my-title).
+Link to [typo section](#mytitle).
 Link to [old section](#doesnotexist).
 ````
 
 Error:
 
 ````
-warning: readme.md:4:9: warning: Unknown link 'readme.md#doesnotexist'
+warning: readme.md:4:9: warning: Unknown link 'readme.md#mytitle', did you mean 'readme.md#my-title'?
+Link to [typo section](#mytitle).
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+warning: readme.md:5:9: warning: Unknown link 'readme.md#doesnotexist'.
 Link to [old section](#doesnotexist).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ````
 
+
+Observe that mdoc suggests a fix if there exists a header that is similar to the
+unknown link.
 
 ### Script semantics
 
@@ -726,6 +733,9 @@ Common options:
     Instead of generating a new site, report an error if generating the site would
     produce a diff against an existing site. Useful for asserting in CI that a
     site is up-to-date.
+
+  --verbose
+    Include additional diagnostics for debuggin potential problems.
 
   --classpath String (default: "")
     Classpath to use when compiling Scala code examples. Defaults to the current
