@@ -32,8 +32,7 @@ final class MainOps(
     LinkHygiene.lint(docs, reporter)
   }
 
-  def handleMarkdown(file: InputFile): Unit = synchronized {
-    clearScreen()
+  def handleMarkdown(file: InputFile): Exit = synchronized {
     reporter.reset()
     reporter.info(s"Compiling ${file.in}")
     val start = System.nanoTime()
@@ -48,19 +47,21 @@ final class MainOps(
       val end = System.nanoTime()
       val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
       reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
-      waitingForFileChanges()
     }
+    if (reporter.hasErrors) Exit.error
+    else Exit.success
   }
 
-  def handleRegularFile(file: InputFile): Unit = {
+  def handleRegularFile(file: InputFile): Exit = {
     Files.createDirectories(file.out.toNIO.getParent)
     Files.copy(file.in.toNIO, file.out.toNIO, StandardCopyOption.REPLACE_EXISTING)
     reporter.info(s"Copied    ${file.out.toNIO}")
+    Exit.success
   }
 
-  def handleFile(file: InputFile): Unit = {
+  def handleFile(file: InputFile): Exit = {
     try {
-      if (!settings.matches(file.relpath)) ()
+      if (!settings.matches(file.relpath)) Exit.success
       else {
         PathIO.extension(file.in.toNIO) match {
           case "md" => handleMarkdown(file)
@@ -70,6 +71,7 @@ final class MainOps(
     } catch {
       case NonFatal(e) =>
         new FileException(file.in, e).printStackTrace()
+        Exit.error
     }
   }
 
@@ -94,53 +96,62 @@ final class MainOps(
     }
   }
 
-  def generateCompleteSite(): Unit = {
+  def generateCompleteSite(): Exit = {
     var isEmpty = true
+    var exit = Exit.success
     IO.foreachInputFile(settings) { file =>
       isEmpty = false
-      handleFile(file)
+      val nextExit = handleFile(file)
+      exit = exit.merge(nextExit)
     }
     if (isEmpty) {
       reporter.error(s"no input files: ${settings.in}")
     }
     lint()
+    exit
   }
 
-  def run(): Unit = {
+  def run(): Exit = {
     if (settings.cleanTarget && Files.exists(settings.out.toNIO)) {
       IO.cleanTarget(settings.out)
     }
-    generateCompleteSite()
-    runFileWatcher()
+    val isOk = generateCompleteSite()
+    if (settings.isFileWatching) {
+      waitingForFileChanges()
+      runFileWatcher()
+      // exit code doesn't matter when file watching
+      Exit.success
+    } else {
+      isOk
+    }
   }
 
   def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
+    if (PathIO.extension(event.path()) == "md") {
+      clearScreen()
+    }
     val path = AbsolutePath(event.path())
     settings.toInputFile(path) match {
-      case Some(inputFile) => handleFile(inputFile)
+      case Some(inputFile) =>
+        handleFile(inputFile)
+        lint()
+        waitingForFileChanges()
       case None => ()
     }
-    lint()
   }
 
   def runFileWatcher(): Unit = {
-    if (settings.isFileWatching) {
-      val executor = Executors.newFixedThreadPool(1)
-      val watcher = MdocFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
-      watcher.watchUntilInterrupted()
-    }
+    val executor = Executors.newFixedThreadPool(1)
+    val watcher = MdocFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
+    watcher.watchUntilInterrupted()
   }
 
   def clearScreen(): Unit = {
-    if (settings.isFileWatching) {
-      print("\033[H\033[2J")
-    }
+    print("\033[H\033[2J")
   }
 
   def waitingForFileChanges(): Unit = {
-    if (settings.isFileWatching) {
-      reporter.println(s"Waiting for file changes (press enter to interrupt)")
-    }
+    reporter.println(s"Waiting for file changes (press enter to interrupt)")
   }
 
 }
@@ -165,11 +176,11 @@ object MainOps {
           case Configured.Ok(ctx) =>
             val markdown = Markdown.mdocSettings(ctx)
             val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
-            runner.run()
-            if (ctx.reporter.hasErrors) {
-              1 // error
-            } else {
+            val exit = runner.run()
+            if (exit.isSuccess) {
               0
+            } else {
+              1 // error
             }
         }
     }
