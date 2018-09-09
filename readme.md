@@ -377,7 +377,7 @@ You can choose the Scastie theme when initializing the Scastie modifier:
 import mdoc.modifiers.ScastieModifier
 
 new ScastieModifier(theme = "dark")
-// res0: ScastieModifier = mdoc.modifiers.ScastieModifier@264340f0
+// res0: ScastieModifier = StringModifier(mdoc:scastie)
 ```
 
 ## Key features
