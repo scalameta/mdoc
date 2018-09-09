@@ -73,6 +73,7 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       case (section, ScalaBlockInput(block, _, mod)) =>
         block.setInfo(CharSubSequence.of("scala"))
         mod match {
+          case Modifier.Silent =>
           case Modifier.Default | Modifier.Fail =>
             val str = Renderer.renderEvaluatedSection(rendered, section, ctx.reporter)
             val content: BasedSequence = CharSubSequence.of(str)
