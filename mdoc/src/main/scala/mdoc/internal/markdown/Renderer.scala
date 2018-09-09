@@ -158,7 +158,7 @@ object Renderer {
 
             case Modifier.Crash =>
               throw new IllegalArgumentException(Modifier.Crash.toString)
-            case c: Modifier.Str =>
+            case c @ (Modifier.Str(_, _) | Modifier.Silent) =>
               throw new IllegalArgumentException(c.toString)
           }
         }

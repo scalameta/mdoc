@@ -20,9 +20,10 @@ sealed trait Modifier {
   def isPassthrough: Boolean = this == Passthrough
   def isString: Boolean = this.isInstanceOf[Str]
   def isCrash: Boolean = this == Crash
+  def isSilent: Boolean = this == Silent
 }
 object Modifier {
-  def all: List[Modifier] = List(Default, Passthrough, Fail, Crash)
+  def all: List[Modifier] = List(Default, Passthrough, Fail, Crash, Silent)
   def apply(string: String): Option[Modifier] =
     all.find(_.toString.equalsIgnoreCase(string))
 
@@ -34,6 +35,9 @@ object Modifier {
 
   /** Expect a runtime exception from evaluating the block. */
   case object Crash extends Modifier
+
+  /** Keep the input code fence unchanged, don't print out the evaluated output. */
+  case object Silent extends Modifier
 
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends Modifier

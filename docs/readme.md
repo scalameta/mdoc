@@ -31,6 +31,7 @@ Table of contents:
   - [Command-line](#command-line)
 - [Modifiers](#modifiers)
   - [Default](#default)
+  - [Silent](#silent)
   - [Fail](#fail)
   - [Crash](#crash)
   - [Passthrough](#passthrough)
@@ -161,6 +162,22 @@ The default modifier compiles and executes the code fence as normal
 ```scala mdoc
 val x = 1
 val y = 2
+x + y
+```
+````
+
+### Silent
+
+The `silent` modifier is identical to the default modifier except that it hides
+the evaluated output. The input code fence renders unchanged.
+
+````scala mdoc:mdoc
+```scala mdoc:silent
+val x = 1
+val y = 2
+x + y
+```
+```scala mdoc
 x + y
 ```
 ````
