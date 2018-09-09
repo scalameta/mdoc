@@ -75,6 +75,9 @@ final class MainSettings private (
   def withInputStream(inputStream: InputStream): MainSettings = {
     copy(settings.copy(inputStream = inputStream))
   }
+  def withHeaderIdGenerator(headerIdGenerator: String => String): MainSettings = {
+    copy(settings.copy(headerIdGenerator = headerIdGenerator))
+  }
 
   private[this] implicit def cwd: AbsolutePath = settings.cwd
   private[this] def copy(

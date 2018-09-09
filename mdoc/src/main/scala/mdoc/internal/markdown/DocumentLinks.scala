@@ -56,21 +56,25 @@ object DocumentLinks {
       if (isMarkdown && hasMatchingInputFile) {
         val abspath = ls.root.resolve(relpath)
         val input = Input.VirtualFile(relpath.toString(), FileIO.slurp(abspath, settings.charset))
-        links += DocumentLinks.fromMarkdown(relpath, input)
+        links += DocumentLinks.fromMarkdown(settings.headerIdGenerator, relpath, input)
       }
     }
     links.result()
   }
 
-  def fromMarkdown(relpath: RelativePath, input: Input): DocumentLinks = {
-    val settings = Markdown.plainSettings()
-    val parser = Parser.builder(settings).build
+  def fromMarkdown(
+      headerIdGenerator: String => String,
+      relpath: RelativePath,
+      input: Input
+  ): DocumentLinks = {
+    val markdownSettings = Markdown.plainSettings()
+    val parser = Parser.builder(markdownSettings).build
     val ast = parser.parse(input.text)
     val definitions = List.newBuilder[String]
     val links = List.newBuilder[MarkdownReference]
     Markdown.foreach(ast) {
       case heading: Heading =>
-        definitions += HeaderIdGenerator.generateId(heading.getText, dashChars, false)
+        definitions += headerIdGenerator(heading.getText.toString)
       case p: Paragraph if p.getChars.startsWith("<a name=") =>
         p.getChars.toString.lines.next() match {
           case HtmlName(id) =>

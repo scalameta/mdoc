@@ -25,6 +25,7 @@ import scala.meta.io.RelativePath
 import mdoc.StringModifier
 import mdoc.Reporter
 import mdoc.internal.BuildInfo
+import mdoc.internal.markdown.GitHubIdGenerator
 import mdoc.internal.markdown.MarkdownCompiler
 
 class Section(val name: String) extends StaticAnnotation
@@ -87,7 +88,10 @@ case class Settings(
     stringModifiers: List[StringModifier] = Nil,
     @Hidden()
     @Description("The input stream to listen for enter key during file watching.")
-    inputStream: InputStream = System.in
+    inputStream: InputStream = System.in,
+    @Hidden()
+    @Description("The generator for header IDs, defaults to GitHub ID generator")
+    headerIdGenerator: String => String = GitHubIdGenerator
 ) {
   def isFileWatching: Boolean = watch && !check
 
@@ -187,6 +191,8 @@ object Settings extends MetaconfigScalametaImplicits {
     }
   implicit val inputStreamDecoder: ConfDecoder[InputStream] =
     ConfDecoder.stringConfDecoder.map(_ => System.in)
+  implicit val headerIdGeneratorDecoder: ConfDecoder[String => String] =
+    ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
 
   implicit val pathEncoder: ConfEncoder[AbsolutePath] =
     ConfEncoder.StringEncoder.contramap { path =>
@@ -199,5 +205,7 @@ object Settings extends MetaconfigScalametaImplicits {
     ConfEncoder.StringEncoder.contramap(_.name())
   implicit val inputStreamEncoder: ConfEncoder[InputStream] =
     ConfEncoder.StringEncoder.contramap(_ => "<input stream>")
+  implicit val headerIdGeneratorEncoder: ConfEncoder[String => String] =
+    ConfEncoder.StringEncoder.contramap(_ => "<String => String>")
 
 }

@@ -1,4 +1,5 @@
 package mdoc.internal.markdown
+
 import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 
 object GitHubIdGenerator extends (String => String) {

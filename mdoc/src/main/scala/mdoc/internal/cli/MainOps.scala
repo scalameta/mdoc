@@ -28,8 +28,8 @@ final class MainOps(
 ) {
 
   def lint(): Unit = {
-    val links = DocumentLinks.fromGeneratedSite(settings, reporter)
-    LinkHygiene.lint(links, reporter)
+    val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
+    LinkHygiene.lint(docs, reporter)
   }
 
   def handleMarkdown(file: InputFile): Unit = synchronized {
