@@ -337,8 +337,12 @@ invalid.
 # My title
 
 Link to [my title](#my-title).
+Link to [typo section](#mytitle).
 Link to [old section](#doesnotexist).
 ```
+
+Observe that mdoc suggests a fix if there exists a header that is similar to the
+unknown link.
 
 ### Script semantics
 

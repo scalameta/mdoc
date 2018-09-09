@@ -55,10 +55,10 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       |* [name](a.md#name)
       |
     """.stripMargin,
-    """|warning: a.md:3:7: warning: Unknown link 'a.md#does-not-exist'
+    """|warning: a.md:3:7: warning: Unknown link 'a.md#does-not-exist'.
        |Error [link](#does-not-exist) failed.
        |      ^^^^^^^^^^^^^^^^^^^^^^^
-       |warning: a.md:4:6: warning: Unknown link 'a.md#sectionn'
+       |warning: a.md:4:6: warning: Unknown link 'a.md#sectionn', did you mean 'a.md#section'?
        |Typo [section](#sectionn) failed.
        |     ^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -122,7 +122,12 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       |/b.md
       |# Header 2
     """.stripMargin,
-    """|warning: a.md:2:1: warning: Unknown link 'b.md#header'. isValidHeading=Set(b.md, b.md#header-2, a.md, a.md#header-1)
+    """|warning: a.md:2:1: warning: Unknown link 'b.md#header', did you mean 'b.md#header-2'?
+       |isValidHeading:
+       |  92  b.md#header-2
+       |  83  a.md#header-1
+       |  53  b.md
+       |  40  a.md
        |[2](b.md#header)
        |^^^^^^^^^^^^^^^^
        |""".stripMargin,

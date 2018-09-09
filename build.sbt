@@ -66,6 +66,7 @@ lazy val mdoc = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "io.methvin" % "directory-watcher" % "0.7.0",
+      "me.xdrop" % "fuzzywuzzy" % "1.1.9", // for link hygiene "did you mean?"
       "ch.epfl.scala" %% "scalafix-core" % V.scalafix
     )
   )

@@ -503,17 +503,24 @@ Before:
 # My title
 
 Link to [my title](#my-title).
+Link to [typo section](#mytitle).
 Link to [old section](#doesnotexist).
 ````
 
 Error:
 
 ````
-warning: readme.md:4:9: warning: Unknown link 'readme.md#doesnotexist'
+warning: readme.md:4:9: warning: Unknown link 'readme.md#mytitle', did you mean 'readme.md#my-title'?
+Link to [typo section](#mytitle).
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+warning: readme.md:5:9: warning: Unknown link 'readme.md#doesnotexist'.
 Link to [old section](#doesnotexist).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ````
 
+
+Observe that mdoc suggests a fix if there exists a header that is similar to the
+unknown link.
 
 ### Script semantics
 
