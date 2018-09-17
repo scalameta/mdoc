@@ -61,7 +61,7 @@ final class MainOps(
 
   def handleFile(file: InputFile): Exit = {
     try {
-      if (!settings.matches(file.relpath)) Exit.success
+      if (!settings.isIncluded(file.relpath)) Exit.success
       else {
         PathIO.extension(file.in.toNIO) match {
           case "md" => handleMarkdown(file)

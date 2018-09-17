@@ -60,10 +60,29 @@ class CliSuite extends BaseCliSuite {
       |# Include
     """.stripMargin,
     extraArgs = Array(
-      "--include-path",
+      "--include",
       "include.md",
-      "--exclude-path",
+      "--exclude",
       "exclude.md"
+    )
+  )
+  checkCli(
+    "include one file",
+    """
+      |/users/install.md
+      |# Install
+      |/users/usage.md
+      |# Usage
+      |/developers/setup.md
+      |# Setup
+    """.stripMargin,
+    """
+      |/users/install.md
+      |# Install
+    """.stripMargin,
+    extraArgs = Array(
+      "--include",
+      "**/install.md"
     )
   )
 
@@ -82,7 +101,7 @@ class CliSuite extends BaseCliSuite {
       |# Index 1.0.0
     """.stripMargin,
     extraArgs = Array(
-      "--exclude-path",
+      "--exclude",
       "src"
     )
   )

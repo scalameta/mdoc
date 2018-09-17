@@ -32,8 +32,8 @@ object IO {
 
       override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
         val relpath = RelativePath(root.relativize(dir))
-        if (dir == root || settings.matches(relpath)) FileVisitResult.CONTINUE
-        else FileVisitResult.SKIP_SUBTREE // excluded
+        if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
+        else FileVisitResult.CONTINUE
       }
     }
     Files.walkFileTree(root, visitor)
