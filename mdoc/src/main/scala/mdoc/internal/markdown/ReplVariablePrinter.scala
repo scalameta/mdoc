@@ -19,17 +19,18 @@ class ReplVariablePrinter(
       if (leadingNewline) {
         sb.append('\n')
       }
-      val lines = pprint.PPrinter.BlackWhite.tokenize(
-        binder.runtimeValue,
-        width = width,
-        height = height,
-        indent = 2
-      )
       sb.append("// ")
         .append(binder.name)
         .append(": ")
         .append(binder.staticType)
         .append(" = ")
+      val lines = pprint.PPrinter.BlackWhite.tokenize(
+        binder.runtimeValue,
+        width = width,
+        height = height,
+        indent = 2,
+        initialOffset = baos.size()
+      )
       lines.foreach { lineStr =>
         val line = lineStr.plainText
         Renderer.appendMultiline(sb, line)

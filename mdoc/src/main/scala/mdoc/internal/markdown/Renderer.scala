@@ -95,17 +95,19 @@ object Renderer {
     val baos = new ByteArrayOutputStream()
     val sb = new PrintStream(baos)
     val stats = section.source.stats.lift
+    val input = section.source.pos.input
     val totalStats = section.source.stats.length
     section.section.statements.zip(section.source.stats).zipWithIndex.foreach {
       case ((statement, tree), statementIndex) =>
         val pos = tree.pos
-        val leadingBlankLines = stats(statementIndex - 1) match {
+        val leadingStart = stats(statementIndex - 1) match {
           case None =>
             0
           case Some(previousStatement) =>
-            tree.pos.startLine - previousStatement.pos.endLine
+            previousStatement.pos.end
         }
-        sb.append("\n" * leadingBlankLines)
+        val leadingTrivia = Position.Range(input, leadingStart, pos.start)
+        sb.append(leadingTrivia.text)
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
         sb.append(endOfLinePosition.text)
