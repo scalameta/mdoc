@@ -1,4 +1,5 @@
 package tests.markdown
+import mdoc.internal.markdown.ReplVariablePrinter
 
 class VariablePrinterSuite extends BaseMarkdownSuite {
 
@@ -58,4 +59,27 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     lastStatementOnly
   )
 
+  val initialOffset = baseSettings.copy(
+    variablePrinter =
+      new ReplVariablePrinter(leadingNewline = true, width = 25, height = 20, indent = 2)
+  )
+  check(
+    "initial-offset",
+    """
+      |```scala mdoc
+      |// Column 25             |
+      |val name = List(1, 2)
+      |```
+    """.stripMargin,
+    """|```scala
+       |// Column 25             |
+       |val name = List(1, 2)
+       |// name: List[Int] = List(
+       |//   1,
+       |//   2
+       |// )
+       |```
+    """.stripMargin,
+    initialOffset
+  )
 }

@@ -183,4 +183,43 @@ class DefaultSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "leading-comment",
+    """
+      |```scala mdoc
+      |
+      |/* Comment 1 */
+      |val x = 2
+      |
+      |// Comment 2
+      |
+      |val y = 2
+      |
+      |// Comment 4
+      |x + y
+      |
+      |/** Docstring */
+      |class User()
+      |```
+    """.stripMargin,
+    """|```scala
+       |/* Comment 1 */
+       |val x = 2
+       |// x: Int = 2
+       |
+       |// Comment 2
+       |
+       |val y = 2
+       |// y: Int = 2
+       |
+       |// Comment 4
+       |x + y
+       |// res0: Int = 4
+       |
+       |/** Docstring */
+       |class User()
+       |```
+    """.stripMargin
+  )
+
 }
