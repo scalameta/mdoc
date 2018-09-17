@@ -33,6 +33,6 @@ object Docs {
           )
         )
     )
-    sys.exit(exitCode)
+    if (exitCode != 0) sys.exit(exitCode)
   }
 }

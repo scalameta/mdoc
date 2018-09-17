@@ -6,6 +6,7 @@ import scala.meta.testkit.DiffAssertions
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.Renderer
+import mdoc.internal.markdown.ReplVariablePrinter
 
 class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
 
@@ -21,7 +22,7 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: List[String], expected: String): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val obtained = Renderer.render(inputs, compiler, reporter, name + ".md")
+      val obtained = Renderer.render(inputs, compiler, reporter, name + ".md", ReplVariablePrinter)
       assertNoDiff(obtained, expected)
     }
   }
