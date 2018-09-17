@@ -711,7 +711,8 @@ Usage:   mdoc [<option> ...]
 Example: mdoc --in <path> --out <path> (customize input/output directories)
          mdoc --watch                  (watch for file changes)
          mdoc --site.VERSION 1.0.0     (pass in site variables)
-         mdoc --exclude-path <glob>    (exclude files matching patterns)
+         mdoc --include **/example.md  (process only files named example.md)
+         mdoc --exclude node_modules   (don't process node_modules directory)
 
 Mdoc is a documentation tool that interprets Scala code examples within markdown
 code fences allowing you to compile and test documentation as part your build. 
@@ -760,11 +761,14 @@ Less common options:
   --version
     Print out the version number and exit
 
-  --include-path [<glob> ...] (default: [])
-    Glob to filter which files from --in directory to include.
+  --include [<glob> ...] (default: [])
+    Glob to filter which files to process. Defaults to all files. Example: --include
+    **/example.md will process only files with the name example.md.
 
-  --exclude-path [<glob> ...] (default: [])
-    Glob to filter which files from --in directory to exclude.
+  --exclude [<glob> ...] (default: [])
+    Glob to filter which files from exclude from processing. Defaults to no files.
+    Example: --include users/**.md --exclude **/example.md will process all
+    files in the users/ directory excluding files named example.md.
 
   --report-relative-paths
     Use relative filenames when reporting error messages. Useful for producing

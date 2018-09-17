@@ -73,10 +73,19 @@ case class Settings(
     usage: Boolean = false,
     @Description("Print out the version number and exit")
     version: Boolean = false,
-    @Description("Glob to filter which files from --in directory to include.")
-    includePath: List[PathMatcher] = Nil,
-    @Description("Glob to filter which files from --in directory to exclude.")
-    excludePath: List[PathMatcher] = Nil,
+    @Description(
+      "Glob to filter which files to process. Defaults to all files. " +
+        "Example: --include **/example.md will process only files with the name example.md."
+    )
+    @ExtraName("includePath")
+    include: List[PathMatcher] = Nil,
+    @Description(
+      "Glob to filter which files from exclude from processing. Defaults to no files. " +
+        "Example: --include users/**.md --exclude **/example.md will process all files in the users/ directory " +
+        "excluding files named example.md."
+    )
+    @ExtraName("excludePath")
+    exclude: List[PathMatcher] = Nil,
     @Description(
       "Use relative filenames when reporting error messages. " +
         "Useful for producing consistent docs on a local machine and CI. "
@@ -99,16 +108,19 @@ case class Settings(
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = infile.toRelative(in)
-    if (matches(relpath)) {
+    if (isIncluded(relpath)) {
       val outfile = out.resolve(relpath)
       Some(InputFile(relpath, infile, outfile))
     } else {
       None
     }
   }
-  def matches(path: RelativePath): Boolean = {
-    (includePath.isEmpty || includePath.exists(_.matches(path.toNIO))) &&
-    !excludePath.exists(_.matches(path.toNIO))
+  def isExplicitlyExcluded(path: RelativePath): Boolean = {
+    exclude.exists(_.matches(path.toNIO))
+  }
+  def isIncluded(path: RelativePath): Boolean = {
+    (include.isEmpty || include.exists(_.matches(path.toNIO))) &&
+    !isExplicitlyExcluded(path)
   }
   def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {
@@ -145,7 +157,8 @@ object Settings extends MetaconfigScalametaImplicits {
        |Example: mdoc --in <path> --out <path> (customize input/output directories)
        |         mdoc --watch                  (watch for file changes)
        |         mdoc --site.VERSION 1.0.0     (pass in site variables)
-       |         mdoc --exclude-path <glob>    (exclude files matching patterns)
+       |         mdoc --include **/example.md  (process only files named example.md)
+       |         mdoc --exclude node_modules   (don't process node_modules directory)
        |""".stripMargin
   def description: Doc =
     Doc.paragraph(

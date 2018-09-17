@@ -27,10 +27,10 @@ final class MainSettings private (
     }
   }
   def withExcludePath(excludePath: List[PathMatcher]): MainSettings = {
-    copy(settings.copy(excludePath = excludePath))
+    copy(settings.copy(exclude = excludePath))
   }
   def withIncludePath(includePath: List[PathMatcher]): MainSettings = {
-    copy(settings.copy(includePath = includePath))
+    copy(settings.copy(include = includePath))
   }
   def withSiteVariables(variables: Map[String, String]): MainSettings = {
     copy(settings.copy(site = variables))
