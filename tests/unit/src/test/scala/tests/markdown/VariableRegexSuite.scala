@@ -42,7 +42,6 @@ class VariableRegexSuite extends BaseMarkdownSuite {
       |```scala
       |val x = "1.0"
       |// x: String = "1.0"
-      |
       |x.length // should match "1.0".length
       |// res0: Int = 3
       |```

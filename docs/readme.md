@@ -118,7 +118,7 @@ object Main {
     // generate out/readme.md from working directory
     val exitCode = mdoc.Main.process(settings)
     // (optional) exit the main function with exit code 0 (success) or 1 (error)
-    sys.exit(exitCode)
+    if (exitCode != 0) sys.exit(exitCode)
   }
 }
 ```

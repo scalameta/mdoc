@@ -9,6 +9,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
+
 import metaconfig.Conf
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
@@ -18,15 +19,15 @@ import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
 import org.typelevel.paiges.Doc
+
 import scala.annotation.StaticAnnotation
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
 import mdoc.StringModifier
+import mdoc.Variable
 import mdoc.Reporter
-import mdoc.internal.BuildInfo
-import mdoc.internal.markdown.GitHubIdGenerator
-import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.{ReplVariablePrinter, GitHubIdGenerator, MarkdownCompiler}
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -102,7 +103,10 @@ case class Settings(
     inputStream: InputStream = System.in,
     @Hidden()
     @Description("The generator for header IDs, defaults to GitHub ID generator")
-    headerIdGenerator: String => String = GitHubIdGenerator
+    headerIdGenerator: String => String = GitHubIdGenerator,
+    @Hidden()
+    @Description("The pretty printer for variables")
+    variablePrinter: Variable => String = ReplVariablePrinter
 ) {
   def isFileWatching: Boolean = watch && !check
 
@@ -208,6 +212,8 @@ object Settings extends MetaconfigScalametaImplicits {
     ConfDecoder.stringConfDecoder.map(_ => System.in)
   implicit val headerIdGeneratorDecoder: ConfDecoder[String => String] =
     ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
+  implicit val variablePrinterDecoder: ConfDecoder[Variable => String] =
+    ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
 
   implicit val pathEncoder: ConfEncoder[AbsolutePath] =
     ConfEncoder.StringEncoder.contramap { path =>
@@ -222,5 +228,7 @@ object Settings extends MetaconfigScalametaImplicits {
     ConfEncoder.StringEncoder.contramap(_ => "<input stream>")
   implicit val headerIdGeneratorEncoder: ConfEncoder[String => String] =
     ConfEncoder.StringEncoder.contramap(_ => "<String => String>")
+  implicit val variablePrinterEncoder: ConfEncoder[Variable => String] =
+    ConfEncoder.StringEncoder.contramap(_ => "<Variable => String>")
 
 }

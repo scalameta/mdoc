@@ -14,7 +14,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val code = process(args, System.out, PathIO.workingDirectory.toNIO)
-    sys.exit(code)
+    if (code != 0) sys.exit(code)
   }
 
   def process(args: Array[String], out: PrintStream, cwd: Path): Int = {

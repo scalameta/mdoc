@@ -78,6 +78,9 @@ final class MainSettings private (
   def withHeaderIdGenerator(headerIdGenerator: String => String): MainSettings = {
     copy(settings.copy(headerIdGenerator = headerIdGenerator))
   }
+  def withVariablePrinter(variablePrinter: Variable => String): MainSettings = {
+    copy(settings.copy(variablePrinter = variablePrinter))
+  }
 
   private[this] implicit def cwd: AbsolutePath = settings.cwd
   private[this] def copy(

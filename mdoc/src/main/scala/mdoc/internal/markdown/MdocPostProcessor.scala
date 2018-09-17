@@ -75,7 +75,12 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
         mod match {
           case Modifier.Silent =>
           case Modifier.Default | Modifier.Fail =>
-            val str = Renderer.renderEvaluatedSection(rendered, section, ctx.reporter)
+            val str = Renderer.renderEvaluatedSection(
+              rendered,
+              section,
+              ctx.reporter,
+              ctx.settings.variablePrinter
+            )
             val content: BasedSequence = CharSubSequence.of(str)
             block.setContent(List(content).asJava)
           case Modifier.Passthrough =>
