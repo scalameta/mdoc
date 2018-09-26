@@ -8,12 +8,18 @@ import mdoc.internal.BuildInfo
 import mdoc.modifiers.ScastieModifier
 
 object Docs {
+  def stableVersion: String =
+    BuildInfo.version.replaceFirst("\\+.*", "")
   def main(args: Array[String]): Unit = {
     val cwd = PathIO.workingDirectory.toNIO
     val settings = MainSettings()
       .withIn(Paths.get("docs"))
       .withOut(cwd)
-      .withSiteVariables(Map("VERSION" -> BuildInfo.stableVersion))
+      .withSiteVariables(
+        Map(
+          "VERSION" -> stableVersion
+        )
+      )
       .withCleanTarget(false)
       .withReportRelativePaths(true)
       .withStringModifiers(

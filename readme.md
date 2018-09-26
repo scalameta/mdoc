@@ -568,7 +568,7 @@ List(User("John"), User("Susan")).sorted
 
 ### Variable injection
 
-Mdoc renders constants like `0.4.0` in markdown with variables provided at
+Mdoc renders constants like `0.4.5` in markdown with variables provided at
 runtime. This makes it easy to keep documentation up-to-date as new releases are
 published. Variables can be passed from the command-line interface with the
 syntax
@@ -699,7 +699,7 @@ Contributions are welcome!
 ## --help
 
 ```
-Mdoc v0.4.0
+Mdoc v0.4.5
 Usage:   mdoc [<option> ...]
 Example: mdoc --in <path> --out <path> (customize input/output directories)
          mdoc --watch                  (watch for file changes)
