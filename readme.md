@@ -72,7 +72,6 @@ List(x, x)
 ```
 ````
 
-
 Then we generate the site using either the [command-line](#command-line)
 interface or [library API](#library). The resulting readme will look like this
 
@@ -92,7 +91,6 @@ List(x, x)
 // res0: List[Int] = List(1, 1)
 ```
 ````
-
 
 Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 `scala mdoc` code fence has been interpreted by the Scala compiler.
@@ -300,7 +298,6 @@ $table
 ```
 ````
 
-
 After:
 
 ````
@@ -316,7 +313,6 @@ Look at the table:
 |  3 |  6 |  9 | 12 |
 |  4 |  8 | 12 | 16 |
 ````
-
 
 ### Scastie
 
@@ -345,7 +341,6 @@ After:
 <script src='https://scastie.scala-lang.org/xbrvky6fTjysG32zK6kzRQ.js?theme=light'></script>
 ````
 
-
 or in case of a user's snippet:
 
 
@@ -362,7 +357,6 @@ After:
 ````
 <script src='https://scastie.scala-lang.org/MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg.js?theme=light'></script>
 ````
-
 
 > ⚠️ The empty line in the block can't be omitted due to how the Markdown parser
 > works
@@ -398,7 +392,6 @@ scalaVersion: '2.12.6'
 })
 })</script>
 ````
-
 
 > ⚠️ Inline snippets are slower to run than embedded ones, since they won't be
 > cached. You should prefer embedding existing snippets whenever possible.
@@ -513,7 +506,6 @@ warning: readme.md:5:9: warning: Unknown link 'readme.md#doesnotexist'.
 Link to [old section](#doesnotexist).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ````
-
 
 Observe that mdoc suggests a fix if there exists a header that is similar to the
 unknown link.
