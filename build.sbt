@@ -1,6 +1,6 @@
 inThisBuild(
   List(
-    scalaVersion := "2.12.6",
+    scalaVersion := "2.12.7",
     organization := "com.geirsson",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -26,8 +26,8 @@ inThisBuild(
 name := "mdocRoot"
 skip in publish := true
 val V = new {
-  val scalameta = "4.0.0-M8"
-  val scalafix = "0.6.0-M14"
+  val scalameta = "4.0.0"
+  val scalafix = "0.9.0-RC1"
 }
 
 lazy val runtime = project
@@ -62,10 +62,10 @@ lazy val mdoc = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.8.3",
-      "com.vladsch.flexmark" % "flexmark-all" % "0.26.4",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.34.44",
       "com.lihaoyi" %% "fansi" % "0.2.5",
-      "io.methvin" % "directory-watcher" % "0.7.0",
-      "me.xdrop" % "fuzzywuzzy" % "1.1.9", // for link hygiene "did you mean?"
+      "io.methvin" % "directory-watcher" % "0.8.0",
+      "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
       "ch.epfl.scala" %% "scalafix-core" % V.scalafix
     )
   )
