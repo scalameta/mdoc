@@ -1,8 +1,8 @@
-# Mdoc: compiled markdown documentation
+# mdoc: compiled markdown documentation
 
 [![Build Status](https://travis-ci.org/olafurpg/mdoc.svg?branch=master)](https://travis-ci.org/olafurpg/mdoc)
 
-Mdoc is a documentation tool for Scala inspired by
+mdoc is a documentation tool for Scala inspired by
 [tut](http://tpolecat.github.io/tut/). Like tut, mdoc interprets Scala code
 examples in markdown files allowing you to compile markdown documentation as
 part of your build. Distinguishing features of mdoc include:
@@ -152,7 +152,7 @@ Consult [`--help`](#--help) to learn more about the command-line interface.
 
 ## Modifiers
 
-Mdocs supports several modifiers to control the output of code fences.
+mdocs supports several modifiers to control the output of code fences.
 
 ### Default
 
@@ -283,8 +283,8 @@ new ScastieModifier(theme = "dark") // default is "light"
 
 ### Performance
 
-Mdoc is designed to provide a tight edit/render/preview feedback loop while
-writing documentation. Mdoc achieves good performance through
+mdoc is designed to provide a tight edit/render/preview feedback loop while
+writing documentation. mdoc achieves good performance through
 
 - [script semantics](#script-semantics): each markdown file compiles into a
   single Scala program that executes in one run.
@@ -297,7 +297,7 @@ writing documentation. Mdoc achieves good performance through
 
 ### Good error messages
 
-Mdoc tries to report helpful error messages when things go wrong. Here below,
+mdoc tries to report helpful error messages when things go wrong. Here below,
 the program that is supposed to compile successfully but it has a type error so
 the build is stopped with an error message from the Scala compiler.
 
@@ -346,7 +346,7 @@ unknown link.
 
 ### Script semantics
 
-Mdoc interprets code fences as normal Scala programs instead of as if they're
+mdoc interprets code fences as normal Scala programs instead of as if they're
 evaluated in the REPL. This behavior is different from tut that interprets
 statements as if they were typed in a REPL session. Using "script semantics"
 instead of "repl semantics" has both benefits and downsides.
@@ -378,7 +378,7 @@ List(User("John"), User("Susan")).sorted
 
 ### Variable injection
 
-Mdoc renders constants like `@VERSION@` in markdown with variables provided at
+mdoc renders constants like `@VERSION@` in markdown with variables provided at
 runtime. This makes it easy to keep documentation up-to-date as new releases are
 published. Variables can be passed from the command-line interface with the
 syntax

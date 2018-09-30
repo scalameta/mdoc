@@ -24,6 +24,7 @@ final class MdocFileListener(
   private def blockUntilEnterKey(): Unit = {
     try {
       new Scanner(in).nextLine()
+      println("Shutting down...")
     } catch {
       case _: NoSuchElementException =>
     }

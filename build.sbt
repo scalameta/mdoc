@@ -66,7 +66,11 @@ lazy val mdoc = project
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "io.methvin" % "directory-watcher" % "0.8.0",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
-      "ch.epfl.scala" %% "scalafix-core" % V.scalafix
+      "ch.epfl.scala" %% "scalafix-core" % V.scalafix,
+      // live reload
+      "io.undertow" % "undertow-core" % "2.0.13.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",
+      "org.slf4j" % "slf4j-nop" % "1.8.0-beta2"
     )
   )
   .dependsOn(runtime)
