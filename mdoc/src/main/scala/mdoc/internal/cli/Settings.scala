@@ -67,6 +67,13 @@ case class Settings(
     site: Map[String, String] = Map.empty,
     @Description("Remove all files in the outout directory before generating a new site.")
     cleanTarget: Boolean = false,
+    @Section("LiveReload options")
+    @Description("Don't start a LiveReload server")
+    noLivereload: Boolean = false,
+    @Description("Which port the LiveReload server should listen to")
+    port: Int = 4000,
+    @Description("Which hostname the LiveReload server should listen to")
+    host: String = "localhost",
     @Section("Less common options")
     @Description("Print out a help message and exit")
     help: Boolean = false,

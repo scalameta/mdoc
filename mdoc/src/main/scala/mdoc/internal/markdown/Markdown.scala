@@ -1,15 +1,9 @@
 package mdoc.internal.markdown
 
-import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
-import com.vladsch.flexmark.ext.anchorlink.AnchorLink
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
 import com.vladsch.flexmark.formatter.internal.Formatter
-import com.vladsch.flexmark.html.HtmlRenderer
-import com.vladsch.flexmark.html.HtmlRenderer.HtmlRendererExtension
-import com.vladsch.flexmark.html.renderer.HeaderIdGenerator
 import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
 import scala.collection.JavaConverters._

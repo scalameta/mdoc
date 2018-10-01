@@ -6,6 +6,15 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import mdoc.Reporter
+import mdoc.internal.BuildInfo
+import mdoc.internal.io.IO
+import mdoc.internal.io.MdocFileListener
+import mdoc.internal.livereload.LiveReload
+import mdoc.internal.livereload.UndertowLiveReload
+import mdoc.internal.markdown.DocumentLinks
+import mdoc.internal.markdown.LinkHygiene
+import mdoc.internal.markdown.Markdown
 import metaconfig.Configured
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
@@ -13,19 +22,27 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scalafix.internal.diff.DiffUtils
-import mdoc.Reporter
-import mdoc.internal.BuildInfo
-import mdoc.internal.io.IO
-import mdoc.internal.io.MdocFileListener
-import mdoc.internal.markdown.Markdown
-import mdoc.internal.markdown.DocumentLinks
-import mdoc.internal.markdown.LinkHygiene
 
 final class MainOps(
     settings: Settings,
     markdown: MutableDataSet,
     reporter: Reporter
 ) {
+
+  private var livereload: Option[LiveReload] = None
+  private def startLivereload(): Unit = {
+    if (settings.noLivereload) ()
+    else {
+      val livereload = UndertowLiveReload(
+        settings.out.toNIO,
+        host = settings.host,
+        port = settings.port,
+        reporter = reporter
+      )
+      livereload.start()
+      this.livereload = Some(livereload)
+    }
+  }
 
   def lint(): Unit = {
     val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
@@ -47,6 +64,7 @@ final class MainOps(
       val end = System.nanoTime()
       val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
       reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
+      livereload.foreach(_.reload(file.out.toNIO))
     }
     if (reporter.hasErrors) Exit.error
     else Exit.success
@@ -115,6 +133,9 @@ final class MainOps(
     if (settings.cleanTarget && Files.exists(settings.out.toNIO)) {
       IO.cleanTarget(settings.out)
     }
+    if (settings.watch) {
+      startLivereload()
+    }
     val isOk = generateCompleteSite()
     if (settings.isFileWatching) {
       waitingForFileChanges()
@@ -144,6 +165,7 @@ final class MainOps(
     val executor = Executors.newFixedThreadPool(1)
     val watcher = MdocFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
     watcher.watchUntilInterrupted()
+    this.livereload.foreach(_.stop())
   }
 
   def clearScreen(): Unit = {
