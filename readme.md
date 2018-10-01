@@ -103,7 +103,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
-libraryDependencies += "com.geirsson" % "mdoc" % "0.4.5" cross CrossVersion.full
+libraryDependencies += "com.geirsson" % "mdoc" % "0.5.0" cross CrossVersion.full
 ```
 
 Then write a main function that invokes mdoc as a library
@@ -126,7 +126,7 @@ object Main {
 Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
-available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/0.4.5)
+available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/0.5.0)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
@@ -140,7 +140,7 @@ Then run the following command:
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
 
 ```
-$ coursier launch com.geirsson:mdoc_2.12.6:0.4.5 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_2.12.6:0.5.0 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -560,7 +560,7 @@ List(User("John"), User("Susan")).sorted
 
 ### Variable injection
 
-mdoc renders constants like `0.4.5` in markdown with variables provided at
+mdoc renders constants like `0.5.0` in markdown with variables provided at
 runtime. This makes it easy to keep documentation up-to-date as new releases are
 published. Variables can be passed from the command-line interface with the
 syntax
@@ -691,7 +691,7 @@ Contributions are welcome!
 ## --help
 
 ```
-Mdoc v0.4.5
+mdoc v0.5.0
 Usage:   mdoc [<option> ...]
 Example: mdoc --in <path> --out <path> (customize input/output directories)
          mdoc --watch                  (watch for file changes)
@@ -699,7 +699,7 @@ Example: mdoc --in <path> --out <path> (customize input/output directories)
          mdoc --include **/example.md  (process only files named example.md)
          mdoc --exclude node_modules   (don't process node_modules directory)
 
-Mdoc is a documentation tool that interprets Scala code examples within markdown
+mdoc is a documentation tool that interprets Scala code examples within markdown
 code fences allowing you to compile and test documentation as part your build. 
 
 Common options:

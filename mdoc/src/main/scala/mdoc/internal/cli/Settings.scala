@@ -162,7 +162,7 @@ object Settings extends MetaconfigScalametaImplicits {
       .andThen(_.as[Settings](decoder(base)))
   }
   def version(displayVersion: String) =
-    s"Mdoc v$displayVersion"
+    s"mdoc v$displayVersion"
   def usage: String =
     """|Usage:   mdoc [<option> ...]
        |Example: mdoc --in <path> --out <path> (customize input/output directories)
@@ -173,7 +173,7 @@ object Settings extends MetaconfigScalametaImplicits {
        |""".stripMargin
   def description: Doc =
     Doc.paragraph(
-      """|Mdoc is a documentation tool that interprets Scala code examples within markdown
+      """|mdoc is a documentation tool that interprets Scala code examples within markdown
          |code fences allowing you to compile and test documentation as part your build.
          |""".stripMargin
     )

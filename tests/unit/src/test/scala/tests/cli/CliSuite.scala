@@ -149,7 +149,7 @@ class CliSuite extends BaseCliSuite {
     "",
     extraArgs = Array("--help"),
     onStdout = { out =>
-      assert(out.contains("Mdoc is a documentation tool"))
+      assert(out.contains("mdoc is a documentation tool"))
     }
   )
 
