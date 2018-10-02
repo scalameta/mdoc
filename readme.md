@@ -154,7 +154,7 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6) [![Join the chat at https://gitter.im/olafurpg/mdoc](https://badges.gitter.im/olafurpg/mdoc.svg)](https://gitter.im/olafurpg/mdoc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ```
 $ coursier launch com.geirsson:mdoc_2.12.6:0.5.0 -- --site.MY_VERSION 1.0.0
