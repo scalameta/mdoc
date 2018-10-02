@@ -17,7 +17,8 @@ object Docs {
       .withOut(cwd)
       .withSiteVariables(
         Map(
-          "VERSION" -> stableVersion
+          "VERSION" -> stableVersion,
+          "SCALA_VERSION" -> scala.util.Properties.versionNumberString
         )
       )
       .withCleanTarget(false)

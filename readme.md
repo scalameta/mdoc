@@ -1,6 +1,7 @@
 # mdoc: compiled markdown documentation
 
 [![Build Status](https://travis-ci.org/olafurpg/mdoc.svg?branch=master)](https://travis-ci.org/olafurpg/mdoc)
+[![Join the chat at https://gitter.im/olafurpg/mdoc](https://badges.gitter.im/olafurpg/mdoc.svg)](https://gitter.im/olafurpg/mdoc)
 
 mdoc is a documentation tool for Scala inspired by
 [tut](http://tpolecat.github.io/tut/). Like tut, mdoc interprets Scala code
@@ -100,7 +101,7 @@ Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7)
 
 ```scala
 // build.sbt
@@ -127,25 +128,42 @@ object Main {
 Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
-available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/0.5.0)
+available
+[here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.7/0.5.0)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
 
 ### sbt
 
-There is no sbt plugin for mdoc, use the [Library API](#library) instead. To
-enable compiler plugins add the following settings to `build.sbt` for the
-project the runs mdoc:
+There is no sbt plugin for mdoc, create a new project instead that uses the mdoc
+[Library API](#library).
 
 ```scala
-resourceGenerators.in(Compile) += Def.task {
-  val out = resourceDirectory.in(Compile).value / "mdoc.properties"
-  val props = new java.util.Properties()
-  props.put("scalacOptions", scalacOptions.in(Compile).value.mkString(" "))
-  IO.write(props, "mdoc properties", out)
-  List(out)
-}
+// build.sbt
+lazy val docs = project
+  .in(file("myproject-docs"))
+  .settings(
+    moduleName := "myproject-docs",
+    scalaVersion := "2.12.7", // must match exactly, no other Scala version is supported
+    libraryDependencies += "com.geirsson" % "mdoc" % "0.5.0" cross CrossVersion.full,
+    // (optional): enable compiler plugins and other flags
+    resourceGenerators.in(Compile) += Def.task {
+      val out = resourceDirectory.in(Compile).value / "mdoc.properties"
+      val props = new java.util.Properties()
+      props.put("scalacOptions", scalacOptions.in(Compile).value.mkString(" "))
+      IO.write(props, "mdoc properties", out)
+      List(out)
+    }
+  )
+  .dependsOn(myproject)
+```
+
+From the sbt shell, run the mdoc main function
+
+```scala
+// sbt shell
+> docs/runMain mdoc.Main --help
 ```
 
 ### Command-line
@@ -154,10 +172,10 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7)
 
 ```
-$ coursier launch com.geirsson:mdoc_2.12.6:0.5.0 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_2.12.7:0.5.0 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -583,7 +601,7 @@ published. Variables can be passed from the command-line interface with the
 syntax
 
 ```
-mdoc --site.VERSION 1.0.0 --site.SCALA_VERSION 2.12.6
+mdoc --site.VERSION 1.0.0 --site.SCALA_VERSION 2.12.7
 ```
 
 When using the library API, variables are passed with the
@@ -593,7 +611,7 @@ When using the library API, variables are passed with the
 val settings = mdoc.MainSettings()
   .withSiteVariables(Map(
     "VERSION" -> "1.0.0",
-    "SCALA_VERSION" -> "2.12.6"
+    "SCALA_VERSION" -> "2.12.7"
   ))
 ```
 
