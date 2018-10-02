@@ -1,6 +1,7 @@
 # mdoc: compiled markdown documentation
 
 [![Build Status](https://travis-ci.org/olafurpg/mdoc.svg?branch=master)](https://travis-ci.org/olafurpg/mdoc)
+[![Join the chat at https://gitter.im/olafurpg/mdoc](https://badges.gitter.im/olafurpg/mdoc.svg)](https://gitter.im/olafurpg/mdoc)
 
 mdoc is a documentation tool for Scala inspired by
 [tut](http://tpolecat.github.io/tut/). Like tut, mdoc interprets Scala code
@@ -136,7 +137,7 @@ breaking changes between any release, including PATCH versions.
 
 There is no sbt plugin for mdoc, use the [Library API](#library) instead. To
 enable compiler plugins add the following settings to `build.sbt` for the
-project the runs mdoc:
+project that runs mdoc:
 
 ```scala
 resourceGenerators.in(Compile) += Def.task {
