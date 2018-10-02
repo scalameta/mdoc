@@ -89,10 +89,11 @@ lazy val unit = project
     scalacOptions ++= List(
       "-deprecation"
     ),
+    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.8"),
     resourceGenerators.in(Test) += Def.task {
       val out = managedResourceDirectories.in(Test).value.head / "mdoc.properties"
       val props = new java.util.Properties()
-      props.put("scalacOptions", scalacOptions.value.mkString(" "))
+      props.put("scalacOptions", scalacOptions.in(Compile).value.mkString(" "))
       IO.write(props, "mdoc properties", out)
       List(out)
     },
