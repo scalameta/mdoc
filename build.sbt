@@ -86,6 +86,16 @@ lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     skip in publish := true,
+    scalacOptions ++= List(
+      "-deprecation"
+    ),
+    resourceGenerators.in(Test) += Def.task {
+      val out = managedResourceDirectories.in(Test).value.head / "mdoc.properties"
+      val props = new java.util.Properties()
+      props.put("scalacOptions", scalacOptions.value.mkString(" "))
+      IO.write(props, "mdoc properties", out)
+      List(out)
+    },
     libraryDependencies ++= List(
       "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
       "org.scalatest" %% "scalatest" % "3.2.0-SNAP10" % Test,

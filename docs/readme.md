@@ -28,6 +28,7 @@ Table of contents:
 
 - [Quickstart](#quickstart)
   - [Library](#library)
+  - [sbt](#sbt)
   - [Command-line](#command-line)
 - [Modifiers](#modifiers)
   - [Default](#default)
@@ -130,6 +131,22 @@ available [here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.6/@VERSION@)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
+
+### sbt
+
+There is no sbt plugin for mdoc, use the [Library API](#library) instead. To
+enable compiler plugins add the following settings to `build.sbt` for the
+project the runs mdoc:
+
+```scala
+resourceGenerators.in(Compile) += Def.task {
+  val out = resourceDirectory.in(Compile).value / "mdoc.properties"
+  val props = new java.util.Properties()
+  props.put("scalacOptions", scalacOptions.value.mkString(" "))
+  IO.write(props, "mdoc properties", out)
+  List(out)
+}
+```
 
 ### Command-line
 
