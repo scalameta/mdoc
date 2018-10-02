@@ -28,6 +28,7 @@ Table of contents:
 
 - [Quickstart](#quickstart)
   - [Library](#library)
+  - [sbt](#sbt)
   - [Command-line](#command-line)
 - [Modifiers](#modifiers)
   - [Default](#default)
@@ -131,13 +132,29 @@ but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
 
+### sbt
+
+There is no sbt plugin for mdoc, use the [Library API](#library) instead. To
+enable compiler plugins add the following settings to `build.sbt` for the
+project the runs mdoc:
+
+```scala
+resourceGenerators.in(Compile) += Def.task {
+  val out = resourceDirectory.in(Compile).value / "mdoc.properties"
+  val props = new java.util.Properties()
+  props.put("scalacOptions", scalacOptions.value.mkString(" "))
+  IO.write(props, "mdoc properties", out)
+  List(out)
+}
+```
+
 ### Command-line
 
 First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.6) [![Join the chat at https://gitter.im/olafurpg/mdoc](https://badges.gitter.im/olafurpg/mdoc.svg)](https://gitter.im/olafurpg/mdoc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ```
 $ coursier launch com.geirsson:mdoc_2.12.6:0.5.0 -- --site.MY_VERSION 1.0.0
@@ -723,14 +740,23 @@ Common options:
   --verbose
     Include additional diagnostics for debuggin potential problems.
 
-  --classpath String (default: "")
-    Classpath to use when compiling Scala code examples. Defaults to the current
-    thread's classpath.
-
   --site Map[String, String] (default: {})
     Key/value pairs of variables to replace through @VAR@. For example, the flag
     '--site.VERSION 1.0.0' will replace appearances of '@VERSION@' in markdown
     files with the string 1.0.0
+
+Compiler options:
+
+  --classpath String (default: "")
+    Classpath to use when compiling Scala code examples. Defaults to the current
+    thread's classpath.
+
+  --scalac-options String (default: "")
+    Compiler flags such as compiler plugins '-Xplugin:kind-projector.jar' or custom
+    options '-deprecated'. Formatted as a single string with space separated
+    values. To pass multiple values: --scalac-options "-Yrangepos -deprecated".
+    Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource
+    file, if any.
 
   --clean-target
     Remove all files in the outout directory before generating a new site.
