@@ -105,6 +105,7 @@ Add the following dependency to your build
 
 ```scala
 // build.sbt
+scalaVersion := "@SCALA_VERSION@" // must match exactly, no other Scala version is supported.
 libraryDependencies += "com.geirsson" % "mdoc" % "@VERSION@" cross CrossVersion.full
 ```
 
