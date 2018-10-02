@@ -72,6 +72,7 @@ object UndertowLiveReload {
         .addExactPath("/livereload.js", staticResource("/livereload.js"))
         .addExactPath("/highlight.js", staticResource("/highlight.js"))
         .addExactPath("/github.css", staticResource("/github.css"))
+        .addExactPath("/custom.css", staticResource("/custom.css"))
         .addPrefixPath(
           "/livereload",
           websocket(new LiveReloadConnectionCallback(openChannels))
