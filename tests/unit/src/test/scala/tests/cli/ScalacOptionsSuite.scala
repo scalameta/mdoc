@@ -27,4 +27,21 @@ class ScalacOptionsSuite extends BaseCliSuite {
     }
   )
 
+  checkCli(
+    "kind-projector",
+    """
+      |/index.md
+      |```scala mdoc
+      |def baz[T[_]] = ()
+      |baz[Either[Int, ?]]
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |def baz[T[_]] = ()
+       |baz[Either[Int, ?]]
+       |```
+    """.stripMargin
+  )
+
 }

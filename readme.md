@@ -142,7 +142,7 @@ project the runs mdoc:
 resourceGenerators.in(Compile) += Def.task {
   val out = resourceDirectory.in(Compile).value / "mdoc.properties"
   val props = new java.util.Properties()
-  props.put("scalacOptions", scalacOptions.value.mkString(" "))
+  props.put("scalacOptions", scalacOptions.in(Compile).value.mkString(" "))
   IO.write(props, "mdoc properties", out)
   List(out)
 }

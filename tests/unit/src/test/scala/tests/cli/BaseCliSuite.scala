@@ -42,7 +42,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
       val stdout = fansi.Str(myStdout.toString()).plainText
       assert(code == expectedExitCode, stdout)
       val obtained = StringFS.asString(AbsolutePath(out))
-      assertNoDiff(obtained, expected)
+      assertNoDiffOrPrintExpected(obtained, expected)
       onStdout(stdout)
     }
   }
