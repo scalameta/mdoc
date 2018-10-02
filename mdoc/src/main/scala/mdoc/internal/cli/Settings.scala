@@ -55,16 +55,24 @@ case class Settings(
     @Description("Include additional diagnostics for debuggin potential problems.")
     verbose: Boolean = false,
     @Description(
-      "Classpath to use when compiling Scala code examples. " +
-        "Defaults to the current thread's classpath."
-    )
-    classpath: String = "",
-    @Description(
       "Key/value pairs of variables to replace through @VAR@. " +
         "For example, the flag '--site.VERSION 1.0.0' will replace appearances of '@VERSION@' in " +
         "markdown files with the string 1.0.0"
     )
     site: Map[String, String] = Map.empty,
+    @Section("Compiler options")
+    @Description(
+      "Classpath to use when compiling Scala code examples. " +
+        "Defaults to the current thread's classpath."
+    )
+    classpath: String = "",
+    @Description(
+      "Compiler flags such as compiler plugins '-Xplugin:kind-projector.jar' " +
+        "or custom options '-deprecated'. Formatted as a single string with space separated values. " +
+        "To pass multiple values: --scalac-options \"-Yrangepos -deprecated\". " +
+        "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any."
+    )
+    scalacOptions: String = MdocProperties.default().scalacOptions,
     @Description("Remove all files in the outout directory before generating a new site.")
     cleanTarget: Boolean = false,
     @Section("LiveReload options")
@@ -135,7 +143,7 @@ case class Settings(
   }
   def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {
-      val compiler = MarkdownCompiler.fromClasspath(classpath)
+      val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
       Configured.ok(Context(this, logger, compiler))
     } else {
       ConfError.fileDoesNotExist(in.toNIO).notOk

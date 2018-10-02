@@ -8,7 +8,7 @@ case class Context(settings: Settings, reporter: Reporter, compiler: MarkdownCom
 
 object Context {
   def fromOptions(options: Settings, reporter: Reporter = ConsoleReporter.default): Context = {
-    val compiler = MarkdownCompiler.fromClasspath(options.classpath)
+    val compiler = MarkdownCompiler.fromClasspath(options.classpath, options.scalacOptions)
     Context(options, reporter, compiler)
   }
 }

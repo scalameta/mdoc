@@ -27,7 +27,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       )
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = new ConsoleReporter(new PrintStream(myStdout))
-  private val compiler = MarkdownCompiler.fromClasspath("")
+  protected def scalacOptions: String = ""
+  private val compiler = MarkdownCompiler.fromClasspath("", scalacOptions)
   private def newContext(settings: Settings, reporter: Reporter) =
     Context(settings, reporter, compiler)
 

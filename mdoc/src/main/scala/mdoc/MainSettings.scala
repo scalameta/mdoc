@@ -47,6 +47,9 @@ final class MainSettings private (
   def withClasspath(classpath: String): MainSettings = {
     copy(settings.copy(classpath = classpath))
   }
+  def withScalacOptions(scalacOptions: String): MainSettings = {
+    copy(settings.copy(scalacOptions = scalacOptions))
+  }
   def withStringModifiers(modifiers: List[StringModifier]): MainSettings = {
     copy(settings.copy(stringModifiers = modifiers))
   }

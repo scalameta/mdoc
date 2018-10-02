@@ -24,7 +24,7 @@ import mdoc.internal.pos.TokenEditDistance
 
 object MarkdownCompiler {
 
-  def default(): MarkdownCompiler = fromClasspath("")
+  def default(): MarkdownCompiler = fromClasspath(classpath = "", scalacOptions = "")
 
   def buildDocument(
       compiler: MarkdownCompiler,
@@ -69,7 +69,7 @@ object MarkdownCompiler {
     EvaluatedDocument(doc, sectionInputs)
   }
 
-  def fromClasspath(classpath: String): MarkdownCompiler = {
+  def fromClasspath(classpath: String, scalacOptions: String): MarkdownCompiler = {
     val fullClasspath =
       if (classpath.isEmpty) defaultClasspath(_ => true)
       else {
@@ -77,7 +77,7 @@ object MarkdownCompiler {
         val runtime = defaultClasspath(path => path.toString.contains("mdoc-runtime"))
         base ++ runtime
       }
-    new MarkdownCompiler(fullClasspath.syntax)
+    new MarkdownCompiler(fullClasspath.syntax, scalacOptions)
   }
 
   private def defaultClasspath(fn: Path => Boolean): Classpath = {
@@ -94,6 +94,7 @@ object MarkdownCompiler {
 
 class MarkdownCompiler(
     classpath: String,
+    scalacOptions: String,
     target: AbstractFile = new VirtualDirectory("(memory)", None)
 ) {
   private val settings = new Settings()
@@ -101,6 +102,7 @@ class MarkdownCompiler(
   settings.unchecked.value = true // enable detailed unchecked warnings
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
+  settings.processArgumentString(scalacOptions)
   lazy val sreporter = new StoreReporter
   private val global = new Global(settings, sreporter)
   private val appClasspath: Array[URL] = classpath
@@ -131,11 +133,16 @@ class MarkdownCompiler(
     } else {
       sreporter.infos.foreach {
         case sreporter.Info(pos, msg, severity) =>
-          val mpos = edit.toOriginal(pos.point) match {
-            case Left(_) =>
+          val mpos =
+            if (pos.isDefined) {
+              edit.toOriginal(pos.point) match {
+                case Left(_) =>
+                  Position.None
+                case Right(p) => p.toUnslicedPosition
+              }
+            } else {
               Position.None
-            case Right(p) => p.toUnslicedPosition
-          }
+            }
           severity match {
             case sreporter.ERROR => vreporter.error(mpos, msg)
             case sreporter.INFO => vreporter.info(mpos, msg)
