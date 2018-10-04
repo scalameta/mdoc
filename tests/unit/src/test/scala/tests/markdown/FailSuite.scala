@@ -120,4 +120,27 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "fs2",
+    """
+      |```scala mdoc:fail
+      |fs2.Stream.eval(println("Do not ever do this"))
+      |```
+    """.stripMargin,
+    // NOTE(olafur) https://github.com/olafurpg/mdoc/issues/95#issuecomment-426993507
+    // The error message below does not match the compiler error reported in the REPL.
+    // We should reconsider the architecture for the `fail` modifier.
+    """|```scala
+       |fs2.Stream.eval(println("Do not ever do this"))
+       |// type mismatch;
+       |//  found   : Unit
+       |//  required: ?F[?O]
+       |// Note that implicit conversions are not applicable because they are ambiguous:
+       |//  both method ArrowAssoc in object Predef of type [A](self: A)ArrowAssoc[A]
+       |//  and method Ensuring in object Predef of type [A](self: A)Ensuring[A]
+       |//  are possible conversion functions from Unit to ?F[?O]
+       |```
+    """.stripMargin
+  )
+
 }
