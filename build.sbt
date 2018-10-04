@@ -98,6 +98,8 @@ lazy val unit = project
       List(out)
     },
     libraryDependencies ++= List(
+      "co.fs2" %% "fs2-core" % "0.10.4",
+      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
       "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
       "org.scalatest" %% "scalatest" % "3.2.0-SNAP10" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test

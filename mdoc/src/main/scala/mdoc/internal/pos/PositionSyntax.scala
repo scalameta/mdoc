@@ -9,6 +9,7 @@ import scalafix.internal.util.PositionSyntax._
 import mdoc.document.RangePosition
 import mdoc.internal.cli.Settings
 import mdoc.internal.markdown.EvaluatedSection
+import scala.util.control.NonFatal
 
 object PositionSyntax {
   implicit class XtensionInputMdoc(input: Input) {
@@ -31,17 +32,29 @@ object PositionSyntax {
   }
   implicit class XtensionRangePositionMdoc(pos: RangePosition) {
     def formatMessage(section: EvaluatedSection, message: String): String = {
-      val mpos = pos.toMeta(section)
-      new StringBuilder()
-        .append(message)
-        .append("\n")
-        .append(mpos.lineContent)
-        .append("\n")
-        .append(mpos.lineCaret)
-        .append("\n")
-        .toString()
+      pos.toMeta(section) match {
+        case Position.None =>
+          message
+        case mpos =>
+          new StringBuilder()
+            .append(message)
+            .append("\n")
+            .append(mpos.lineContent)
+            .append("\n")
+            .append(mpos.lineCaret)
+            .append("\n")
+            .toString()
+      }
     }
     def toMeta(section: EvaluatedSection): Position = {
+      // FIXME: https://github.com/olafurpg/mdoc/issues/95#issuecomment-426993507
+      try toMetaUnsafe(section)
+      catch {
+        case NonFatal(e) =>
+          Position.None
+      }
+    }
+    def toMetaUnsafe(section: EvaluatedSection): Position = {
       val mpos = Position.Range(
         section.input,
         pos.startLine,
@@ -50,17 +63,6 @@ object PositionSyntax {
         pos.endColumn
       )
       mpos.toUnslicedPosition
-    }
-    def toMeta(edit: TokenEditDistance): Position = {
-      Position
-        .Range(
-          edit.originalInput,
-          pos.startLine,
-          pos.startColumn,
-          pos.endLine,
-          pos.endColumn
-        )
-        .toUnslicedPosition
     }
     def toOriginal(edit: TokenEditDistance): Position = {
       val Right(x) = edit.toOriginal(pos.startLine, pos.startColumn)
