@@ -85,6 +85,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             block.setContent(List(content).asJava)
           case Modifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)
+          case Modifier.Invisible =>
+            replaceNodeWithText(doc, block, "")
           case Modifier.Crash =>
             val stacktrace =
               Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)

@@ -152,7 +152,7 @@ object Renderer {
                 sb.append(printer(variable))
               case Modifier.Crash =>
                 throw new IllegalArgumentException(Modifier.Crash.toString)
-              case c @ (Modifier.Str(_, _) | Modifier.Silent) =>
+              case c @ (Modifier.Str(_, _) | Modifier.Silent | Modifier.Invisible) =>
                 throw new IllegalArgumentException(c.toString)
             }
         }

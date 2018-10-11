@@ -37,6 +37,7 @@ Table of contents:
   - [Fail](#fail)
   - [Crash](#crash)
   - [Passthrough](#passthrough)
+  - [Invisible](#invisible)
   - [Scastie](#scastie)
 - [Key features](#key-features)
   - [Performance](#performance)
@@ -348,6 +349,31 @@ Look at the table:
 |  2 |  4 |  6 |  8 |
 |  3 |  6 |  9 | 12 |
 |  4 |  8 | 12 | 16 |
+````
+
+### Invisible
+
+The `invisible` modifier evaluates the code but does not render anything. The
+`invisible` modifier is equivalent to `passthrough` when the expression does not
+print to stdout.
+
+
+Before:
+
+````
+This is prose.
+```scala mdoc:invisible
+println("I am invisible")
+```
+More prose.
+````
+
+After:
+
+````
+This is prose.
+
+More prose.
 ````
 
 ### Scastie
