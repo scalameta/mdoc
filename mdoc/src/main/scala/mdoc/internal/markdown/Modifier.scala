@@ -23,7 +23,7 @@ sealed trait Modifier {
   def isSilent: Boolean = this == Silent
 }
 object Modifier {
-  def all: List[Modifier] = List(Default, Passthrough, Fail, Crash, Silent)
+  def all: List[Modifier] = List(Default, Passthrough, Invisible, Fail, Crash, Silent)
   def apply(string: String): Option[Modifier] =
     all.find(_.toString.equalsIgnoreCase(string))
 
@@ -41,6 +41,9 @@ object Modifier {
 
   /** Render stdout as raw markdown and remove code block. */
   case object Passthrough extends Modifier
+
+  /** Do no render anything. */
+  case object Invisible extends Modifier
 
   /** Render this code fence according to this string modifier */
   case class Str(mod: StringModifier, info: String) extends Modifier
