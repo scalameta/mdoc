@@ -62,6 +62,10 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
         }
     }
     val instrumented = Instrumenter.instrument(sectionInputs)
+    if (ctx.settings.verbose) {
+      ctx.reporter.info(s"Instrumented $filename")
+      ctx.reporter.println(instrumented)
+    }
     val rendered = MarkdownCompiler.buildDocument(
       ctx.compiler,
       ctx.reporter,

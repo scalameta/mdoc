@@ -222,4 +222,18 @@ class DefaultSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "backtick",
+    // see https://github.com/olafurpg/mdoc/issues/97
+    """
+      |```scala mdoc
+      |type `0` = Int
+      |```
+    """.stripMargin,
+    """|```scala
+       |type `0` = Int
+       |```
+       |""".stripMargin
+  )
+
 }

@@ -66,7 +66,9 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       val input = Input.VirtualFile(name + ".md", original)
       val obtained =
         Markdown.toMarkdown(input, getMarkdownSettings(context), reporter, settings).trimLineEnds
-      val stdout = fansi.Str(myStdout.toString()).plainText
+      val colorOut = myStdout.toString()
+      print(colorOut)
+      val stdout = fansi.Str(colorOut).plainText
       assert(!reporter.hasErrors, stdout)
       assertNoDiffOrPrintExpected(obtained, expected)
     }
