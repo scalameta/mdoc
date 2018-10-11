@@ -43,7 +43,7 @@ object Renderer {
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
     ps.println("```scala")
-    ps.println(section.source.syntax)
+    ps.println(section.source.pos.text)
     val crashes = for {
       statement <- section.section.statements
       binder <- statement.binders

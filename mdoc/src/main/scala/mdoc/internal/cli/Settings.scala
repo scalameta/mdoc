@@ -52,7 +52,7 @@ case class Settings(
     )
     @ExtraName("test")
     check: Boolean = false,
-    @Description("Include additional diagnostics for debuggin potential problems.")
+    @Description("Include additional diagnostics for debugging potential problems.")
     verbose: Boolean = false,
     @Description(
       "Key/value pairs of variables to replace through @VAR@. " +

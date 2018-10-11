@@ -45,14 +45,14 @@ class Instrumenter(sections: List[SectionInput]) {
           sb.print(s"val $fresh = ")
           List(Name(fresh) -> stat.pos)
       }
-      sb.print(stat.syntax)
+      sb.print(stat.pos.text)
       binders.foreach {
         case (name, pos) =>
           printBinder(name.syntax, pos)
       }
 
     case Modifier.Fail =>
-      val literal = Instrumenter.stringLiteral(stat.syntax)
+      val literal = Instrumenter.stringLiteral(stat.pos.text)
       val binder = freshBinder()
       sb.append("val ")
         .append(binder)
@@ -67,10 +67,10 @@ class Instrumenter(sections: List[SectionInput]) {
       sb.append("$doc.crash(")
         .append(position(stat.pos))
         .append(") {\n")
-        .append(stat.syntax)
+        .append(stat.pos.text)
         .append("\n}")
     case Modifier.Str(_, _) =>
-      throw new IllegalArgumentException(stat.syntax)
+      throw new IllegalArgumentException(stat.pos.text)
   }
 }
 object Instrumenter {

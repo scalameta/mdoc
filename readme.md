@@ -757,7 +757,7 @@ Common options:
     site is up-to-date.
 
   --verbose
-    Include additional diagnostics for debuggin potential problems.
+    Include additional diagnostics for debugging potential problems.
 
   --site Map[String, String] (default: {})
     Key/value pairs of variables to replace through @VAR@. For example, the flag
