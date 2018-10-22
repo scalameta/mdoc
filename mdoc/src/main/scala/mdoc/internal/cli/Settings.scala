@@ -9,7 +9,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
-
+import mdoc.PostModifier
 import metaconfig.Conf
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
@@ -19,7 +19,6 @@ import metaconfig.annotation._
 import metaconfig.generic
 import metaconfig.generic.Surface
 import org.typelevel.paiges.Doc
-
 import scala.annotation.StaticAnnotation
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
@@ -27,7 +26,7 @@ import scala.meta.io.RelativePath
 import mdoc.StringModifier
 import mdoc.Variable
 import mdoc.Reporter
-import mdoc.internal.markdown.{ReplVariablePrinter, GitHubIdGenerator, MarkdownCompiler}
+import mdoc.internal.markdown.{GitHubIdGenerator, MarkdownCompiler, ReplVariablePrinter}
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -112,7 +111,9 @@ case class Settings(
     @Description("The working directory to use for making relative paths absolute.")
     cwd: AbsolutePath,
     @Hidden()
-    stringModifiers: List[StringModifier] = Nil,
+    stringModifiers: List[StringModifier] = StringModifier.default(),
+    @Hidden()
+    postModifiers: List[PostModifier] = PostModifier.default(),
     @Hidden()
     @Description("The input stream to listen for enter key during file watching.")
     inputStream: InputStream = System.in,

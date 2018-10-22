@@ -4,20 +4,26 @@ import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.formatter.internal.Formatter
+import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
-import scala.collection.JavaConverters._
 import com.vladsch.flexmark.util.sequence.BasedSequence
-import scala.language.dynamics
-import scala.meta.inputs.Input
-import scala.reflect.ClassTag
+import java.nio.file.Files
+import java.nio.file.Paths
 import mdoc.Reporter
 import mdoc.internal.cli.Context
+import mdoc.internal.cli.InputFile
 import mdoc.internal.cli.Settings
-import com.vladsch.flexmark.parser.Parser
+import scala.collection.JavaConverters._
+import scala.language.dynamics
+import scala.meta.inputs.Input
+import scala.meta.io.AbsolutePath
+import scala.meta.io.RelativePath
+import scala.reflect.ClassTag
 
 object Markdown {
   val InputKey = new DataKey[Option[Input]]("scalametaInput", None)
+  val RelativePathKey = new DataKey[Option[RelativePath]]("mdocFile", None)
   val SiteVariables = new DataKey[Option[Map[String, String]]]("siteVariables", None)
 
   /**
@@ -44,6 +50,12 @@ object Markdown {
       .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
   }
 
+  def dummyInputFile(input: Input): InputFile = {
+    val relativePath = RelativePath(Paths.get(input.syntax).getFileName)
+    val tmp = AbsolutePath(Files.createTempFile("mdoc", relativePath.toString()))
+    InputFile(relativePath, tmp, tmp)
+  }
+
   def toMarkdown(
       input: Input,
       markdownSettings: MutableDataSet,
@@ -51,6 +63,14 @@ object Markdown {
       settings: Settings
   ): String = {
     markdownSettings.set(InputKey, Some(input))
+    markdownSettings.get(RelativePathKey) match {
+      case None =>
+        markdownSettings.set(
+          RelativePathKey,
+          Some(RelativePath(Paths.get(input.syntax).getFileName))
+        )
+      case _ =>
+    }
     val variables = markdownSettings.get(SiteVariables).getOrElse(Map.empty)
     val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter, settings)
     markdownSettings.set(InputKey, Some(textWithVariables))

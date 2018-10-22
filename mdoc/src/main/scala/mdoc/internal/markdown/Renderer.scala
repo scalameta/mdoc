@@ -139,20 +139,21 @@ object Renderer {
                         s"Obtained $obtained"
                     )
                 }
-              case Modifier.Default | Modifier.Passthrough =>
+              case Modifier.Default | Modifier.Passthrough | Modifier.Post(_, _) =>
+                val pos = binder.pos.toMeta(section)
                 val variable = new mdoc.Variable(
                   binder.name,
                   binder.tpe.render,
                   binder.value,
+                  pos,
                   i,
                   N,
                   statementIndex,
                   totalStats
                 )
                 sb.append(printer(variable))
-              case Modifier.Crash =>
-                throw new IllegalArgumentException(Modifier.Crash.toString)
-              case c @ (Modifier.Str(_, _) | Modifier.Silent | Modifier.Invisible) =>
+              case c @ (Modifier.Str(_, _) | Modifier.Silent | Modifier.Invisible |
+                  Modifier.Crash) =>
                 throw new IllegalArgumentException(c.toString)
             }
         }

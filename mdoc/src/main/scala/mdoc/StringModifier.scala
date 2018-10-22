@@ -1,11 +1,13 @@
 package mdoc
 
+import java.util.ServiceLoader
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
 import metaconfig.ConfError
 import metaconfig.generic.Surface
 import scala.meta.inputs.Input
 import mdoc.internal.cli.Settings
+import scala.collection.JavaConverters._
 
 trait StringModifier {
   val name: String
@@ -14,6 +16,9 @@ trait StringModifier {
 }
 
 object StringModifier {
+  def default(): List[StringModifier] = default(this.getClass.getClassLoader)
+  def default(classLoader: ClassLoader): List[StringModifier] =
+    ServiceLoader.load(classOf[StringModifier], classLoader).iterator().asScala.toList
   implicit val surface: Surface[Settings] = new Surface(Nil)
   implicit val decoder: ConfDecoder[StringModifier] =
     ConfDecoder.instanceF[StringModifier](_ => ConfError.message("unsupported").notOk)

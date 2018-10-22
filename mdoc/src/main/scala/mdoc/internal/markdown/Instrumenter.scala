@@ -36,7 +36,8 @@ class Instrumenter(sections: List[SectionInput]) {
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
   private def printStatement(stat: Stat, mod: Modifier, sb: PrintStream): Unit = mod match {
-    case Modifier.Default | Modifier.Passthrough | Modifier.Invisible | Modifier.Silent =>
+    case Modifier.Default | Modifier.Passthrough | Modifier.Invisible | Modifier.Silent |
+        Modifier.Post(_, _) =>
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)

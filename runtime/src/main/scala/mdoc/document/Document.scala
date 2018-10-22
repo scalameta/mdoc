@@ -25,7 +25,7 @@ final case class Statement(
     position: RangePosition
 )
 
-final class Binder[T](val value: T, val name: String, val tpe: TPrint[T], pos: RangePosition) {
+final class Binder[T](val value: T, val name: String, val tpe: TPrint[T], val pos: RangePosition) {
   override def toString: String = {
     val valueString = PPrinter.BlackWhite.apply(value)
     val tpeString = tpe.render(TPrintColors.BlackWhite)

@@ -97,7 +97,9 @@ lazy val unit = project
       IO.write(props, "mdoc properties", out)
       List(out)
     },
+    resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
+      "com.cibo" %% "evilplot" % "0.6.0",
       "co.fs2" %% "fs2-core" % "0.10.4",
       "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
       "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
@@ -118,6 +120,10 @@ lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
     skip in publish := true,
+    resolvers += Resolver.bintrayRepo("cibotech", "public"),
+    libraryDependencies ++= List(
+      "com.cibo" %% "evilplot" % "0.6.0",
+    ),
     test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,

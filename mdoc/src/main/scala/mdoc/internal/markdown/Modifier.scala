@@ -48,4 +48,7 @@ object Modifier {
   /** Render this code fence according to this string modifier */
   case class Str(mod: StringModifier, info: String) extends Modifier
 
+  /** Render this code fence according to this post modifier */
+  case class Post(mod: mdoc.PostModifier, info: String) extends Modifier
+
 }

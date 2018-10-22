@@ -6,6 +6,7 @@ import scala.meta.inputs.Position
 import mdoc.internal.cli.Context
 import mdoc.internal.markdown.Modifier.Str
 import mdoc.internal.markdown.Modifier.Default
+import mdoc.internal.markdown.Modifier.Post
 
 case class StringBlockInput(block: FencedCodeBlock, input: Input, mod: Str)
 case class ScalaBlockInput(block: FencedCodeBlock, input: Input, mod: Modifier)
@@ -24,15 +25,19 @@ class BlockInput(ctx: Context, baseInput: Input) {
               case Array(a) => (a, "")
               case Array(a, b) => (a, b)
             }
-            ctx.settings.stringModifiers.collectFirst {
-              case mod if mod.name == name =>
-                Str(mod, info)
-            }
+            ctx.settings.stringModifiers
+              .collectFirst[Modifier] {
+                case mod if mod.name == name =>
+                  Str(mod, info)
+              }
+              .orElse {
+                ctx.settings.postModifiers.collectFirst {
+                  case mod if mod.name == name =>
+                    Post(mod, info)
+                }
+              }
           }
           .orElse {
-            val allModifiers =
-              Modifier.all.map(_.toString.toLowerCase()) ++
-                ctx.settings.stringModifiers.map(_.name)
             val msg = s"Invalid mode '$mode'"
             val offset = "scala mdoc:".length
             val start = block.getInfo.getStartOffset + offset
