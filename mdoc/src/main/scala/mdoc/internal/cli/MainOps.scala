@@ -36,7 +36,7 @@ final class MainOps(
       val livereload = UndertowLiveReload(
         settings.out.toNIO,
         host = settings.host,
-        port = settings.port,
+        preferredPort = settings.port,
         reporter = reporter
       )
       livereload.start()

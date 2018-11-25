@@ -410,10 +410,9 @@ class EvilplotModifier extends PostModifier {
     ctx.lastValue match {
       case d: Drawable =>
         Files.createDirectories(out.toNIO.getParent)
-        if (out.isFile) {
-          Files.delete(out.toNIO)
+        if (!out.isFile) {
+          d.write(out.toFile)
         }
-        d.write(out.toFile)
         s"![](${out.toNIO.getFileName})"
       case _ =>
         val (pos, obtained) = ctx.variables.lastOption match {
@@ -959,7 +958,8 @@ LiveReload options:
     Don't start a LiveReload server
 
   --port Int (default: 4000)
-    Which port the LiveReload server should listen to
+    Which port the LiveReload server should listen to. If the port is not free,
+    another free port close to this number is used.
 
   --host String (default: "localhost")
     Which hostname the LiveReload server should listen to
