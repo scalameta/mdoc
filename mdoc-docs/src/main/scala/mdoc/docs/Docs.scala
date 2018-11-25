@@ -4,6 +4,7 @@ import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
 import mdoc.Main
 import mdoc.MainSettings
+import mdoc.StringModifier
 import mdoc.internal.BuildInfo
 import mdoc.modifiers.ScastieModifier
 
@@ -24,7 +25,7 @@ object Docs {
       .withCleanTarget(false)
       .withReportRelativePaths(true)
       .withStringModifiers(
-        List(
+        StringModifier.default() ++ List(
           new FooModifier,
           new ScastieModifier(debugClassSuffix = Some("<a_random_uuid>"))
         )
@@ -34,7 +35,7 @@ object Docs {
     val exitCode = Main.process(
       settings
         .withStringModifiers(
-          List(
+          StringModifier.default() ++ List(
             new FooModifier,
             new MdocModifier(context)
           )

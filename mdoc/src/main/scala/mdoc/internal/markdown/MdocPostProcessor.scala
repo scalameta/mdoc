@@ -9,6 +9,8 @@ import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
 import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
+import java.util
+import mdoc.PostModifierContext
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.util.control.NonFatal
@@ -17,11 +19,11 @@ import mdoc.internal.cli.Context
 import mdoc.internal.document.MdocExceptions
 import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
+import pprint.TPrintColors
 
 class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
   override def processDocument(doc: Document): Document = {
-    import scala.collection.JavaConverters._
     val docInput = doc
       .get(Markdown.InputKey)
       .getOrElse(sys.error(s"Missing DataKey ${Markdown.InputKey}"))
@@ -66,6 +68,10 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       ctx.reporter.info(s"Instrumented $filename")
       ctx.reporter.println(instrumented)
     }
+    val inputFile =
+      doc
+        .get(Markdown.RelativePathKey)
+        .getOrElse(throw new NoSuchElementException(s"InputFile: $filename"))
     val rendered = MarkdownCompiler.buildDocument(
       ctx.compiler,
       ctx.reporter,
@@ -76,17 +82,45 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     rendered.sections.zip(inputs).foreach {
       case (section, ScalaBlockInput(block, _, mod)) =>
         block.setInfo(CharSubSequence.of("scala"))
+        def defaultRender: String = Renderer.renderEvaluatedSection(
+          rendered,
+          section,
+          ctx.reporter,
+          ctx.settings.variablePrinter
+        )
         mod match {
           case Modifier.Silent =>
-          case Modifier.Default | Modifier.Fail =>
-            val str = Renderer.renderEvaluatedSection(
-              rendered,
-              section,
+          case Modifier.Post(modifier, info) =>
+            val variables = for {
+              (stat, i) <- section.section.statements.zipWithIndex
+              n = section.section.statements.length
+              (binder, j) <- stat.binders.zipWithIndex
+              m = stat.binders.length
+            } yield {
+              new mdoc.Variable(
+                binder.name,
+                binder.tpe.render(TPrintColors.BlackWhite),
+                binder.value,
+                binder.pos.toMeta(section),
+                j,
+                n,
+                i,
+                m
+              )
+            }
+            val postCtx = new PostModifierContext(
+              info,
+              section.input,
+              defaultRender,
+              variables,
               ctx.reporter,
-              ctx.settings.variablePrinter
+              inputFile,
+              ctx.settings,
             )
-            val content: BasedSequence = CharSubSequence.of(str)
-            block.setContent(List(content).asJava)
+            val postRender = modifier.process(postCtx)
+            replaceNodeWithText(doc, block, postRender)
+          case Modifier.Default | Modifier.Fail =>
+            block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
           case Modifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)
           case Modifier.Invisible =>
@@ -99,6 +133,10 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             throw new IllegalArgumentException(c.toString)
         }
     }
+  }
+
+  def asBasedSequence(string: String): util.List[BasedSequence] = {
+    List[BasedSequence](CharSubSequence.of(string)).asJava
   }
 
   def replaceNodeWithText(enclosingDoc: Document, toReplace: Node, text: String): Unit = {

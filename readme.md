@@ -38,6 +38,8 @@ Table of contents:
   - [Crash](#crash)
   - [Passthrough](#passthrough)
   - [Invisible](#invisible)
+  - [PostModifier](#postmodifier)
+  - [StringModifier](#stringmodifier)
   - [Scastie](#scastie)
 - [Key features](#key-features)
   - [Performance](#performance)
@@ -376,6 +378,204 @@ This is prose.
 More prose.
 ````
 
+### PostModifier
+
+A `PostModifier` is a custom modifier that post-processes a compiled and
+interpreted mdoc code fence. Post modifiers have access to the original code
+fence text, the static types and runtime values of the evaluated Scala code, the
+input and output file paths and other contextual information.
+
+One example use-case for post modifiers is to render charts based on the runtime
+value of the last expression in the code fence.
+
+![](evilplot.gif)
+
+Extend the `mdoc.PostModifier` trait to implement a post modifier.
+
+
+File: [EvilplotModifier.scala](https://github.com/olafurpg/mdoc/blob/master/mdoc-docs/src/main/scala/mdoc/docs/EvilplotModifier.scala)
+
+`````scala
+package mdoc.docs
+
+import com.cibo.evilplot.geometry.Drawable
+import java.nio.file.Files
+import mdoc._
+import scala.meta.inputs.Position
+
+class EvilplotModifier extends PostModifier {
+  val name = "evilplot"
+  def process(ctx: PostModifierContext): String = {
+    val out = ctx.outputFile.resolveSibling(_ => ctx.info)
+    ctx.lastValue match {
+      case d: Drawable =>
+        Files.createDirectories(out.toNIO.getParent)
+        if (out.isFile) {
+          Files.delete(out.toNIO)
+        }
+        d.write(out.toFile)
+        s"![](${out.toNIO.getFileName})"
+      case _ =>
+        val (pos, obtained) = ctx.variables.lastOption match {
+          case Some(variable) =>
+            val prettyObtained =
+              s"${variable.staticType} = ${variable.runtimeValue}"
+            (variable.pos, prettyObtained)
+          case None =>
+            (Position.Range(ctx.originalCode, 0, 0), "nothing")
+        }
+        ctx.reporter.error(
+          pos,
+          s"""type mismatch:
+  expected: com.cibo.evilplot.geometry.Drawable
+  obtained: $obtained"""
+        )
+        ""
+    }
+  }
+}
+
+`````
+
+Next, create a resource file `META-INF/services/mdoc.PostModifier` so the post
+modififer is recognized by the JVM
+[ServiceLoader](https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html)
+framework.
+
+
+File: [mdoc.PostModifier](https://github.com/olafurpg/mdoc/blob/master/mdoc-docs/src/main/resources/META-INF/services/mdoc.PostModifier)
+
+`````scala
+mdoc.docs.EvilplotModifier
+
+`````
+
+As long as `EvilplotModifier` is available on the classpath, for example via
+`libraryDependencies` in build.sbt, then you can use the modifier like this.
+
+
+Before:
+
+````
+```scala mdoc:evilplot:scatterplot.png
+import com.cibo.evilplot._
+import com.cibo.evilplot.plot._
+import com.cibo.evilplot.plot.aesthetics.DefaultTheme._
+import com.cibo.evilplot.numeric.Point
+
+val data = Seq.tabulate(90) { i =>
+  val degree = i * 8
+  val radian = math.toRadians(degree)
+  Point(i.toDouble, math.sin(radian))
+}
+
+ScatterPlot(data)
+  .xAxis()
+  .yAxis()
+  .frame()
+  .xLabel("x")
+  .yLabel("y")
+  .render()
+```
+````
+
+After:
+
+````
+![](scatterplot.png)
+````
+
+Which renders into a scatter plot like this:
+
+![](scatterplot.png)
+
+It's important that post modifiers present helpful error messages to the user in
+case of failures. For example, if the last runtime value is not an EvilPlot
+`Drawable` we can report the expected and obtained types with carets pointing to
+the position of the last variable.
+
+
+Before:
+
+````
+```scala mdoc:evilplot:scatterplot.png
+val message = "hello world!"
+```
+````
+
+Error:
+
+````
+error: readme.md:2:5: error: type mismatch:
+  expected: com.cibo.evilplot.geometry.Drawable
+  obtained: String = hello world!
+val message = "hello world!"
+    ^^^^^^^
+````
+
+### StringModifier
+
+A `StringModifier` is a custom modifier that processes the plain text contents
+of a code block, ignoring the compilation and interpretation of the Scala code.
+
+```scala
+import mdoc.StringModifier
+import mdoc.Reporter
+import scala.meta.Input
+class FooModifier extends StringModifier {
+  override val name = "foo"
+  override def process(info: String, code: Input, reporter: Reporter): String = {
+    val originalCodeFenceText = code.text
+    val isCrash = info == "crash"
+    if (isCrash) "BOOM"
+    else "OK: " + originalCodeFenceText
+  }
+}
+```
+
+Pass the custom modifier to `MainSettings.withStringModifiers(List(...))`.
+
+```scala
+val settings = mdoc.MainSettings()
+  .withStringModifiers(List(
+    new FooModifier
+  ))
+```
+
+Code blocks with the `mdoc:foo` modifier will then render as follows.
+
+
+Before:
+
+````
+```scala mdoc:foo
+Hello world!
+```
+````
+
+After:
+
+````
+OK: Hello world!
+````
+
+We can also add the argument `:crash` to render "BOOM".
+
+
+Before:
+
+````
+```scala mdoc:foo:crash
+Hello world!
+```
+````
+
+After:
+
+````
+BOOM
+````
+
 ### Scastie
 
 The `scastie` modifier transforms a Scala code block into a
@@ -677,66 +877,13 @@ Install version @OLD_VERSION@
 
 ### Extensible
 
-When using the library API, it's possible to implement custom modifiers by
-extending `mdoc.StringModifier`.
+The mdoc library API enables users to implement "modifiers" that customize the
+rendering of mdoc code fences. There are two kinds of modifiers:
 
-```scala
-import mdoc.StringModifier
-import mdoc.Reporter
-import scala.meta.Input
-class FooModifier extends StringModifier {
-  override val name = "foo"
-  override def process(info: String, code: Input, reporter: Reporter): String = {
-    val originalCodeFenceText = code.text
-    val isCrash = info == "crash"
-    if (isCrash) "BOOM"
-    else "OK: " + originalCodeFenceText
-  }
-}
-```
-
-Pass the custom modifier to `MainSettings.withStringModifiers(List(...))`.
-
-```scala
-val settings = mdoc.MainSettings()
-  .withStringModifiers(List(
-    new FooModifier
-  ))
-```
-
-Code blocks with the `mdoc:foo` modifier will then render as follows.
-
-
-Before:
-
-````
-```scala mdoc:foo
-Hello world!
-```
-````
-
-After:
-
-````
-OK: Hello world!
-````
-
-We can also add the argument `:crash` to render "BOOM".
-
-
-Before:
-
-````
-```scala mdoc:foo:crash
-Hello world!
-```
-````
-
-After:
-
-````
-BOOM
-````
+- [PostModifier](#postmodifier): post-process a compiled and interpreted mdoc
+  code fence.
+- [StringModifier](#stringmodifier): process code fences as plain string values
+  without mdoc compilation or intepretation.
 
 ⚠️ This feature is under development and is likely to have breaking changes in
 future releases.

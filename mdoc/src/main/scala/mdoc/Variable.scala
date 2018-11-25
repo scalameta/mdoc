@@ -1,6 +1,7 @@
 package mdoc
 
 import mdoc.internal.markdown.ReplVariablePrinter
+import scala.meta.inputs.Position
 
 /**
   * A captured variable in a code fence.
@@ -49,6 +50,7 @@ final class Variable private[mdoc] (
     val name: String,
     val staticType: String,
     val runtimeValue: Any,
+    val pos: Position,
     val indexOfVariableInStatement: Int,
     val totalVariablesInStatement: Int,
     val indexOfStatementInCodeFence: Int,

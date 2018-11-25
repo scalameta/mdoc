@@ -45,8 +45,10 @@ final class MainOps(
   }
 
   def lint(): Unit = {
-    val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
-    LinkHygiene.lint(docs, reporter, settings.verbose)
+    if (settings.out.isDirectory) {
+      val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
+      LinkHygiene.lint(docs, reporter, settings.verbose)
+    }
   }
 
   def handleMarkdown(file: InputFile): Exit = synchronized {
@@ -56,6 +58,7 @@ final class MainOps(
     val source = FileIO.slurp(file.in, settings.charset)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(Markdown.InputKey, Some(input))
+    markdown.set(Markdown.RelativePathKey, Some(file.relpath))
     val md = Markdown.toMarkdown(input, markdown, reporter, settings)
     if (reporter.hasErrors) {
       reporter.error(s"Failed to generate ${file.out}")

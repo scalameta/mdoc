@@ -5,15 +5,15 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 import mdoc.Reporter
-import scala.meta.inputs.Input
-import scala.meta.io.AbsolutePath
-import scala.meta.testkit.DiffAssertions
-import tests.markdown.StringSyntax._
 import mdoc.internal.cli.Context
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.Markdown
 import mdoc.internal.markdown.MarkdownCompiler
+import scala.meta.inputs.Input
+import scala.meta.io.AbsolutePath
+import scala.meta.testkit.DiffAssertions
+import tests.markdown.StringSyntax._
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   private val tmp = AbsolutePath(Files.createTempDirectory("mdoc"))
