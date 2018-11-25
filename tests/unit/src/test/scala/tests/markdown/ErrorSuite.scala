@@ -72,4 +72,45 @@ class ErrorSuite extends BaseMarkdownSuite {
       |       ^
     """.stripMargin
   )
+  checkError(
+    "not-member",
+    """
+      |```scala mdoc
+      |List(1).len
+      |```
+    """.stripMargin,
+    """|error: not-member.md:3:1: error: value len is not a member of List[Int]
+       |List(1).len
+       |^^^^^^^^^^^
+    """.stripMargin
+  )
+
+  checkError(
+    "already-defined",
+    """
+      |```scala mdoc
+      |val x = 1
+      |val x = 1
+      |```
+    """.stripMargin,
+    """|error: already-defined.md:4:1: error: x is already defined as value x
+       |val x = 1
+       |^^^^^^^^^
+    """.stripMargin
+  )
+
+  checkError(
+    "yrangepos",
+    """
+      |```scala mdoc
+      |List[Int]("".length.toString)
+      |```
+    """.stripMargin,
+    """|error: yrangepos.md:3:11: error: type mismatch;
+       | found   : String
+       | required: Int
+       |List[Int]("".length.toString)
+       |          ^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
 }

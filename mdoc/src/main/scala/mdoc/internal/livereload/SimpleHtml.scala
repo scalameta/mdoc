@@ -16,7 +16,7 @@ object SimpleHtml {
     wrapHtmlBody(body, toc, filename, url)
   }
 
-  private def wrapHtmlBody(
+  def wrapHtmlBody(
       body: String,
       tableOfContents: TableOfContents,
       title: String,

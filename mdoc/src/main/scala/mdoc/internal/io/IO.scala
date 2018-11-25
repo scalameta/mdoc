@@ -13,6 +13,27 @@ import mdoc.internal.cli.Settings
 
 object IO {
 
+  def foreachOutput(settings: Settings)(fn: (AbsolutePath, RelativePath) => Unit): Unit = {
+    val root = settings.out
+    Files.walkFileTree(
+      root.toNIO,
+      new SimpleFileVisitor[Path] {
+        override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+          val path = AbsolutePath(file)
+          val relpath = path.toRelative(root)
+          if (!settings.isExplicitlyExcluded(relpath)) {
+            fn(path, relpath)
+          }
+          FileVisitResult.CONTINUE
+        }
+        override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
+          val relpath = AbsolutePath(dir).toRelative(root)
+          if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
+          else FileVisitResult.CONTINUE
+        }
+      }
+    )
+  }
   def foreachInputFile(settings: Settings)(fn: InputFile => Unit): Unit = {
     implicit val cwd = settings.cwd
     val root = settings.in.toNIO

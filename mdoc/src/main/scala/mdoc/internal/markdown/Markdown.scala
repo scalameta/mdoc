@@ -1,9 +1,12 @@
 package mdoc.internal.markdown
 
+import com.vladsch.flexmark.ast.Document
 import com.vladsch.flexmark.ast.Node
 import com.vladsch.flexmark.ast.NodeVisitor
 import com.vladsch.flexmark.ast.VisitHandler
 import com.vladsch.flexmark.formatter.internal.Formatter
+import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.html.HtmlRenderer.HtmlRendererExtension
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.DataKey
 import com.vladsch.flexmark.util.options.MutableDataSet
@@ -56,12 +59,12 @@ object Markdown {
     InputFile(relativePath, tmp, tmp)
   }
 
-  def toMarkdown(
+  def toDocument(
       input: Input,
       markdownSettings: MutableDataSet,
       reporter: Reporter,
       settings: Settings
-  ): String = {
+  ): Document = {
     markdownSettings.set(InputKey, Some(input))
     markdownSettings.get(RelativePathKey) match {
       case None =>
@@ -75,9 +78,42 @@ object Markdown {
     val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter, settings)
     markdownSettings.set(InputKey, Some(textWithVariables))
     val parser = Parser.builder(markdownSettings).build
-    val formatter = Formatter.builder(markdownSettings).build
     val ast = parser.parse(textWithVariables.text)
-    formatter.render(ast)
+    ast
+  }
+
+  def toHtml(
+      input: Input,
+      markdownSettings: MutableDataSet,
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    val formatter = HtmlRenderer.builder(markdownSettings).build
+    formatter.render(
+      toDocument(
+        input,
+        markdownSettings,
+        reporter,
+        settings
+      )
+    )
+  }
+
+  def toMarkdown(
+      input: Input,
+      markdownSettings: MutableDataSet,
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    val formatter = Formatter.builder(markdownSettings).build
+    formatter.render(
+      toDocument(
+        input,
+        markdownSettings,
+        reporter,
+        settings
+      )
+    )
   }
 
   def traverse[T <: Node](

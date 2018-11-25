@@ -26,9 +26,10 @@ import mdoc.internal.io.ConsoleReporter
 import scala.collection.mutable
 import scala.meta.internal.io.InputStreamIO
 
-final class UndertowLiveReload private (
+final case class UndertowLiveReload private (
     server: Undertow,
     reporter: Reporter,
+    port: Int,
     url: String,
     openChannels: mutable.Set[WebSocketChannel]
 ) extends LiveReload {
@@ -37,15 +38,17 @@ final class UndertowLiveReload private (
     server.start()
   }
   override def stop(): Unit = server.stop()
-  override def reload(path: Path): Unit = {
+  def reload(path: String): Unit = {
     sendJson(s"""{"command":"reload","path":"$path","liveCss":true}""")
+  }
+  override def reload(path: Path): Unit = {
+    reload(path.toString)
   }
   override def alert(message: String): Unit = {
     sendJson(s"""{"command":"alert","message":"$message"}""")
   }
   private def sendJson(json: String): Unit = {
     openChannels.foreach(channel => WebSockets.sendTextBlocking(json, channel))
-
   }
 }
 
@@ -68,8 +71,9 @@ object UndertowLiveReload {
       root: Path,
       host: String = "localhost",
       preferredPort: Int = 4000,
-      reporter: Reporter = ConsoleReporter.default
-  ): LiveReload = {
+      reporter: Reporter = ConsoleReporter.default,
+      lastPreview: () => String = () => ""
+  ): UndertowLiveReload = {
     val port = freePort(host, preferredPort)
     val url = s"http://$host:$port"
     val openChannels = mutable.Set.empty[WebSocketChannel]
@@ -80,6 +84,16 @@ object UndertowLiveReload {
         .addExactPath("/highlight.js", staticResource("/highlight.js"))
         .addExactPath("/github.css", staticResource("/github.css"))
         .addExactPath("/custom.css", staticResource("/custom.css"))
+        .addExactPath("/preview.css", staticResource("/preview.css"))
+        .addExactPath(
+          "/preview",
+          new HttpHandler {
+            override def handleRequest(exchange: HttpServerExchange): Unit = {
+              exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "text/html")
+              exchange.getResponseSender.send(lastPreview())
+            }
+          }
+        )
         .addPrefixPath(
           "/livereload",
           websocket(new LiveReloadConnectionCallback(openChannels))
@@ -102,7 +116,7 @@ object UndertowLiveReload {
       .addHttpListener(port, host)
       .setHandler(markdownHandler)
       .build()
-    new UndertowLiveReload(server, reporter, url, openChannels)
+    new UndertowLiveReload(server, reporter, port, url, openChannels)
   }
 
   private def staticResource(path: String): HttpHandler = {
