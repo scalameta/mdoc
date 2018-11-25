@@ -77,7 +77,10 @@ case class Settings(
     @Section("LiveReload options")
     @Description("Don't start a LiveReload server")
     noLivereload: Boolean = false,
-    @Description("Which port the LiveReload server should listen to")
+    @Description(
+      "Which port the LiveReload server should listen to. " +
+        "If the port is not free, another free port close to this number is used."
+    )
     port: Int = 4000,
     @Description("Which hostname the LiveReload server should listen to")
     host: String = "localhost",

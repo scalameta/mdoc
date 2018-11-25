@@ -15,6 +15,9 @@ import io.undertow.websockets.core.StreamSourceFrameChannel
 import io.undertow.websockets.core.WebSocketChannel
 import io.undertow.websockets.core.WebSockets
 import io.undertow.websockets.spi.WebSocketHttpExchange
+import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -55,15 +58,19 @@ object UndertowLiveReload {
     *
     * @param root the root directory to serve files from.
     * @param host the hostname of the server.
-    * @param port the port of the server.
+    * @param preferredPort the preferred port of the server. If the port is not free,
+    *                      the first free port that is an increment of this port is picked.
+    *                      For example, if preferredPort == 4000 and 4000 is not free, then
+    *                      4001 will be picked instead.
     * @param reporter the reporter to use for logging purposes.
     */
   def apply(
       root: Path,
       host: String = "localhost",
-      port: Int = 4000,
+      preferredPort: Int = 4000,
       reporter: Reporter = ConsoleReporter.default
   ): LiveReload = {
+    val port = freePort(host, preferredPort)
     val url = s"http://$host:$port"
     val openChannels = mutable.Set.empty[WebSocketChannel]
     val fromFileSystem = resource(new PathResourceManager(root)).setDirectoryListingEnabled(true)
@@ -146,6 +153,22 @@ object UndertowLiveReload {
         }
       })
       channel.resumeReceives()
+    }
+  }
+
+  private final def freePort(host: String, port: Int, maxRetries: Int = 20): Int = {
+    try {
+      val socket = new ServerSocket()
+      try {
+        socket.bind(new InetSocketAddress(host, port))
+        val free = socket.getLocalPort
+        free
+      } finally {
+        socket.close()
+      }
+    } catch {
+      case _: IOException if maxRetries > 0 =>
+        freePort(host, port + 1, maxRetries - 1)
     }
   }
 }
