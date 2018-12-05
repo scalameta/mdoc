@@ -19,8 +19,9 @@ import mdoc.Reporter
 import mdoc.document.Document
 import mdoc.document._
 import mdoc.internal.document.DocumentBuilder
-import mdoc.internal.pos.PositionSyntax._
+import scalafix.internal.util.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
+import mdoc.internal.pos.PositionSyntax._
 
 object MarkdownCompiler {
 
@@ -98,6 +99,7 @@ class MarkdownCompiler(
     target: AbstractFile = new VirtualDirectory("(memory)", None)
 ) {
   private val settings = new Settings()
+  settings.Yrangepos.value = true
   settings.deprecation.value = true // enable detailed deprecation warnings
   settings.unchecked.value = true // enable detailed unchecked warnings
   settings.outputDirs.setSingleOutput(target)
@@ -131,14 +133,27 @@ class MarkdownCompiler(
     if (!sreporter.hasErrors) {
       Some(new AbstractFileClassLoader(target, appClassLoader))
     } else {
+      def toOffsetPosition(offset: Int): Position = {
+        edit.toOriginal(offset) match {
+          case Left(_) =>
+            Position.None
+          case Right(p) =>
+            p.toUnslicedPosition
+        }
+      }
       sreporter.infos.foreach {
         case sreporter.Info(pos, msg, severity) =>
           val mpos =
             if (pos.isDefined) {
-              edit.toOriginal(pos.point) match {
-                case Left(_) =>
-                  Position.None
-                case Right(p) => p.toUnslicedPosition
+              if (pos.isRange) {
+                (edit.toOriginal(pos.start), edit.toOriginal(pos.end - 1)) match {
+                  case (Right(start), Right(end)) =>
+                    Position.Range(start.input, start.start, end.end).toUnslicedPosition
+                  case (_, _) =>
+                    toOffsetPosition(pos.point)
+                }
+              } else {
+                toOffsetPosition(pos.point)
               }
             } else {
               Position.None

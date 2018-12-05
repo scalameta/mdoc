@@ -22,3 +22,5 @@ project/plugins/project/
 .ensime_cache/
 .ensime
 out/
+
+.mdoc/

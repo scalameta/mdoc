@@ -59,7 +59,7 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
           case parsers.Parsed.Success(source) =>
             SectionInput(input, source, mod)
           case parsers.Parsed.Error(pos, msg, _) =>
-            ctx.reporter.error(pos, msg)
+            ctx.reporter.error(pos.toUnslicedPosition, msg)
             SectionInput(input, Source(Nil), mod)
         }
     }
@@ -115,7 +115,7 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
               variables,
               ctx.reporter,
               inputFile,
-              ctx.settings,
+              ctx.settings
             )
             val postRender = modifier.process(postCtx)
             replaceNodeWithText(doc, block, postRender)

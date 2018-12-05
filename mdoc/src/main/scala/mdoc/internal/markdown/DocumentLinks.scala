@@ -8,6 +8,7 @@ import com.vladsch.flexmark.parser.Parser
 import java.net.URI
 import mdoc.Reporter
 import mdoc.internal.cli.Settings
+import mdoc.internal.io.IO
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.meta.internal.io.FileIO
@@ -48,11 +49,9 @@ object DocumentLinks {
 
   def fromGeneratedSite(settings: Settings, reporter: Reporter): List[DocumentLinks] = {
     val links = List.newBuilder[DocumentLinks]
-    val ls = FileIO.listAllFilesRecursively(settings.out)
-    ls.files.foreach { relpath =>
+    IO.foreachOutput(settings) { (abspath, relpath) =>
       val isMarkdown = PathIO.extension(relpath.toNIO) == "md"
       if (isMarkdown) {
-        val abspath = ls.root.resolve(relpath)
         val input = Input.VirtualFile(relpath.toString(), FileIO.slurp(abspath, settings.charset))
         links += DocumentLinks.fromMarkdown(settings.headerIdGenerator, relpath, input)
       }

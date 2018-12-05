@@ -1,5 +1,6 @@
 package mdoc.docs
 
+import java.nio.file.FileSystems
 import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
 import mdoc.Main
@@ -13,6 +14,7 @@ object Docs {
     BuildInfo.version.replaceFirst("\\+.*", "")
   def main(args: Array[String]): Unit = {
     val cwd = PathIO.workingDirectory.toNIO
+    val fs = FileSystems.getDefault
     val settings = MainSettings()
       .withIn(Paths.get("docs"))
       .withOut(cwd)
@@ -20,6 +22,11 @@ object Docs {
         Map(
           "VERSION" -> stableVersion,
           "SCALA_VERSION" -> scala.util.Properties.versionNumberString
+        )
+      )
+      .withExcludePath(
+        List(
+          fs.getPathMatcher("glob:vscode-extension")
         )
       )
       .withCleanTarget(false)

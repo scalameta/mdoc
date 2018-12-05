@@ -2,6 +2,13 @@ inThisBuild(
   List(
     scalaVersion := "2.12.7",
     organization := "com.geirsson",
+    version ~= { old =>
+      if (System.getProperty("CI") == "true") {
+        old
+      } else {
+        "0.6.0+1-SNAPSHOT"
+      }
+    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
@@ -19,7 +26,10 @@ inThisBuild(
         "olafurpg@gmail.com",
         url("https://geirsson.com")
       )
-    )
+    ),
+    // faster publishLocal:
+    publishArtifact.in(packageDoc) := sys.env.contains("CI"),
+    publishArtifact.in(packageSrc) := sys.env.contains("CI"),
   )
 )
 
@@ -116,16 +126,28 @@ lazy val unit = project
   .dependsOn(mdoc, testsInput)
   .enablePlugins(BuildInfoPlugin)
 
+lazy val lsp = project
+  .in(file("mdoc-lsp"))
+  .settings(
+    moduleName := "mdoc-lsp",
+    libraryDependencies ++= List(
+      "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % "0.5.0",
+      "com.outr" %% "scribe" % "2.6.0",
+      "com.outr" %% "scribe-slf4j" % "2.6.0"
+    )
+  )
+  .dependsOn(mdoc)
+
 lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
     skip in publish := true,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
-      "com.cibo" %% "evilplot" % "0.6.0",
+      "com.cibo" %% "evilplot" % "0.6.0"
     ),
     test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
-    cancelable in Global := true,
+    cancelable in Global := true
   )
   .dependsOn(mdoc)
