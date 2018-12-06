@@ -15,6 +15,9 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
 
   private var myWarnings = 0
   private var myErrors = 0
+
+  override def warningCount: Int = myWarnings
+  override def errorCount: Int = myErrors
   def hasWarnings: Boolean = myWarnings > 0
   def hasErrors: Boolean = myErrors > 0
   def reset(): Unit = {

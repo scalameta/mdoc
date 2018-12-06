@@ -16,5 +16,7 @@ trait Reporter {
 
   private[mdoc] def hasWarnings: Boolean
   private[mdoc] def hasErrors: Boolean
+  private[mdoc] def warningCount: Int
+  private[mdoc] def errorCount: Int
   private[mdoc] def reset(): Unit
 }

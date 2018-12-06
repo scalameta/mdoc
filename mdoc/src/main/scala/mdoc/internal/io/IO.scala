@@ -34,6 +34,12 @@ object IO {
       }
     )
   }
+  def inputFiles(settings: Settings): List[InputFile] = {
+    val buf = List.newBuilder[InputFile]
+    foreachInputFile(settings)(buf += _)
+    buf.result()
+  }
+
   def foreachInputFile(settings: Settings)(fn: InputFile => Unit): Unit = {
     implicit val cwd = settings.cwd
     val root = settings.in.toNIO

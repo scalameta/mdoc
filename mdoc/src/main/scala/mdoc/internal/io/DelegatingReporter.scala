@@ -23,6 +23,11 @@ class DelegatingReporter(underlying: List[Reporter]) extends Reporter {
     underlying.foreach(_.print(msg))
   override def println(msg: String): Unit =
     underlying.foreach(_.println(msg))
+
+  override def warningCount: Int =
+    underlying.foldLeft(0)(_ + _.warningCount)
+  override def errorCount: Int =
+    underlying.foldLeft(0)(_ + _.errorCount)
   override private[mdoc] def hasWarnings: Boolean =
     underlying.exists(_.hasWarnings)
   override private[mdoc] def hasErrors: Boolean =
