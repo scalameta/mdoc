@@ -2,13 +2,6 @@ inThisBuild(
   List(
     scalaVersion := "2.12.7",
     organization := "com.geirsson",
-    version ~= { old =>
-      if (System.getProperty("CI") == "true") {
-        old
-      } else {
-        "0.6.0+1-SNAPSHOT"
-      }
-    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
