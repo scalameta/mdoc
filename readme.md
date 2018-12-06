@@ -109,7 +109,7 @@ Add the following dependency to your build
 ```scala
 // build.sbt
 scalaVersion := "2.12.7" // must match exactly, no other Scala version is supported.
-libraryDependencies += "com.geirsson" % "mdoc" % "0.6.0" cross CrossVersion.full
+libraryDependencies += "com.geirsson" % "mdoc" % "0.6.1" cross CrossVersion.full
 ```
 
 Then write a main function that invokes mdoc as a library
@@ -133,7 +133,7 @@ Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-[here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.7/0.6.0)
+[here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.7/0.6.1)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
@@ -150,7 +150,7 @@ lazy val docs = project
   .settings(
     moduleName := "myproject-docs",
     scalaVersion := "2.12.7", // must match exactly, no other Scala version is supported
-    libraryDependencies += "com.geirsson" % "mdoc" % "0.6.0" cross CrossVersion.full,
+    libraryDependencies += "com.geirsson" % "mdoc" % "0.6.1" cross CrossVersion.full,
     // (optional): enable compiler plugins and other flags
     resourceGenerators.in(Compile) += Def.task {
       val out = resourceDirectory.in(Compile).value / "mdoc.properties"
@@ -179,7 +179,7 @@ Then run the following command:
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.7)
 
 ```
-$ coursier launch com.geirsson:mdoc_2.12.7:0.6.0 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_2.12.7:0.6.1 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
@@ -821,7 +821,7 @@ List(User("John"), User("Susan")).sorted
 
 ### Variable injection
 
-mdoc renders constants like `0.6.0` in markdown with variables provided at
+mdoc renders constants like `0.6.1` in markdown with variables provided at
 runtime. This makes it easy to keep documentation up-to-date as new releases are
 published. Variables can be passed from the command-line interface with the
 syntax
@@ -899,7 +899,7 @@ Contributions are welcome!
 ## --help
 
 ```
-mdoc v0.6.0
+mdoc v0.6.1
 Usage:   mdoc [<option> ...]
 Example: mdoc --in <path> --out <path> (customize input/output directories)
          mdoc --watch                  (watch for file changes)
