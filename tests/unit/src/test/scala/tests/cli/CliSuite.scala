@@ -132,14 +132,20 @@ class CliSuite extends BaseCliSuite {
       |```
       |/before-index.md
       |# Header
+      |[Head](#head)
     """.stripMargin,
     """
       |/before-index.md
       |# Header
+      |
+      |[Head](#head)
     """.stripMargin, // did not generate index.md
     expectedExitCode = 1,
     onStdout = { out =>
+      assert(out.contains("Compiling 2 files to"))
       assert(out.contains("Invalid mode 'foobar'"))
+      assert(out.contains("Compiled in"))
+      assert(out.contains("(1 error, 1 warning)"))
     }
   )
 

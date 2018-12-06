@@ -18,14 +18,17 @@ import scala.meta.io.AbsolutePath
 
 class DiagnosticsReporter(client: MdocLanguageClient) extends Reporter {
   val diagnostics = new ConcurrentHashMap[AbsolutePath, jutil.Queue[Diagnostic]]()
-  val errorCount = new AtomicInteger()
-  val warningCount = new AtomicInteger()
+  val myErrors = new AtomicInteger()
+  val myWarnings = new AtomicInteger()
+
+  override def errorCount: Int = myErrors.get()
+  override def warningCount: Int = myWarnings.get()
   def add(pos: Position, sev: DiagnosticSeverity, msg: String): Unit = {
 
     if (sev == DiagnosticSeverity.Error) {
-      errorCount.incrementAndGet()
+      myErrors.incrementAndGet()
     } else if (sev == DiagnosticSeverity.Warning) {
-      warningCount.incrementAndGet()
+      myWarnings.incrementAndGet()
     }
 
     val path = pos.input.syntax.toAbsolutePath
@@ -68,11 +71,11 @@ class DiagnosticsReporter(client: MdocLanguageClient) extends Reporter {
   private def logMessage(tpe: MessageType, msg: String): Unit = {
     client.logMessage(new MessageParams(MessageType.Log, msg))
   }
-  override private[mdoc] def hasWarnings: Boolean = warningCount.get() > 0
-  override private[mdoc] def hasErrors: Boolean = errorCount.get() > 0
+  override private[mdoc] def hasWarnings: Boolean = myWarnings.get() > 0
+  override private[mdoc] def hasErrors: Boolean = myErrors.get() > 0
   override private[mdoc] def reset(): Unit = {
-    errorCount.set(0)
-    warningCount.set(0)
+    myErrors.set(0)
+    myWarnings.set(0)
     diagnostics.clear()
   }
   def publishDiagnostics(path: AbsolutePath): Unit = {

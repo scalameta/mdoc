@@ -52,21 +52,22 @@ final class MainOps(
   }
 
   def handleMarkdown(file: InputFile): Exit = synchronized {
-    reporter.reset()
-    reporter.info(s"Compiling ${file.in}")
-    val start = System.nanoTime()
+    val originalErrors = reporter.errorCount
+    if (settings.verbose) {
+      reporter.info(s"Compiling ${file.in}")
+    }
+    val timer = new Timer
     val source = FileIO.slurp(file.in, settings.charset)
     val input = Input.VirtualFile(file.in.toString(), source)
     markdown.set(Markdown.InputKey, Some(input))
     markdown.set(Markdown.RelativePathKey, Some(file.relpath))
     val md = Markdown.toMarkdown(input, markdown, reporter, settings)
-    if (reporter.hasErrors) {
-      reporter.error(s"Failed to generate ${file.out}")
-    } else {
+    val fileHasErrors = reporter.errorCount > originalErrors
+    if (!fileHasErrors) {
       writePath(file, md)
-      val end = System.nanoTime()
-      val elapsed = TimeUnit.NANOSECONDS.toMillis(end - start)
-      reporter.info(f"  done => ${file.out} ($elapsed%,d ms)")
+      if (settings.verbose) {
+        reporter.info(f"  done => ${file.out} ($timer)")
+      }
       livereload.foreach(_.reload(file.out.toNIO))
     }
     if (reporter.hasErrors) Exit.error
@@ -76,7 +77,9 @@ final class MainOps(
   def handleRegularFile(file: InputFile): Exit = {
     Files.createDirectories(file.out.toNIO.getParent)
     Files.copy(file.in.toNIO, file.out.toNIO, StandardCopyOption.REPLACE_EXISTING)
-    reporter.info(s"Copied    ${file.out.toNIO}")
+    if (settings.verbose) {
+      reporter.info(s"Copied    ${file.out.toNIO}")
+    }
     Exit.success
   }
 
@@ -118,17 +121,21 @@ final class MainOps(
   }
 
   def generateCompleteSite(): Exit = {
-    var isEmpty = true
-    var exit = Exit.success
-    IO.foreachInputFile(settings) { file =>
-      isEmpty = false
-      val nextExit = handleFile(file)
-      exit = exit.merge(nextExit)
-    }
-    if (isEmpty) {
-      reporter.error(s"no input files: ${settings.in}")
+    val files = IO.inputFiles(settings)
+    val timer = new Timer()
+    val n = files.length
+    compilingFiles(n)
+    val exit = files.foldLeft(Exit.success) {
+      case (accum, file) =>
+        val fileExit = handleFile(file)
+        accum.merge(fileExit)
     }
     lint()
+    if (files.isEmpty) {
+      reporter.error(s"no input files: ${settings.in}")
+    } else {
+      compiledFiles(n, timer)
+    }
     exit
   }
 
@@ -157,8 +164,12 @@ final class MainOps(
     val path = AbsolutePath(event.path())
     settings.toInputFile(path) match {
       case Some(inputFile) =>
+        reporter.reset()
+        val timer = new Timer()
+        compilingFiles(1)
         handleFile(inputFile)
         lint()
+        compiledFiles(1, timer)
         waitingForFileChanges()
       case None => ()
     }
@@ -177,6 +188,22 @@ final class MainOps(
 
   def waitingForFileChanges(): Unit = {
     reporter.println(s"Waiting for file changes (press enter to interrupt)")
+  }
+
+  def compiledFiles(n: Int, timer: Timer): Unit = {
+    val errors = Messages.count("error", reporter.errorCount)
+    val warnings =
+      if (reporter.hasWarnings) {
+        s", " + Messages.count("warning", reporter.warningCount)
+      } else {
+        ""
+      }
+    reporter.info(s"Compiled in $timer ($errors$warnings)")
+  }
+
+  def compilingFiles(n: Int): Unit = {
+    val files = Messages.count("file", n)
+    reporter.info(s"Compiling $files to ${settings.out}")
   }
 
 }
