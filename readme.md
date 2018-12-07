@@ -104,11 +104,11 @@ Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.8)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12)
 
 ```scala
 // build.sbt
-scalaVersion := "2.12.8" // must match exactly, no other Scala version is supported.
+scalaVersion := "2.12.8" // Any version in 2.12.x works.
 libraryDependencies += "com.geirsson" % "mdoc" % "0.6.1" cross CrossVersion.full
 ```
 
@@ -133,7 +133,7 @@ Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-[here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12.8/0.6.1)
+[here](https://www.javadoc.io/doc/com.geirsson/mdoc_2.12/0.6.1)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
@@ -149,7 +149,7 @@ lazy val docs = project
   .in(file("myproject-docs"))
   .settings(
     moduleName := "myproject-docs",
-    scalaVersion := "2.12.8", // must match exactly, no other Scala version is supported
+    scalaVersion := "2.12.8", // Any version in 2.12.x works.
     libraryDependencies += "com.geirsson" % "mdoc" % "0.6.1" cross CrossVersion.full,
     // (optional): enable compiler plugins and other flags
     resourceGenerators.in(Compile) += Def.task {
@@ -176,10 +176,10 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12.8)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_2.12)
 
 ```
-$ coursier launch com.geirsson:mdoc_2.12.8:0.6.1 -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_2.12:0.6.1 -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```

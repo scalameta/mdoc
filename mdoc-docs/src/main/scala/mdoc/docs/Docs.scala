@@ -21,7 +21,8 @@ object Docs {
       .withSiteVariables(
         Map(
           "VERSION" -> stableVersion,
-          "SCALA_VERSION" -> scala.util.Properties.versionNumberString
+          "SCALA_BINARY_VERSION" -> BuildInfo.scalaBinaryVersion,
+          "SCALA_VERSION" -> BuildInfo.scalaVersion
         )
       )
       .withExcludePath(

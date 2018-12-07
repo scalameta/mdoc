@@ -104,11 +104,11 @@ Observe that `MY_VERSION` has been replaced with `1.0.0` and that the
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_VERSION@)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@)
 
 ```scala
 // build.sbt
-scalaVersion := "@SCALA_VERSION@" // must match exactly, no other Scala version is supported.
+scalaVersion := "@SCALA_VERSION@" // Any version in @SCALA_BINARY_VERSION@.x works.
 libraryDependencies += "com.geirsson" % "mdoc" % "@VERSION@" cross CrossVersion.full
 ```
 
@@ -133,7 +133,7 @@ Consult [--help](#--help) to see what arguments are valid for `withArgs`.
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-[here](https://www.javadoc.io/doc/com.geirsson/mdoc_@SCALA_VERSION@/@VERSION@)
+[here](https://www.javadoc.io/doc/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/@VERSION@)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.
@@ -149,7 +149,7 @@ lazy val docs = project
   .in(file("myproject-docs"))
   .settings(
     moduleName := "myproject-docs",
-    scalaVersion := "@SCALA_VERSION@", // must match exactly, no other Scala version is supported
+    scalaVersion := "@SCALA_VERSION@", // Any version in @SCALA_BINARY_VERSION@.x works.
     libraryDependencies += "com.geirsson" % "mdoc" % "@VERSION@" cross CrossVersion.full,
     // (optional): enable compiler plugins and other flags
     resourceGenerators.in(Compile) += Def.task {
@@ -176,10 +176,10 @@ First, install the
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line).
 Then run the following command:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_VERSION@)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@)
 
 ```
-$ coursier launch com.geirsson:mdoc_@SCALA_VERSION@:@VERSION@ -- --site.MY_VERSION 1.0.0
+$ coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- --site.MY_VERSION 1.0.0
 info: Compiling docs/readme.md
 info:   done => out/readme.md (120 ms)
 ```
