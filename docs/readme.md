@@ -109,7 +109,7 @@ Add the following dependency to your build
 ```scala
 // build.sbt
 scalaVersion := "@SCALA_VERSION@" // Any version in @SCALA_BINARY_VERSION@.x works.
-libraryDependencies += "com.geirsson" % "mdoc" % "@VERSION@" cross CrossVersion.full
+libraryDependencies += "com.geirsson" %% "mdoc" % "@VERSION@"
 ```
 
 Then write a main function that invokes mdoc as a library
@@ -150,7 +150,7 @@ lazy val docs = project
   .settings(
     moduleName := "myproject-docs",
     scalaVersion := "@SCALA_VERSION@", // Any version in @SCALA_BINARY_VERSION@.x works.
-    libraryDependencies += "com.geirsson" % "mdoc" % "@VERSION@" cross CrossVersion.full,
+    libraryDependencies += "com.geirsson" %% "mdoc" % "@VERSION@",
     // (optional): enable compiler plugins and other flags
     resourceGenerators.in(Compile) += Def.task {
       val out = resourceDirectory.in(Compile).value / "mdoc.properties"

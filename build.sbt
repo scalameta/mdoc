@@ -45,7 +45,6 @@ lazy val runtime = project
 lazy val mdoc = project
   .settings(
     moduleName := "mdoc",
-    crossVersion := CrossVersion.full,
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
     test in assembly := {},
