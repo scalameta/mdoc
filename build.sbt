@@ -66,7 +66,7 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.8.3",
+      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.1",
       "com.vladsch.flexmark" % "flexmark-all" % "0.34.44",
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "io.methvin" % "directory-watcher" % "0.8.0",
