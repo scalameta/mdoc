@@ -36,7 +36,7 @@ final class MainSettings private (
     copy(settings.copy(site = variables))
   }
   def withWorkingDirectory(cwd: Path): MainSettings = {
-    copy(settings.copy(cwd = AbsolutePath(cwd)))
+    copy(settings.withWorkingDirectory(AbsolutePath(cwd)))
   }
   def withOut(out: Path): MainSettings = {
     copy(settings.copy(out = AbsolutePath(out)))
@@ -95,9 +95,12 @@ final class MainSettings private (
 }
 
 object MainSettings {
-  def apply(): MainSettings = {
-    val settings = Settings.default(PathIO.workingDirectory)
+  def apply(workingDirectory: Path): MainSettings = {
+    val settings = Settings.default(AbsolutePath(workingDirectory))
     val reporter = ConsoleReporter.default
     new MainSettings(settings, reporter)
+  }
+  def apply(): MainSettings = {
+    MainSettings(PathIO.workingDirectory.toNIO)
   }
 }
