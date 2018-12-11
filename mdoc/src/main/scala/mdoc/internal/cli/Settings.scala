@@ -160,6 +160,13 @@ case class Settings(
   def resolveOut(relpath: RelativePath): AbsolutePath = {
     out.resolve(relpath)
   }
+  def withWorkingDirectory(dir: AbsolutePath): Settings = {
+    copy(
+      in = dir.resolve("docs"),
+      out = dir.resolve("out"),
+      cwd = dir
+    )
+  }
 }
 
 object Settings extends MetaconfigScalametaImplicits {
