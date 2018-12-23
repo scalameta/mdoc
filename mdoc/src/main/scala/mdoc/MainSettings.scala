@@ -15,6 +15,11 @@ final class MainSettings private (
     private[mdoc] val settings: Settings,
     private[mdoc] val reporter: Reporter
 ) {
+
+  override def toString: String = {
+    s"MainSettings($settings, $reporter)"
+  }
+
   def withArgs(args: List[String]): MainSettings = {
     if (args.isEmpty) this
     else {
