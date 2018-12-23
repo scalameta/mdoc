@@ -127,6 +127,9 @@ case class Settings(
     @Description("The pretty printer for variables")
     variablePrinter: Variable => String = ReplVariablePrinter
 ) {
+
+  override def toString: String = ConfEncoder[Settings].write(this).toString()
+
   def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {

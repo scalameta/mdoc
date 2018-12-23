@@ -48,4 +48,23 @@ class CrashSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "comments",
+    """
+      |```scala mdoc:crash
+      |1 match {
+      |  case 2 => // boom!
+      |}
+      |```
+    """.stripMargin,
+    """|```scala
+       |1 match {
+       |  case 2 => // boom!
+       |}
+       |// scala.MatchError: 1 (of class java.lang.Integer)
+       |// 	at repl.Session.$anonfun$app$1(comments.md:8)
+       |```
+    """.stripMargin
+  )
+
 }

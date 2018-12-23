@@ -29,8 +29,8 @@ inThisBuild(
 name := "mdocRoot"
 skip in publish := true
 val V = new {
-  val scalameta = "4.0.0"
-  val scalafix = "0.9.0-RC1"
+  val scalameta = "4.1.0"
+  val scalafix = "0.9.1"
 }
 
 lazy val runtime = project
