@@ -10,8 +10,7 @@ class CrashSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |```scala
-      |val x = 1
+      |```scala |val x = 1
       |???
       |// scala.NotImplementedError: an implementation is missing
       |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
@@ -45,6 +44,25 @@ class CrashSuite extends BaseMarkdownSuite {
       |error: false-positive.md:3:1: error: Expected runtime exception but program completed successfully
       |"ab".length
       |^^^^^^^^^^^
+    """.stripMargin
+  )
+
+  check(
+    "comments",
+    """
+      |```scala mdoc:crash
+      |1 match {
+      |  case 2 => // boom!
+      |}
+      |```
+    """.stripMargin,
+    """|```scala
+       |1 match {
+       |  case 2 => // boom!
+       |}
+       |// scala.MatchError: 1 (of class java.lang.Integer)
+       |// 	at repl.Session.$anonfun$app$1(comments.md:8)
+       |```
     """.stripMargin
   )
 
