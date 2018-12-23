@@ -142,7 +142,8 @@ class MarkdownCompiler(
         }
       }
       sreporter.infos.foreach {
-        case sreporter.Info(pos, msg, severity) =>
+        case sreporter.Info(pos, msgOrNull, severity) =>
+          val msg = if (msgOrNull == null) "" else msgOrNull
           val mpos =
             if (pos.isDefined) {
               if (pos.isRange) {
