@@ -15,6 +15,7 @@ class Instrumenter(sections: List[SectionInput]) {
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   private var counter = 0
+  private var resets = 0
   private def freshBinder(): String = {
     val name = s"res$counter"
     counter += 1
@@ -22,6 +23,11 @@ class Instrumenter(sections: List[SectionInput]) {
   }
   private def printAsScript(): Unit = {
     sections.foreach { section =>
+      if (section.mod == Modifier.Reset) {
+        resets += 1
+        val nextApp = s"app$resets()"
+        sb.print(s"this.$nextApp\n}\ndef $nextApp: Unit = {\n")
+      }
       sb.println("\n$doc.startSection();")
       section.source.stats.foreach { stat =>
         sb.println(s"$$doc.startStatement(${position(stat.pos)});")
@@ -37,7 +43,7 @@ class Instrumenter(sections: List[SectionInput]) {
   }
   private def printStatement(stat: Stat, mod: Modifier, sb: PrintStream): Unit = mod match {
     case Modifier.Default | Modifier.Passthrough | Modifier.Invisible | Modifier.Silent |
-        Modifier.Post(_, _) =>
+        Modifier.Post(_, _) | Modifier.Reset =>
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
