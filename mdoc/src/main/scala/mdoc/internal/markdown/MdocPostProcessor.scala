@@ -119,7 +119,7 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             )
             val postRender = modifier.process(postCtx)
             replaceNodeWithText(doc, block, postRender)
-          case Modifier.Default | Modifier.Fail =>
+          case Modifier.Default | Modifier.Reset | Modifier.Fail =>
             block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
           case Modifier.Passthrough =>
             replaceNodeWithText(doc, block, section.out)

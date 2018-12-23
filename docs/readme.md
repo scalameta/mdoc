@@ -28,26 +28,27 @@ Table of contents:
 <!-- TOC depthFrom:2 -->
 
 - [Quickstart](#quickstart)
-  - [Library](#library)
-  - [sbt](#sbt)
-  - [Command-line](#command-line)
+    - [Library](#library)
+    - [sbt](#sbt)
+    - [Command-line](#command-line)
 - [Modifiers](#modifiers)
-  - [Default](#default)
-  - [Silent](#silent)
-  - [Fail](#fail)
-  - [Crash](#crash)
-  - [Passthrough](#passthrough)
-  - [Invisible](#invisible)
-  - [PostModifier](#postmodifier)
-  - [StringModifier](#stringmodifier)
-  - [Scastie](#scastie)
+    - [Default](#default)
+    - [Silent](#silent)
+    - [Fail](#fail)
+    - [Crash](#crash)
+    - [Passthrough](#passthrough)
+    - [Invisible](#invisible)
+    - [Reset](#reset)
+    - [PostModifier](#postmodifier)
+    - [StringModifier](#stringmodifier)
+    - [Scastie](#scastie)
 - [Key features](#key-features)
-  - [Performance](#performance)
-  - [Good error messages](#good-error-messages)
-  - [Link hygiene](#link-hygiene)
-  - [Script semantics](#script-semantics)
-  - [Variable injection](#variable-injection)
-  - [Extensible](#extensible)
+    - [Performance](#performance)
+    - [Good error messages](#good-error-messages)
+    - [Link hygiene](#link-hygiene)
+    - [Script semantics](#script-semantics)
+    - [Variable injection](#variable-injection)
+    - [Extensible](#extensible)
 - [Team](#team)
 - [--help](#--help)
 
@@ -282,6 +283,26 @@ println("I am invisible")
 ```
 More prose.
 ````
+
+### Reset
+
+The `reset` modifier starts a new scope where previous statements in the document are no longer available.
+This can be helpful to clear existing imports or implicits in scope.
+
+````scala mdoc:mdoc
+```scala mdoc
+implicit val x: Int = 41
+```
+
+```scala mdoc:reset
+implicit val y: Int = 42
+implicitly[Int] // x is no longer in scope
+```
+```scala mdoc:fail
+println(x)
+```
+````
+
 
 ### PostModifier
 

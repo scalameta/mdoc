@@ -139,7 +139,7 @@ object Renderer {
                         s"Obtained $obtained"
                     )
                 }
-              case Modifier.Default | Modifier.Passthrough | Modifier.Post(_, _) =>
+              case Modifier.Default | Modifier.Passthrough | Modifier.Reset | Modifier.Post(_, _) =>
                 val pos = binder.pos.toMeta(section)
                 val variable = new mdoc.Variable(
                   binder.name,

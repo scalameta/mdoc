@@ -38,6 +38,7 @@ Table of contents:
   - [Crash](#crash)
   - [Passthrough](#passthrough)
   - [Invisible](#invisible)
+  - [Reset](#reset)
   - [PostModifier](#postmodifier)
   - [StringModifier](#stringmodifier)
   - [Scastie](#scastie)
@@ -377,6 +378,52 @@ This is prose.
 
 More prose.
 ````
+
+### Reset
+
+The `reset` modifier starts a new scope where previous statements in the document are no longer available.
+This can be helpful to clear existing imports or implicits in scope.
+
+
+Before:
+
+````
+```scala mdoc
+implicit val x: Int = 41
+```
+
+```scala mdoc:reset
+implicit val y: Int = 42
+implicitly[Int] // x is no longer in scope
+```
+```scala mdoc:fail
+println(x)
+```
+````
+
+After:
+
+````
+```scala
+implicit val x: Int = 41
+// x: Int = 41
+```
+
+```scala
+implicit val y: Int = 42
+// y: Int = 42
+implicitly[Int] // x is no longer in scope
+// res0: Int = 42
+```
+
+```scala
+println(x)
+// not found: value x
+// println(x)
+//         ^
+```
+````
+
 
 ### PostModifier
 
