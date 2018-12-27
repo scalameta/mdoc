@@ -305,7 +305,7 @@ After:
 val y = ???
 // scala.NotImplementedError: an implementation is missing
 // 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-// 	at repl.Session.$anonfun$app$1(readme.md:8)
+// 	at repl.Session$App.$anonfun$new$1(readme.md:9)
 // 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
 ```
 ````
@@ -820,13 +820,13 @@ unknown link.
 
 ### Program semantics
 
-mdoc interprets code fences as normal Scala programs instead of as if they're
-evaluated in the REPL. This behavior is different from tut that interprets
-statements as if they were typed in a REPL session. Using "script semantics"
-instead of "repl semantics" has both benefits and downsides.
+mdoc interprets code fences as normal Scala programs instead of using the REPL.
+This behavior is different from tut that interprets statements as if they were
+typed in a REPL session. Using "program semantics" instead of "repl semantics"
+has benefits and downsides.
 
 **Downside**: It's not possible to bind the same variable twice, for example the
-code below input fails compilation with mdoc but compiles successfully with tut
+code below fails compilation with mdoc but compiles successfully with tut
 
 ````
 ```scala mdoc
@@ -835,10 +835,10 @@ val x = 1
 ```
 ````
 
-**Upside**: Code examples can be copy-pasted into normal Scala programs and
-compile.
+**Upside**: Code examples from the documentation can be copy-pasted into normal
+Scala programs and compile.
 
-**Upside**: Companion objects Just Work™️
+**Upside**: Companion objects work as expected.
 
 
 Before:
@@ -849,7 +849,7 @@ case class User(name: String)
 object User {
   implicit val ordering: Ordering[User] = Ordering.by(_.name)
 }
-List(User("John"), User("Susan")).sorted
+List(User("Susan"), User("John")).sorted
 ```
 ````
 
@@ -861,16 +861,76 @@ case class User(name: String)
 object User {
   implicit val ordering: Ordering[User] = Ordering.by(_.name)
 }
-List(User("John"), User("Susan")).sorted
+List(User("Susan"), User("John")).sorted
 // res0: List[User] = List(User("John"), User("Susan"))
 ```
 ````
 
+**Upside**: Overloaded methods work as expected.
+
+
+Before:
+
+````
+```scala mdoc
+def add(a: Int, b: Int): Int = a + b
+def add(a: Int): Int = add(a, 1)
+add(3)
+```
+````
+
+After:
+
+````
+```scala
+def add(a: Int, b: Int): Int = a + b
+def add(a: Int): Int = add(a, 1)
+add(3)
+// res0: Int = 4
+```
+````
+
+**Upside**: Mutually recursive methods work as expected.
+
+
+Before:
+
+````
+```scala mdoc
+def isEven(n: Int): Boolean = n == 0 || !isOdd(n - 1)
+def isOdd(n: Int): Boolean  = n == 1 || !isEven(n - 1)
+isEven(8)
+```
+````
+
+After:
+
+````
+```scala
+def isEven(n: Int): Boolean = n == 0 || !isOdd(n - 1)
+def isOdd(n: Int): Boolean  = n == 1 || !isEven(n - 1)
+isEven(8)
+// res0: Boolean = false
+```
+````
+
+**Upside**: Compiler options like `-Ywarn-unused` don't report spurious errors like they do in the REPL.
+
+```scala
+$ scala -Ywarn-unused
+scala> import scala.concurrent.Future
+<console>:11: warning: Unused import
+       import scala.concurrent.Future
+                               ^
+scala> Future.successful(1)
+res0: scala.concurrent.Future[Int] = Future(Success(1))
+```
+
 ### Variable injection
 
-mdoc renders variables like `@VERSION@` into `0.7.1`. This makes it easy to keep documentation
-up-to-date as new releases are published. Variables can be passed from the
-command-line interface with the syntax
+mdoc renders variables like `@VERSION@` into `0.7.1`. This makes it easy to
+keep documentation up-to-date as new releases are published. Variables can be
+passed from the command-line interface with the syntax
 
 ```
 mdoc --site.VERSION 1.0.0 --site.SCALA_VERSION 2.12.8
