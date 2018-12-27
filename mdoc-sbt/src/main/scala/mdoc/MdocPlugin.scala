@@ -4,20 +4,43 @@ import sbt.Keys._
 import sbt._
 import scala.collection.mutable.ListBuffer
 
+object Main {
+  import MdocPlugin.autoImport._
+  def main(args: Array[String]): Unit = {
+    println(mdocIn)
+    println(mdocIn.key)
+    println(mdocIn.key.description)
+    println(mdocIn.key.manifest)
+    println(mdocIn.key.manifest.runtimeClass.getName)
+  }
+}
+
 object MdocPlugin extends AutoPlugin {
   object autoImport {
     val mdoc =
-      inputKey[Unit]("Run mdoc to generate markdown sources.")
-    val mdocCode =
-      taskKey[Unit]("Run mdoc and launch VSCode with the mdoc extension installed.")
+      inputKey[Unit](
+        "Run mdoc to generate markdown sources. " +
+          "Supports arguments like --watch to start the file watcher with livereload."
+      )
     val mdocVariables =
-      settingKey[Map[String, String]]("Site variables such as @VERSION@.")
+      settingKey[Map[String, String]](
+        "Site variables that can be referenced from markdown with @VERSION@."
+      )
     val mdocIn =
-      settingKey[File]("Input directory containing markdown sources to be processed by mdoc.")
+      settingKey[File](
+        "Input directory containing markdown sources to be processed by mdoc. " +
+          "Defaults to the toplevel docs/ directory."
+      )
     val mdocOut =
-      settingKey[File]("Output directory for mdoc generated markdown.")
+      settingKey[File](
+        "Output directory for mdoc generated markdown. " +
+          "Defaults to the target/mdoc directory of this project."
+      )
     val mdocAutoDependency =
-      settingKey[Boolean]("If true, add mdoc as a library dependency this project.")
+      settingKey[Boolean](
+        "If false, do not add mdoc as a library dependency this project. " +
+          "Default value is true."
+      )
   }
   import autoImport._
 
@@ -32,13 +55,6 @@ object MdocPlugin extends AutoPlugin {
         runMain.in(Compile).toTask(s" mdoc.Main ${parsed.mkString(" ")}")
       }
     }.evaluated,
-    mdocCode := {
-      mdoc.toTask(" ").value
-      import sys.process._
-      List("code", "--install-extension", "geirsson.mdoc").!!
-      val cwd = baseDirectory.in(ThisBuild).value.toString
-      List("code", cwd).!!
-    },
     libraryDependencies ++= {
       if (mdocAutoDependency.value) {
         List("com.geirsson" %% "mdoc" % BuildInfo.version)

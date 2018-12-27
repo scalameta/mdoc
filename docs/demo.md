@@ -1,3 +1,8 @@
+---
+id: demo
+title: Summing numbers
+---
+
 ## Summing numbers
 
 Build a list with the `to` method:
@@ -15,7 +20,7 @@ Build a list with the `until` method:
 Use `map` to transform the list.
 
 ```scala mdoc
-List(1, 2, 3, 4).lengthCompare("3")
+// "hello".matches("h.*".length)
 ```
 
-Learn more in [summing numbers](#suming-numbers)
+<!-- Learn more in [summing numbers](#suming-numbers) -->

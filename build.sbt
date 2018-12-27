@@ -159,9 +159,9 @@ lazy val docs = project
     mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
+      "org.scala-sbt" % "sbt" % sbtVersion.value,
       "com.cibo" %% "evilplot" % "0.6.0"
     ),
-    test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
     mdocVariables := {
@@ -174,5 +174,5 @@ lazy val docs = project
       )
     }
   )
-  .dependsOn(mdoc)
+  .dependsOn(mdoc, plugin)
   .enablePlugins(MdocPlugin)

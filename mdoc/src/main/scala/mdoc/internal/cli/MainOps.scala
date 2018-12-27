@@ -5,7 +5,6 @@ import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import mdoc.Reporter
 import mdoc.internal.BuildInfo
 import mdoc.internal.io.IO

@@ -72,10 +72,10 @@ case class Settings(
         "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any."
     )
     scalacOptions: String = "",
-    @Description("Remove all files in the outout directory before generating a new site.")
+    @Description("Remove all files in the output directory before generating a new site.")
     cleanTarget: Boolean = false,
     @Section("LiveReload options")
-    @Description("Don't start a LiveReload server")
+    @Description("Don't start a LiveReload server under --watch mode.")
     noLivereload: Boolean = false,
     @Description(
       "Which port the LiveReload server should listen to. " +

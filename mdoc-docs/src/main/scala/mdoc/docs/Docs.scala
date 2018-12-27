@@ -15,8 +15,9 @@ object Docs {
   def main(args: Array[String]): Unit = {
     val cwd = PathIO.workingDirectory.toNIO
     val fs = FileSystems.getDefault
+    val out = cwd.resolve("website").resolve("target").resolve("docs")
     val settings = MainSettings()
-      .withOut(cwd)
+      .withOut(out)
       .withExcludePath(
         List(
           fs.getPathMatcher("glob:vscode-extension")
@@ -26,7 +27,6 @@ object Docs {
       .withReportRelativePaths(true)
       .withStringModifiers(
         StringModifier.default() ++ List(
-          new FooModifier,
           new ScastieModifier(debugClassSuffix = Some("<a_random_uuid>"))
         )
       )
@@ -36,7 +36,6 @@ object Docs {
       settings
         .withStringModifiers(
           StringModifier.default() ++ List(
-            new FooModifier,
             new MdocModifier(context)
           )
         )
