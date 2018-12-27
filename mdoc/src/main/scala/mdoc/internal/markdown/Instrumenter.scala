@@ -14,27 +14,37 @@ class Instrumenter(sections: List[SectionInput]) {
   }
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
-  private var counter = 0
-  private var resets = 0
-  private def freshBinder(): String = {
-    val name = s"res$counter"
-    counter += 1
-    name
-  }
+  val gensym = new Gensym()
   private def printAsScript(): Unit = {
-    sections.foreach { section =>
-      if (section.mod == Modifier.Reset) {
-        resets += 1
-        val nextApp = s"app$resets()"
-        sb.print(s"this.$nextApp\n}\ndef $nextApp: Unit = {\n")
-      }
-      sb.println("\n$doc.startSection();")
-      section.source.stats.foreach { stat =>
-        sb.println(s"$$doc.startStatement(${position(stat.pos)});")
-        printStatement(stat, section.mod, sb)
-        sb.println("\n$doc.endStatement();")
-      }
-      sb.println("$doc.endSection();")
+    sections.zipWithIndex.foreach {
+      case (section, i) =>
+        if (section.mod == Modifier.Reset) {
+          val nextApp = gensym.fresh("app", "()")
+          sb.print(s"this.$nextApp\n}\ndef $nextApp: Unit = {\n")
+        }
+        sb.println("\n$doc.startSection();")
+        if (section.mod == Modifier.Fail) {
+          sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
+          val out = new FailInstrumenter(sections, i).instrument()
+          val literal = Instrumenter.stringLiteral(out)
+          val binder = gensym.fresh("res")
+          sb.append("val ")
+            .append(binder)
+            .append(" = _root_.mdoc.internal.document.Macros.Delay(")
+            .append(literal)
+            .append(", ")
+            .append(position(section.source.pos))
+            .append(");")
+          printBinder(binder, section.source.pos)
+          sb.println("\n$doc.endStatement();")
+        } else {
+          section.source.stats.foreach { stat =>
+            sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+            printStatement(stat, section.mod, sb)
+            sb.println("\n$doc.endStatement();")
+          }
+        }
+        sb.println("$doc.endSection();")
     }
   }
 
@@ -48,7 +58,7 @@ class Instrumenter(sections: List[SectionInput]) {
         case Binders(names) =>
           names.map(name => name -> name.pos)
         case _ =>
-          val fresh = freshBinder()
+          val fresh = gensym.fresh("res")
           sb.print(s"val $fresh = ")
           List(Name(fresh) -> stat.pos)
       }
@@ -60,7 +70,7 @@ class Instrumenter(sections: List[SectionInput]) {
 
     case Modifier.Fail =>
       val literal = Instrumenter.stringLiteral(stat.pos.text)
-      val binder = freshBinder()
+      val binder = gensym.fresh("res")
       sb.append("val ")
         .append(binder)
         .append(" = _root_.mdoc.internal.document.Macros.fail(")

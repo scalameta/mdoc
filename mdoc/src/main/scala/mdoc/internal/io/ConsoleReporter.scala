@@ -1,17 +1,25 @@
 package mdoc.internal.io
 
+import fansi.Attrs
 import fansi.Color._
 import java.io.PrintStream
 import scala.meta.Position
-import scalafix.internal.util.PositionSyntax._
 import mdoc.Reporter
 import mdoc.internal.pos.PositionSyntax._
 
-class ConsoleReporter(ps: PrintStream) extends Reporter {
+class ConsoleReporter(
+    ps: PrintStream,
+    blue: Attrs = Blue,
+    yellow: Attrs = Yellow,
+    red: Attrs = Red
+) extends Reporter {
 
-  private val myInfo = Blue("info")
-  private val myWarning = Yellow("warning")
-  private val myError = Red("error")
+  def formatMessage(pos: Position, severity: String, message: String): String =
+    pos.formatMessage(severity, message)
+
+  private val myInfo = blue("info")
+  private val myWarning = yellow("warning")
+  private val myError = red("error")
 
   private var myWarnings = 0
   private var myErrors = 0
@@ -34,20 +42,20 @@ class ConsoleReporter(ps: PrintStream) extends Reporter {
     throwable.printStackTrace(ps)
   }
   def error(pos: Position, msg: String): Unit = {
-    error(pos.toUnslicedPosition.formatMessage("error", msg))
+    error(formatMessage(pos.toUnslicedPosition, "error", msg))
   }
   def error(msg: String): Unit = {
     myErrors += 1
     ps.println(myError ++ s": $msg")
   }
   def info(pos: Position, msg: String): Unit = {
-    info(pos.toUnslicedPosition.formatMessage("info", msg))
+    info(formatMessage(pos.toUnslicedPosition, "info", msg))
   }
   def info(msg: String): Unit = {
     ps.println(myInfo ++ s": $msg")
   }
   def warning(pos: Position, msg: String): Unit = {
-    warning(pos.toUnslicedPosition.formatMessage("warning", msg))
+    warning(formatMessage(pos.toUnslicedPosition, "warning", msg))
   }
   def warning(msg: String): Unit = {
     myWarnings += 1

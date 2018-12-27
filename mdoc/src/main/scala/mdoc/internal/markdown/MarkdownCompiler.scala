@@ -1,6 +1,8 @@
 package mdoc.internal.markdown
 
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.PrintStream
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Path
@@ -19,7 +21,8 @@ import mdoc.Reporter
 import mdoc.document.Document
 import mdoc.document._
 import mdoc.internal.document.DocumentBuilder
-import scalafix.internal.util.PositionSyntax._
+import mdoc.internal.pos.PositionSyntax
+import scala.reflect.internal.util.{Position => GPosition}
 import mdoc.internal.pos.TokenEditDistance
 import mdoc.internal.pos.PositionSyntax._
 
@@ -120,53 +123,79 @@ class MarkdownCompiler(
     case _ =>
   }
 
+  private def toSource(input: Input): BatchSourceFile =
+    new BatchSourceFile(input.syntax, new String(input.chars))
+
+  def fail(original: Seq[Tree], input: Input): String = {
+    sreporter.reset()
+    val run = new global.Run
+    run.compileSources(List(toSource(input)))
+    val out = new ByteArrayOutputStream()
+    val ps = new PrintStream(out)
+    val edit = TokenEditDistance.toTokenEdit(original, input)
+    sreporter.infos.foreach {
+      case sreporter.Info(pos, msgOrNull, gseverity) =>
+        val msg = nullableMessage(msgOrNull)
+        val mpos = toMetaPosition(edit, pos)
+        val severity = gseverity.toString().toLowerCase
+        val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
+        ps.println(formatted)
+    }
+    out.toString()
+  }
+
   def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
     clearTarget()
     sreporter.reset()
     val run = new global.Run
-    val label = input match {
-      case Input.File(path, _) => path.toString()
-      case Input.VirtualFile(path, _) => path
-      case _ => "(input)"
-    }
-    run.compileSources(List(new BatchSourceFile(label, new String(input.chars))))
+    run.compileSources(List(toSource(input)))
     if (!sreporter.hasErrors) {
       Some(new AbstractFileClassLoader(target, appClassLoader))
     } else {
-      def toOffsetPosition(offset: Int): Position = {
-        edit.toOriginal(offset) match {
-          case Left(_) =>
-            Position.None
-          case Right(p) =>
-            p.toUnslicedPosition
-        }
-      }
-      sreporter.infos.foreach {
-        case sreporter.Info(pos, msgOrNull, severity) =>
-          val msg = if (msgOrNull == null) "" else msgOrNull
-          val mpos =
-            if (pos.isDefined) {
-              if (pos.isRange) {
-                (edit.toOriginal(pos.start), edit.toOriginal(pos.end - 1)) match {
-                  case (Right(start), Right(end)) =>
-                    Position.Range(start.input, start.start, end.end).toUnslicedPosition
-                  case (_, _) =>
-                    toOffsetPosition(pos.point)
-                }
-              } else {
-                toOffsetPosition(pos.point)
-              }
-            } else {
-              Position.None
-            }
-          severity match {
-            case sreporter.ERROR => vreporter.error(mpos, msg)
-            case sreporter.INFO => vreporter.info(mpos, msg)
-            case sreporter.WARNING => vreporter.warning(mpos, msg)
-          }
-        case _ =>
-      }
+      report(vreporter, edit)
       None
     }
   }
+
+  private def toMetaPosition(edit: TokenEditDistance, pos: GPosition): Position = {
+    def toOffsetPosition(offset: Int): Position = {
+      edit.toOriginal(offset) match {
+        case Left(_) =>
+          Position.None
+        case Right(p) =>
+          p.toUnslicedPosition
+      }
+    }
+    if (pos.isDefined) {
+      if (pos.isRange) {
+        (edit.toOriginal(pos.start), edit.toOriginal(pos.end - 1)) match {
+          case (Right(start), Right(end)) =>
+            Position.Range(start.input, start.start, end.end).toUnslicedPosition
+          case (_, _) =>
+            toOffsetPosition(pos.point)
+        }
+      } else {
+        toOffsetPosition(pos.point)
+      }
+    } else {
+      Position.None
+    }
+  }
+
+  private def nullableMessage(msgOrNull: String): String =
+    if (msgOrNull == null) "" else msgOrNull
+  private def report(vreporter: Reporter, edit: TokenEditDistance): Unit = {
+    sreporter.infos.foreach {
+      case sreporter.Info(pos, msgOrNull, severity) =>
+        val msg = nullableMessage(msgOrNull)
+        val mpos = toMetaPosition(edit, pos)
+        severity match {
+          case sreporter.ERROR => vreporter.error(mpos, msg)
+          case sreporter.INFO => vreporter.info(mpos, msg)
+          case sreporter.WARNING => vreporter.warning(mpos, msg)
+        }
+      case _ =>
+    }
+  }
+
 }

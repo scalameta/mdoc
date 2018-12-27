@@ -11,15 +11,14 @@ class FailSuite extends BaseMarkdownSuite {
       |val x: Int = "String"
       |```
     """.stripMargin,
-    """
-      |```scala
-      |val x: Int = "String"
-      |// type mismatch;
-      |//  found   : String("String")
-      |//  required: Int
-      |// val x: Int = "String"
-      |//              ^
-      |```
+    """|```scala
+       |val x: Int = "String"
+       |// error: type mismatch;
+       |//  found   : String("String")
+       |//  required: Int
+       |// val x: Int = "String"
+       |//              ^^^^^^^^
+       |```
     """.stripMargin
   )
 
@@ -37,7 +36,7 @@ class FailSuite extends BaseMarkdownSuite {
       |val y: Int = '''Triplequote
       |newlines
       |'''
-      |// type mismatch;
+      |// error: type mismatch;
       |//  found   : String("Triplequote\nnewlines\n")
       |//  required: Int
       |// val y: Int = '''Triplequote
@@ -103,20 +102,19 @@ class FailSuite extends BaseMarkdownSuite {
       |val x: Int = "String"
       |```
     """.stripMargin,
-    """
-      |```scala
-      |println(42)
-      |// 42
-      |```
-      |
-      |```scala
-      |val x: Int = "String"
-      |// type mismatch;
-      |//  found   : String("String")
-      |//  required: Int
-      |// val x: Int = "String"
-      |//              ^
-      |```
+    """|```scala
+       |println(42)
+       |// 42
+       |```
+       |
+       |```scala
+       |val x: Int = "String"
+       |// error: type mismatch;
+       |//  found   : String("String")
+       |//  required: Int
+       |// val x: Int = "String"
+       |//              ^^^^^^^^
+       |```
     """.stripMargin
   )
 
@@ -132,13 +130,76 @@ class FailSuite extends BaseMarkdownSuite {
     // We should reconsider the architecture for the `fail` modifier.
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
-       |// type mismatch;
+       |// error: no type parameters for method eval: (fo: F[O])fs2.Stream[F,O] exist so that it can be applied to arguments (Unit)
+       |//  --- because ---
+       |// argument expression's type is not compatible with formal parameter type;
        |//  found   : Unit
        |//  required: ?F[?O]
-       |// Note that implicit conversions are not applicable because they are ambiguous:
-       |//  both method ArrowAssoc in object Predef of type [A](self: A)ArrowAssoc[A]
-       |//  and method Ensuring in object Predef of type [A](self: A)Ensuring[A]
-       |//  are possible conversion functions from Unit to ?F[?O]
+       |// fs2.Stream.eval(println("Do not ever do this"))
+       |// ^^^^^^^^^^^^^^^
+       |// error: type mismatch;
+       |//  found   : Unit
+       |//  required: F[O]
+       |// fs2.Stream.eval(println("Do not ever do this"))
+       |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       |```
+    """.stripMargin
+  )
+
+  check(
+    "double",
+    """
+      |```scala mdoc:fail
+      |println(a)
+      |println(b)
+      |```
+    """.stripMargin,
+    """|```scala
+       |println(a)
+       |println(b)
+       |// error: not found: value a
+       |// println(a)
+       |//         ^
+       |// error: not found: value b
+       |// println(b)
+       |//         ^
+       |```
+    """.stripMargin
+  )
+
+  check(
+    "edit",
+    """
+      |```scala mdoc:fail
+      |val x = 1
+      |println(a)
+      |println(b)
+      |```
+      |
+      |```scala mdoc:fail
+      |val x = 1
+      |println(c)
+      |println(d)
+      |```
+    """.stripMargin,
+    """|```scala
+       |val x = 1
+       |println(a)
+       |println(b)
+       |// error: not found: value a
+       |// error: not found: value b
+       |```
+       |
+       |```scala
+       |val x = 1
+       |println(c)
+       |println(d)
+       |// error: not found: value c
+       |// println(c)
+       |//         ^
+       |// error: not found: value d
+       |// println(d)
+       |//         ^
        |```
     """.stripMargin
   )

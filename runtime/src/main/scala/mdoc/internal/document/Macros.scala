@@ -9,7 +9,13 @@ import mdoc.document.CompileResult._
 import mdoc.document.RangePosition
 
 object Macros {
-
+  case class Delay(
+      code: String,
+      startLine: Int,
+      startColumn: Int,
+      endLine: Int,
+      endColumn: Int
+  )
   def fail(
       code: String,
       startLine: Int,

@@ -274,11 +274,11 @@ After:
 ````
 ```scala
 val x: Int = ""
-// type mismatch;
+// error: type mismatch;
 //  found   : String("")
 //  required: Int
 // val x: Int = ""
-//              ^
+//              ^^
 ```
 ````
 
@@ -413,12 +413,12 @@ implicit val x: Int = 41
 implicit val y: Int = 42
 // y: Int = 42
 implicitly[Int] // x is no longer in scope
-// res0: Int = 42
+// res1: Int = 42
 ```
 
 ```scala
 println(x)
-// not found: value x
+// error: not found: value x
 // println(x)
 //         ^
 ```

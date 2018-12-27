@@ -86,7 +86,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
           rendered,
           section,
           ctx.reporter,
-          ctx.settings.variablePrinter
+          ctx.settings.variablePrinter,
+          ctx.compiler
         )
         mod match {
           case Modifier.Silent =>
