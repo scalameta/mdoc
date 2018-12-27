@@ -16,16 +16,16 @@ class ErrorSuite extends BaseMarkdownSuite {
       |x + y + z
       |```
     """.stripMargin,
-    """
-      |error: crash.md:10:1: error: an implementation is missing
-      |x + y + z
-      |^^^^^^^^^
-      |scala.NotImplementedError: an implementation is missing
-      |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-      |	at repl.Session.crash$1(crash.md:16)
-      |	at repl.Session.z$1(crash.md:19)
-      |	at repl.Session.app(crash.md:25)
-      |""".stripMargin
+    """|error: crash.md:10:1: error: an implementation is missing
+       |x + y + z
+       |^^^^^^^^^
+       |scala.NotImplementedError: an implementation is missing
+       |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
+       |	at repl.Session$App.crash(crash.md:17)
+       |	at repl.Session$App.z(crash.md:20)
+       |	at repl.Session$App.<init>(crash.md:26)
+       |	at repl.Session.app(crash.md:3)
+       |""".stripMargin
   )
 
   checkError(
@@ -90,12 +90,12 @@ class ErrorSuite extends BaseMarkdownSuite {
     """
       |```scala mdoc
       |val x = 1
-      |val x = 1
+      |val x = 2
       |```
     """.stripMargin,
-    """|error: already-defined.md:4:1: error: x is already defined as value x
-       |val x = 1
-       |^^^^^^^^^
+    """|error: already-defined.md:4:5: error: x is already defined as value x
+       |val x = 2
+       |    ^
     """.stripMargin
   )
 

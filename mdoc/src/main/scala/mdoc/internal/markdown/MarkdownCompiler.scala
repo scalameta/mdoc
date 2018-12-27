@@ -7,24 +7,23 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Path
 import java.nio.file.Paths
-import scala.meta._
-import scala.meta.inputs.Input
-import scala.meta.inputs.Position
-import scala.reflect.internal.util.AbstractFileClassLoader
-import scala.reflect.internal.util.BatchSourceFile
-import scala.tools.nsc.Global
-import scala.tools.nsc.Settings
-import scala.tools.nsc.io.AbstractFile
-import scala.tools.nsc.io.VirtualDirectory
-import scala.tools.nsc.reporters.StoreReporter
 import mdoc.Reporter
 import mdoc.document.Document
 import mdoc.document._
 import mdoc.internal.document.DocumentBuilder
 import mdoc.internal.pos.PositionSyntax
-import scala.reflect.internal.util.{Position => GPosition}
-import mdoc.internal.pos.TokenEditDistance
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.pos.TokenEditDistance
+import scala.meta._
+import scala.meta.inputs.Input
+import scala.meta.inputs.Position
+import scala.reflect.internal.util.AbstractFileClassLoader
+import scala.reflect.internal.util.BatchSourceFile
+import scala.reflect.internal.util.{Position => GPosition}
+import scala.tools.nsc.Global
+import scala.tools.nsc.Settings
+import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.io.VirtualDirectory
 
 object MarkdownCompiler {
 
@@ -108,7 +107,9 @@ class MarkdownCompiler(
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
   settings.processArgumentString(scalacOptions)
-  lazy val sreporter = new StoreReporter
+  private def _settings = settings
+
+  lazy val sreporter = new FilterStoreReporter(settings)
   private val global = new Global(settings, sreporter)
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)

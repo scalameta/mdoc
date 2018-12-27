@@ -14,14 +14,14 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   private def printAsScript(): Unit = {
     sb.println("package repl")
     sb.println("class Session {")
-    sb.println("  def app() = {")
+    sb.println("  class App() {")
     sections.zipWithIndex.foreach {
       case (section, j) =>
         if (j > i) ()
         else {
           if (section.mod == Modifier.Reset) {
-            val nextApp = gensym.fresh("app", "()")
-            sb.print(s"this.$nextApp\n}\ndef $nextApp: Unit = {\n")
+            val nextApp = gensym.fresh("App", "()")
+            sb.print(s"new $nextApp\n}\nclass $nextApp {\n")
           }
           if (j == i || section.mod != Modifier.Fail) {
             sb.println(section.input.text)
