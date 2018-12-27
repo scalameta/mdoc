@@ -7,6 +7,8 @@ import mdoc.Variable
 import mdoc.document.CompileResult
 import mdoc.document.CrashResult
 import mdoc.document.CrashResult.Crashed
+import mdoc.document.RangePosition
+import mdoc.internal.document.Macros
 import mdoc.internal.document.MdocExceptions
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
@@ -29,7 +31,7 @@ object Renderer {
       MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
     doc.sections
       .map(s => s"""```scala
-                   |${Renderer.renderEvaluatedSection(doc, s, reporter, printer)}
+                   |${Renderer.renderEvaluatedSection(doc, s, reporter, printer, compiler)}
                    |```""".stripMargin)
       .mkString("\n")
   }
@@ -90,13 +92,17 @@ object Renderer {
       doc: EvaluatedDocument,
       section: EvaluatedSection,
       reporter: Reporter,
-      printer: Variable => String
+      printer: Variable => String,
+      compiler: MarkdownCompiler
   ): String = {
     val baos = new ByteArrayOutputStream()
     val sb = new PrintStream(baos)
     val stats = section.source.stats.lift
     val input = section.source.pos.input
     val totalStats = section.source.stats.length
+    if (section.mod.isFail) {
+      sb.print(section.input.text)
+    }
     section.section.statements.zip(section.source.stats).zipWithIndex.foreach {
       case ((statement, tree), statementIndex) =>
         val pos = tree.pos
@@ -107,10 +113,14 @@ object Renderer {
             previousStatement.pos.end
         }
         val leadingTrivia = Position.Range(input, leadingStart, pos.start)
-        sb.append(leadingTrivia.text)
+        if (!section.mod.isFail) {
+          sb.append(leadingTrivia.text)
+        }
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
-        sb.append(endOfLinePosition.text)
+        if (!section.mod.isFail) {
+          sb.append(endOfLinePosition.text)
+        }
         if (statement.out.nonEmpty) {
           sb.append("\n")
           appendFreshMultiline(sb, statement.out)
@@ -132,6 +142,17 @@ object Renderer {
                     appendFreshMultiline(sb, tpos.formatMessage(section, msg))
                   case CompileResult.TypeError(msg, tpos) =>
                     appendFreshMultiline(sb, tpos.formatMessage(section, msg))
+                  case Macros.Delay(instrumented, startLine, startColumn, endLine, endColumn) =>
+                    val compiled =
+                      compiler.fail(doc.sections.map(_.source), Input.String(instrumented))
+                    if (compiled.isEmpty) {
+                      val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
+                      reporter.error(
+                        tpos.toMeta(section),
+                        s"Expected compile error but statement type-checked successfully"
+                      )
+                    }
+                    appendFreshMultiline(sb, compiled)
                   case _ =>
                     val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
                     throw new IllegalArgumentException(

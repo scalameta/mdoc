@@ -32,7 +32,7 @@ class ResetSuite extends BaseMarkdownSuite {
        |
        |```scala
        |println(x)
-       |// not found: value x
+       |// error: not found: value x
        |// println(x)
        |//         ^
        |```

@@ -30,7 +30,6 @@ name := "mdocRoot"
 skip in publish := true
 val V = new {
   val scalameta = "4.1.0"
-  val scalafix = "0.9.1"
 }
 
 lazy val runtime = project
@@ -70,7 +69,6 @@ lazy val mdoc = project
       "com.lihaoyi" %% "fansi" % "0.2.5",
       "io.methvin" % "directory-watcher" % "0.8.0",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
-      "ch.epfl.scala" %% "scalafix-core" % V.scalafix,
       // live reload
       "io.undertow" % "undertow-core" % "2.0.13.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",

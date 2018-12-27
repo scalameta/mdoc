@@ -15,13 +15,13 @@ import mdoc.internal.livereload.UndertowLiveReload
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.markdown.Markdown
+import mdoc.internal.pos.DiffUtils
 import metaconfig.Configured
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
-import scalafix.internal.diff.DiffUtils
 
 final class MainOps(
     settings: Settings,
