@@ -76,7 +76,7 @@ object MarkdownCompiler {
     val fullClasspath =
       if (classpath.isEmpty) defaultClasspath(_ => true)
       else {
-        val base = defaultClasspath(_ => true)
+        val base = Classpath(classpath)
         val runtime = defaultClasspath(path => path.toString.contains("mdoc-runtime"))
         base ++ runtime
       }
@@ -107,9 +107,8 @@ class MarkdownCompiler(
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
   settings.processArgumentString(scalacOptions)
-  private def _settings = settings
 
-  lazy val sreporter = new FilterStoreReporter(settings)
+  private val sreporter = new FilterStoreReporter(settings)
   private val global = new Global(settings, sreporter)
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)

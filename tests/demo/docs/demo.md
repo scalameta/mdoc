@@ -3,6 +3,6 @@
 Paragraph. Paragraph.
 
 ```scala mdoc
-val x = ""
-x.length
+val x = "@in@"
+demo.Demo.message
 ```

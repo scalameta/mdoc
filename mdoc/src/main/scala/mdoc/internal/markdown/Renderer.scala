@@ -132,16 +132,6 @@ object Renderer {
               case Modifier.Fail =>
                 sb.append('\n')
                 binder.value match {
-                  case CompileResult.TypecheckedOK(_, tpe, tpos) =>
-                    reporter.error(
-                      tpos.toMeta(section),
-                      s"Expected compile error but statement type-checked successfully"
-                    )
-                    appendMultiline(sb, tpe)
-                  case CompileResult.ParseError(msg, tpos) =>
-                    appendFreshMultiline(sb, tpos.formatMessage(section, msg))
-                  case CompileResult.TypeError(msg, tpos) =>
-                    appendFreshMultiline(sb, tpos.formatMessage(section, msg))
                   case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
                     val compiled =
                       compiler.fail(doc.sections.map(_.source), Input.String(instrumented))
@@ -149,15 +139,14 @@ object Renderer {
                       val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                       reporter.error(
                         tpos.toMeta(section),
-                        s"Expected compile error but statement type-checked successfully"
+                        s"Expected compile error but statement typechecked successfully"
                       )
                     }
                     appendFreshMultiline(sb, compiled)
                   case _ =>
                     val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
                     throw new IllegalArgumentException(
-                      s"Expected Macros.CompileResult." +
-                        s"Obtained $obtained"
+                      s"Expected FailSection. Obtained $obtained"
                     )
                 }
               case Modifier.Default | Modifier.Passthrough | Modifier.Reset | Modifier.Post(_, _) =>

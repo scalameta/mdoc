@@ -2,6 +2,13 @@ inThisBuild(
   List(
     scalaVersion := "2.12.8",
     organization := "com.geirsson",
+    version ~= { old =>
+      if (System.getProperty("CI") == null) {
+        "0.8.0-SNAPSHOT"
+      } else {
+        old
+      }
+    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
@@ -122,7 +129,15 @@ lazy val plugin = project
   .in(file("mdoc-sbt"))
   .settings(
     sbtPlugin := true,
-    moduleName := "sbt-mdoc"
+    moduleName := "sbt-mdoc",
+    resourceGenerators.in(Compile) += Def.task {
+      val out =
+        managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
+      val props = new java.util.Properties()
+      props.put("version", version.value)
+      IO.write(props, "sbt-mdoc properties", out)
+      List(out)
+    }
   )
 
 lazy val lsp = project
@@ -141,6 +156,7 @@ lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
     skip in publish := true,
+    mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "com.cibo" %% "evilplot" % "0.6.0"
