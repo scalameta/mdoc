@@ -22,7 +22,7 @@ inThisBuild(
     ),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
-    publishArtifact.in(packageSrc) := sys.env.contains("CI"),
+    publishArtifact.in(packageSrc) := sys.env.contains("CI")
   )
 )
 
@@ -118,6 +118,13 @@ lazy val unit = project
   .dependsOn(mdoc, testsInput)
   .enablePlugins(BuildInfoPlugin)
 
+lazy val plugin = project
+  .in(file("mdoc-sbt"))
+  .settings(
+    sbtPlugin := true,
+    moduleName := "sbt-mdoc"
+  )
+
 lazy val lsp = project
   .in(file("mdoc-lsp"))
   .settings(
@@ -140,6 +147,16 @@ lazy val docs = project
     ),
     test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
-    cancelable in Global := true
+    cancelable in Global := true,
+    mdocVariables := {
+      val stableVersion: String =
+        version.value.replaceFirst("\\+.*", "")
+      Map(
+        "VERSION" -> stableVersion,
+        "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
+        "SCALA_VERSION" -> scalaVersion.value
+      )
+    }
   )
   .dependsOn(mdoc)
+  .enablePlugins(MdocPlugin)

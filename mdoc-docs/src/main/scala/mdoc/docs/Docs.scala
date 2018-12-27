@@ -16,15 +16,7 @@ object Docs {
     val cwd = PathIO.workingDirectory.toNIO
     val fs = FileSystems.getDefault
     val settings = MainSettings()
-      .withIn(Paths.get("docs"))
       .withOut(cwd)
-      .withSiteVariables(
-        Map(
-          "VERSION" -> stableVersion,
-          "SCALA_BINARY_VERSION" -> BuildInfo.scalaBinaryVersion,
-          "SCALA_VERSION" -> BuildInfo.scalaVersion
-        )
-      )
       .withExcludePath(
         List(
           fs.getPathMatcher("glob:vscode-extension")

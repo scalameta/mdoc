@@ -71,7 +71,7 @@ case class Settings(
         "To pass multiple values: --scalac-options \"-Yrangepos -deprecated\". " +
         "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any."
     )
-    scalacOptions: String = MdocProperties.default().scalacOptions,
+    scalacOptions: String = "",
     @Description("Remove all files in the outout directory before generating a new site.")
     cleanTarget: Boolean = false,
     @Section("LiveReload options")
@@ -128,6 +128,15 @@ case class Settings(
     variablePrinter: Variable => String = ReplVariablePrinter
 ) {
 
+  def withProperties(props: MdocProperties): Settings =
+    copy(
+      scalacOptions = props.scalacOptions,
+      classpath = props.classpath,
+      site = site ++ props.site,
+      in = props.in.getOrElse(in),
+      out = props.out.getOrElse(out)
+    )
+
   override def toString: String = ConfEncoder[Settings].write(this).toString()
 
   def isFileWatching: Boolean = watch && !check
@@ -173,11 +182,18 @@ case class Settings(
 }
 
 object Settings extends MetaconfigScalametaImplicits {
-  def default(cwd: AbsolutePath): Settings = new Settings(
-    in = cwd.resolve("docs"),
-    out = cwd.resolve("out"),
-    cwd = cwd
-  )
+  def baseDefault(cwd: AbsolutePath): Settings = {
+    new Settings(
+      in = cwd.resolve("docs"),
+      out = cwd.resolve("out"),
+      cwd = cwd
+    )
+  }
+  def default(cwd: AbsolutePath): Settings = {
+    val base = baseDefault(cwd)
+    val props = MdocProperties.default(cwd)
+    base.withProperties(props)
+  }
   def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
@@ -201,7 +217,7 @@ object Settings extends MetaconfigScalametaImplicits {
     )
   def help(displayVersion: String, width: Int): String =
     new HelpMessage[Settings](
-      default(PathIO.workingDirectory),
+      baseDefault(PathIO.workingDirectory),
       version(displayVersion),
       usage,
       description

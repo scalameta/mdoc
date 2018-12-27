@@ -40,7 +40,7 @@
       "properties": {
         "mdoc.serverVersion": {
           "type": "string",
-          "default": "0.6.0+1-SNAPSHOT",
+          "default": "0.7.1+11-505b256f+20181227-1253-SNAPSHOT",
           "description": "The mdoc version to use."
         }
       }
