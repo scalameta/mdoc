@@ -30,7 +30,7 @@ class Instrumenter(sections: List[SectionInput]) {
           val binder = gensym.fresh("res")
           sb.append("val ")
             .append(binder)
-            .append(" = _root_.mdoc.internal.document.Macros.Delay(")
+            .append(" = _root_.mdoc.internal.document.FailSection(")
             .append(literal)
             .append(", ")
             .append(position(section.source.pos))
@@ -68,25 +68,13 @@ class Instrumenter(sections: List[SectionInput]) {
           printBinder(name.syntax, pos)
       }
 
-    case Modifier.Fail =>
-      val literal = Instrumenter.stringLiteral(stat.pos.text)
-      val binder = gensym.fresh("res")
-      sb.append("val ")
-        .append(binder)
-        .append(" = _root_.mdoc.internal.document.Macros.fail(")
-        .append(literal)
-        .append(", ")
-        .append(position(stat.pos))
-        .append(");")
-      printBinder(binder, stat.pos)
-
     case Modifier.Crash =>
       sb.append("$doc.crash(")
         .append(position(stat.pos))
         .append(") {\n")
         .append(stat.pos.text)
         .append("\n}")
-    case Modifier.Str(_, _) =>
+    case Modifier.Str(_, _) | Modifier.Fail =>
       throw new IllegalArgumentException(stat.pos.text)
   }
 }

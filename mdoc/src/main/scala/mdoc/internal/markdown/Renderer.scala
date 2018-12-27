@@ -8,7 +8,7 @@ import mdoc.document.CompileResult
 import mdoc.document.CrashResult
 import mdoc.document.CrashResult.Crashed
 import mdoc.document.RangePosition
-import mdoc.internal.document.Macros
+import mdoc.internal.document.FailSection
 import mdoc.internal.document.MdocExceptions
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
@@ -142,7 +142,7 @@ object Renderer {
                     appendFreshMultiline(sb, tpos.formatMessage(section, msg))
                   case CompileResult.TypeError(msg, tpos) =>
                     appendFreshMultiline(sb, tpos.formatMessage(section, msg))
-                  case Macros.Delay(instrumented, startLine, startColumn, endLine, endColumn) =>
+                  case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
                     val compiled =
                       compiler.fail(doc.sections.map(_.source), Input.String(instrumented))
                     if (compiled.isEmpty) {
