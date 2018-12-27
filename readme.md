@@ -381,8 +381,9 @@ More prose.
 
 ### Reset
 
-The `reset` modifier starts a new scope where previous statements in the document are no longer available.
-This can be helpful to clear existing imports or implicits in scope.
+The `reset` modifier starts a new scope where previous statements in the
+document are no longer available. This can be helpful to clear existing imports
+or implicits in scope.
 
 
 Before:
@@ -423,7 +424,6 @@ println(x)
 //         ^
 ```
 ````
-
 
 ### PostModifier
 
@@ -868,10 +868,9 @@ List(User("John"), User("Susan")).sorted
 
 ### Variable injection
 
-mdoc renders constants like `0.7.1` in markdown with variables provided at
-runtime. This makes it easy to keep documentation up-to-date as new releases are
-published. Variables can be passed from the command-line interface with the
-syntax
+mdoc renders variables like `@VERSION@` into `0.7.1`. This makes it easy to keep documentation
+up-to-date as new releases are published. Variables can be passed from the
+command-line interface with the syntax
 
 ```
 mdoc --site.VERSION 1.0.0 --site.SCALA_VERSION 2.12.8
