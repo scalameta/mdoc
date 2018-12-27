@@ -10,7 +10,7 @@ part of your build. Distinguishing features of mdoc include:
 
 - [good performance](#performance): incremental, hot compilation gives you
   snappy feedback while writing documentation.
-- [script semantics](#script-semantics): markdown documents are compiled into
+- [program semantics](#program-semantics): markdown documents are compiled into
   normal Scala programs making examples copy-paste friendly.
 - [good error messages](#good-error-messages): compile errors and crashes are
   reported with positions of the original markdown source making it easy to
@@ -46,7 +46,7 @@ Table of contents:
     - [Performance](#performance)
     - [Good error messages](#good-error-messages)
     - [Link hygiene](#link-hygiene)
-    - [Script semantics](#script-semantics)
+    - [Program semantics](#program-semantics)
     - [Variable injection](#variable-injection)
     - [Extensible](#extensible)
 - [Team](#team)
@@ -473,7 +473,7 @@ new ScastieModifier(theme = "dark") // default is "light"
 mdoc is designed to provide a tight edit/render/preview feedback loop while
 writing documentation. mdoc achieves good performance through
 
-- [script semantics](#script-semantics): each markdown file compiles into a
+- [program semantics](#program-semantics): each markdown file compiles into a
   single Scala program that executes in one run.
 - being incremental: with `--watch`, mdoc compiles individual files as they
   change avoiding unnecessary work re-generating the full site.
@@ -531,7 +531,7 @@ Link to [old section](#doesnotexist).
 Observe that mdoc suggests a fix if there exists a header that is similar to the
 unknown link.
 
-### Script semantics
+### Program semantics
 
 mdoc interprets code fences as normal Scala programs instead of as if they're
 evaluated in the REPL. This behavior is different from tut that interprets
