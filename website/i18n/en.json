@@ -14,6 +14,9 @@
       "modifiers": {
         "title": "Modifiers"
       },
+      "quickstart": {
+        "title": "Getting started"
+      },
       "tut": {
         "title": "Coming from tut"
       },
@@ -23,6 +26,7 @@
     },
     "links": {
       "Docs": "Docs",
+      "Blog": "Blog",
       "GitHub": "GitHub"
     },
     "categories": {

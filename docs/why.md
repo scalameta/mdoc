@@ -3,12 +3,7 @@ id: why
 title: Why mdoc?
 ---
 
-mdoc is a documentation tool for Scala inspired by
-[tut](http://tpolecat.github.io/tut/). Like tut, mdoc reads markdown files as
-input and produces markdown files as output. Unlike tut, mdoc does not use the
-Scala REPL to evaluate Scala code. Instead, mdoc translates markdown files into
-regular Scala programs and evaluates them in one run. This approach enables mdoc
-to support several distinguishing features:
+The distinguishing features of mdoc are the following.
 
 - [good performance](#performance): markdwn documents compile as a single Scala
   program and evaluate in one run. Combined with incremental and hot compilation
