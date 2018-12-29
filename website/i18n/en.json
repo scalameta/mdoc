@@ -8,6 +8,9 @@
       "demo": {
         "title": "Summing numbers"
       },
+      "docusaurus": {
+        "title": "Docusaurus"
+      },
       "installation": {
         "title": "Installation"
       },

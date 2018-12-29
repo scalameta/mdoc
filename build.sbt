@@ -130,6 +130,11 @@ lazy val plugin = project
   .settings(
     sbtPlugin := true,
     moduleName := "sbt-mdoc",
+    libraryDependencies ++= List(
+      "org.jsoup" % "jsoup" % "1.11.3",
+      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+      "org.scalameta" %% "testkit" % "4.0.0-M11" % Test
+    ),
     resourceGenerators.in(Compile) += Def.task {
       val out =
         managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
@@ -155,6 +160,7 @@ lazy val lsp = project
 lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
+    moduleName := "mdoc-docs",
     skip in publish := true,
     mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
@@ -164,6 +170,12 @@ lazy val docs = project
     ),
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
+    MdocPlugin.autoImport.mdoc := Def.inputTaskDyn {
+      val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
+      Def.taskDyn {
+        run.in(Compile).toTask(s" ${parsed.mkString(" ")}")
+      }
+    }.evaluated,
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")
@@ -175,4 +187,4 @@ lazy val docs = project
     }
   )
   .dependsOn(mdoc, plugin)
-  .enablePlugins(MdocPlugin)
+  .enablePlugins(DocusaurusPlugin)

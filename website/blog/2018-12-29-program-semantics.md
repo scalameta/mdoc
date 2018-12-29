@@ -368,6 +368,7 @@ Several projects already use mdoc: mdoc itself (this website),
 [Scalafmt](https://scalameta.org/scalafmt/),
 [Scalafix](https://scalacenter.github.io/scalafix/),
 [Scalameta](http://scalameta.org/), [Metals](https://scalameta.org/metals/),
+[Bloop](https://scalacenter.github.io/bloop/),
 [Coursier](https://coursier.github.io/coursier/),
 [Almond](http://almond-sh.github.io/almond/stable/docs/intro) and
 [fs2-kafka](https://ovotech.github.io/fs2-kafka/). Those projects may serve as
