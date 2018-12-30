@@ -25,8 +25,9 @@ Docusaurus:
 First, install the sbt-mdoc plugin using the normal
 [mdoc installation instructions](installation.md#sbt).
 
-Next, enable the `DocusaurusPlugin` in addition to the `MdocPlugin` and define
-the `moduleName` setting to have your project name suffixed with `-docs`.
+Next, enable the `mdoc.DocusaurusPlugin` in addition to the `mdoc.MdocPlugin`
+and define the `moduleName` setting to have your project name suffixed with
+`-docs`.
 
 ```diff
  // build.sbt

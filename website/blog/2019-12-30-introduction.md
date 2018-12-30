@@ -204,7 +204,7 @@ cd http4s
 
 ```diff
 // project/plugins.sbt
-+ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "<VERSION>")
++ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "1.0.0")
 // build.sbt
 lazy val docs = project
   .enablePlugins(

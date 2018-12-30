@@ -24,14 +24,14 @@ List(x, x)
 ```
 ````
 
-Then we generate the site using one of the available integrations:
+We process the markdown with one of the following mdoc integrations:
 
-- [sbt-mdoc](#sbt): for simple integration with sbt builds.
-- [command-line](#command-line): to run directly from the console outside of a
-  build tool.
+- [sbt-mdoc](#sbt): for usage with sbt projects.
+- [command-line](#command-line): to run from the console outside of a build
+  tool.
 - [library API](#library): for programmatic usage.
 
-The resulting generated `readme.md` will look like this.
+The generated `readme.md` will look like this.
 
 ````
 # My Project
@@ -64,15 +64,15 @@ enables `mdoc.MdocPlugin`.
 // project/plugins.sbt
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "@VERSION@" )
 // build.sbt
-lazy val myproject = project // your existing library
+lazy val myproject = project  // your existing library
   .settings(...)
-lazy val docs = project // new documentation project
-  .in(file("myproject-docs"))
+lazy val docs = project       // new documentation project
+  .in(file("myproject-docs")) // important: must not be docs/
   .dependsOn(myproject)
   .enablePlugins(MdocPlugin)
 ```
 
-Next, from the sbt shell, run the `mdoc` task to generate the documentation
+Next, from the sbt shell, run the `docs/mdoc` task to generate the documentation
 site. By default, the `mdoc` task looks for markdown sources in the toplevel
 `docs/` directory.
 
@@ -81,14 +81,31 @@ site. By default, the `mdoc` task looks for markdown sources in the toplevel
 > docs/mdoc
 ```
 
+Update `mdocVariables` to include site variables like `@@VERSION@`.
+
+```diff
+// build.sbt
+lazy val docs = project
+  .in(file("myproject-docs"))
+  .settings(
++   mdocVariables := Map(
++     "VERSION" -> version.value
++   )
+  )
+  .dependsOn(myproject)
+  .enablePlugins(MdocPlugin)
+```
+
 The `mdoc` task runs the mdoc command-line interface so it's possible to pass in
-arguments like `--watch` to start file watcher with livereload.
+arguments like `--watch` to start file watcher with livereload. It's recommended
+to use `--watch` while writing documentation to enjoy 3-4x faster compilation
+performance.
 
 ```scala
 > docs/mdoc --watch
 ```
 
-Use `--help` to learn more how to use the command-line interface.
+See [`--help`](#help) to learn more how to use the command-line interface.
 
 ```scala
 > docs/mdoc --help
@@ -104,9 +121,8 @@ The sbt-mdoc plugin supports the following settings.
 
 ## Command-line
 
-Use
-[coursier command-line interface](https://github.com/coursier/coursier/#command-line)
-to launch mdoc outside of a build tool:
+Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
+mdoc outside of a build tool.
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
@@ -150,7 +166,9 @@ default the `out/` directory is used.
 +  --out target/docs
 ```
 
-Use `--watch` to start the file watcher with livereload.
+Use `--watch` to start the file watcher with livereload. It's recommended to use
+`--watch` while writing documentation to enjoy 3-4x faster compilation
+performance.
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
@@ -181,7 +199,10 @@ libraryDependencies += "org.scalameta" %% "mdoc" % "@VERSION@"
 
 Then write a main function that invokes mdoc as a library
 
-```scala
+It's recommended to use `--watch` while writing documentation to enjoy 3-4x
+faster compilation performance.
+
+```scala mdoc:silent
 object Main {
   def main(args: Array[String]): Unit = {
     // build arguments for mdoc
@@ -194,6 +215,20 @@ object Main {
     if (exitCode != 0) sys.exit(exitCode)
   }
 }
+```
+
+If you use sbt-mdoc, update the `mdoc` task to call `run` instead of the default
+`runMain mdoc.Main`.
+
+```diff
+// build.sbt
+lazy val docs = project
+  .in(file("myproject-docs"))
+  .settings(
++   mdoc := run.in(Compile).evaluated
+  )
+  .dependsOn(myproject)
+  .enablePlugins(MdocPlugin)
 ```
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are

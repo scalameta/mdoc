@@ -163,12 +163,7 @@ lazy val docs = project
     ),
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
-    MdocPlugin.autoImport.mdoc := Def.inputTaskDyn {
-      val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
-      Def.taskDyn {
-        run.in(Compile).toTask(s" ${parsed.mkString(" ")}")
-      }
-    }.evaluated,
+    MdocPlugin.autoImport.mdoc := run.in(Compile).evaluated,
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")
