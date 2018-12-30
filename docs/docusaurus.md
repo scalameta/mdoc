@@ -70,7 +70,7 @@ to include the following information:
 
 ```diff
 +  projectName: "mdoc",
-+  organizationName: "olafurpg",
++  organizationName: "scalameta",
 ```
 
 Next, run `docs/docusaurusPublishGhpages` to publish the website to GitHub
@@ -92,7 +92,7 @@ this sounds interesting, read ahead.
 ### Deploy key
 
 Open the "Deploy key" menu in your project settings:
-https://github.com/olafurpg/mdoc/settings/keys. Press "Add deploy key".
+https://github.com/scalameta/mdoc/settings/keys. Press "Add deploy key".
 
 - `Title`: use "Docusaurus Travis".
 - `Allow write access`: check the box, this is requires since we want to write
@@ -127,7 +127,7 @@ Your screen should look like this
 ### Environment variables
 
 Next open the Travis CI settings panel for your project:
-https://travis-ci.org/olafurpg/sbt-docusaurus/settings.
+https://travis-ci.org/scalameta/mdoc/settings.
 
 Add the following values:
 
@@ -173,7 +173,7 @@ jobs:
 ```
 
 For a complete example of the Travis configuration, see the
-[.travis.yml](https://github.com/olafurpg/mdoc/blob/master/.travis.yml) in this
+[.travis.yml](https://github.com/scalameta/mdoc/blob/master/.travis.yml) in this
 project.
 
 You're all set! Merge a PR to your project and watch the Travis job release the

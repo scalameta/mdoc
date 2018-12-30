@@ -224,7 +224,7 @@ class DefaultSuite extends BaseMarkdownSuite {
 
   check(
     "backtick",
-    // see https://github.com/olafurpg/mdoc/issues/97
+    // see https://github.com/scalameta/mdoc/issues/97
     """
       |```scala mdoc
       |type `0` = Int

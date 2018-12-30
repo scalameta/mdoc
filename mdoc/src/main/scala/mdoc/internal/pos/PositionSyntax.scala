@@ -46,7 +46,6 @@ object PositionSyntax {
       }
     }
     def toMeta(section: EvaluatedSection): Position = {
-      // FIXME: https://github.com/olafurpg/mdoc/issues/95#issuecomment-426993507
       try toMetaUnsafe(section)
       catch {
         case NonFatal(e) =>
