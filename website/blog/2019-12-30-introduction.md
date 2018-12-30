@@ -74,7 +74,7 @@ markdown files.
 
 Instead of using the REPL to eagerly evaluate individual expressions, mdoc
 builds a single Scala program from all code examples in the markdown file and
-evaluates them in one run. The approach is possible because we know which
+evaluates them in one run. This approach is possible because we know which
 statements appear in the document. For example, consider the following markdown
 document.
 
