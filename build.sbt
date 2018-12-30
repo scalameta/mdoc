@@ -2,17 +2,10 @@ inThisBuild(
   List(
     scalaVersion := "2.12.8",
     organization := "org.scalameta",
-    version ~= { old =>
-      if (System.getProperty("CI") == null) {
-        "0.8.0-SNAPSHOT"
-      } else {
-        old
-      }
-    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
-    homepage := Some(url("https://github.com/olafurpg/mdoc")),
+    homepage := Some(url("https://github.com/scalameta/mdoc")),
     developers := List(
       Developer(
         "jvican",
@@ -161,7 +154,7 @@ lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
     moduleName := "mdoc-docs",
-    skip in publish := true,
+    skip in publish := version.in(ThisBuild).value.endsWith("-SNAPSHOT"),
     mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(

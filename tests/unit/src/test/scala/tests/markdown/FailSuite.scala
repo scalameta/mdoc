@@ -125,9 +125,7 @@ class FailSuite extends BaseMarkdownSuite {
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
-    // NOTE(olafur) https://github.com/olafurpg/mdoc/issues/95#issuecomment-426993507
-    // The error message below does not match the compiler error reported in the REPL.
-    // We should reconsider the architecture for the `fail` modifier.
+    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters for method eval: (fo: F[O])fs2.Stream[F,O] exist so that it can be applied to arguments (Unit)

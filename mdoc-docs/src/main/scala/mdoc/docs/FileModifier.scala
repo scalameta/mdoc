@@ -20,7 +20,7 @@ class FileModifier extends StringModifier {
     if (file.isFile) {
       val text = FileIO.slurp(file, StandardCharsets.UTF_8)
       s"""
-File: [${file.toNIO.getFileName}](https://github.com/olafurpg/mdoc/blob/master/$info)
+File: [${file.toNIO.getFileName}](https://github.com/scalameta/mdoc/blob/master/$info)
 `````scala
 $text
 `````

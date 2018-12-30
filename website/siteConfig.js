@@ -1,19 +1,19 @@
 // See https://docusaurus.io/docs/site-config.html for all the possible
 // site configuration options.
 
-const repoUrl = "https://github.com/olafurpg/mdoc";
-const gitterUrl = "https://gitter.im/olafurpg/mdoc";
+const repoUrl = "https://github.com/scalameta/mdoc";
+const gitterUrl = "https://gitter.im/scalameta/mdoc";
 const baseUrl = "/mdoc/";
 
 const siteConfig = {
   title: "mdoc",
   tagline: "Markdown documentation for Scala",
-  url: "https://olafurpg.github.io/mdoc",
+  url: "https://scalameta.org/mdoc",
   baseUrl: baseUrl,
 
   // Used for publishing and more
   projectName: "mdoc",
-  organizationName: "olafurpg",
+  organizationName: "scalameta",
 
   // algolia: {
   //   apiKey: "c865f6d974a3072a35d4b53d48ac2307",
