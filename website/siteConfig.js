@@ -37,8 +37,8 @@ const siteConfig = {
 
   /* colors for website */
   colors: {
-    primaryColor: "#FF5000",
-    secondaryColor: "#B23800"
+    primaryColor: "#CC540A",
+    secondaryColor: "#7F4623"
   },
 
   customDocsPath: "website/target/docs",
