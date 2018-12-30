@@ -54,7 +54,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: silent.md:7:1: error: Expected compile error but statement type-checked successfully
+      |error: silent.md:7:1: error: Expected compile error but statement typechecked successfully
       |List(1)
       |^^^^^^^
     """.stripMargin

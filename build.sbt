@@ -1,7 +1,14 @@
 inThisBuild(
   List(
     scalaVersion := "2.12.8",
-    organization := "com.geirsson",
+    organization := "org.scalameta",
+    version ~= { old =>
+      if (System.getProperty("CI") == null) {
+        "0.8.0-SNAPSHOT"
+      } else {
+        old
+      }
+    },
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
     ),
@@ -22,7 +29,7 @@ inThisBuild(
     ),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
-    publishArtifact.in(packageSrc) := sys.env.contains("CI"),
+    publishArtifact.in(packageSrc) := sys.env.contains("CI")
   )
 )
 
@@ -118,6 +125,26 @@ lazy val unit = project
   .dependsOn(mdoc, testsInput)
   .enablePlugins(BuildInfoPlugin)
 
+lazy val plugin = project
+  .in(file("mdoc-sbt"))
+  .settings(
+    sbtPlugin := true,
+    moduleName := "sbt-mdoc",
+    libraryDependencies ++= List(
+      "org.jsoup" % "jsoup" % "1.11.3",
+      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+      "org.scalameta" %% "testkit" % "4.0.0-M11" % Test
+    ),
+    resourceGenerators.in(Compile) += Def.task {
+      val out =
+        managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
+      val props = new java.util.Properties()
+      props.put("version", version.value)
+      IO.write(props, "sbt-mdoc properties", out)
+      List(out)
+    }
+  )
+
 lazy val lsp = project
   .in(file("mdoc-lsp"))
   .settings(
@@ -133,13 +160,31 @@ lazy val lsp = project
 lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
+    moduleName := "mdoc-docs",
     skip in publish := true,
+    mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
+      "org.scala-sbt" % "sbt" % sbtVersion.value,
       "com.cibo" %% "evilplot" % "0.6.0"
     ),
-    test := run.in(Compile).toTask(" --test").value,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
-    cancelable in Global := true
+    cancelable in Global := true,
+    MdocPlugin.autoImport.mdoc := Def.inputTaskDyn {
+      val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
+      Def.taskDyn {
+        run.in(Compile).toTask(s" ${parsed.mkString(" ")}")
+      }
+    }.evaluated,
+    mdocVariables := {
+      val stableVersion: String =
+        version.value.replaceFirst("\\+.*", "")
+      Map(
+        "VERSION" -> stableVersion,
+        "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
+        "SCALA_VERSION" -> scalaVersion.value
+      )
+    }
   )
-  .dependsOn(mdoc)
+  .dependsOn(mdoc, plugin)
+  .enablePlugins(DocusaurusPlugin)

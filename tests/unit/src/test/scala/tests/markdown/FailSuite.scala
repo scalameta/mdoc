@@ -67,7 +67,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: fail-success.md:3:1: error: Expected compile error but statement type-checked successfully
+      |error: fail-success.md:3:1: error: Expected compile error but statement typechecked successfully
       |1.to(2)
       |^^^^^^^
       |""".stripMargin
