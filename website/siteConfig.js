@@ -15,10 +15,10 @@ const siteConfig = {
   projectName: "mdoc",
   organizationName: "scalameta",
 
-  // algolia: {
-  //   apiKey: "c865f6d974a3072a35d4b53d48ac2307",
-  //   indexName: "metals"
-  // },
+  algolia: {
+    apiKey: "5791175eba35c6626d93ae96610a8ae9",
+    indexName: "scalamenta_mdoc"
+  },
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
