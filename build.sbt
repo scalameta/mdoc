@@ -1,7 +1,7 @@
 inThisBuild(
   List(
     scalaVersion := "2.12.8",
-    organization := "com.geirsson",
+    organization := "org.scalameta",
     version ~= { old =>
       if (System.getProperty("CI") == null) {
         "0.8.0-SNAPSHOT"

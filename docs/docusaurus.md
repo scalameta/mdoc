@@ -4,7 +4,8 @@ title: Docusaurus
 ---
 
 It's possible to use mdoc with [Docusaurus](https://docusaurus.io/) to build
-documentation websites. Docusaurus and mdoc is already used by several projects:
+documentation websites. Several projects already use mdoc in combination with
+Docusaurus:
 
 - [Scalafmt](https://scalameta.org/scalafmt/)
 - [Scalafix](https://scalacenter.github.io/scalafix/)
@@ -22,7 +23,7 @@ documentation websites. Docusaurus and mdoc is already used by several projects:
 ## Installation
 
 First, install the sbt-mdoc plugin using the normal
-[installation instructions](installation.md#sbt).
+[mdoc installation instructions](installation.md#sbt).
 
 Next, enable the `DocusaurusPlugin` in addition to the `MdocPlugin` and define
 the `moduleName` setting to have your project name suffixed with `-docs`.
@@ -55,11 +56,11 @@ several steps:
 
 - `sbt docs/mdoc`
 - `cd website && yarn install && yarn run build`
-- creates `website/build/index.html` that redirects to the path `myproject/`
+- creates `website/build/index.html` that redirects to `/myproject/`
 - relativizes all links in the generated html so that it can be hosted on
   http://static.javadoc.io/
 
-The static website is generated in the `website/build` directory. You can copy
+The static website gets generated in the `website/build` directory. You can copy
 these files over to any static HTTP server to host your website.
 
 ## Publish to GitHub pages locally
@@ -76,7 +77,6 @@ Next, run `docs/docusaurusPublishGhpages` to publish the website to GitHub
 pages. This task run several steps:
 
 - `sbt docs/mdoc`
-- (in CI) if the `DEPLOY_KEY` environment variable is defined, setup SSH
 - `cd website && yarn install && USE_SSH=true yarn publish-gh-pages`
 
 ## Publish to GitHub pages from CI

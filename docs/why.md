@@ -5,7 +5,7 @@ title: Why mdoc?
 
 The distinguishing features of mdoc are the following.
 
-- [good performance](#performance): markdwn documents compile as a single Scala
+- [good performance](#performance): markdown documents compile as a single Scala
   program and evaluate in one run. Combined with incremental and hot compilation
   from file watching, medium sized documents can generate in a few hundred
   milliseconds.

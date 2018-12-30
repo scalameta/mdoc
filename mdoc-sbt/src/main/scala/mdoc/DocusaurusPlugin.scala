@@ -77,9 +77,6 @@ object DocusaurusPlugin extends AutoPlugin {
     """.stripMargin
 
   override def projectSettings: Seq[Def.Setting[_]] = List(
-    libraryDependencies ++= List(
-      "com.geirsson" %% "mdoc" % "0.7.1"
-    ),
     aggregate.in(docusaurusPublishGhpages) := false,
     aggregate.in(docusaurusCreateSite) := false,
     docusaurusProjectName := moduleName.value.stripSuffix("-docs"),

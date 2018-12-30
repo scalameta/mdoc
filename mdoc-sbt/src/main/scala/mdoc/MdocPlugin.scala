@@ -57,7 +57,7 @@ object MdocPlugin extends AutoPlugin {
     }.evaluated,
     libraryDependencies ++= {
       if (mdocAutoDependency.value) {
-        List("com.geirsson" %% "mdoc" % BuildInfo.version)
+        List("org.scalameta" %% "mdoc" % BuildInfo.version)
       } else {
         List()
       }

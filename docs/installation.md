@@ -58,11 +58,11 @@ code fence has been evaluated.
 Install the `sbt-mdoc` plugin and create a `docs` project in build.sbt that
 enables `mdoc.MdocPlugin`.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```scala
 // project/plugins.sbt
-addSbtPlugin("com.geirsson" % "sbt-mdoc" % "@VERSION@" )
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "@VERSION@" )
 // build.sbt
 lazy val myproject = project // your existing library
   .settings(...)
@@ -108,12 +108,12 @@ Use
 [coursier command-line interface](https://github.com/coursier/coursier/#command-line)
 to launch mdoc outside of a build tool:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```sh
 curl -L -o coursier https://git.io/coursier
 chmod +x coursier
-coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- --site.VERSION 1.0.0
+coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- --site.VERSION 1.0.0
 info: Compiling 1 file to website/target/docs
 info: Compiled in 1.2s (0 errors)
 ```
@@ -122,7 +122,7 @@ Add libraries to the launched classpath to include them for compilation.
 
 ```diff
  coursier launch \
-   com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+   org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
 +  org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0
 ```
 
@@ -130,7 +130,7 @@ Use `--in` to customize the input directory where markdown sources are
 contained, by default the `docs/` directory is used.
 
 ```diff
- coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
 +  --in mydocs
 ```
 
@@ -138,7 +138,7 @@ Use `--site.VARIABLE=value` to add site variables that can be referenced from
 markdown as `@@VARIABLE@`.
 
 ```diff
- coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
@@ -146,14 +146,14 @@ Use `--out` to customize the directory where markdown sources are generated, by
 default the `out/` directory is used.
 
 ```diff
- coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
 +  --out target/docs
 ```
 
 Use `--watch` to start the file watcher with livereload.
 
 ```diff
- coursier launch com.geirsson:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
 +  --watch
 ```
 
@@ -171,12 +171,12 @@ println("```")
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.geirsson/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```scala
 // build.sbt
 scalaVersion := "@SCALA_VERSION@" // Any version in @SCALA_BINARY_VERSION@.x works.
-libraryDependencies += "com.geirsson" %% "mdoc" % "@VERSION@"
+libraryDependencies += "org.scalameta" %% "mdoc" % "@VERSION@"
 ```
 
 Then write a main function that invokes mdoc as a library
@@ -198,7 +198,7 @@ object Main {
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-[here](https://www.javadoc.io/doc/com.geirsson/mdoc_@SCALA_BINARY_VERSION@/@VERSION@)
+[here](https://www.javadoc.io/doc/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/@VERSION@)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.

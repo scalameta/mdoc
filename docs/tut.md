@@ -41,7 +41,7 @@ Use the sbt-mdoc plugin instead of sbt-tut and run `sbt docs/mdoc` instead of
 ```diff
 // project/plugins.sbt
 - addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.10")
-+ addSbtPlugin("com.geirsson" % "sbt-mdoc" % "@VERSION@")
++ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "@VERSION@")
 // build.sbt
 - enablePlugins(TutPlugin)
 + enablePlugins(MdocPlugin)

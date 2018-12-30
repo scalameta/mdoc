@@ -14,7 +14,7 @@ output with the Scala code examples evaluated. Unlike tut, mdoc does not use the
 Scala REPL to evaluate Scala code examples. Instead, mdoc translates each
 markdown file into a regular Scala program that evaluates in one run. In this
 post, we look into the implications of this change and how it can deliver up to
-27x faster performance when processing invalid documents.
+**27x faster performance** when processing invalid documents.
 
 <!-- truncate -->
 
@@ -116,15 +116,17 @@ structure with enough information to render the document back into markdown.
 
 There are many benefits to using this approach over the REPL:
 
-- better performance: the document is compiled once and classloaded once instead
-  of compiled + classloaded per-statement.
+- better performance, the document is compiled and classloaded once per-document
+  instead of per-statement.
 - language features like companion objects, overloaded methods and mutually
   recursive methods work as expected.
+- compiler options like `-Ywarn-unused-import` don't report spurious warnings.
 - the mdoc instrumentation builds a data structure giving us control over
   pretty-printing of static types and runtime values.
 
-However, one challenge with the approach is that error messages point to cryptic
-positions in the instrumented code instead of the original markdown source.
+However, one challenge with the approach is that compiler errors point to
+cryptic positions in the instrumented code instead of the original markdown
+source.
 
 ## Clear error messages
 
@@ -152,8 +154,8 @@ instead.
 
 To report readable error messages, mdoc translates positions in the synthetic
 program to positions in the markdown source. To translate positions, mdoc
-tokenizes the original source code and the synthetic source code and aligns the
-tokens using [edit distance](https://en.wikipedia.org/wiki/Edit_distance).
+tokenizes both the original source code and the synthetic source code and aligns
+the tokens using [edit distance](https://en.wikipedia.org/wiki/Edit_distance).
 
 ```diff
 -val
@@ -182,9 +184,9 @@ Edit distance is used by tools like `git` and `diff` to show which lines have
 changed between two source files. Instead of comparing textual lines, mdoc
 compares tokens.
 
-As long as the instrumented code such as `$doc.startStatement()` doesn't contain
-type errors, error messages reported by the compiler should translate to
-positions in the original markdown source.
+As long as instrumented sections like `$doc.startStatement()` don't contain type
+errors, error messages reported by the compiler should translate to positions in
+the original markdown source.
 
 ## Evaluation
 
@@ -202,7 +204,7 @@ cd http4s
 
 ```diff
 // project/plugins.sbt
-+ addSbtPlugin("com.geirsson" % "sbt-mdoc" % "<VERSION>")
++ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "<VERSION>")
 // build.sbt
 lazy val docs = project
   .enablePlugins(
@@ -272,8 +274,8 @@ Waiting for file changes (press enter to interrupt)
 ```
 
 It took 10 seconds to evaluate the document for the first time. We insert
-a blank line and generate the document again and it only takes 3.5 seconds. It's
-faster the second time because the JVM has warmed up.
+a blank line and generate the document again and it only takes 3.5 seconds this
+time.
 
 ```scala
 info: Compiling 1 file to /Users/olafurpg/dev/http4s/docs/target/mdoc
@@ -281,8 +283,9 @@ info: Compiled in 3.53s (0 errors)
 Waiting for file changes (press enter to interrupt)
 ```
 
-After 6 iterations of adding blank lines and recompiling it takes 2.4 seconds to
-generate the document.
+It's faster the second time because the JVM has warmed up. After 6 iterations of
+adding blank lines and recompiling it takes 2.4 seconds to generate the
+document.
 
 ```scala
 info: Compiling 1 file to /Users/olafurpg/dev/http4s/docs/target/mdoc
@@ -352,20 +355,21 @@ not the exact line where `year` is referenced.
 Some observations:
 
 - we had to make changes in the document to migrate from REPL semantics to
-  program semantics. The migration can't be automated and you sacrifice
-  flexibility in variable naming and implicits usage by migrating to mdoc.
-- for cold performance, mdoc takes 10 seconds while tut takes 21 seconds. My
-  theory is that the primary reason for this difference is REPL semantics vs.
-  program semantics.
-- for hot performance, mdoc takes 2.4 seconds while tut takes between 21 and 28
-  seconds. Under `--watch` mode, mdoc reuses the same compiler instance between
-  runs allowing the JVM to warm up. I suspect tut can enjoy similar speedups by
-  introducing a `--watch` mode.
+  program semantics. The migration can't be automated because it requires
+  renaming variables and reorganizing the implicit scope.
+- for cold performance, mdoc takes 10 seconds while tut takes 21 seconds to
+  process a 500 line markdown document with 32 evaluated code fences. My theory
+  is that the primary reason for this difference is REPL semantics vs. program
+  semantics.
+- for hot performance, mdoc processes the same document in 2.4 seconds while tut
+  takes between 21 and 28 seconds. Under `--watch` mode, mdoc reuses the same
+  compiler instance between runs allowing the JVM to warm up. I suspect tut can
+  enjoy similar speedups by introducing a `--watch` mode.
 - mdoc reports compile errors for invalid documents in 0.8 seconds while it
-  takes 22 seconds for the REPL. The reason for this difference is likely the
-  fact that the REPL compiles and evaluates each leading statement in the
+  takes 22 seconds for tut. The reason for this difference is likely the fact
+  that the REPL needs to compile and evaluate each leading statement in the
   document to reach the compile error (which appeared late in the document)
-  while mdoc typechecks the entire document before evaluating the expressions.
+  while mdoc typechecks the entire document before evaluating the statements.
 
 ## Conclusion
 
@@ -377,8 +381,8 @@ compile errors for invalid documents up to 27x faster when combined with
 
 To report clear error messages, mdoc uses edit distance to align tokens in the
 original markdown source with tokens in the instrumented program. This technique
-enables mdoc to generate instrumented source code while reporting positions in
-the original markdown source.
+enables mdoc to generate instrumented Scala source code while reporting
+positions in the original markdown source.
 
 Migrating from REPL semantics to program semantics requires manual effort. If
 you write a lot of documentation and want a tight edit/preview feedback loop,
