@@ -13,38 +13,50 @@ Like tut, mdoc reads markdown files as input and produces markdown files as
 output with the Scala code examples evaluated. Unlike tut, mdoc does not use the
 Scala REPL to evaluate Scala code examples. Instead, mdoc translates each
 markdown file into a regular Scala program that evaluates in one run. In this
-post, we learn how this approach delivers improved performance.
+post, we look into the implications of this change and how it can deliver up to
+27x faster performance when processing invalid documents.
 
 <!-- truncate -->
 
 ## REPL semantics
 
-It's not possible to write companion objects or overloaded methods with tut.
-This limitation comes from how the Scala REPL evaluates each statement
-individually.
+A key feature of the REPL is that it shows you the value of an expression right
+after you type it. Although this feature is great for explorative programming,
+it can be limiting when writing larger programs.
+
+For example, you get spurious warnings with `-Ywarn-unused` enabled.
 
 ```scala
-scala> case class User(name: String)
-scala> object User {
-     |   implicit val ordering: Ordering[User] = Ordering.by(_.name)
-     | }
-defined object User
+$ scala -Ywarn-unused
+> import scala.concurrent._
+<console>:11: warning: Unused import
+       import scala.concurrent._
+                               ^
+> Future.successful(1)
+res0: scala.concurrent.Future[Int] = Future(Success(1))
+```
+
+Also, you get a warning when writing companion objects.
+
+```scala
+> case class User(name: String)
+> object User
 warning: previously defined class User is not a companion to object User.
 Companions must be defined together; you may wish to use :paste mode for this.
 ```
 
-The warning may be surprising if you are not familiar with how the REPL works.
-In the REPL, each statements gets wrapped into a synthetic object. We can look
-at the generated code by adding the compiler option `-Xprint:parser`.
+Companion objects don't work out of the box because the REPL wraps each
+statement in a synthetic object. We can look at the generated code by adding the
+compiler option `-Xprint:parser`.
 
 ```scala
 $ scala -Xprint:parser
-scala> case class User(name: String)
+> case class User(name: String)
 package $line3 {
   // ..
   case class User(...)
 }
-scala> object User
+> object User
 package $line4 {
   // ..
   object User
@@ -53,15 +65,18 @@ package $line4 {
 
 It's not possible for `object User` to be a companion of `class User` because
 they're defined in separate objects `$line3` and `$line4`. This encoding is
-required for the REPL because we don't know ahead-of-time how many statements
-will get evaluated in the session.
+required for the REPL because we need to eagerly evaluate each expression as its
+typed. However, this limitation can be lifted if we know the entire program
+ahead of time, which is the case when evaluating all Scala code examples in
+markdown files.
 
 ## Program semantics
 
-Instead of evaluating each statement individually like in the REPL, mdoc builds
-a single Scala program that evaluates in one run. The approach is possible
-because we know which statements appear in the document, unlike the REPL. For
-example, consider the following markdown document.
+Instead of using the REPL to eagerly evaluate individual expressions, mdoc
+builds a single Scala program from all code examples in the markdown file and
+evaluates them in one run. The approach is possible because we know which
+statements appear in the document. For example, consider the following markdown
+document.
 
 ````md
 ```scala mdoc
@@ -104,9 +119,9 @@ There are many benefits to using this approach over the REPL:
 - better performance: the document is compiled once and classloaded once instead
   of compiled + classloaded per-statement.
 - language features like companion objects, overloaded methods and mutually
-  recursive methods just work.
-- the mdoc instrumentation builds a rich data structure giving us fine-grained
-  control over pretty-printing of static types and runtime values.
+  recursive methods work as expected.
+- the mdoc instrumentation builds a data structure giving us control over
+  pretty-printing of static types and runtime values.
 
 However, one challenge with the approach is that error messages point to cryptic
 positions in the instrumented code instead of the original markdown source.
@@ -117,17 +132,18 @@ It's annoying if compile errors show synthetic code that you didn't write
 yourself.
 
 ```scala
-// error: generated/Session.scala:45:10 type mismatch;
+// error: generated/Session.scala:45:28 type mismatch;
 //   obtained: Int
 //   expected: String
 val res0 = "hello".matches("h".length) ; super.$doc.binder(res0)
-                           ^
+                           ^^^^^^^^^^
 ```
 
-We want compile errors to point to the original markdown source instead.
+Ideally, we want compile errors to point to the original markdown source
+instead.
 
 ```scala
-// error: readme.md:10:8 type mismatch;
+// error: readme.md:10:17 type mismatch;
 //   obtained: Int
 //   expected: String
 "hello".matches("h".length)
@@ -137,7 +153,7 @@ We want compile errors to point to the original markdown source instead.
 To report readable error messages, mdoc translates positions in the synthetic
 program to positions in the markdown source. To translate positions, mdoc
 tokenizes the original source code and the synthetic source code and aligns the
-tokens using [edit-distance](https://en.wikipedia.org/wiki/Edit_distance).
+tokens using [edit distance](https://en.wikipedia.org/wiki/Edit_distance).
 
 ```diff
 -val
@@ -162,13 +178,13 @@ tokens using [edit-distance](https://en.wikipedia.org/wiki/Edit_distance).
 - )
 ```
 
-Edit-distance is used by tools like `git` and `diff` to show which lines have
+Edit distance is used by tools like `git` and `diff` to show which lines have
 changed between two source files. Instead of comparing textual lines, mdoc
 compares tokens.
 
-As long as the instrumented code doesn't contain type errors, all error messages
-reported by the compiler should translate to positions in the original markdown
-source.
+As long as the instrumented code such as `$doc.startStatement()` doesn't contain
+type errors, error messages reported by the compiler should translate to
+positions in the original markdown source.
 
 ## Evaluation
 
@@ -197,7 +213,8 @@ lazy val docs = project
   )
 ```
 
-Next, we run the tut migration script.
+Next, we run a migration script to convert tut code fences into mdoc code
+fences.
 
 ````sh
 find . -name '*.md' -type f -exec perl -pi -e '
@@ -219,7 +236,8 @@ info: Compiled in 14.02s (46 errors, 36 warnings)
 
 It's expected that there are compile errors because mdoc uses program semantics
 instead of REPL semantics. For example, in this particular example
-`meteredClient` was already defined in this document.
+`meteredClient` was already defined in this document, which is not a problem for
+the REPL but is invalid in normal programs.
 
 We rename a few conflicting variables and comment out two ambiguous implicits.
 
@@ -255,7 +273,7 @@ Waiting for file changes (press enter to interrupt)
 
 It took 10 seconds to evaluate the document for the first time. We insert
 a blank line and generate the document again and it only takes 3.5 seconds. It's
-faster the second time because the JVM has warmed up a bit.
+faster the second time because the JVM has warmed up.
 
 ```scala
 info: Compiling 1 file to /Users/olafurpg/dev/http4s/docs/target/mdoc
@@ -290,9 +308,10 @@ Waiting for file changes (press enter to interrupt)
 ```
 
 Observe that the error is reported within one second, faster than it takes to
-process the document on success. The error message position points to line 449
-and column 41 which is exactly where `year` identifier is referenced. In iTerm,
-you can cmd+click on the error to open your editor at that position.
+process the document when it's valid. The position of the error message points
+to line 449 and column 41 which is exactly where `year` identifier is
+referenced. In some terminals, you can cmd+click on the error to open your
+editor at that position.
 
 We compare the performance with tut by checking out the master branch and run
 `docs/tutOnly dsl.md` four times.
@@ -325,13 +344,14 @@ We introduce the same compile error as before.
 [error] Total time: 22 s, completed Dec 29, 2018 2:39:42 PM
 ```
 
-Observe that it took 22 seconds to report the compile error. Also, the position
-points to line 458, which is the last line of the code fence containing the
-closing `}`, but it's is not the line where `year` is referenced.
+Observe that it took 22 seconds to report the compile error, about as long as it
+takes to process the valid document. Also, the position points to line 458,
+which is the last line of the code fence containing the closing `}`, but it's is
+not the exact line where `year` is referenced.
 
 Some observations:
 
-- it requires manual effort to translate documentation from REPL semantics to
+- we had to make changes in the document to migrate from REPL semantics to
   program semantics. The migration can't be automated and you sacrifice
   flexibility in variable naming and implicits usage by migrating to mdoc.
 - for cold performance, mdoc takes 10 seconds while tut takes 21 seconds. My
@@ -339,29 +359,29 @@ Some observations:
   program semantics.
 - for hot performance, mdoc takes 2.4 seconds while tut takes between 21 and 28
   seconds. Under `--watch` mode, mdoc reuses the same compiler instance between
-  runs it possible for the JVM to optimize the code. I suspect tut can enjoy
-  similar speedups by introducing a `--watch` mode.
-- mdoc reports compile errors in 0.8 seconds with exact line and column
-  positions of the original markdown document, while tut reports compile errors
-  in 22 seconds with accurate but not exact line numbers. The big difference
-  likely comes from the fact that the REPL needs to compile + classload all
-  leading statements in the document to reach the compile error while mdoc has
-  no bytecode to classload when the document contains a compile error.
+  runs allowing the JVM to warm up. I suspect tut can enjoy similar speedups by
+  introducing a `--watch` mode.
+- mdoc reports compile errors for invalid documents in 0.8 seconds while it
+  takes 22 seconds for the REPL. The reason for this difference is likely the
+  fact that the REPL compiles and evaluates each leading statement in the
+  document to reach the compile error (which appeared late in the document)
+  while mdoc typechecks the entire document before evaluating the expressions.
 
 ## Conclusion
 
-In this post, we learned the difference between REPL semantics used by tut and
-program semantics used by mdoc. Program semantics enable mdoc to process
-markdown documents up to 2x faster under cold compilation, and 10x faster when
-combined with `--watch` mode under hot compilation.
+In this post, we looked into the difference between REPL semantics used by tut
+and program semantics used by mdoc. Program semantics enable mdoc to process
+valid markdown documents up to 2x faster under cold compilation, and report
+compile errors for invalid documents up to 27x faster when combined with
+`--watch` mode under hot compilation.
 
-To report clear error messages, mdoc uses edit-distance to align tokens in the
+To report clear error messages, mdoc uses edit distance to align tokens in the
 original markdown source with tokens in the instrumented program. This technique
-enables mdoc to generate instrumented code while reporting positions in the
-original markdown source.
+enables mdoc to generate instrumented source code while reporting positions in
+the original markdown source.
 
 Migrating from REPL semantics to program semantics requires manual effort. If
-you have a lot of documentation and want a tighter edit/preview feedback loop,
+you write a lot of documentation and want a tight edit/preview feedback loop,
 the migration might be worth your effort.
 
 Several projects already use mdoc: mdoc itself (this website),
