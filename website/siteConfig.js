@@ -7,7 +7,7 @@ const baseUrl = "/mdoc/";
 
 const siteConfig = {
   title: "mdoc",
-  tagline: "Markdown documentation for Scala",
+  tagline: "Typechecked markdown documentation for Scala",
   url: "https://scalameta.org/mdoc",
   baseUrl: baseUrl,
 

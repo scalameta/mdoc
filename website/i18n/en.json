@@ -3,7 +3,7 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Markdown documentation for Scala",
+    "tagline": "Typechecked markdown documentation for Scala",
     "docs": {
       "demo": {
         "title": "Summing numbers"
@@ -17,8 +17,8 @@
       "modifiers": {
         "title": "Modifiers"
       },
-      "quickstart": {
-        "title": "Getting started"
+      "readme": {
+        "title": "readme"
       },
       "tut": {
         "title": "Coming from tut"
