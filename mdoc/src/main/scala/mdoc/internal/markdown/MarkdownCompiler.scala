@@ -125,8 +125,10 @@ class MarkdownCompiler(
     case _ =>
   }
 
-  private def toSource(input: Input): BatchSourceFile =
-    new BatchSourceFile(input.syntax, new String(input.chars))
+  private def toSource(input: Input): BatchSourceFile = {
+    val filename = Paths.get(input.syntax).getFileName.toString
+    new BatchSourceFile(filename, new String(input.chars))
+  }
 
   def fail(original: Seq[Tree], input: Input): String = {
     sreporter.reset()

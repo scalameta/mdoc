@@ -67,4 +67,20 @@ class CrashSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "path/to/relative",
+    """
+      |```scala mdoc:crash
+      |???
+      |```
+    """.stripMargin,
+    """|```scala
+       |???
+       |// scala.NotImplementedError: an implementation is missing
+       |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
+       |// 	at repl.Session$App$.$anonfun$new$1(relative.md:9)
+       |```
+    """.stripMargin
+  )
+
 }
