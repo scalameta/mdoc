@@ -16,7 +16,7 @@ class BlockInput(ctx: Context, baseInput: Input) {
     val string = block.getInfo.toString
     if (!string.startsWith("scala mdoc")) None
     else {
-      if (!string.contains(':')) Some(Default)
+      if (!string.contains(':')) Some(Modifier.Default())
       else {
         val mode = string.stripPrefix("scala mdoc:")
         Modifier(mode)
@@ -38,27 +38,48 @@ class BlockInput(ctx: Context, baseInput: Input) {
               }
           }
           .orElse {
-            val msg = s"Invalid mode '$mode'"
-            val offset = "scala mdoc:".length
-            val start = block.getInfo.getStartOffset + offset
-            val end = block.getInfo.getEndOffset
-            val pos = Position.Range(baseInput, start, end)
-            ctx.reporter.error(pos, msg)
+            invalid(block, s"Invalid mode '$mode'")
             None
           }
       }
     }
   }
+
+  private def invalid(block: FencedCodeBlock, message: String): Unit = {
+    val offset = "scala mdoc:".length
+    val start = block.getInfo.getStartOffset + offset
+    val end = block.getInfo.getEndOffset
+    val pos = Position.Range(baseInput, start, end)
+    ctx.reporter.error(pos, message)
+  }
+  private def invalidCombination(block: FencedCodeBlock, mod1: String, mod2: String): Boolean = {
+    invalid(block, s"invalid combination of modifiers '$mod1' and '$mod2' are ")
+    false
+  }
+
+  private def isValid(block: FencedCodeBlock, mod: Modifier): Boolean = {
+    if (mod.isFail && mod.isCrash) {
+      invalidCombination(block, "crash", "fail")
+    } else if (mod.isSilent && mod.isInvisible) {
+      invalidCombination(block, "silent", "invisible")
+    } else {
+      true
+    }
+  }
   def unapply(block: FencedCodeBlock): Option[ScalaBlockInput] = {
     getModifier(block) match {
       case Some(mod) =>
-        val child = block.getFirstChild
-        val start = child.getStartOffset
-        val end = child.getEndOffset
-        val isNewline = baseInput.chars(end - 1) == '\n'
-        val cutoff = if (isNewline) 1 else 0
-        val input = Input.Slice(baseInput, start, end - cutoff)
-        Some(ScalaBlockInput(block, input, mod))
+        if (isValid(block, mod)) {
+          val child = block.getFirstChild
+          val start = child.getStartOffset
+          val end = child.getEndOffset
+          val isNewline = baseInput.chars(end - 1) == '\n'
+          val cutoff = if (isNewline) 1 else 0
+          val input = Input.Slice(baseInput, start, end - cutoff)
+          Some(ScalaBlockInput(block, input, mod))
+        } else {
+          None
+        }
       case _ => None
     }
   }

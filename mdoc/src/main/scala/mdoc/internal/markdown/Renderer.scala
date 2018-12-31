@@ -25,7 +25,7 @@ object Renderer {
       printer: Variable => String
   ): String = {
     val inputs =
-      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default))
+      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default()))
     val instrumented = Instrumenter.instrument(inputs)
     val doc =
       MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
@@ -129,7 +129,7 @@ object Renderer {
         statement.binders.zipWithIndex.foreach {
           case (binder, i) =>
             section.mod match {
-              case Modifier.Fail =>
+              case Modifier.Fail() =>
                 sb.append('\n')
                 binder.value match {
                   case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
@@ -149,7 +149,7 @@ object Renderer {
                       s"Expected FailSection. Obtained $obtained"
                     )
                 }
-              case Modifier.Default | Modifier.Passthrough | Modifier.Reset | Modifier.Post(_, _) =>
+              case Modifier.PrintVariable() | Modifier.Post(_, _) =>
                 val pos = binder.pos.toMeta(section)
                 val variable = new mdoc.Variable(
                   binder.name,
@@ -162,8 +162,7 @@ object Renderer {
                   totalStats
                 )
                 sb.append(printer(variable))
-              case c @ (Modifier.Str(_, _) | Modifier.Silent | Modifier.Invisible |
-                  Modifier.Crash) =>
+              case c @ (Modifier.Str(_, _) | Modifier.Builtin(_)) =>
                 throw new IllegalArgumentException(c.toString)
             }
         }
