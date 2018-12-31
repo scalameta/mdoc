@@ -42,8 +42,10 @@ object MarkdownCompiler {
     val edit = TokenEditDistance.toTokenEdit(sectionInputs.map(_.source), compileInput)
     val doc = compiler.compile(compileInput, reporter, edit) match {
       case Some(loader) =>
-        val cls = loader.loadClass("repl.Session")
-        val doc = cls.newInstance().asInstanceOf[DocumentBuilder].$doc
+        val cls = loader.loadClass("repl.Session$")
+        val ctor = cls.getDeclaredConstructor()
+        ctor.setAccessible(true)
+        val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
         try {
           doc.build(instrumentedInput)
         } catch {

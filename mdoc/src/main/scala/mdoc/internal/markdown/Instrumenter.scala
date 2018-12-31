@@ -19,8 +19,8 @@ class Instrumenter(sections: List[SectionInput]) {
     sections.zipWithIndex.foreach {
       case (section, i) =>
         if (section.mod == Modifier.Reset) {
-          val nextApp = gensym.fresh("App", "()")
-          sb.print(s"new $nextApp\n}\nclass $nextApp {\n")
+          val nextApp = gensym.fresh("App")
+          sb.print(s"$nextApp\n}\nobject $nextApp {\n")
         }
         sb.println("\n$doc.startSection();")
         if (section.mod == Modifier.Fail) {
@@ -96,9 +96,9 @@ object Instrumenter {
   def wrapBody(body: String): String = {
     val wrapped = new StringBuilder()
       .append("package repl\n")
-      .append("class Session extends _root_.mdoc.internal.document.DocumentBuilder {\n")
-      .append("  def app(): Unit = new App()\n")
-      .append("  class App {\n")
+      .append("object Session extends _root_.mdoc.internal.document.DocumentBuilder {\n")
+      .append("  def app(): Unit = App\n")
+      .append("  object App {\n")
       .append(body)
       .append("  }\n")
       .append("}\n")

@@ -185,7 +185,11 @@ class FailSuite extends BaseMarkdownSuite {
        |println(a)
        |println(b)
        |// error: not found: value a
+       |// println(a)
+       |//         ^
        |// error: not found: value b
+       |// println(b)
+       |//         ^
        |```
        |
        |```scala
