@@ -114,4 +114,17 @@ class ErrorSuite extends BaseMarkdownSuite {
        |          ^^^^^^^^^^^^^^^^^^
     """.stripMargin
   )
+
+  checkError(
+    "multimods-typo",
+    """
+      |```scala mdoc:reset:silen
+      |List[Int]("".length.toString)
+      |```
+    """.stripMargin,
+    """|error: multimods-typo.md:2:15: error: Invalid mode 'reset:silen'
+       |```scala mdoc:reset:silen
+       |              ^^^^^^^^^^^
+    """.stripMargin
+  )
 }

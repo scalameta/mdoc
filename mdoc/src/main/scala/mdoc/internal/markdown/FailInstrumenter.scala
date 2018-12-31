@@ -19,11 +19,11 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
       case (section, j) =>
         if (j > i) ()
         else {
-          if (section.mod == Modifier.Reset) {
+          if (section.mod.isReset) {
             val nextApp = gensym.fresh("App")
             sb.print(s"$nextApp\n}\nobject $nextApp {\n")
           }
-          if (j == i || section.mod != Modifier.Fail) {
+          if (j == i || !section.mod.isFail) {
             sb.println(section.input.text)
           }
         }

@@ -1,6 +1,7 @@
 package mdoc.internal.markdown
 
 import mdoc.StringModifier
+import mdoc.internal.markdown.Mod._
 
 /**
   * A mdoc code fence modifier.
@@ -13,53 +14,52 @@ import mdoc.StringModifier
   *
   * Currently, only supports parsing one modifier per code block.
   */
-sealed trait Modifier {
-  import Modifier._
-  def isDefault: Boolean = this == Default
-  def isFail: Boolean = this == Fail
-  def isPassthrough: Boolean = this == Passthrough
-  def isString: Boolean = this.isInstanceOf[Str]
-  def isCrash: Boolean = this == Crash
-  def isSilent: Boolean = this == Silent
+sealed abstract class Modifier(mods: Set[Mod]) {
+  def isDefault: Boolean = mods.isEmpty
+  def isFail: Boolean = mods(Fail)
+  def isPassthrough: Boolean = mods(Passthrough)
+  def isString: Boolean = this.isInstanceOf[Modifier.Str]
+  def isPost: Boolean = this.isInstanceOf[Modifier.Post]
+  def isCrash: Boolean = mods(Crash)
+  def isSilent: Boolean = mods(Silent)
+  def isInvisible: Boolean = mods(Invisible)
+  def isReset: Boolean = mods(Reset)
 }
 object Modifier {
-  def all: List[Modifier] = List(
-    Default,
-    Passthrough,
-    Invisible,
-    Reset,
-    Fail,
-    Crash,
-    Silent
-  )
-  def apply(string: String): Option[Modifier] =
-    all.find(_.toString.equalsIgnoreCase(string))
+  object Default {
+    def apply(): Modifier = Builtin(Set.empty)
+  }
+  object Crash {
+    def unapply(m: Modifier): Boolean =
+      m.isCrash
+  }
+  object Fail {
+    def unapply(m: Modifier): Boolean =
+      m.isFail
+  }
+  object PrintVariable {
+    def unapply(m: Modifier): Boolean =
+      m.isDefault || m.isPassthrough || m.isReset
+  }
 
-  /** Render output as if in a normal repl. */
-  case object Default extends Modifier
+  def apply(string: String): Option[Modifier] = {
+    val mods = string.split(":").map {
+      case Mod(m) => Some(m)
+      case _ => None
+    }
+    if (mods.forall(_.isDefined)) {
+      Some(Builtin(mods.iterator.map(_.get).toSet))
+    } else {
+      None
+    }
+  }
 
-  /** Expect error and fail build if code block succeeds. */
-  case object Fail extends Modifier
-
-  /** Expect a runtime exception from evaluating the block. */
-  case object Crash extends Modifier
-
-  /** Keep the input code fence unchanged, don't print out the evaluated output. */
-  case object Silent extends Modifier
-
-  /** Render stdout as raw markdown and remove code block. */
-  case object Passthrough extends Modifier
-
-  /** Do no render anything. */
-  case object Invisible extends Modifier
-
-  /** Start from scratch and ignore all declarations in this document. */
-  case object Reset extends Modifier
+  case class Builtin(mods: Set[Mod]) extends Modifier(mods)
 
   /** Render this code fence according to this string modifier */
-  case class Str(mod: StringModifier, info: String) extends Modifier
+  case class Str(mod: StringModifier, info: String) extends Modifier(Set.empty)
 
   /** Render this code fence according to this post modifier */
-  case class Post(mod: mdoc.PostModifier, info: String) extends Modifier
+  case class Post(mod: mdoc.PostModifier, info: String) extends Modifier(Set.empty)
 
 }

@@ -90,7 +90,6 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
           ctx.compiler
         )
         mod match {
-          case Modifier.Silent =>
           case Modifier.Post(modifier, info) =>
             val variables = for {
               (stat, i) <- section.section.statements.zipWithIndex
@@ -120,16 +119,22 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             )
             val postRender = modifier.process(postCtx)
             replaceNodeWithText(doc, block, postRender)
-          case Modifier.Default | Modifier.Reset | Modifier.Fail =>
-            block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
-          case Modifier.Passthrough =>
-            replaceNodeWithText(doc, block, section.out)
-          case Modifier.Invisible =>
-            replaceNodeWithText(doc, block, "")
-          case Modifier.Crash =>
-            val stacktrace =
-              Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)
-            replaceNodeWithText(doc, block, stacktrace)
+          case m: Modifier.Builtin =>
+            if (m.isPassthrough) {
+              replaceNodeWithText(doc, block, section.out)
+            } else if (m.isInvisible) {
+              replaceNodeWithText(doc, block, "")
+            } else if (m.isCrash) {
+              val stacktrace =
+                Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)
+              replaceNodeWithText(doc, block, stacktrace)
+            } else if (m.isSilent) {
+              () // Do nothing
+            } else if (m.isDefault || m.isReset || m.isFail) {
+              block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
+            } else {
+              throw new IllegalArgumentException(m.toString)
+            }
           case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)
         }

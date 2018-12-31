@@ -18,12 +18,12 @@ class Instrumenter(sections: List[SectionInput]) {
   private def printAsScript(): Unit = {
     sections.zipWithIndex.foreach {
       case (section, i) =>
-        if (section.mod == Modifier.Reset) {
+        if (section.mod.isReset) {
           val nextApp = gensym.fresh("App")
           sb.print(s"$nextApp\n}\nobject $nextApp {\n")
         }
         sb.println("\n$doc.startSection();")
-        if (section.mod == Modifier.Fail) {
+        if (section.mod.isFail) {
           sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
           val out = new FailInstrumenter(sections, i).instrument()
           val literal = Instrumenter.stringLiteral(out)
@@ -51,9 +51,8 @@ class Instrumenter(sections: List[SectionInput]) {
   private def printBinder(name: String, pos: Position): Unit = {
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
-  private def printStatement(stat: Stat, mod: Modifier, sb: PrintStream): Unit = mod match {
-    case Modifier.Default | Modifier.Passthrough | Modifier.Invisible | Modifier.Silent |
-        Modifier.Post(_, _) | Modifier.Reset =>
+  private def printStatement(stat: Stat, m: Modifier, sb: PrintStream): Unit = {
+    if (m.isDefault || m.isPassthrough || m.isInvisible || m.isSilent || m.isReset || m.isPost) {
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
@@ -67,15 +66,15 @@ class Instrumenter(sections: List[SectionInput]) {
         case (name, pos) =>
           printBinder(name.syntax, pos)
       }
-
-    case Modifier.Crash =>
+    } else if (m.isCrash) {
       sb.append("$doc.crash(")
         .append(position(stat.pos))
         .append(") {\n")
         .append(stat.pos.text)
         .append("\n}")
-    case Modifier.Str(_, _) | Modifier.Fail =>
+    } else {
       throw new IllegalArgumentException(stat.pos.text)
+    }
   }
 }
 object Instrumenter {
