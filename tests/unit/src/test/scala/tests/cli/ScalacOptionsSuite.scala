@@ -44,4 +44,28 @@ class ScalacOptionsSuite extends BaseCliSuite {
     """.stripMargin
   )
 
+  // NOTE(olafur): with -Xfatal-warning, the following program reports the following
+  // warning if its wrapped in classes.
+  // > warning: The outer reference in this type test cannot be checked at run time.
+  // We wrap the code in objects instead of classes to avoid this warning.
+  val finalInput: String =
+    """
+      |/in.md
+      |```scala mdoc
+      |sealed abstract class Maybe[+A] extends Product with Serializable
+      |
+      |final case class Just[A](value: A) extends Maybe[A]
+      |final case object Nothing extends Maybe[Nothing]
+      |```
+    """.stripMargin
+  checkCli(
+    "final",
+    finalInput,
+    extraArgs = Array(
+      "--scalac-options",
+      "-Ywarn-unused -Xfatal-warnings"
+    ),
+    expected = finalInput.replaceFirst("scala mdoc", "scala")
+  )
+
 }

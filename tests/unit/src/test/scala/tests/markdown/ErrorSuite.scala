@@ -21,10 +21,11 @@ class ErrorSuite extends BaseMarkdownSuite {
        |^^^^^^^^^
        |scala.NotImplementedError: an implementation is missing
        |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |	at repl.Session$App.crash(crash.md:17)
-       |	at repl.Session$App.z(crash.md:20)
-       |	at repl.Session$App.<init>(crash.md:26)
-       |	at repl.Session.app(crash.md:3)
+       |	at repl.Session$App$.crash(crash.md:17)
+       |	at repl.Session$App$.z(crash.md:20)
+       |	at repl.Session$App$.<init>(crash.md:26)
+       |	at repl.Session$App$.<clinit>(crash.md)
+       |	at repl.Session$.app(crash.md:3)
        |""".stripMargin
   )
 
