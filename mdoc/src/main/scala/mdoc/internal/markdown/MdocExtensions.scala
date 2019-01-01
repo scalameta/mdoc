@@ -38,7 +38,6 @@ object MdocExtensions {
       AutolinkExtension.create(),
       TablesExtension.create(),
       EmojiExtension.create(),
-      FootnoteExtension.create(),
       StrikethroughExtension.create(),
       TocExtension.create(),
       InsExtension.create(),
