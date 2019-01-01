@@ -9,14 +9,14 @@ class CrashSuite extends BaseMarkdownSuite {
       |???
       |```
     """.stripMargin,
-    """
-      |```scala
-      |val x = 1
-      |???
-      |// scala.NotImplementedError: an implementation is missing
-      |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-      |// 	at repl.Session$App$.$anonfun$new$2(basic.md:14)
-      |```
+    """|```scala
+       |val x = 1
+       |???
+       |// scala.NotImplementedError: an implementation is missing
+       |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
+       |// 	at repl.Session$App$$anonfun$2.apply(basic.md:14)
+       |// 	at repl.Session$App$$anonfun$2.apply(basic.md:14)
+       |```
     """.stripMargin
   )
 
@@ -62,7 +62,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |  case 2 => // boom!
        |}
        |// scala.MatchError: 1 (of class java.lang.Integer)
-       |// 	at repl.Session$App$.$anonfun$new$1(comments.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(comments.md:9)
        |```
     """.stripMargin
   )
@@ -78,7 +78,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |???
        |// scala.NotImplementedError: an implementation is missing
        |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |// 	at repl.Session$App$.$anonfun$new$1(relative.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(relative.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(relative.md:9)
        |```
     """.stripMargin
   )

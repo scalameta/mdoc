@@ -38,7 +38,7 @@ class ConsoleReporter(
   }
 
   def error(pos: Position, throwable: Throwable): Unit = {
-    error(pos, throwable.getMessage)
+    error(pos, throwable.message)
     throwable.printStackTrace(ps)
   }
   def error(pos: Position, msg: String): Unit = {

@@ -11,6 +11,7 @@ import mdoc.Reporter
 import mdoc.document.Document
 import mdoc.document._
 import mdoc.internal.document.DocumentBuilder
+import mdoc.internal.document.MdocNonFatal
 import mdoc.internal.pos.PositionSyntax
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
@@ -66,6 +67,9 @@ object MarkdownCompiler {
               }
             reporter.error(pos, e.getCause)
             Document.empty(instrumentedInput)
+          case MdocNonFatal(e) =>
+            reporter.error(e)
+            Document.empty(instrumentedInput)
         }
       case None =>
         // An empty document will render as the original markdown
@@ -108,6 +112,10 @@ class MarkdownCompiler(
   settings.unchecked.value = true // enable detailed unchecked warnings
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
+  // enable -Ydelambdafy:inline to avoid future timeouts, see:
+  //   https://github.com/scala/bug/issues/9824
+  //   https://github.com/scalameta/mdoc/issues/124
+  settings.Ydelambdafy.value = "inline"
   settings.processArgumentString(scalacOptions)
 
   private val sreporter = new FilterStoreReporter(settings)

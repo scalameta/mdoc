@@ -153,4 +153,11 @@ object PositionSyntax {
     }
   }
 
+  implicit class XtensionThrowable(e: Throwable) {
+    def message: String = {
+      if (e.getMessage != null) e.getMessage
+      else if (e.getCause != null) e.getCause.message
+      else "null"
+    }
+  }
 }
