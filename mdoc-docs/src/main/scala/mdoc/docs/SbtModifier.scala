@@ -14,6 +14,7 @@ class SbtModifier extends StringModifier {
       mdocIn,
       mdocOut,
       mdocVariables,
+      mdocExtraArguments,
       mdocAutoDependency
     )
     val rows = keys.map { s =>
@@ -21,6 +22,7 @@ class SbtModifier extends StringModifier {
         .toString()
         .replaceAllLiterally("java.lang.String", "String")
         .replaceAllLiterally("scala.collection.immutable.", "")
+        .replaceAllLiterally("scala.collection.", "")
       <tr>
         <td><code>{s.key.toString}</code></td>
         <td><code>{tpe}</code></td>
