@@ -1,5 +1,7 @@
 package mdoc.internal.pos
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.nio.file.Paths
 import scala.meta.Input
 import scala.meta.Position
@@ -25,6 +27,9 @@ object PositionSyntax {
     def toFilename(settings: Settings): String =
       if (settings.reportRelativePaths) Paths.get(input.filename).getFileName.toString
       else filename
+    def toPosition: Position.Range = {
+      Position.Range(input, 0, input.chars.length)
+    }
     def toOffset(line: Int, column: Int): Position = {
       Position.Range(input, line, column, line, column)
     }
@@ -68,6 +73,12 @@ object PositionSyntax {
     }
   }
   implicit class XtensionPositionMdoc(pos: Position) {
+    def addStart(offset: Int): Position = pos match {
+      case Position.Range(i, start, end) =>
+        Position.Range(i, start + offset, end)
+      case _ =>
+        pos
+    }
     def toUnslicedPosition: Position = pos.input match {
       case Input.Slice(underlying, a, _) =>
         Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition
@@ -91,7 +102,8 @@ object PositionSyntax {
   ): String =
     pos match {
       case Position.None =>
-        s"$severity: $message"
+        if (severity.isEmpty) message
+        else s"$severity: $message"
       case _ =>
         new java.lang.StringBuilder()
           .append(if (includePath) pos.lineInput else "")
@@ -159,5 +171,18 @@ object PositionSyntax {
       else if (e.getCause != null) e.getCause.message
       else "null"
     }
+  }
+  implicit class XtensionAbsolutePathLink(path: AbsolutePath) {
+    def write(text: String): Unit = {
+      Files.createDirectories(path.toNIO.getParent)
+      Files.write(
+        path.toNIO,
+        text.getBytes(StandardCharsets.UTF_8)
+      )
+    }
+    def toRelativeLinkFrom(other: AbsolutePath): String = {
+      path.toRelative(other.parent).toURI(false).toString
+    }
+    def parent: AbsolutePath = AbsolutePath(path.toNIO.getParent)
   }
 }

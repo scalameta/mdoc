@@ -1,7 +1,6 @@
 package mdoc.docs
 
 import java.nio.file.FileSystems
-import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
 import mdoc.Main
 import mdoc.MainSettings

@@ -1,5 +1,6 @@
 package mdoc.internal.cli
 
+import java.nio.file.Files
 import java.util.Properties
 import scala.collection.JavaConverters._
 import scala.meta.io.AbsolutePath
@@ -13,6 +14,13 @@ case class MdocProperties(
 )
 
 object MdocProperties {
+  def fromFile(path: AbsolutePath): MdocProperties = {
+    val props = new Properties()
+    val in = Files.newInputStream(path.toNIO)
+    try props.load(in)
+    finally in.close()
+    fromProps(props, path)
+  }
   def fromProps(props: Properties, cwd: AbsolutePath): MdocProperties = {
     def getPath(key: String): Option[AbsolutePath] =
       Option(props.getProperty(key)).map(AbsolutePath(_)(cwd))

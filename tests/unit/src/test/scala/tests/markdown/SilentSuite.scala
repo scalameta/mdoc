@@ -30,7 +30,7 @@ class SilentSuite extends BaseMarkdownSuite {
       |val x: String = 4
       |```
     """.stripMargin,
-    """|error: error.md:3:17: error: type mismatch;
+    """|error: error.md:3:17: type mismatch;
        | found   : Int(4)
        | required: String
        |val x: String = 4

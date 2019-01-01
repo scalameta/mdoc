@@ -83,7 +83,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: silent:invisible.md:2:15: error: invalid combination of modifiers 'silent' and 'invisible' are
+    """|error: silent:invisible.md:2:15: invalid combination of modifiers 'silent' and 'invisible'
        |```scala mdoc:reset:silent:invisible
        |              ^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -96,7 +96,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: fail:crash.md:2:15: error: invalid combination of modifiers 'crash' and 'fail' are
+    """|error: fail:crash.md:2:15: invalid combination of modifiers 'crash' and 'fail'
        |```scala mdoc:reset:fail:crash
        |              ^^^^^^^^^^^^^^^^
     """.stripMargin

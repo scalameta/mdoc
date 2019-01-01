@@ -120,11 +120,7 @@ object UndertowLiveReload {
   }
 
   private def staticResource(path: String): HttpHandler = {
-    val is = this.getClass.getResourceAsStream(path)
-    val bytes =
-      try InputStreamIO.readBytes(is)
-      finally is.close()
-    val text = new String(bytes, StandardCharsets.UTF_8)
+    val text = Resources.readPath(path)
     new HttpHandler {
       override def handleRequest(exchange: HttpServerExchange): Unit = {
         exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, contentType(path))

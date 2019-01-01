@@ -14,7 +14,7 @@ object EvaluatedDocument {
   def apply(document: Document, trees: List[SectionInput]): EvaluatedDocument = {
     val instrumented =
       Input.VirtualFile(document.instrumented.filename, document.instrumented.text)
-    val edit = TokenEditDistance.toTokenEdit(trees.map(_.source), instrumented)
+    val edit = TokenEditDistance.fromTrees(trees.map(_.source), instrumented)
     EvaluatedDocument(
       instrumented,
       edit,

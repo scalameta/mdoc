@@ -11,6 +11,8 @@ import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 import java.util
 import mdoc.PostModifierContext
+import mdoc.PostProcessContext
+import mdoc.PreModifierContext
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.util.control.NonFatal
@@ -20,6 +22,7 @@ import mdoc.internal.document.MdocExceptions
 import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
 import pprint.TPrintColors
+import scala.meta.io.RelativePath
 
 class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
 
@@ -27,14 +30,66 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     val docInput = doc
       .get(Markdown.InputKey)
       .getOrElse(sys.error(s"Missing DataKey ${Markdown.InputKey}"))
-    val (scalaInputs, customInputs) = collectBlockInputs(doc, docInput)
+    val (scalaInputs, customInputs, preInputs) = collectBlockInputs(doc, docInput)
+    val filename = docInput.toFilename(ctx.settings)
+    val inputFile =
+      doc
+        .get(Markdown.RelativePathKey)
+        .getOrElse(throw new NoSuchElementException(s"InputFile: $filename"))
     customInputs.foreach { block =>
       processStringInput(doc, block)
     }
+    preInputs.foreach { block =>
+      processPreInput(doc, block)
+    }
     if (scalaInputs.nonEmpty) {
-      processScalaInputs(doc, scalaInputs, docInput.toFilename(ctx.settings))
+      processScalaInputs(doc, scalaInputs, inputFile, filename)
+    }
+    if (preInputs.nonEmpty) {
+      val post = new PostProcessContext(ctx.reporter, inputFile, ctx.settings)
+      ctx.settings.preModifiers.foreach { pre =>
+        runModifier(pre.name, () => {
+          appendChild(doc, pre.postProcess(post))
+        })
+      }
     }
     doc
+  }
+
+  def runModifier(name: String, fn: () => Unit): Unit = {
+    try {
+      fn()
+    } catch {
+      case NonFatal(e) =>
+        ctx.reporter.error(new ModifierException(name, e))
+    }
+  }
+
+  def postProcess(doc: Document, inputFile: RelativePath): Unit = {}
+
+  def processPreInput(doc: Document, custom: PreBlockInput): Unit = {
+    val PreBlockInput(block, input, Pre(mod, info)) = custom
+    try {
+      val inputFile =
+        doc
+          .get(Markdown.RelativePathKey)
+          .getOrElse(throw new NoSuchElementException(s"relativepath"))
+      val preCtx = new PreModifierContext(
+        info,
+        input,
+        ctx.reporter,
+        inputFile,
+        ctx.settings
+      )
+      val out = mod.process(preCtx)
+      replaceNodeWithText(doc, block, out)
+    } catch {
+      case NonFatal(e) =>
+        val pos = Position.Range(input, 0, input.chars.length)
+        MdocExceptions.trimStacktrace(e)
+        val exception = new ModifierException(mod.name, e)
+        ctx.reporter.error(pos, exception)
+    }
   }
 
   def processStringInput(doc: Document, custom: StringBlockInput): Unit = {
@@ -46,12 +101,17 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       case NonFatal(e) =>
         val pos = Position.Range(input, 0, input.chars.length)
         MdocExceptions.trimStacktrace(e)
-        val exception = new StringModifierException(mod, e)
+        val exception = new ModifierException(mod.name, e)
         ctx.reporter.error(pos, exception)
     }
   }
 
-  def processScalaInputs(doc: Document, inputs: List[ScalaBlockInput], filename: String): Unit = {
+  def processScalaInputs(
+      doc: Document,
+      inputs: List[ScalaBlockInput],
+      inputFile: RelativePath,
+      filename: String
+  ): Unit = {
     val sectionInputs = inputs.map {
       case ScalaBlockInput(_, input, mod) =>
         import scala.meta._
@@ -68,10 +128,6 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       ctx.reporter.info(s"Instrumented $filename")
       ctx.reporter.println(instrumented)
     }
-    val inputFile =
-      doc
-        .get(Markdown.RelativePathKey)
-        .getOrElse(throw new NoSuchElementException(s"InputFile: $filename"))
     val rendered = MarkdownCompiler.buildDocument(
       ctx.compiler,
       ctx.reporter,
@@ -137,6 +193,22 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             }
           case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)
+          case c: Modifier.Pre =>
+            val preCtx = new PreModifierContext(
+              c.info,
+              section.input,
+              ctx.reporter,
+              inputFile,
+              ctx.settings
+            )
+            val out =
+              try c.mod.process(preCtx)
+              catch {
+                case NonFatal(e) =>
+                  ctx.reporter.error(e)
+                  e.getMessage
+              }
+            replaceNodeWithText(doc, block, out)
         }
     }
   }
@@ -145,10 +217,20 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     List[BasedSequence](CharSubSequence.of(string)).asJava
   }
 
-  def replaceNodeWithText(enclosingDoc: Document, toReplace: Node, text: String): Unit = {
+  def appendChild(doc: Document, text: String): Unit = {
+    if (text.nonEmpty) {
+      doc.appendChild(parseMarkdown(doc, text))
+    }
+  }
+
+  def parseMarkdown(doc: Document, text: String): Node = {
     val markdownOptions = new MutableDataSet()
-    markdownOptions.setAll(enclosingDoc)
-    val child = Markdown.parse(CharSubSequence.of(text), markdownOptions)
+    markdownOptions.setAll(doc)
+    Markdown.parse(CharSubSequence.of(text), markdownOptions)
+  }
+
+  def replaceNodeWithText(doc: Document, toReplace: Node, text: String): Unit = {
+    val child = parseMarkdown(doc, text)
     toReplace.insertAfter(child)
     toReplace.unlink()
   }
@@ -156,20 +238,23 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
   def collectBlockInputs(
       doc: Document,
       docInput: Input
-  ): (List[ScalaBlockInput], List[StringBlockInput]) = {
+  ): (List[ScalaBlockInput], List[StringBlockInput], List[PreBlockInput]) = {
     val InterestingCodeFence = new BlockInput(ctx, docInput)
     val inputs = List.newBuilder[ScalaBlockInput]
     val strings = List.newBuilder[StringBlockInput]
+    val pres = List.newBuilder[PreBlockInput]
     Markdown.traverse[FencedCodeBlock](doc) {
       case InterestingCodeFence(input) =>
         input.mod match {
           case string: Str =>
             strings += StringBlockInput(input.block, input.input, string)
+          case pre: Pre =>
+            pres += PreBlockInput(input.block, input.input, pre)
           case _ =>
             inputs += input
         }
     }
-    (inputs.result(), strings.result())
+    (inputs.result(), strings.result(), pres.result())
   }
 }
 

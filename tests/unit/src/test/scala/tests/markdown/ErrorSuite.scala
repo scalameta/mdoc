@@ -16,7 +16,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |x + y + z
       |```
     """.stripMargin,
-    """|error: crash.md:10:1: error: an implementation is missing
+    """|error: crash.md:10:1: an implementation is missing
        |x + y + z
        |^^^^^^^^^
        |scala.NotImplementedError: an implementation is missing
@@ -37,7 +37,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: invalid-mod.md:2:15: error: Invalid mode 'foobaz'
+      |error: invalid-mod.md:2:15: Invalid mode 'foobaz'
       |```scala mdoc:foobaz
       |              ^^^^^^
     """.stripMargin
@@ -55,7 +55,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: silent.md:7:1: error: Expected compile error but statement typechecked successfully
+      |error: silent.md:7:1: Expected compile error but statement typechecked successfully
       |List(1)
       |^^^^^^^
     """.stripMargin
@@ -68,7 +68,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: parse-error.md:3:8: error: illegal start of simple expression
+      |error: parse-error.md:3:8: illegal start of simple expression
       |val x =
       |       ^
     """.stripMargin
@@ -80,7 +80,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |List(1).len
       |```
     """.stripMargin,
-    """|error: not-member.md:3:1: error: value len is not a member of List[Int]
+    """|error: not-member.md:3:1: value len is not a member of List[Int]
        |List(1).len
        |^^^^^^^^^^^
     """.stripMargin
@@ -94,7 +94,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: already-defined.md:4:5: error: x is already defined as value x
+    """|error: already-defined.md:4:5: x is already defined as value x
        |val x = 2
        |    ^
     """.stripMargin
@@ -107,7 +107,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |List[Int]("".length.toString)
       |```
     """.stripMargin,
-    """|error: yrangepos.md:3:11: error: type mismatch;
+    """|error: yrangepos.md:3:11: type mismatch;
        | found   : String
        | required: Int
        |List[Int]("".length.toString)
@@ -122,7 +122,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |List[Int]("".length.toString)
       |```
     """.stripMargin,
-    """|error: multimods-typo.md:2:15: error: Invalid mode 'reset:silen'
+    """|error: multimods-typo.md:2:15: Invalid mode 'reset:silen'
        |```scala mdoc:reset:silen
        |              ^^^^^^^^^^^
     """.stripMargin

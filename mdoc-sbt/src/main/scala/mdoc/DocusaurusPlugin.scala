@@ -80,6 +80,9 @@ object DocusaurusPlugin extends AutoPlugin {
     aggregate.in(docusaurusPublishGhpages) := false,
     aggregate.in(docusaurusCreateSite) := false,
     docusaurusProjectName := moduleName.value.stripSuffix("-docs"),
+    MdocPlugin.mdocInternalVariables ++= List(
+      "js-out-prefix" -> "assets"
+    ),
     docusaurusPublishGhpages := {
       m.mdoc.toTask(" ").value
       val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")

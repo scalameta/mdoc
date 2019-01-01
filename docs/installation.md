@@ -146,7 +146,7 @@ Use `--in` to customize the input directory where markdown sources are
 contained, by default the `docs/` directory is used.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --in mydocs
 ```
 
@@ -154,7 +154,7 @@ Use `--site.VARIABLE=value` to add site variables that can be referenced from
 markdown as `@@VARIABLE@`.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
@@ -162,7 +162,7 @@ Use `--out` to customize the directory where markdown sources are generated, by
 default the `out/` directory is used.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --out target/docs
 ```
 
@@ -171,7 +171,7 @@ Use `--watch` to start the file watcher with livereload. It's recommended to use
 performance.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --watch
 ```
 

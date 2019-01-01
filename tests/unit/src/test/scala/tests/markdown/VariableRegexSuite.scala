@@ -13,7 +13,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
       |```scala
       |libraryDeps += "1.0"
       |```
-    """.stripMargin,
+    """.stripMargin
   )
 
   checkError(
@@ -24,10 +24,10 @@ class VariableRegexSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: missing-key.md:3:17: error: key not found: unknown
+      |error: missing-key.md:3:17: key not found: unknown
       |libraryDeps += "@unknown@"
       |                ^^^^^^^^^
-    """.stripMargin,
+    """.stripMargin
   )
 
   check(
@@ -45,7 +45,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
       |x.length // should match "1.0".length
       |// res0: Int = 3
       |```
-    """.stripMargin,
+    """.stripMargin
   )
 
   check(
@@ -55,7 +55,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |This to @olafurpg
-    """.stripMargin,
+    """.stripMargin
   )
 
   check(
@@ -65,7 +65,7 @@ class VariableRegexSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |This to @version@
-    """.stripMargin,
+    """.stripMargin
   )
 
 }
