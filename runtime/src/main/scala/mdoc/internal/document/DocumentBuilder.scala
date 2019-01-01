@@ -2,12 +2,12 @@ package mdoc.internal.document
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import mdoc.document._
 import pprint.TPrint
 import scala.collection.mutable.ArrayBuffer
 import scala.language.experimental.macros
 import scala.util.control.NonFatal
 import sourcecode.Text
-import mdoc.document._
 
 trait DocumentBuilder {
 
@@ -77,7 +77,7 @@ trait DocumentBuilder {
           }
         }
       } catch {
-        case NonFatal(e) =>
+        case MdocNonFatal(e) =>
           MdocExceptions.trimStacktrace(e)
           throw new PositionedException(mySections.length, lastPosition, e)
       }
