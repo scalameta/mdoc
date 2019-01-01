@@ -44,7 +44,7 @@ final class MainOps(
   }
 
   def lint(): Unit = {
-    if (settings.out.isDirectory) {
+    if (settings.out.isDirectory && !settings.noLinkHygiene) {
       val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
       LinkHygiene.lint(docs, reporter, settings.verbose)
     }
