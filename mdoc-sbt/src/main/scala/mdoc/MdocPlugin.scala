@@ -36,6 +36,11 @@ object MdocPlugin extends AutoPlugin {
         "Output directory for mdoc generated markdown. " +
           "Defaults to the target/mdoc directory of this project."
       )
+    val mdocExtraArguments =
+      settingKey[Seq[String]](
+        "Additional command-line arguments to pass on every mdoc invocation. " +
+          "For example, add --no-link-hygiene to disable link hygiene."
+      )
     val mdocAutoDependency =
       settingKey[Boolean](
         "If false, do not add mdoc as a library dependency this project. " +
@@ -49,10 +54,12 @@ object MdocPlugin extends AutoPlugin {
     mdocOut := target.in(Compile).value / "mdoc",
     mdocVariables := Map.empty,
     mdocAutoDependency := true,
+    mdocExtraArguments := Nil,
     mdoc := Def.inputTaskDyn {
       val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
+      val args = mdocExtraArguments.value ++ parsed
       Def.taskDyn {
-        runMain.in(Compile).toTask(s" mdoc.Main ${parsed.mkString(" ")}")
+        runMain.in(Compile).toTask(s" mdoc.Main ${args.mkString(" ")}")
       }
     }.evaluated,
     libraryDependencies ++= {

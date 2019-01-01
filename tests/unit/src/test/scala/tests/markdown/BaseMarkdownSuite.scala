@@ -70,6 +70,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       print(colorOut)
       val stdout = fansi.Str(colorOut).plainText
       assert(!reporter.hasErrors, stdout)
+      assert(!reporter.hasWarnings, stdout)
       assertNoDiffOrPrintExpected(obtained, expected)
     }
   }

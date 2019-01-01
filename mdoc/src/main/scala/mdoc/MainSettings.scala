@@ -71,6 +71,9 @@ final class MainSettings private (
   def withCheck(check: Boolean): MainSettings = {
     copy(settings.copy(check = check))
   }
+  def withNoLinkHygiene(noLinkHygiene: Boolean): MainSettings = {
+    copy(settings.copy(noLinkHygiene = noLinkHygiene))
+  }
   def withReportRelativePaths(reportRelativePaths: Boolean): MainSettings = {
     copy(settings.copy(reportRelativePaths = reportRelativePaths))
   }

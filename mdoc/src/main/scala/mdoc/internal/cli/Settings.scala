@@ -51,6 +51,8 @@ case class Settings(
     )
     @ExtraName("test")
     check: Boolean = false,
+    @Description("Disable link hygiene analysis so that no warnings are reported for dead links.")
+    noLinkHygiene: Boolean = false,
     @Description("Include additional diagnostics for debugging potential problems.")
     verbose: Boolean = false,
     @Description(
