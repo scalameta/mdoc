@@ -53,7 +53,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: fail-error.md:3:1: error: not found: value foobar
+      |error: fail-error.md:3:1: not found: value foobar
       |foobar
       |^^^^^^
       |""".stripMargin
@@ -67,7 +67,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: fail-success.md:3:1: error: Expected compile error but statement typechecked successfully
+      |error: fail-success.md:3:1: Expected compile error but statement typechecked successfully
       |1.to(2)
       |^^^^^^^
       |""".stripMargin
@@ -86,7 +86,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: mixed-error.md:3:9: error: not found: value foobar
+      |error: mixed-error.md:3:9: not found: value foobar
       |val x = foobar
       |        ^^^^^^
       |""".stripMargin

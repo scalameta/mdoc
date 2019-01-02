@@ -40,7 +40,7 @@ object MarkdownCompiler {
     // Use string builder to avoid accidental stripMargin processing
     val instrumentedInput = InstrumentedInput(filename, instrumented)
     val compileInput = Input.VirtualFile(filename, instrumented)
-    val edit = TokenEditDistance.toTokenEdit(sectionInputs.map(_.source), compileInput)
+    val edit = TokenEditDistance.fromTrees(sectionInputs.map(_.source), compileInput)
     val doc = compiler.compile(compileInput, reporter, edit) match {
       case Some(loader) =>
         val cls = loader.loadClass("repl.Session$")
@@ -119,7 +119,7 @@ class MarkdownCompiler(
   settings.processArgumentString(scalacOptions)
 
   private val sreporter = new FilterStoreReporter(settings)
-  private val global = new Global(settings, sreporter)
+  val global = new Global(settings, sreporter)
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)
     .map(path => new File(path).toURI.toURL)
@@ -144,7 +144,7 @@ class MarkdownCompiler(
     run.compileSources(List(toSource(input)))
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
-    val edit = TokenEditDistance.toTokenEdit(original, input)
+    val edit = TokenEditDistance.fromTrees(original, input)
     sreporter.infos.foreach {
       case sreporter.Info(pos, msgOrNull, gseverity) =>
         val msg = nullableMessage(msgOrNull)
@@ -156,15 +156,19 @@ class MarkdownCompiler(
     out.toString()
   }
 
-  def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
+  def compileSources(input: Input, vreporter: Reporter, edit: TokenEditDistance): Unit = {
     clearTarget()
     sreporter.reset()
     val run = new global.Run
     run.compileSources(List(toSource(input)))
+    report(vreporter, edit)
+  }
+
+  def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
+    compileSources(input, vreporter, edit)
     if (!sreporter.hasErrors) {
       Some(new AbstractFileClassLoader(target, appClassLoader))
     } else {
-      report(vreporter, edit)
       None
     }
   }
@@ -201,10 +205,25 @@ class MarkdownCompiler(
       case sreporter.Info(pos, msgOrNull, severity) =>
         val msg = nullableMessage(msgOrNull)
         val mpos = toMetaPosition(edit, pos)
+        val actualMessage =
+          if (mpos == Position.None) {
+            val line = pos.lineContent
+            if (line.nonEmpty) {
+              new CodeBuilder()
+                .println(s"<mdoc>:${pos.line} $msg")
+                .println(pos.lineContent)
+                .println(pos.lineCaret)
+                .toString
+            } else {
+              msg
+            }
+          } else {
+            msg
+          }
         severity match {
-          case sreporter.ERROR => vreporter.error(mpos, msg)
-          case sreporter.INFO => vreporter.info(mpos, msg)
-          case sreporter.WARNING => vreporter.warning(mpos, msg)
+          case sreporter.ERROR => vreporter.error(mpos, actualMessage)
+          case sreporter.INFO => vreporter.info(mpos, actualMessage)
+          case sreporter.WARNING => vreporter.warning(mpos, actualMessage)
         }
       case _ =>
     }

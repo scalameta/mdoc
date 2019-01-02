@@ -7,7 +7,9 @@ import mdoc.internal.cli.Context
 import mdoc.internal.markdown.Modifier.Str
 import mdoc.internal.markdown.Modifier.Default
 import mdoc.internal.markdown.Modifier.Post
+import mdoc.internal.markdown.Modifier.Pre
 
+case class PreBlockInput(block: FencedCodeBlock, input: Input, mod: Pre)
 case class StringBlockInput(block: FencedCodeBlock, input: Input, mod: Str)
 case class ScalaBlockInput(block: FencedCodeBlock, input: Input, mod: Modifier)
 
@@ -36,6 +38,12 @@ class BlockInput(ctx: Context, baseInput: Input) {
                     Post(mod, info)
                 }
               }
+              .orElse {
+                ctx.settings.preModifiers.collectFirst {
+                  case mod if mod.name == name =>
+                    Pre(mod, info)
+                }
+              }
           }
           .orElse {
             invalid(block, s"Invalid mode '$mode'")
@@ -53,7 +61,7 @@ class BlockInput(ctx: Context, baseInput: Input) {
     ctx.reporter.error(pos, message)
   }
   private def invalidCombination(block: FencedCodeBlock, mod1: String, mod2: String): Boolean = {
-    invalid(block, s"invalid combination of modifiers '$mod1' and '$mod2' are ")
+    invalid(block, s"invalid combination of modifiers '$mod1' and '$mod2'")
     false
   }
 

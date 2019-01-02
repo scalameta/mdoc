@@ -20,7 +20,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
     onStdout = { out =>
       val expected =
         """
-          |warning: index.md:3:1: warning: Unused import
+          |warning: index.md:3:1: Unused import
           |import scala.concurrent.Future
           |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^""".stripMargin
       assert(out.contains(expected))

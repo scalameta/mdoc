@@ -15,7 +15,7 @@ class ConsoleReporter(
 ) extends Reporter {
 
   def formatMessage(pos: Position, severity: String, message: String): String =
-    pos.formatMessage(severity, message)
+    pos.formatMessage("", message)
 
   private val myInfo = blue("info")
   private val myWarning = yellow("warning")

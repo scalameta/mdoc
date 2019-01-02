@@ -19,6 +19,7 @@ sealed abstract class Modifier(mods: Set[Mod]) {
   def isFail: Boolean = mods(Fail)
   def isPassthrough: Boolean = mods(Passthrough)
   def isString: Boolean = this.isInstanceOf[Modifier.Str]
+  def isPre: Boolean = this.isInstanceOf[Modifier.Pre]
   def isPost: Boolean = this.isInstanceOf[Modifier.Post]
   def isCrash: Boolean = mods(Crash)
   def isSilent: Boolean = mods(Silent)
@@ -55,11 +56,8 @@ object Modifier {
   }
 
   case class Builtin(mods: Set[Mod]) extends Modifier(mods)
-
-  /** Render this code fence according to this string modifier */
   case class Str(mod: StringModifier, info: String) extends Modifier(Set.empty)
-
-  /** Render this code fence according to this post modifier */
   case class Post(mod: mdoc.PostModifier, info: String) extends Modifier(Set.empty)
+  case class Pre(mod: mdoc.PreModifier, info: String) extends Modifier(Set.empty)
 
 }

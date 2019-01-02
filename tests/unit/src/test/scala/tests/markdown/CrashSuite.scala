@@ -28,7 +28,7 @@ class CrashSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """
-      |error: definition.md:3:1: error: Expected runtime exception but program completed successfully
+      |error: definition.md:3:1: Expected runtime exception but program completed successfully
       |case class User(name: String)
       |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -42,7 +42,7 @@ class CrashSuite extends BaseMarkdownSuite {
       |```
   """.stripMargin,
     """
-      |error: false-positive.md:3:1: error: Expected runtime exception but program completed successfully
+      |error: false-positive.md:3:1: Expected runtime exception but program completed successfully
       |"ab".length
       |^^^^^^^^^^^
     """.stripMargin
