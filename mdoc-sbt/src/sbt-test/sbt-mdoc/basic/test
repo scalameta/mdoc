@@ -1,2 +1,4 @@
 > mdoc
 > check
+> set mdocIn := baseDirectory.in(ThisBuild).value
+-> mdoc
