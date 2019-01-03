@@ -217,7 +217,7 @@ class JsSuite extends BaseMarkdownSuite {
       |println(jsapp.ExampleJS.greeting)
       |```
     """.stripMargin,
-    """|error: <mdoc>:3 object scalajs is not a member of package org
+    """|error: no-dom.md:3 (mdoc generated code) object scalajs is not a member of package org
        |def run0(node: _root_.org.scalajs.dom.raw.Element): Unit = {
        |                          ^
     """.stripMargin,

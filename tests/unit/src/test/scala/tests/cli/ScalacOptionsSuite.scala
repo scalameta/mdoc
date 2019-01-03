@@ -69,7 +69,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "-Ydiscard-value-discard",
+    "-Ywarn-value-discard",
     """
       |/index.md
       |```scala mdoc
