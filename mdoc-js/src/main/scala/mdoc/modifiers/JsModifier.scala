@@ -1,24 +1,20 @@
 package mdoc.modifiers
 
-import com.ibm.icu.text.RelativeDateTimeFormatter.RelativeDateTimeUnit
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.PreModifierContext
-import mdoc.internal.cli.Timer
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.livereload.Resources
 import mdoc.internal.markdown.CodeBuilder
 import mdoc.internal.markdown.Gensym
 import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
 import org.scalajs.core.tools.io.IRFileCache
 import org.scalajs.core.tools.io.IRFileCache.VirtualRelativeIRFile
 import org.scalajs.core.tools.io.MemVirtualSerializedScalaJSIRFile
 import org.scalajs.core.tools.io.VirtualScalaJSIRFile
 import org.scalajs.core.tools.io.WritableMemVirtualJSFile
-import mdoc.internal.pos.PositionSyntax._
 import org.scalajs.core.tools.linker.Linker
 import org.scalajs.core.tools.linker.StandardLinker
 import org.scalajs.core.tools.logging.Level
@@ -30,7 +26,6 @@ import scala.meta.inputs.Input
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
-import scala.meta.io.RelativePath
 import scala.reflect.io.VirtualDirectory
 
 class JsModifier extends mdoc.PreModifier {

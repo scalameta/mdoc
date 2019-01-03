@@ -126,6 +126,7 @@ lazy val plugin = project
   .in(file("mdoc-sbt"))
   .settings(
     sbtPlugin := true,
+    sbtVersion in pluginCrossBuild := "1.0.0",
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.11.3",
@@ -143,7 +144,8 @@ lazy val plugin = project
     publishLocal := publishLocal
       .dependsOn(
         publishLocal in runtime,
-        publishLocal in mdoc
+        publishLocal in mdoc,
+        publishLocal in js
       )
       .value,
     scriptedBufferLog := false,
