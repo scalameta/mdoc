@@ -39,7 +39,7 @@ object MdocPlugin extends AutoPlugin {
     val mdocExtraArguments =
       settingKey[Seq[String]](
         "Additional command-line arguments to pass on every mdoc invocation. " +
-          "For example, add --no-link-hygiene to disable link hygiene."
+          "For example, add '--no-link-hygiene' to disable link hygiene."
       )
     val mdocJS =
       settingKey[Option[Project]](
@@ -54,23 +54,40 @@ object MdocPlugin extends AutoPlugin {
   }
   val mdocInternalVariables =
     settingKey[List[(String, String)]](
-      " variables that can be referenced from markdown with @VERSION@."
+      "Additional site variables that are added by mdoc plugins. Not intended for public use."
     )
   import autoImport._
 
+  lazy val validateSettings = Def.task[Unit] {
+    val in = mdocIn.value.toPath
+    val base = baseDirectory.value.toPath
+    if (in == base) {
+      throw MdocException(
+        s"mdocIn and baseDirectory cannot have the same value '$in'. " +
+          s"To fix this problem, either customize the project baseDirectory with `in(file('myproject-docs'))` or " +
+          s"move `mdocIn` somewhere else."
+      )
+    }
+  }
+
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
-      mdocInternalVariables := Nil,
       mdocIn := baseDirectory.in(ThisBuild).value / "docs",
       mdocOut := target.in(Compile).value / "mdoc",
       mdocVariables := Map.empty,
-      mdocAutoDependency := true,
       mdocExtraArguments := Nil,
+      mdocJS := None,
+      mdocAutoDependency := true,
+      mdocInternalVariables := Nil,
       mdoc := Def.inputTaskDyn {
+        validateSettings.value
         val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
-        val args = mdocExtraArguments.value ++ parsed
+        val args = Iterator(
+          mdocExtraArguments.value,
+          parsed
+        ).flatten.mkString(" ")
         Def.taskDyn {
-          runMain.in(Compile).toTask(s" mdoc.Main ${args.mkString(" ")}")
+          runMain.in(Compile).toTask(s" mdoc.Main $args")
         }
       }.evaluated,
       libraryDependencies ++= {

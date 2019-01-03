@@ -1,6 +1,7 @@
 package tests.cli
 
 import java.nio.file.Files
+import mdoc.internal.cli.Feedback
 import org.scalatest.FunSuite
 import scala.meta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
@@ -9,8 +10,6 @@ import mdoc.internal.io.ConsoleReporter
 
 class CliArgsSuite extends FunSuite with DiffAssertions {
   private val reporter = ConsoleReporter.default
-  private val tmp = Files.createTempDirectory("mdoc")
-  Files.delete(tmp)
   private val base = Settings.default(PathIO.workingDirectory)
 
   def checkOk(args: List[String], isExpected: Settings => Boolean): Unit = {
@@ -31,6 +30,8 @@ class CliArgsSuite extends FunSuite with DiffAssertions {
     }
   }
 
+  private val tmp = Files.createTempDirectory("mdoc")
+  Files.delete(tmp)
   checkError(
     "--in" :: tmp.toString :: Nil,
     s"File $tmp does not exist."
@@ -39,6 +40,13 @@ class CliArgsSuite extends FunSuite with DiffAssertions {
   checkOk(
     "--site.VERSION" :: "1.0" :: Nil,
     _.site == Map("VERSION" -> "1.0")
+  )
+
+  private val in2 = Files.createTempDirectory("mdoc")
+  private val out2 = in2.resolve("out")
+  checkError(
+    "--in" :: in2.toString :: "--out" :: out2.toString :: Nil,
+    Feedback.outSubdirectoryOfIn(in2, out2)
   )
 
 }

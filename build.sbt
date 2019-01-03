@@ -133,15 +133,26 @@ lazy val plugin = project
       "org.scalameta" %% "testkit" % "4.0.0-M11" % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
-
       val out =
         managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
       val props = new java.util.Properties()
       props.put("version", version.value)
       IO.write(props, "sbt-mdoc properties", out)
       List(out)
-    }
+    },
+    publishLocal := publishLocal
+      .dependsOn(
+        publishLocal in runtime,
+        publishLocal in mdoc
+      )
+      .value,
+    scriptedBufferLog := false,
+    scriptedLaunchOpts ++= Seq(
+      "-Xmx2048M",
+      s"-Dplugin.version=${version.value}"
+    )
   )
+  .enablePlugins(ScriptedPlugin)
 
 lazy val js = project
   .in(file("mdoc-js"))

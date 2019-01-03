@@ -170,12 +170,16 @@ case class Settings(
   }
   def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {
-      val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
-      onLoad(logger)
-      if (logger.hasErrors) {
-        Configured.error("Failed to load modifiers")
+      if (out.toNIO.startsWith(in.toNIO)) {
+        Configured.error(Feedback.outSubdirectoryOfIn(in.toNIO, out.toNIO))
       } else {
-        Configured.ok(Context(this, logger, compiler))
+        val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
+        onLoad(logger)
+        if (logger.hasErrors) {
+          Configured.error("Failed to load modifiers")
+        } else {
+          Configured.ok(Context(this, logger, compiler))
+        }
       }
     } else {
       ConfError.fileDoesNotExist(in.toNIO).notOk
