@@ -206,4 +206,30 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "value-class",
+    """
+      |```scala mdoc
+      |final case class FloatValue(val value: Float) extends AnyVal
+      |```
+      |
+      |```scala mdoc:fail
+      |"abc": Int
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |final case class FloatValue(val value: Float) extends AnyVal
+       |```
+       |
+       |```scala
+       |"abc": Int
+       |// error: type mismatch;
+       |//  found   : String("abc")
+       |//  required: Int
+       |// "abc": Int
+       |// ^^^^^
+       |```
+    """.stripMargin
+  )
 }
