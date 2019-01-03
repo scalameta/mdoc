@@ -67,7 +67,7 @@ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "@VERSION@" )
 lazy val myproject = project  // your existing library
   .settings(...)
 lazy val docs = project       // new documentation project
-  .in(file("myproject-docs")) // important: must not be docs/
+  .in(file("myproject-docs")) // important: it must not be docs/
   .dependsOn(myproject)
   .enablePlugins(MdocPlugin)
 ```
