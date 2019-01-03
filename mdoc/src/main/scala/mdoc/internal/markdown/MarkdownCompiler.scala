@@ -161,7 +161,7 @@ class MarkdownCompiler(
     sreporter.reset()
     val run = new global.Run
     run.compileSources(List(toSource(input)))
-    report(vreporter, edit)
+    report(vreporter, input, edit)
   }
 
   def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
@@ -200,7 +200,7 @@ class MarkdownCompiler(
 
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
-  private def report(vreporter: Reporter, edit: TokenEditDistance): Unit = {
+  private def report(vreporter: Reporter, input: Input, edit: TokenEditDistance): Unit = {
     sreporter.infos.foreach {
       case sreporter.Info(pos, msgOrNull, severity) =>
         val msg = nullableMessage(msgOrNull)
@@ -210,7 +210,7 @@ class MarkdownCompiler(
             val line = pos.lineContent
             if (line.nonEmpty) {
               new CodeBuilder()
-                .println(s"<mdoc>:${pos.line} $msg")
+                .println(s"${input.syntax}:${pos.line} (mdoc generated code) $msg")
                 .println(pos.lineContent)
                 .println(pos.lineCaret)
                 .toString
