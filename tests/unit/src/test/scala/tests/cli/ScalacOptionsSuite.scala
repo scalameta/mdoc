@@ -68,4 +68,34 @@ class ScalacOptionsSuite extends BaseCliSuite {
     expected = finalInput.replaceFirst("scala mdoc", "scala")
   )
 
+  checkCli(
+    "-Ydiscard-value-discard",
+    """
+      |/index.md
+      |```scala mdoc
+      |println("1")
+      |```
+      |```scala mdoc:reset
+      |println("2")
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |println("1")
+       |// 1
+       |```
+       |
+       |```scala
+       |println("2")
+       |// 2
+       |```
+    """.stripMargin,
+    extraArgs = Array(
+      "--scalac-options",
+      "-Ywarn-value-discard"
+    ),
+    onStdout = { out =>
+      assert(!out.contains("discarded non-Unit value"))
+    }
+  )
 }
