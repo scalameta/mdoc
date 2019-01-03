@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 class CodeBuilder() {
   private val out = new ByteArrayOutputStream()
   private val ps = new PrintStream(out)
-  def printIf(cond: Boolean, s: String): CodeBuilder = {
+  def printIf(cond: Boolean, s: => String): CodeBuilder = {
     if (cond) print(s)
     else this
   }
@@ -15,16 +15,22 @@ class CodeBuilder() {
     ps.print(s)
     this
   }
-  def printlnIf(cond: Boolean, s: String): CodeBuilder = {
+  def printlnIf(cond: Boolean, s: => String): CodeBuilder = {
     if (cond) println(s)
     else this
+  }
+  def lines(xs: Iterable[String]): CodeBuilder = {
+    xs.iterator.filterNot(_.isEmpty).foreach(println)
+    this
   }
   def foreach[T](xs: Iterable[T])(fn: T => Unit): CodeBuilder = {
     xs.foreach(fn)
     this
   }
   def println(s: String): CodeBuilder = {
-    ps.println(s)
+    if (s.nonEmpty) {
+      ps.println(s)
+    }
     this
   }
 

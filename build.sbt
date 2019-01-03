@@ -84,15 +84,21 @@ lazy val testsInput = project
     skip in publish := true
   )
 
-val jsapp = project
-  .in(file("tests/jsapp"))
+val jsdocs = project
+  .in(file("tests/jsdocs"))
   .settings(
     skip in publish := true,
+    scalaJSModuleKind := ModuleKind.CommonJSModule,
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
-    )
+    ),
+    scalaJSUseMainModuleInitializer := true,
+    npmDependencies in Compile ++= List(
+      "ms" -> "2.1.1"
+    ),
+    webpackBundlingMode := BundlingMode.LibraryOnly()
   )
-  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
 lazy val unit = project
   .in(file("tests/unit"))
@@ -117,7 +123,7 @@ lazy val unit = project
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     ),
-    mdocJS := Some(jsapp)
+    mdocJS := Some(jsdocs)
   )
   .dependsOn(mdoc, js, testsInput)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
@@ -193,7 +199,8 @@ lazy val docs = project
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
     MdocPlugin.autoImport.mdoc := run.in(Compile).evaluated,
-    mdocJS := Some(jsapp),
+    mdocJS := Some(jsdocs),
+    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value,
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")

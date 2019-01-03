@@ -1,19 +1,9 @@
 package mdoc
 
+import java.io.File
 import sbt.Keys._
 import sbt._
 import scala.collection.mutable.ListBuffer
-
-object Main {
-  import MdocPlugin.autoImport._
-  def main(args: Array[String]): Unit = {
-    println(mdocIn)
-    println(mdocIn.key)
-    println(mdocIn.key.description)
-    println(mdocIn.key.manifest)
-    println(mdocIn.key.manifest.runtimeClass.getName)
-  }
-}
 
 object MdocPlugin extends AutoPlugin {
   object autoImport {
@@ -46,6 +36,11 @@ object MdocPlugin extends AutoPlugin {
         "Optional Scala.js classpath and compiler options to use for the mdoc:js modifier. " +
           "To use this setting, set the value to `mdocJS := Some(jsproject)` where `jsproject` must be a Scala.js project."
       )
+    val mdocJSLibraries =
+      taskKey[Seq[Attributed[File]]](
+        "Additional local JavaScript files to load before loading the mdoc compiled Scala.js bundle. " +
+          "If using scalajs-bundler, set this key to `webpack.in(<mdocJS project>, Compile, fullOptJS).value`."
+      )
     val mdocAutoDependency =
       settingKey[Boolean](
         "If false, do not add mdoc as a library dependency this project. " +
@@ -77,6 +72,7 @@ object MdocPlugin extends AutoPlugin {
       mdocVariables := Map.empty,
       mdocExtraArguments := Nil,
       mdocJS := None,
+      mdocJSLibraries := Nil,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
       mdoc := Def.inputTaskDyn {
@@ -113,14 +109,21 @@ object MdocPlugin extends AutoPlugin {
         }
         mdocJSCompileOptions.value.foreach { options =>
           props.put(
-            s"js-scalacOptions",
+            s"js-scalac-options",
             options.options.mkString(" ")
           )
           props.put(
             s"js-classpath",
-            options.classpath.mkString(java.io.File.pathSeparator)
+            options.classpath.mkString(File.pathSeparator)
           )
+          options.moduleKind.foreach { moduleKind =>
+            props.put(s"js-module-kind", moduleKind)
+          }
         }
+        props.put(
+          s"js-libraries",
+          mdocJSLibraries.value.map(_.data).mkString(File.pathSeparator)
+        )
         props.put("in", mdocIn.value.toString)
         props.put("out", mdocOut.value.toString)
         props.put(
@@ -141,7 +144,7 @@ object MdocPlugin extends AutoPlugin {
       }
     )
 
-  private val mdocJSCompileOptions: Def.Initialize[Task[Option[CompileOptions]]] =
+  private lazy val mdocJSCompileOptions: Def.Initialize[Task[Option[CompileOptions]]] =
     Def.taskDyn[Option[CompileOptions]] {
       mdocJS.value match {
         case Some(p) =>
@@ -150,12 +153,43 @@ object MdocPlugin extends AutoPlugin {
           Def.task(None)
       }
     }
-  private case class CompileOptions(options: Seq[String], classpath: Seq[File])
+  private case class CompileOptions(
+      options: Seq[String],
+      classpath: Seq[File],
+      moduleKind: Option[String]
+  )
+  private lazy val anyWriter = implicitly[sbt.util.OptJsonWriter[AnyRef]]
+  // Loads a setting by fully qualified classname so that we don't have to depend on that sbt plugin directly.
+  // Adapted from sbt-bloop sources: https://github.com/scalacenter/bloop/blob/ec217891ebd5190a0a66d6faf5bd000a6d951f3c/integrations/sbt-bloop/src/main/scala/bloop/integrations/sbt/SbtBloop.scala
+  private def classloadedSetting(
+      ref: Project,
+      fullyQualifiedClassName: String,
+      attributeName: String
+  ): Def.Initialize[Option[AnyRef]] = Def.settingDyn {
+    def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
+      val cls = Class.forName(fullyQualifiedClassName)
+      val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
+      SettingKey(attributeName)(stageManifest, anyWriter).in(ref).?
+    }
+    try {
+      val stageSetting = proxyForSetting()
+      Def.setting {
+        stageSetting.value
+      }
+    } catch {
+      case _: ClassNotFoundException => Def.setting(None)
+    }
+  }
   private def mdocCompileOptions(ref: Project): Def.Initialize[Task[CompileOptions]] =
     Def.task {
       CompileOptions(
         scalacOptions.in(ref, Compile).value,
-        fullClasspath.in(ref, Compile).value.map(_.data)
+        fullClasspath.in(ref, Compile).value.map(_.data),
+        classloadedSetting(
+          ref,
+          "org.scalajs.core.tools.linker.backend.ModuleKind",
+          "scalaJSModuleKind"
+        ).value.map(_.toString)
       )
     }
 

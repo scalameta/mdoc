@@ -1,11 +1,11 @@
 ---
 id: modifiers
-title: Modifiers
+title: JVM Modifiers
+sidebar_label: JVM
 ---
 
-Code fences with `scala mdoc` can have different "modifiers", which control how
-the code should be evaluated or rendered. A code fence can only have one
-modifier.
+Code fences with the `scala mdoc` modifier are compiled and evaluated on the JVM
+at markdown generation time.
 
 ## Default
 

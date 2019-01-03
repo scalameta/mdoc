@@ -16,12 +16,22 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
 import tests.markdown.StringSyntax._
+import mdoc.internal.pos.PositionSyntax._
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
-  private val tmp = AbsolutePath(Files.createTempDirectory("mdoc"))
+  def createTempDirectory(): AbsolutePath = {
+    val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
+    dir.toFile.deleteOnExit()
+    dir
+  }
+  def createTempFile(filename: String): AbsolutePath = {
+    val file = createTempDirectory().resolve(filename)
+    file.write("")
+    file
+  }
   protected def baseSettings: Settings =
     Settings
-      .default(tmp)
+      .default(createTempDirectory())
       .copy(
         site = Map(
           "version" -> "1.0"
