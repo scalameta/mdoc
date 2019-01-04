@@ -1,7 +1,8 @@
 package mdoc.internal.markdown
 
 import com.vladsch.flexmark.Extension
-import com.vladsch.flexmark.ast
+import com.vladsch.flexmark.ast.Text
+import com.vladsch.flexmark.util.ast
 import com.vladsch.flexmark.parser.LinkRefProcessor
 import com.vladsch.flexmark.parser.LinkRefProcessorFactory
 import com.vladsch.flexmark.parser.Parser
@@ -29,7 +30,7 @@ class MdocParserExtension(context: Context) extends Parser.ParserExtension {
       nodeChars.toString match {
         case VariableInjectionPattern(key) =>
           val value = site.getOrElse(key, sys.error(s"Missing '$key' site variable."))
-          new ast.Text(PrefixedSubSequence.of(value, nodeChars).removeSuffix(nodeChars))
+          new Text(PrefixedSubSequence.of(value, nodeChars).removeSuffix(nodeChars))
         case _ =>
           sys.error("Flexmark matched a variable injection which is not of the expected shape.")
       }
