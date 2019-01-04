@@ -1,10 +1,10 @@
 package mdoc.internal.markdown
 
-import com.vladsch.flexmark.ast.Document
-import com.vladsch.flexmark.ast.Node
-import com.vladsch.flexmark.ast.NodeVisitor
-import com.vladsch.flexmark.ast.VisitHandler
-import com.vladsch.flexmark.formatter.internal.Formatter
+import com.vladsch.flexmark.formatter.Formatter
+import com.vladsch.flexmark.util.ast.Document
+import com.vladsch.flexmark.util.ast.Node
+import com.vladsch.flexmark.util.ast.NodeVisitor
+import com.vladsch.flexmark.util.ast.VisitHandler
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.DataKey

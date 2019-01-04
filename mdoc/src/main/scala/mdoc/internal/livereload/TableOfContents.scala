@@ -1,7 +1,7 @@
 package mdoc.internal.livereload
 
-import com.vladsch.flexmark.ast.Document
 import com.vladsch.flexmark.ast.Heading
+import com.vladsch.flexmark.util.ast.Document
 import mdoc.internal.markdown.Markdown
 import scala.collection.mutable.ListBuffer
 
