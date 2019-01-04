@@ -4,20 +4,64 @@ title: Scala.js Modifiers
 sidebar_label: Scala.js
 ---
 
-Code fences with the `scala mdoc:js` modifier are compiled with Scala.js and
-evaluate on every browser page load providing interactive documentation.
+Code fences with the `scala mdoc:js` modifier are compiled with Scala.js and run
+in the browser.
 
+```scala mdoc:js:shared:invisible
+import org.scalajs.dom.window._
+import jsdocs._
+```
+
+````md
 ```scala mdoc:js
-Loading...
----
-val tick = { () =>
-  val date = new scala.scalajs.js.Date()
-  val time = s"${date.getHours}h${date.getMinutes}m${date.getSeconds}s"
+val progress = new Progress()
+setInterval({ () =>
   // `node` variable is a DOM element in scope.
-  node.innerHTML = s"Current time is $time"
-}
-tick()
-org.scalajs.dom.window.setInterval(tick, 1000)
+  node.innerHTML = progress.tick(5)
+}, 100)
+```
+````
+
+```scala mdoc:js:invisible
+Loading progress bar...
+---
+val progress = new Progress()
+setInterval({ () =>
+  // `node` variable is a DOM element in scope.
+  node.innerHTML = progress.tick(5)
+}, 100)
+```
+
+<p></p>
+
+A good use-case for `mdoc:js` code fences is interactive documentation. For
+example, here below is a counter implemented with
+[monadic-html](https://github.com/OlivierBlanvillain/monadic-html).
+
+````md
+```scala mdoc:js
+import mhtml._
+val counter = Var(0)
+val component =
+  <div>
+    <button onclick={() => counter.update(_ - 1)}>-</button>
+    {counter}
+    <button onclick={() => counter.update(_ + 1)}>+</button>
+  </div>
+mount(node, component)
+```
+````
+
+```scala mdoc:js:invisible
+import mhtml._
+val counter = Var(0)
+val component =
+  <div>
+    <button onclick={() => counter.update(_ - 1)}>-</button>
+    {counter}
+    <button onclick={() => counter.update(_ + 1)}>+</button>
+  </div>
+mount(node, component)
 ```
 
 ## Installation
