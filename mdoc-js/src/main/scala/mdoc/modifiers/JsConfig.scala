@@ -17,15 +17,10 @@ case class JsConfig(
     minLevel: Level = Level.Info,
     outDirectory: AbsolutePath = PathIO.workingDirectory,
     fullOpt: Boolean = true,
-    htmlPrefix: String = ""
+    htmlPrefix: String = "",
+    relativeLinkPrefix: String = ""
 ) {
   def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
-  private def libraryKind(path: AbsolutePath): Int = {
-    val filename = path.filename
-    if (filename.endsWith("-library.js")) 1
-    else if (filename.endsWith("-loader.js")) 2
-    else -1
-  }
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
@@ -39,7 +34,7 @@ case class JsConfig(
       val out = outjsfile.resolveSibling(_ => filename)
       if (filename.endsWith(".js")) {
         lib.copyTo(out)
-        val src = out.toRelativeLinkFrom(ctx.outputFile)
+        val src = out.toRelativeLinkFrom(ctx.outputFile, relativeLinkPrefix)
         List(s"""<script type="text/javascript" src="$src" defer></script>""")
       } else if (filename.endsWith(".js.map")) {
         lib.copyTo(out)
@@ -99,7 +94,8 @@ object JsConfig {
               ctx.reporter.error(s"unknown 'js-opt': $unknown")
               !ctx.settings.watch
           }
-      }
+      },
+      relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix)
     )
   }
 }

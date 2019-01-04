@@ -90,6 +90,7 @@ val jsdocs = project
     skip in publish := true,
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     libraryDependencies ++= List(
+      "in.nvilla" %%% "monadic-html" % "0.4.0-RC1",
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     scalaJSUseMainModuleInitializer := true,

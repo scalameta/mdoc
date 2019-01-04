@@ -188,8 +188,8 @@ object PositionSyntax {
         text.getBytes(StandardCharsets.UTF_8)
       )
     }
-    def toRelativeLinkFrom(other: AbsolutePath): String = {
-      path.toRelative(other.parent).toURI(false).toString
+    def toRelativeLinkFrom(other: AbsolutePath, prefix: String): String = {
+      prefix + path.toRelative(other.parent).toURI(false).toString
     }
     def parent: AbsolutePath = AbsolutePath(path.toNIO.getParent)
   }
