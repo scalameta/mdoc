@@ -3,11 +3,11 @@ package mdoc.docs
 import java.nio.charset.StandardCharsets
 import mdoc.Reporter
 import mdoc.StringModifier
+import mdoc.internal.pos.PositionSyntax._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
-import mdoc.internal.pos.PositionSyntax._
 
 class FileModifier extends StringModifier {
   val name = "file"
@@ -18,10 +18,15 @@ class FileModifier extends StringModifier {
   ): String = {
     val file = AbsolutePath(info)
     if (file.isFile) {
-      val text = FileIO.slurp(file, StandardCharsets.UTF_8)
+      val text = FileIO.slurp(file, StandardCharsets.UTF_8).trim
+      val language = file.extension match {
+        case "scala" => "scala"
+        case "md" => "md"
+        case _ => "text"
+      }
       s"""
 File: [${file.toNIO.getFileName}](https://github.com/scalameta/mdoc/blob/master/$info)
-`````scala
+`````$language
 $text
 `````
 """

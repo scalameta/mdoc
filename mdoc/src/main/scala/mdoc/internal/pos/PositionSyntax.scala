@@ -3,6 +3,7 @@ package mdoc.internal.pos
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import scala.meta.Input
 import scala.meta.Position
 import scala.meta.io.AbsolutePath
@@ -10,6 +11,7 @@ import scala.meta.io.RelativePath
 import mdoc.document.RangePosition
 import mdoc.internal.cli.Settings
 import mdoc.internal.markdown.EvaluatedSection
+import scala.meta.internal.io.PathIO
 import scala.util.control.NonFatal
 
 object PositionSyntax {
@@ -173,6 +175,12 @@ object PositionSyntax {
     }
   }
   implicit class XtensionAbsolutePathLink(path: AbsolutePath) {
+    def filename: String = path.toNIO.getFileName.toString
+    def extension: String = PathIO.extension(path.toNIO)
+    def copyTo(out: AbsolutePath): Unit = {
+      Files.createDirectories(path.toNIO.getParent)
+      Files.copy(path.toNIO, out.toNIO, StandardCopyOption.REPLACE_EXISTING)
+    }
     def write(text: String): Unit = {
       Files.createDirectories(path.toNIO.getParent)
       Files.write(

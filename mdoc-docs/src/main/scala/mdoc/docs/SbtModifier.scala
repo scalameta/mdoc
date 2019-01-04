@@ -16,6 +16,7 @@ class SbtModifier extends StringModifier {
       mdocVariables,
       mdocExtraArguments,
       mdocJS,
+      mdocJSLibraries,
       mdocAutoDependency
     )
     val rows = keys.map { s =>

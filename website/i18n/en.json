@@ -15,13 +15,12 @@
         "title": "Installation"
       },
       "js": {
-        "title": "Scala.js"
+        "title": "Scala.js Modifiers",
+        "sidebar_label": "Scala.js"
       },
       "modifiers": {
-        "title": "Modifiers"
-      },
-      "readme": {
-        "title": "readme"
+        "title": "JVM Modifiers",
+        "sidebar_label": "JVM"
       },
       "tut": {
         "title": "Coming from tut"
@@ -36,7 +35,9 @@
       "GitHub": "GitHub"
     },
     "categories": {
-      "Overview": "Overview"
+      "Overview": "Overview",
+      "Modifiers": "Modifiers",
+      "Site generators": "Site generators"
     }
   },
   "pages-strings": {

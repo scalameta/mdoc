@@ -23,28 +23,24 @@ import org.scalajs.core.tools.sem.Semantics
 import scala.collection.mutable.ListBuffer
 import scala.meta.Term
 import scala.meta.inputs.Input
-import scala.meta.internal.io.PathIO
-import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
 import scala.reflect.io.VirtualDirectory
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
+  override def toString: String = s"JsModifier($config)"
   val irCache = new IRFileCache
   val target = new VirtualDirectory("(memory)", None)
-  var mountNode = "node"
   var maybeCompiler: Option[MarkdownCompiler] = None
+  var config = JsConfig()
   var linker: Linker = newLinker()
   var virtualIrFiles: Seq[VirtualRelativeIRFile] = Nil
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
-  var outDirectory: AbsolutePath = PathIO.workingDirectory
-  var fullOpt = false
-  var minLevel: Level = Level.Info
   val sjsLogger: Logger = new Logger {
     override def log(level: Level, message: => String): Unit = {
-      if (level >= minLevel) {
+      if (level >= config.minLevel) {
         if (level == Level.Warn) reporter.info(message)
         else if (level == Level.Error) reporter.info(message)
         else reporter.info(message)
@@ -69,38 +65,29 @@ class JsModifier extends mdoc.PreModifier {
 
   def newLinker(): Linker = {
     val semantics =
-      if (fullOpt) Semantics.Defaults.optimized
+      if (config.fullOpt) Semantics.Defaults.optimized
       else Semantics.Defaults
     StandardLinker(
       StandardLinker
         .Config()
         .withSemantics(semantics)
         .withSourceMap(false)
-        .withClosureCompilerIfAvailable(fullOpt)
+        .withClosureCompilerIfAvailable(config.fullOpt)
+        .withModuleKind(config.moduleKind)
     )
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
-    (ctx.site.get("js-classpath"), ctx.site.get("js-scalacOptions")) match {
+    (ctx.site.get("js-classpath"), ctx.site.get("js-scalac-options")) match {
       case (None, None) => // nothing to do
       case (Some(_), None) =>
-        ctx.reporter.error("missing key: 'js-scalacOptions'")
+        ctx.reporter.error("missing key: 'js-scalac-options'")
       case (None, Some(_)) =>
         ctx.reporter.error("missing key: 'js-classpath'")
       case (Some(classpath), Some(scalacOptions)) =>
-        fullOpt = ctx.site.get("js-opt") match {
-          case None =>
-            !ctx.settings.watch
-          case Some(value) =>
-            value match {
-              case "fast" => false
-              case "full" => true
-              case unknown =>
-                ctx.reporter.error(s"unknown 'js-opt': $unknown")
-                !ctx.settings.watch
-            }
-        }
-        val newClasspathHash = (classpath, scalacOptions, fullOpt).hashCode()
+        config = JsConfig.fromVariables(ctx)
+        reporter = ctx.reporter
+        val newClasspathHash = (classpath, scalacOptions, config.fullOpt).hashCode()
         // Reuse the  linker and compiler when the classpath+scalacOptions haven't changed
         // to speed up unit tests by nearly 2x.
         if (classpathHash != newClasspathHash) {
@@ -113,26 +100,6 @@ class JsModifier extends mdoc.PreModifier {
             val cache = irCache.newCache
             cache.cached(irContainer)
           }
-        }
-        mountNode = ctx.site.getOrElse("js-mountNode", mountNode)
-        outDirectory = ctx.site.get("js-out-prefix") match {
-          case Some(value) =>
-            // This is needed for Docusaurus that requires assets (non markdown) files to live under
-            // `docs/assets/`: https://docusaurus.io/docs/en/doc-markdown#linking-to-images-and-other-assets
-            ctx.settings.out.resolve(value)
-          case None =>
-            ctx.settings.out
-        }
-        reporter = ctx.reporter
-        minLevel = ctx.site.get("js-level") match {
-          case None => Level.Info
-          case Some("info") => Level.Info
-          case Some("warn") => Level.Warn
-          case Some("error") => Level.Error
-          case Some("debug") => Level.Debug
-          case Some(unknown) =>
-            reporter.warning(s"unknown 'js-level': $unknown")
-            Level.Info
         }
     }
   }
@@ -147,7 +114,7 @@ class JsModifier extends mdoc.PreModifier {
           ctx.reporter.error(
             inputs.head.toPosition,
             "Can't process `mdoc:js` code fence because Scala.js is not configured. " +
-              "To fix this problem, set the site variables `js-classpath` and `js-scalacOptions`. " +
+              "To fix this problem, set the site variables `js-classpath` and `js-scalac-options`. " +
               "If you are using sbt-mdoc, update the `mdocJS` setting to point to a Scala.js project."
           )
           ""
@@ -186,13 +153,15 @@ class JsModifier extends mdoc.PreModifier {
     } else {
       val output = WritableMemVirtualJSFile("output.js")
       linker.link(virtualIrFiles ++ sjsir, Nil, output, sjsLogger)
-      val outfile = outDirectory.resolve(ctx.relativePath.resolveSibling(_ + ".js"))
-      outfile.write(output.content)
-      val outmdoc = outfile.resolveSibling(_ => "mdoc.js")
+      val outjsfile = config.outDirectory.resolve(ctx.relativePath.resolveSibling(_ + ".js"))
+      outjsfile.write(output.content)
+      val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
       outmdoc.write(Resources.readPath("/mdoc.js"))
-      val relfile = outfile.toRelativeLinkFrom(ctx.outputFile)
+      val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile)
       val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile)
       new CodeBuilder()
+        .println(config.htmlHeader)
+        .lines(config.libraryScripts(outjsfile, ctx))
         .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
         .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
         .toString
@@ -229,7 +198,7 @@ class JsModifier extends mdoc.PreModifier {
     val run = gensym.fresh("run")
     inputs += input
     val id = s"mdoc-js-$run"
-    val mountNodeParam = Term.Name(mountNode)
+    val mountNodeParam = Term.Name(config.mountNode)
     val code: String =
       if (mods.isShared) {
         input.text

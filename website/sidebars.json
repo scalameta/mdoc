@@ -1,5 +1,7 @@
 {
   "docs": {
-    "Overview": ["installation", "modifiers", "why", "tut", "docusaurus", "js"]
+    "Overview": ["installation", "why", "tut"],
+    "Modifiers": ["modifiers", "js"],
+    "Site generators": ["docusaurus"]
   }
 }

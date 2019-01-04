@@ -1,6 +1,5 @@
 package tests.markdown
 
-import java.nio.file.Paths
 import mdoc.internal.cli.Settings
 import scala.meta.io.Classpath
 import tests.markdown.StringSyntax._
@@ -205,7 +204,7 @@ class JsSuite extends BaseMarkdownSuite {
     "deps",
     """
       |```scala mdoc:js
-      |println(jsapp.ExampleJS.greeting)
+      |println(jsdocs.ExampleJS.greeting)
       |```
     """.stripMargin
   )
@@ -214,7 +213,7 @@ class JsSuite extends BaseMarkdownSuite {
     "no-dom",
     """
       |```scala mdoc:js
-      |println(jsapp.ExampleJS.greeting)
+      |println(jsdocs.ExampleJS.greeting)
       |```
     """.stripMargin,
     """|error: no-dom.md:3 (mdoc generated code) object scalajs is not a member of package org
@@ -222,10 +221,11 @@ class JsSuite extends BaseMarkdownSuite {
        |                          ^
     """.stripMargin,
     settings = {
-      val base = super.baseSettings
-      val noScalajsDom = Classpath(base.site("js-classpath")).entries
+      val noScalajsDom = Classpath(baseSettings.site("js-classpath")).entries
         .filterNot(_.toNIO.getFileName.toString.contains("scalajs-dom"))
-      base.copy(site = base.site.updated("js-classpath", Classpath(noScalajsDom).syntax))
+      baseSettings.copy(
+        site = baseSettings.site.updated("js-classpath", Classpath(noScalajsDom).syntax)
+      )
     }
   )
 
@@ -240,5 +240,66 @@ class JsSuite extends BaseMarkdownSuite {
        |```scala mdoc:js:shared:not
        |                        ^^^
     """.stripMargin
+  )
+
+  check(
+    "commonjs",
+    """
+      |```scala mdoc:js
+      |println("Hello!")
+      |```
+    """.stripMargin,
+    """|```scala
+       |println("Hello!")
+       |```
+       |
+       |<div id="mdoc-js-run0" data-mdoc-js></div>
+       |
+       |<script type="text/javascript" src="mdoc-library.js" defer></script>
+       |
+       |<script type="text/javascript" src="mdoc-loader.js" defer></script>
+       |
+       |<script type="text/javascript" src="commonjs.md.js" defer></script>
+       |
+       |<script type="text/javascript" src="mdoc.js" defer></script>
+       |""".stripMargin,
+    settings = {
+      val libraries = List(
+        createTempFile("mdoc-loader.js"),
+        createTempFile("mdoc-ignoreme.md"),
+        createTempFile("mdoc-library.js"),
+        createTempFile("mdoc-library.js.map")
+      )
+      baseSettings.copy(
+        site = baseSettings.site
+          .updated("js-module-kind", "CommonJSModule")
+          .updated("js-libraries", Classpath(libraries).syntax)
+      )
+    }
+  )
+
+  def unpkgReact =
+    """<script crossorigin src="https://unpkg.com/react@16.5.1/umd/react.production.min.js"></script>"""
+  check(
+    "html-header",
+    """
+      |```scala mdoc:js:invisible
+      |println("Hello!")
+      |```
+    """.stripMargin,
+    s"""|
+        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |
+        |$unpkgReact
+        |
+        |<script type="text/javascript" src="html-header.md.js" defer></script>
+        |
+        |<script type="text/javascript" src="mdoc.js" defer></script>
+        |""".stripMargin,
+    settings = {
+      baseSettings.copy(
+        site = baseSettings.site.updated("js-html-header", unpkgReact)
+      )
+    }
   )
 }
