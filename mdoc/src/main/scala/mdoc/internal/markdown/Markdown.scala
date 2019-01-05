@@ -1,5 +1,6 @@
 package mdoc.internal.markdown
 
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterBlock
 import com.vladsch.flexmark.formatter.Formatter
 import com.vladsch.flexmark.util.ast.Document
 import com.vladsch.flexmark.util.ast.Node
@@ -105,14 +106,24 @@ object Markdown {
       settings: Settings
   ): String = {
     val formatter = Formatter.builder(markdownSettings).build
-    formatter.render(
-      toDocument(
-        input,
-        markdownSettings,
-        reporter,
-        settings
-      )
+    val document = toDocument(
+      input,
+      markdownSettings,
+      reporter,
+      settings
     )
+    val appendable = new java.lang.StringBuilder()
+    document.getChildren.asScala.headOption match {
+      case Some(f: YamlFrontMatterBlock) =>
+        // Workaround for https://github.com/vsch/flexmark-java/issues/293
+        appendable
+          .append(f.getChars)
+          .append("\n\n")
+        f.unlink()
+      case _ =>
+    }
+    formatter.render(document, appendable)
+    appendable.toString
   }
 
   def traverse[T <: Node](

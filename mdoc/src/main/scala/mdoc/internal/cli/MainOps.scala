@@ -1,5 +1,6 @@
 package mdoc.internal.cli
 
+import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.MutableDataSet
 import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
