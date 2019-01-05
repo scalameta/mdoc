@@ -5,6 +5,9 @@
     "previous": "Previous",
     "tagline": "Typechecked markdown documentation for Scala",
     "docs": {
+      "changelog": {
+        "title": "Changelog"
+      },
       "demo": {
         "title": "Summing numbers"
       },

@@ -1,6 +1,6 @@
 {
   "docs": {
-    "Overview": ["installation", "why", "tut"],
+    "Overview": ["installation", "why", "tut", "changelog"],
     "Modifiers": ["modifiers", "js"],
     "Site generators": ["docusaurus"]
   }
