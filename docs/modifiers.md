@@ -126,6 +126,44 @@ println(x)
 ```
 ````
 
+## Reset class
+
+The `:reset-class` modifier is like `:reset` except that it wraps the following
+statements in a class instead of an object. By default, statements are wrapped
+in an object but that encoding can cause problems such as deadlocks during
+initialization of multi-threaded code. See
+[this StackOverflow answer](https://stackoverflow.com/questions/15176199/scala-parallel-collection-in-object-initializer-causes-a-program-to-hang)
+for a more detailed explanation.
+
+For example, the following program crashes by default with a timeout exception.
+
+````scala mdoc:mdoc:crash
+```scala mdoc
+import scala.concurrent._, duration._, mdoc.docs.executor
+val x = 1
+Await.result(Future(x), Duration("10ms"))
+```
+````
+
+Use `:reset-class` to avoid the timeout exception.
+
+````scala mdoc:mdoc
+```scala mdoc:reset-class
+import scala.concurrent._, duration._, mdoc.docs.executor
+val x = 1
+Await.result(Future(x), Duration("10ms"))
+```
+````
+
+Note that `:reset-class` does not support the some language constructs
+including:
+
+- value classes: classes that extend `AnyVal` must be toplevel or enclosed in
+  objects
+- final classes: pattern matching against final inner classes causes "The outer
+  reference in this type test cannot be checked at run time." warnings under
+  `-Xfatal-warnings`.
+
 ## PostModifier
 
 A `PostModifier` is a custom modifier that post-processes a compiled and

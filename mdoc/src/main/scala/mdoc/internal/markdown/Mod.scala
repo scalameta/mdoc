@@ -8,11 +8,15 @@ object Mod {
   case object Passthrough extends Mod
   case object Invisible extends Mod
   case object Reset extends Mod
+  case object ResetClass extends Mod {
+    override def toString: String = "reset-class"
+  }
 
   def all: List[Mod] = List(
     Passthrough,
     Invisible,
     Reset,
+    ResetClass,
     Fail,
     Crash,
     Silent

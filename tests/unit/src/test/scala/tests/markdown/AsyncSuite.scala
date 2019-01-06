@@ -41,4 +41,23 @@ class AsyncSuite extends BaseMarkdownSuite {
        |	... 1 more
     """.stripMargin
   )
+
+  check(
+    "reset-class",
+    """
+      |```scala mdoc:reset-class
+      |import scala.concurrent._, duration._, ExecutionContext.Implicits.global
+      |val x = 1
+      |Await.result(Future(x), Duration("100ms"))
+      |```
+    """.stripMargin,
+    """|```scala
+       |import scala.concurrent._, duration._, ExecutionContext.Implicits.global
+       |val x = 1
+       |// x: Int = 1
+       |Await.result(Future(x), Duration("100ms"))
+       |// res1: Int = 1
+       |```
+    """.stripMargin
+  )
 }

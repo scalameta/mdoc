@@ -24,7 +24,8 @@ sealed abstract class Modifier(mods: Set[Mod]) {
   def isCrash: Boolean = mods(Crash)
   def isSilent: Boolean = mods(Silent)
   def isInvisible: Boolean = mods(Invisible)
-  def isReset: Boolean = mods(Reset)
+  def isReset: Boolean = mods(Reset) || isResetClass
+  def isResetClass: Boolean = mods(ResetClass)
 }
 object Modifier {
   object Default {
