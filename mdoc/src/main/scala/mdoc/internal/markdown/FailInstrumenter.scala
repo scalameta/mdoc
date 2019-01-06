@@ -20,8 +20,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
         if (j > i) ()
         else {
           if (section.mod.isReset) {
-            val nextApp = gensym.fresh("App")
-            sb.print(s"$nextApp\n}\nobject $nextApp {\n")
+            sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
           }
           if (j == i || !section.mod.isFail) {
             sb.println(section.input.text)

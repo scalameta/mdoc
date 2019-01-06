@@ -19,8 +19,7 @@ class Instrumenter(sections: List[SectionInput]) {
     sections.zipWithIndex.foreach {
       case (section, i) =>
         if (section.mod.isReset) {
-          val nextApp = gensym.fresh("App")
-          sb.print(s"$nextApp\n}\nobject $nextApp {\n")
+          sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
         }
         sb.println("\n$doc.startSection();")
         if (section.mod.isFail) {
@@ -78,6 +77,15 @@ class Instrumenter(sections: List[SectionInput]) {
   }
 }
 object Instrumenter {
+  def reset(mod: Modifier, identifier: String): String = {
+    val ctor =
+      if (mod.isResetClass) s"new $identifier()"
+      else identifier
+    val keyword =
+      if (mod.isResetClass) "class"
+      else "object"
+    s"$ctor\n}\n$keyword $identifier {\n"
+  }
   def instrument(sections: List[SectionInput]): String = {
     val body = new Instrumenter(sections).instrument()
     wrapBody(body)
