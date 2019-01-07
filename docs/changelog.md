@@ -3,6 +3,14 @@ id: changelog
 title: Changelog
 ---
 
+## [v1.2.7](https://github.com/scalameta/mdoc/tree/v1.2.7) (2019-01-06)
+
+[Full Changelog](https://github.com/scalameta/mdoc/compare/v1.2.6...v1.2.7)
+
+**Merged pull requests:**
+
+- Add `:reset-class` modifier to wrap code in classes instead of objects. [\#144](https://github.com/scalameta/mdoc/pull/144) ([olafurpg](https://github.com/olafurpg))
+
 ## [v1.2.6](https://github.com/scalameta/mdoc/tree/v1.2.6) (2019-01-05)
 
 [Full Changelog](https://github.com/scalameta/mdoc/compare/v1.2.5...v1.2.6)
