@@ -113,15 +113,6 @@ object Markdown {
       settings
     )
     val appendable = new java.lang.StringBuilder()
-    document.getChildren.asScala.headOption match {
-      case Some(f: YamlFrontMatterBlock) =>
-        // Workaround for https://github.com/vsch/flexmark-java/issues/293
-        appendable
-          .append(f.getChars)
-          .append("\n\n")
-        f.unlink()
-      case _ =>
-    }
     formatter.render(document, appendable)
     appendable.toString
   }
