@@ -4,7 +4,7 @@ class ToStringSuite extends BaseMarkdownSuite {
   check(
     "basic",
     """
-      |```scala mdoc:toString
+      |```scala mdoc:to-string
       |List("a")
       |```
       |```scala mdoc

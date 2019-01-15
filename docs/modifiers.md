@@ -164,13 +164,13 @@ including:
   reference in this type test cannot be checked at run time." warnings under
   `-Xfatal-warnings`.
 
-## `toString`
+## `to-string`
 
 The `toString` modifier changes the pretty-printer for runtime values to use
 `Object.toString` instead of [PPrint](http://www.lihaoyi.com/PPrint/).
 
 ````scala mdoc:mdoc
-```scala mdoc:toString
+```scala mdoc:to-string
 List("no quotes")
 ```
 ```scala mdoc

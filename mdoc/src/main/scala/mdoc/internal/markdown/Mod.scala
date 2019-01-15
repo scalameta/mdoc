@@ -12,7 +12,7 @@ object Mod {
     override def toString: String = "reset-class"
   }
   case object ToString extends Mod {
-    override def toString: String = "toString"
+    override def toString: String = "to-string"
   }
 
   def all: List[Mod] = List(
