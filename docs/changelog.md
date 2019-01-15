@@ -3,6 +3,15 @@ id: changelog
 title: Changelog
 ---
 
+## [v1.2.8](https://github.com/scalameta/mdoc/tree/v1.2.8) (2019-01-15)
+
+[Full Changelog](https://github.com/scalameta/mdoc/compare/v1.2.7...v1.2.8)
+
+**Merged pull requests:**
+
+- Add `toString` modifier to customize value pretty-printer. [\#148](https://github.com/scalameta/mdoc/pull/148) ([olafurpg](https://github.com/olafurpg))
+- Upgrade flexmark to fix frontmatter issue [\#146](https://github.com/scalameta/mdoc/pull/146) ([olafurpg](https://github.com/olafurpg))
+
 ## [v1.2.7](https://github.com/scalameta/mdoc/tree/v1.2.7) (2019-01-06)
 
 [Full Changelog](https://github.com/scalameta/mdoc/compare/v1.2.6...v1.2.7)
