@@ -1,5 +1,6 @@
 package mdoc
 
+import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.ReplVariablePrinter
 import scala.meta.inputs.Position
 
@@ -54,8 +55,10 @@ final class Variable private[mdoc] (
     val indexOfVariableInStatement: Int,
     val totalVariablesInStatement: Int,
     val indexOfStatementInCodeFence: Int,
-    val totalStatementsInCodeFence: Int
+    val totalStatementsInCodeFence: Int,
+    private[mdoc] val mods: Modifier
 ) {
+  def isToString: Boolean = mods.isToString
   def isUnit: Boolean = staticType.endsWith("Unit")
   override def toString: String = {
     ReplVariablePrinter(this)

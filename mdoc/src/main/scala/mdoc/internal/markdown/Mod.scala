@@ -11,6 +11,9 @@ object Mod {
   case object ResetClass extends Mod {
     override def toString: String = "reset-class"
   }
+  case object ToString extends Mod {
+    override def toString: String = "to-string"
+  }
 
   def all: List[Mod] = List(
     Passthrough,
@@ -19,7 +22,8 @@ object Mod {
     ResetClass,
     Fail,
     Crash,
-    Silent
+    Silent,
+    ToString
   )
   def unapply(string: String): Option[Mod] = {
     all.find(_.toString.equalsIgnoreCase(string))

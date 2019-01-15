@@ -19,7 +19,7 @@ x + y
 ```
 ````
 
-## Silent
+## `silent`
 
 The `silent` modifier is identical to the default modifier except that it hides
 the evaluated output. The input code fence renders unchanged.
@@ -35,7 +35,7 @@ x + y
 ```
 ````
 
-## Fail
+## `fail`
 
 The `fail` modifier asserts that the code block will not compile. The rendered
 output contains the type error message.
@@ -57,7 +57,7 @@ val x: String = ""
 > Note that `fail` does not assert that the program compiles but crashes at
 > runtime. To assert runtime exceptions, use the `crash` modifier.
 
-## Crash
+## `crash`
 
 The `crash` modifier asserts that the code block throws an exception at runtime
 
@@ -67,7 +67,7 @@ val y = ???
 ```
 ````
 
-## Passthrough
+## `passthrough`
 
 The `passthrough` modifier collects the stdout and stderr output from the
 program and embeds it verbatim in the markdown file.
@@ -92,7 +92,7 @@ $table
 ```
 ````
 
-## Invisible
+## `invisible`
 
 The `invisible` modifier evaluates the code but does not render anything. The
 `invisible` modifier is equivalent to `passthrough` when the expression does not
@@ -106,7 +106,7 @@ println("I am invisible")
 More prose.
 ````
 
-## Reset
+## `reset`
 
 The `reset` modifier starts a new scope where previous statements in the
 document are no longer available. This can be helpful to clear existing imports
@@ -126,7 +126,7 @@ println(x)
 ```
 ````
 
-## Reset class
+## `reset-class`
 
 The `:reset-class` modifier is like `:reset` except that it wraps the following
 statements in a class instead of an object. By default, statements are wrapped
@@ -163,6 +163,69 @@ including:
 - final classes: pattern matching against final inner classes causes "The outer
   reference in this type test cannot be checked at run time." warnings under
   `-Xfatal-warnings`.
+
+## `to-string`
+
+The `toString` modifier changes the pretty-printer for runtime values to use
+`Object.toString` instead of [PPrint](http://www.lihaoyi.com/PPrint/).
+
+````scala mdoc:mdoc
+```scala mdoc:to-string
+List("no quotes")
+```
+```scala mdoc
+List("with quotes")
+```
+````
+
+## `scastie`
+
+The `scastie` modifier transforms a Scala code block into a
+[Scastie](https://scastie.scala-lang.org/) snippet.
+
+> ℹ️ This modifier will work only in environments that support embedding a
+> `<script>` tag. For example, it won't work in GitHub readmes, but it will work
+> when building a static website from Markdown (e.g., with
+> [Docusaurus](https://docusaurus.io/))
+
+You can embed an existing Scastie snippet by its id:
+
+````scala mdoc:mdoc
+```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
+
+```
+````
+
+or in case of a user's snippet:
+
+````scala mdoc:mdoc
+```scala mdoc:scastie:MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg
+
+```
+````
+
+> ⚠️ The empty line in the block can't be omitted due to how the Markdown parser
+> works
+
+Moreover, you can quickly translate any Scala code block block into a Scastie
+snippet on the fly.
+
+````scala mdoc:mdoc
+```scala mdoc:scastie
+val x = 1 + 2
+println(x)
+```
+````
+
+> ⚠️ Inline snippets are slower to run than embedded ones, since they won't be
+> cached. You should prefer embedding existing snippets whenever possible.
+
+You can choose the Scastie theme when initializing the Scastie modifier:
+
+```scala mdoc
+import mdoc.modifiers.ScastieModifier
+new ScastieModifier(theme = "dark") // default is "light"
+```
 
 ## PostModifier
 
@@ -276,52 +339,3 @@ We can also add the argument `:crash` to render "BOOM".
 Hello world!
 ```
 ````
-
-## Scastie
-
-The `scastie` modifier transforms a Scala code block into a
-[Scastie](https://scastie.scala-lang.org/) snippet.
-
-> ℹ️ This modifier will work only in environments that support embedding a
-> `<script>` tag. For example, it won't work in GitHub readmes, but it will work
-> when building a static website from Markdown (e.g., with
-> [Docusaurus](https://docusaurus.io/))
-
-You can embed an existing Scastie snippet by its id:
-
-````scala mdoc:mdoc
-```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
-
-```
-````
-
-or in case of a user's snippet:
-
-````scala mdoc:mdoc
-```scala mdoc:scastie:MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg
-
-```
-````
-
-> ⚠️ The empty line in the block can't be omitted due to how the Markdown parser
-> works
-
-Moreover, you can quickly translate any Scala code block block into a Scastie
-snippet on the fly.
-
-````scala mdoc:mdoc
-```scala mdoc:scastie
-val x = 1 + 2
-println(x)
-```
-````
-
-> ⚠️ Inline snippets are slower to run than embedded ones, since they won't be
-> cached. You should prefer embedding existing snippets whenever possible.
-
-You can choose the Scastie theme when initializing the Scastie modifier:
-
-```scala mdoc
-import mdoc.modifiers.ScastieModifier
-new ScastieModifier(theme = "dark") // default is "light"
-```
