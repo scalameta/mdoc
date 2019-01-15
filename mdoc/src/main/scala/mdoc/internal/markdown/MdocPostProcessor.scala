@@ -161,7 +161,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
                 j,
                 n,
                 i,
-                m
+                m,
+                section.mod
               )
             }
             val postCtx = new PostModifierContext(
@@ -186,10 +187,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
               replaceNodeWithText(doc, block, stacktrace)
             } else if (m.isSilent) {
               () // Do nothing
-            } else if (m.isDefault || m.isReset || m.isFail) {
-              block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
             } else {
-              throw new IllegalArgumentException(m.toString)
+              block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
             }
           case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)

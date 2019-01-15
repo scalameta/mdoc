@@ -24,16 +24,20 @@ class ReplVariablePrinter(
         .append(": ")
         .append(binder.staticType)
         .append(" = ")
-      val lines = pprint.PPrinter.BlackWhite.tokenize(
-        binder.runtimeValue,
-        width = width,
-        height = height,
-        indent = 2,
-        initialOffset = baos.size()
-      )
-      lines.foreach { lineStr =>
-        val line = lineStr.plainText
-        Renderer.appendMultiline(sb, line)
+      if (binder.isToString) {
+        Renderer.appendMultiline(sb, binder.runtimeValue.toString)
+      } else {
+        val lines = pprint.PPrinter.BlackWhite.tokenize(
+          binder.runtimeValue,
+          width = width,
+          height = height,
+          indent = 2,
+          initialOffset = baos.size()
+        )
+        lines.foreach { lineStr =>
+          val line = lineStr.plainText
+          Renderer.appendMultiline(sb, line)
+        }
       }
       baos.toString()
     }

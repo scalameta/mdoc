@@ -51,7 +51,13 @@ class Instrumenter(sections: List[SectionInput]) {
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
   private def printStatement(stat: Stat, m: Modifier, sb: PrintStream): Unit = {
-    if (m.isDefault || m.isPassthrough || m.isInvisible || m.isSilent || m.isReset || m.isPost) {
+    if (m.isCrash) {
+      sb.append("$doc.crash(")
+        .append(position(stat.pos))
+        .append(") {\n")
+        .append(stat.pos.text)
+        .append("\n}")
+    } else {
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
@@ -65,14 +71,6 @@ class Instrumenter(sections: List[SectionInput]) {
         case (name, pos) =>
           printBinder(name.syntax, pos)
       }
-    } else if (m.isCrash) {
-      sb.append("$doc.crash(")
-        .append(position(stat.pos))
-        .append(") {\n")
-        .append(stat.pos.text)
-        .append("\n}")
-    } else {
-      throw new IllegalArgumentException(stat.pos.text)
     }
   }
 }

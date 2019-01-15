@@ -149,7 +149,7 @@ object Renderer {
                       s"Expected FailSection. Obtained $obtained"
                     )
                 }
-              case Modifier.PrintVariable() | Modifier.Post(_, _) =>
+              case _ =>
                 val pos = binder.pos.toMeta(section)
                 val variable = new mdoc.Variable(
                   binder.name,
@@ -159,11 +159,10 @@ object Renderer {
                   i,
                   N,
                   statementIndex,
-                  totalStats
+                  totalStats,
+                  section.mod
                 )
                 sb.append(printer(variable))
-              case c @ (Modifier.Str(_, _) | Modifier.Builtin(_)) =>
-                throw new IllegalArgumentException(c.toString)
             }
         }
     }
