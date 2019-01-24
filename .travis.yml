@@ -1,7 +1,6 @@
 language: scala
 jdk:
   - oraclejdk8
-  - openjdk11
 
 stages:
   - name: test
@@ -15,6 +14,9 @@ jobs:
       script: ./bin/scalafmt --test
     - env: TEST="sbt test"
       script: sbt test plugin/scripted
+    - env: TEST="sbt test"
+      script: sbt test plugin/scripted
+      jdk: openjdk11
     - stage: release
       script: sbt ci-release docs/docusaurusPublishGhpages
 
