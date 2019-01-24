@@ -108,8 +108,8 @@ final class MainOps(
         val diff = DiffUtils.unifiedDiff(
           s"$filename (on disk)",
           s"$filename (expected output)",
-          expected.lines.toList,
-          string.lines.toList,
+          expected.linesIterator.toList,
+          string.linesIterator.toList,
           3
         )
         reporter.error(s"--test failed! To fix this problem, re-generate the documentation\n$diff")

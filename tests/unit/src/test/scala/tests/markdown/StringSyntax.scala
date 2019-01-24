@@ -4,7 +4,7 @@ object StringSyntax {
   implicit class XtensionStringSyntax(str: String) {
     def triplequoted: String = str.replaceAllLiterally("'''", "\"\"\"")
     def trimLineEnds: String = {
-      str.lines.map(_.trimEnd).mkString("\n")
+      str.linesIterator.map(_.trimEnd).mkString("\n")
     }
     def trimEnd: String = {
       var len = str.length
