@@ -73,7 +73,7 @@ object DocumentLinks {
       case heading: Heading =>
         definitions += headerIdGenerator(heading.getText.toString)
       case p: Paragraph if p.getChars.startsWith("<a name=") =>
-        p.getChars.toString.lines.next() match {
+        p.getChars.toString.linesIterator.next() match {
           case HtmlName(id) =>
             definitions += id
           case _ =>

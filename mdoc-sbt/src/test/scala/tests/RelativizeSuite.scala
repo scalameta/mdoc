@@ -27,7 +27,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
       )
       val obtained = StringFS
         .asString(root)
-        .lines
+        .linesIterator
         .map(_.trim)
         .filterNot(isTrivial)
         .mkString("\n")

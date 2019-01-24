@@ -33,7 +33,7 @@ final class HelpMessage[T: generic.Surface: ConfEncoder](
       }
       buf.clear()
     }
-    text.lines.foreach { line =>
+    text.linesIterator.foreach { line =>
       if (line.startsWith("```")) {
         flush()
         insideCodeFence = !insideCodeFence
