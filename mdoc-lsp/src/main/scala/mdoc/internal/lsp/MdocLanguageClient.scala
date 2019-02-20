@@ -1,6 +1,5 @@
 package mdoc.internal.lsp
 
-import javax.annotation.Nullable
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.services.LanguageClient
 
@@ -13,8 +12,8 @@ trait MdocLanguageClient extends LanguageClient {
 
 case class MdocStatusParams(
     text: String,
-    @Nullable show: java.lang.Boolean = null,
-    @Nullable hide: java.lang.Boolean = null,
-    @Nullable tooltip: String = null,
-    @Nullable command: String = null
+    show: java.lang.Boolean = null,
+    hide: java.lang.Boolean = null,
+    tooltip: String = null,
+    command: String = null
 )
