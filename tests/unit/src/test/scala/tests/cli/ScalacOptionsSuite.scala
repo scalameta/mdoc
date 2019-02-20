@@ -98,4 +98,26 @@ class ScalacOptionsSuite extends BaseCliSuite {
       assert(!out.contains("discarded non-Unit value"))
     }
   )
+
+  checkCli(
+    "no-imports",
+    """
+      |/index.md
+      |```scala mdoc
+      |scala.List(1)
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |scala.List(1)
+       |// res0: scala.collection.immutable.List[scala.Int] = List(1)
+       |```
+       |
+    """.stripMargin,
+    extraArgs = Array(
+      "--scalac-options",
+      "-Yno-imports"
+    )
+  )
+
 }
