@@ -59,7 +59,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       name: String,
       original: String,
       expected: String,
-      settings: Settings = baseSettings
+      settings: Settings = baseSettings,
+      compat: Map[String, String] = Map.empty
   ): Unit = {
     test(name) {
       val reporter = newReporter()
@@ -68,7 +69,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       Markdown.toMarkdown(input, getMarkdownSettings(context), reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
-      assertNoDiffOrPrintExpected(obtainedErrors, expected)
+      assertNoDiffOrPrintExpected(obtainedErrors, Compat(expected, compat))
     }
   }
 
@@ -100,7 +101,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       settings: Settings = baseSettings
   ): Unit = {
     checkCompiles(name, original, settings, obtained => {
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiffOrPrintExpected(obtained, Compat(expected, Map.empty))
     })
   }
 

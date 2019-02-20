@@ -1,31 +1,34 @@
 package tests.cli
 
+import tests.markdown.Compat
+
 class ScalacOptionsSuite extends BaseCliSuite {
-  checkCli(
-    "-Ywarn-unused-import",
-    """
-      |/index.md
-      |# Hello
-      |```scala mdoc
-      |import scala.concurrent.Future
-      |```
+  if (Compat.isScala212)
+    checkCli(
+      "-Ywarn-unused-import",
+      """
+        |/index.md
+        |# Hello
+        |```scala mdoc
+        |import scala.concurrent.Future
+        |```
     """.stripMargin,
-    "",
-    extraArgs = Array(
-      "--report-relative-paths",
-      "--scalac-options",
-      "-Ywarn-unused -Xfatal-warnings"
-    ),
-    expectedExitCode = 1,
-    onStdout = { out =>
-      val expected =
-        """
-          |warning: index.md:3:1: Unused import
-          |import scala.concurrent.Future
-          |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^""".stripMargin
-      assert(out.contains(expected))
-    }
-  )
+      "",
+      extraArgs = Array(
+        "--report-relative-paths",
+        "--scalac-options",
+        "-Ywarn-unused -Xfatal-warnings"
+      ),
+      expectedExitCode = 1,
+      onStdout = { out =>
+        val expected =
+          """
+            |warning: index.md:3:1: Unused import
+            |import scala.concurrent.Future
+            |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^""".stripMargin
+        assert(out.contains(expected))
+      }
+    )
 
   checkCli(
     "kind-projector",
