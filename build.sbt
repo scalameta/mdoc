@@ -199,7 +199,6 @@ lazy val docs = project
     moduleName := "mdoc-docs",
     skip in publish := version.in(ThisBuild).value.endsWith("-SNAPSHOT"),
     mdocAutoDependency := false,
-    crossScalaVersions := List(scala212),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
