@@ -1,6 +1,13 @@
+def scala212 = "2.12.8"
+def scala211 = "2.11.12"
 inThisBuild(
   List(
-    scalaVersion := "2.12.8",
+    scalaVersion := scala212,
+    crossScalaVersions := List(scala212, scala211),
+    scalacOptions ++= List(
+      "-Xexperimental",
+      "-deprecation"
+    ),
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -28,6 +35,8 @@ inThisBuild(
 
 name := "mdocRoot"
 skip in publish := true
+crossScalaVersions := Nil
+
 val V = new {
   val scalameta = "4.1.0"
 }
@@ -105,9 +114,6 @@ lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     skip in publish := true,
-    scalacOptions ++= List(
-      "-deprecation"
-    ),
     addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.8"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
@@ -134,6 +140,7 @@ lazy val plugin = project
   .settings(
     sbtPlugin := true,
     sbtVersion in pluginCrossBuild := "1.0.0",
+    crossScalaVersions := List(scala212),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.11.3",

@@ -12,9 +12,11 @@ jobs:
     # default stage is test
     - env: TEST="scalafmt"
       script: ./bin/scalafmt --test
-    - env: TEST="sbt test"
+    - env: TEST="Scala 2.12"
       script: sbt test plugin/scripted
-    - env: TEST="sbt test"
+    - env: TEST="Scala 2.11"
+      script: sbt ++2.11.12 test
+    - env: TEST="Java 11"
       script: sbt test plugin/scripted
       jdk: openjdk11
     - stage: release

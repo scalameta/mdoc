@@ -19,11 +19,19 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
   def check(name: String, original: String, expected: String): Unit =
     check(name, original :: Nil, expected)
 
-  def check(name: String, original: List[String], expected: String): Unit = {
+  def check(
+      name: String,
+      original: List[String],
+      expected: String,
+      compat: Map[String, String] = Map.empty
+  ): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
       val obtained = Renderer.render(inputs, compiler, reporter, name + ".md", ReplVariablePrinter)
-      assertNoDiff(obtained, expected)
+      assertNoDiff(
+        obtained,
+        Compat(expected, compat)
+      )
     }
   }
 
@@ -46,7 +54,20 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
       |val y = x.length
       |// y: Int = 10
       |```
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "2.11" ->
+        """
+          |```scala
+          |val x = 1.to(10)
+          |// x: Range.Inclusive = Range(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          |```
+          |```scala
+          |val y = x.length
+          |// y: Int = 10
+          |```
+        """.stripMargin
+    )
   )
 
   check(
