@@ -133,8 +133,11 @@ object Renderer {
                 sb.append('\n')
                 binder.value match {
                   case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
-                    val compiled =
-                      compiler.fail(doc.sections.map(_.source), Input.String(instrumented))
+                    val compiled = compiler.fail(
+                      doc.sections.map(_.source),
+                      Input.String(instrumented),
+                      section.source.pos
+                    )
                     if (compiled.isEmpty) {
                       val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                       reporter.error(

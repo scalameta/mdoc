@@ -138,7 +138,7 @@ class MarkdownCompiler(
     new BatchSourceFile(filename, new String(input.chars))
   }
 
-  def fail(original: Seq[Tree], input: Input): String = {
+  def fail(original: Seq[Tree], input: Input, sectionPos: Position): String = {
     sreporter.reset()
     val run = new global.Run
     run.compileSources(List(toSource(input)))
@@ -149,9 +149,11 @@ class MarkdownCompiler(
       case sreporter.Info(pos, msgOrNull, gseverity) =>
         val msg = nullableMessage(msgOrNull)
         val mpos = toMetaPosition(edit, pos)
-        val severity = gseverity.toString().toLowerCase
-        val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
-        ps.println(formatted)
+        if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
+          val severity = gseverity.toString().toLowerCase
+          val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
+          ps.println(formatted)
+        }
     }
     out.toString()
   }

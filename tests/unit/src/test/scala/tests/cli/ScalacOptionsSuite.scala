@@ -123,4 +123,47 @@ class ScalacOptionsSuite extends BaseCliSuite {
     )
   )
 
+  // see https://github.com/scalameta/mdoc/issues/151
+  checkCli(
+    "dead-fail",
+    """
+      |/index.md
+      |```scala mdoc
+      |final case class Test(value: Int)
+      |
+      |val test = Test(123)
+      |
+      |test.value
+      |```
+      |
+      |```scala mdoc:fail
+      |val x: Int = "123"
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |final case class Test(value: Int)
+       |
+       |val test = Test(123)
+       |// test: Test = Test(123)
+       |
+       |test.value
+       |// res0: Int = 123
+       |```
+       |
+       |```scala
+       |val x: Int = "123"
+       |// error: type mismatch;
+       |//  found   : String("123")
+       |//  required: Int
+       |// val x: Int = "123"
+       |//              ^^^^^
+       |```
+       |""".stripMargin,
+    extraArgs = Array(
+      "--scalac-options",
+      "-Ywarn-value-discard"
+    )
+  )
+
 }
