@@ -105,6 +105,10 @@ object DocusaurusPlugin extends AutoPlugin {
       IO.write(out / "index.html", html)
       out
     },
+    cleanFiles := {
+      val buildFolder = website.value / "build"
+      buildFolder +: cleanFiles.value
+    },
     doc := {
       val out = docusaurusCreateSite.value
       Relativize.htmlSite(out.toPath)
