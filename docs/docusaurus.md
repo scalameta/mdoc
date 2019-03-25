@@ -62,7 +62,9 @@ several steps:
   http://static.javadoc.io/
 
 The static website gets generated in the `website/build` directory. You can copy
-these files over to any static HTTP server to host your website.
+these files over to any static HTTP server to host your website. A simple `sbt docs/clean`
+will delete the previous folder since the `DocusaurusPlugin` will also bind it to the
+standard SBT `clean` task. 
 
 ## Publish to GitHub pages locally
 
