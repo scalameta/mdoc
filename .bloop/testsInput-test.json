@@ -1,0 +1,163 @@
+{
+    "version" : "1.1.2",
+    "project" : {
+        "name" : "testsInput-test",
+        "directory" : "/Users/domingueza/Workspace/Projects/mdoc/tests/input",
+        "sources" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/src/test/scala-2.12",
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/src/test/scala",
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/src/test/java",
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/target/scala-2.12/src_managed/test"
+        ],
+        "dependencies" : [
+            "testsInput"
+        ],
+        "classpath" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/.bloop/testsInput/scala-2.12/classes",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar"
+        ],
+        "out" : "/Users/domingueza/Workspace/Projects/mdoc/.bloop/testsInput",
+        "classesDir" : "/Users/domingueza/Workspace/Projects/mdoc/.bloop/testsInput/scala-2.12/test-classes",
+        "resources" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/src/test/resources",
+            "/Users/domingueza/Workspace/Projects/mdoc/tests/input/target/scala-2.12/resource_managed/test"
+        ],
+        "scala" : {
+            "organization" : "org.scala-lang",
+            "name" : "scala-compiler",
+            "version" : "2.12.8",
+            "options" : [
+                "-Xexperimental",
+                "-deprecation",
+                "-P:semanticdb:synthetics:on",
+                "-P:semanticdb:failures:warning",
+                "-P:semanticdb:sourceroot:/Users/domingueza/Workspace/Projects/mdoc",
+                "-Yrangepos",
+                "-Xplugin-require:semanticdb",
+                "-Xplugin:/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-scalac_2.12.8/4.1.4/semanticdb-scalac_2.12.8-4.1.4.jar"
+            ],
+            "jars" : [
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/jline/jline/2.14.6/jline-2.14.6.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8.jar"
+            ],
+            "setup" : {
+                "order" : "mixed",
+                "addLibraryToBootClasspath" : true,
+                "addCompilerToClasspath" : false,
+                "addExtraJarsToClasspath" : false,
+                "manageBootClasspath" : true,
+                "filterLibraryFromClasspath" : true
+            }
+        },
+        "java" : {
+            "options" : [
+            ]
+        },
+        "test" : {
+            "frameworks" : [
+                {
+                    "names" : [
+                        "org.scalacheck.ScalaCheckFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.specs2.runner.Specs2Framework",
+                        "org.specs2.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.specs.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.scalatest.tools.Framework",
+                        "org.scalatest.tools.ScalaTestFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "com.novocode.junit.JUnitFramework"
+                    ]
+                }
+            ],
+            "options" : {
+                "excludes" : [
+                ],
+                "arguments" : [
+                ]
+            }
+        },
+        "platform" : {
+            "name" : "jvm",
+            "config" : {
+                "home" : "/Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/jre",
+                "options" : [
+                ]
+            },
+            "mainClass" : [
+            ]
+        },
+        "resolution" : {
+            "modules" : [
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-library",
+                    "version" : "2.12.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-library",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "36b234834d8f842cdde963c8591efae6cf413e3f"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-library",
+                    "version" : "2.12.8",
+                    "configurations" : "optional",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-library",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "36b234834d8f842cdde963c8591efae6cf413e3f"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-javadoc.jar"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

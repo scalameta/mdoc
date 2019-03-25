@@ -1,0 +1,2441 @@
+{
+    "version" : "1.1.2",
+    "project" : {
+        "name" : "mdoc",
+        "directory" : "/Users/domingueza/Workspace/Projects/mdoc/mdoc",
+        "sources" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/src/main/scala-2.12",
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/src/main/scala",
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/src/main/java",
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/target/scala-2.12/src_managed/main"
+        ],
+        "dependencies" : [
+            "runtime"
+        ],
+        "classpath" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/.bloop/runtime/scala-2.12/classes",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-html-parser/0.40.4/flexmark-html-parser-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-profile-pegdown/0.40.4/flexmark-profile-pegdown-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-tag/0.40.4/flexmark-ext-jekyll-tag-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-attributes/0.40.4/flexmark-ext-attributes-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-media-tags/0.40.4/flexmark-ext-media-tags-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tables/0.40.4/flexmark-ext-gfm-tables-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/me/xdrop/fuzzywuzzy/1.1.10/fuzzywuzzy-1.1.10.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.3/pprint_2.12-0.5.3.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/4.2.1/jna-4.2.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-youtrack-converter/0.40.4/flexmark-youtrack-converter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.6.5.Final/xnio-nio-3.6.5.Final.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tasklist/0.40.4/flexmark-ext-gfm-tasklist-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-anchorlink/0.40.4/flexmark-ext-anchorlink-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.2.0/paiges-core_2.12-0.2.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-util/0.40.4/flexmark-util-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/undertow/undertow-core/2.0.13.Final/undertow-core-2.0.13.Final.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.4/sourcecode_2.12-0.1.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-toc/0.40.4/flexmark-ext-toc-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.1.0/trees_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-front-matter/0.40.4/flexmark-ext-jekyll-front-matter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/quasiquotes_2.12/4.1.0/quasiquotes_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/threads/jboss-threads/2.3.0.Beta2/jboss-threads-2.3.0.Beta2.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-tables/0.40.4/flexmark-ext-tables-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-core_2.12/0.9.1/metaconfig-core_2.12-0.9.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.5/fansi_2.12-0.2.5.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/2.0.8/pdfbox-2.0.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-enumerated-reference/0.40.4/flexmark-ext-enumerated-reference-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-wikilink/0.40.4/flexmark-ext-wikilink-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokens_2.12/4.1.0/tokens_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.8.0-beta2/slf4j-nop-1.8.0-beta2.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.12/0.8.0-RC1/lenses_2.12-0.8.0-RC1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.1.0/io_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/common/wildfly-common/1.3.0.Beta1/wildfly-common-1.3.0.Beta1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-autolink/0.40.4/flexmark-ext-autolink-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/nibor/autolink/autolink/0.6.0/autolink-0.6.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-xwiki-macros/0.40.4/flexmark-ext-xwiki-macros-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC13/openhtmltopdf-jsoup-dom-converter-0.0.1-RC13.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.5.1/protobuf-java-3.5.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/client/wildfly-client-config/1.0.0.Final/wildfly-client-config-1.0.0.Final.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark/0.40.4/flexmark-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-abbreviation/0.40.4/flexmark-ext-abbreviation-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-typesafe-config_2.12/0.9.1/metaconfig-typesafe-config_2.12-0.9.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-footnotes/0.40.4/flexmark-ext-footnotes-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-pdfbox/0.0.1-RC13/openhtmltopdf-pdfbox-0.0.1-RC13.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/methvin/directory-watcher/0.8.0/directory-watcher-0.8.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.8/fontbox-2.0.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-admonition/0.40.4/flexmark-ext-admonition-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.40.4/flexmark-ext-escaped-character-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/googlecode/java-diff-utils/diffutils/1.3.0/diffutils-1.3.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-ins/0.40.4/flexmark-ext-ins-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gitlab/0.40.4/flexmark-ext-gitlab-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-api/3.6.5.Final/xnio-api-3.6.5.Final.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.1.0/common_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/transversers_2.12/4.1.0/transversers_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-pdf-converter/0.40.4/flexmark-pdf-converter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokenizers_2.12/4.1.0/tokenizers_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.1.0/parsers_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-jira-converter/0.40.4/flexmark-jira-converter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-aside/0.40.4/flexmark-ext-aside-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-all/0.40.4/flexmark-all-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-superscript/0.40.4/flexmark-ext-superscript-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.12/0.8.0-RC1/scalapb-runtime_2.12-0.8.0-RC1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.8.0-beta2/slf4j-api-1.8.0-beta2.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-users/0.40.4/flexmark-ext-gfm-users-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-formatter/0.40.4/flexmark-formatter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-core/0.0.1-RC13/openhtmltopdf-core-0.0.1-RC13.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-strikethrough/0.40.4/flexmark-ext-gfm-strikethrough-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-emoji/0.40.4/flexmark-ext-emoji-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/xmpbox/2.0.8/xmpbox-2.0.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-macros/0.40.4/flexmark-ext-macros-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-definition/0.40.4/flexmark-ext-definition-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb_2.12/4.1.0/semanticdb_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-rtl-support/0.0.1-RC13/openhtmltopdf-rtl-support-0.0.1-RC13.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-yaml-front-matter/0.40.4/flexmark-ext-yaml-front-matter-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jsoup/jsoup/1.10.2/jsoup-1.10.2.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-typographic/0.40.4/flexmark-ext-typographic-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/dialects_2.12/4.1.0/dialects_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-issues/0.40.4/flexmark-ext-gfm-issues-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/de/rototor/pdfbox/graphics2d/0.12/graphics2d-0.12.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.1.0/scalameta_2.12-4.1.0.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ibm/icu/icu4j/59.1/icu4j-59.1.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-youtube-embedded/0.40.4/flexmark-ext-youtube-embedded-0.40.4.jar",
+            "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/inputs_2.12/4.1.0/inputs_2.12-4.1.0.jar"
+        ],
+        "out" : "/Users/domingueza/Workspace/Projects/mdoc/.bloop/mdoc",
+        "classesDir" : "/Users/domingueza/Workspace/Projects/mdoc/.bloop/mdoc/scala-2.12/classes",
+        "resources" : [
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/src/main/resources",
+            "/Users/domingueza/Workspace/Projects/mdoc/mdoc/target/scala-2.12/resource_managed/main"
+        ],
+        "scala" : {
+            "organization" : "org.scala-lang",
+            "name" : "scala-compiler",
+            "version" : "2.12.8",
+            "options" : [
+                "-Xexperimental",
+                "-deprecation",
+                "-P:semanticdb:synthetics:on",
+                "-P:semanticdb:failures:warning",
+                "-P:semanticdb:sourceroot:/Users/domingueza/Workspace/Projects/mdoc",
+                "-Yrangepos",
+                "-Xplugin-require:semanticdb",
+                "-Xplugin:/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-scalac_2.12.8/4.1.4/semanticdb-scalac_2.12.8-4.1.4.jar"
+            ],
+            "jars" : [
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/jline/jline/2.14.6/jline-2.14.6.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar",
+                "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8.jar"
+            ],
+            "setup" : {
+                "order" : "mixed",
+                "addLibraryToBootClasspath" : true,
+                "addCompilerToClasspath" : false,
+                "addExtraJarsToClasspath" : false,
+                "manageBootClasspath" : true,
+                "filterLibraryFromClasspath" : true
+            }
+        },
+        "java" : {
+            "options" : [
+            ]
+        },
+        "test" : {
+            "frameworks" : [
+                {
+                    "names" : [
+                        "org.scalacheck.ScalaCheckFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.specs2.runner.Specs2Framework",
+                        "org.specs2.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.specs.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "org.scalatest.tools.Framework",
+                        "org.scalatest.tools.ScalaTestFramework"
+                    ]
+                },
+                {
+                    "names" : [
+                        "com.novocode.junit.JUnitFramework"
+                    ]
+                }
+            ],
+            "options" : {
+                "excludes" : [
+                ],
+                "arguments" : [
+                ]
+            }
+        },
+        "platform" : {
+            "name" : "jvm",
+            "config" : {
+                "home" : "/Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/jre",
+                "options" : [
+                ]
+            },
+            "mainClass" : [
+            ]
+        },
+        "resolution" : {
+            "modules" : [
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-library",
+                    "version" : "2.12.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-library",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "36b234834d8f842cdde963c8591efae6cf413e3f"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-html-parser",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-html-parser",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-html-parser/0.40.4/flexmark-html-parser-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-html-parser",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-html-parser/0.40.4/flexmark-html-parser-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-html-parser",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-html-parser/0.40.4/flexmark-html-parser-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-profile-pegdown",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-profile-pegdown",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-profile-pegdown/0.40.4/flexmark-profile-pegdown-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-profile-pegdown",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-profile-pegdown/0.40.4/flexmark-profile-pegdown-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-profile-pegdown",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-profile-pegdown/0.40.4/flexmark-profile-pegdown-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-jekyll-tag",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-jekyll-tag",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-tag/0.40.4/flexmark-ext-jekyll-tag-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-jekyll-tag",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-tag/0.40.4/flexmark-ext-jekyll-tag-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-jekyll-tag",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-tag/0.40.4/flexmark-ext-jekyll-tag-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-attributes",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-attributes",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-attributes/0.40.4/flexmark-ext-attributes-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-attributes",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-attributes/0.40.4/flexmark-ext-attributes-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-attributes",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-attributes/0.40.4/flexmark-ext-attributes-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-media-tags",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-media-tags",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-media-tags/0.40.4/flexmark-ext-media-tags-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-media-tags",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-media-tags/0.40.4/flexmark-ext-media-tags-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-media-tags",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-media-tags/0.40.4/flexmark-ext-media-tags-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gfm-tables",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gfm-tables",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tables/0.40.4/flexmark-ext-gfm-tables-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-tables",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tables/0.40.4/flexmark-ext-gfm-tables-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-tables",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tables/0.40.4/flexmark-ext-gfm-tables-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "me.xdrop",
+                    "name" : "fuzzywuzzy",
+                    "version" : "1.1.10",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fuzzywuzzy",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/me/xdrop/fuzzywuzzy/1.1.10/fuzzywuzzy-1.1.10.jar"
+                        },
+                        {
+                            "name" : "fuzzywuzzy",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/me/xdrop/fuzzywuzzy/1.1.10/fuzzywuzzy-1.1.10-sources.jar"
+                        },
+                        {
+                            "name" : "fuzzywuzzy",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/me/xdrop/fuzzywuzzy/1.1.10/fuzzywuzzy-1.1.10-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.lihaoyi",
+                    "name" : "pprint_2.12",
+                    "version" : "0.5.3",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "pprint_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "8fbc583e2444b1e501754dd9fede2abcc0b7a7c3"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.3/pprint_2.12-0.5.3.jar"
+                        },
+                        {
+                            "name" : "pprint_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.3/pprint_2.12-0.5.3-sources.jar"
+                        },
+                        {
+                            "name" : "pprint_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.3/pprint_2.12-0.5.3-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "net.java.dev.jna",
+                    "name" : "jna",
+                    "version" : "4.2.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "jna",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/4.2.1/jna-4.2.1.jar"
+                        },
+                        {
+                            "name" : "jna",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/4.2.1/jna-4.2.1-sources.jar"
+                        },
+                        {
+                            "name" : "jna",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/4.2.1/jna-4.2.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-youtrack-converter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-youtrack-converter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-youtrack-converter/0.40.4/flexmark-youtrack-converter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-youtrack-converter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-youtrack-converter/0.40.4/flexmark-youtrack-converter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-youtrack-converter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-youtrack-converter/0.40.4/flexmark-youtrack-converter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "fastparse_2.12",
+                    "version" : "1.0.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fastparse_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "bf1719f2f742272ba4547d382d9f433bc4e87b7f"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0.jar"
+                        },
+                        {
+                            "name" : "fastparse_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0-sources.jar"
+                        },
+                        {
+                            "name" : "fastparse_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.jboss.xnio",
+                    "name" : "xnio-nio",
+                    "version" : "3.6.5.Final",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "xnio-nio",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "7d73fde250a86f30aec162e55d4eb3fcbdeda9b0"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.6.5.Final/xnio-nio-3.6.5.Final.jar"
+                        },
+                        {
+                            "name" : "xnio-nio",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.6.5.Final/xnio-nio-3.6.5.Final-sources.jar"
+                        },
+                        {
+                            "name" : "xnio-nio",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.6.5.Final/xnio-nio-3.6.5.Final-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gfm-tasklist",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gfm-tasklist",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tasklist/0.40.4/flexmark-ext-gfm-tasklist-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-tasklist",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tasklist/0.40.4/flexmark-ext-gfm-tasklist-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-tasklist",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-tasklist/0.40.4/flexmark-ext-gfm-tasklist-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-anchorlink",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-anchorlink",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-anchorlink/0.40.4/flexmark-ext-anchorlink-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-anchorlink",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-anchorlink/0.40.4/flexmark-ext-anchorlink-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-anchorlink",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-anchorlink/0.40.4/flexmark-ext-anchorlink-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.typelevel",
+                    "name" : "paiges-core_2.12",
+                    "version" : "0.2.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "paiges-core_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.2.0/paiges-core_2.12-0.2.0.jar"
+                        },
+                        {
+                            "name" : "paiges-core_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.2.0/paiges-core_2.12-0.2.0-sources.jar"
+                        },
+                        {
+                            "name" : "paiges-core_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/typelevel/paiges-core_2.12/0.2.0/paiges-core_2.12-0.2.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-compiler",
+                    "version" : "2.12.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-compiler",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "d373b4ff7f7dcaf3c590813adc39c2ea518eb8c5"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-compiler",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-compiler",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.typesafe",
+                    "name" : "config",
+                    "version" : "1.2.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "config",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "f771f71fdae3df231bcd54d5ca2d57f0bf93f467"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.jar"
+                        },
+                        {
+                            "name" : "config",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1-sources.jar"
+                        },
+                        {
+                            "name" : "config",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-util",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-util",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-util/0.40.4/flexmark-util-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-util",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-util/0.40.4/flexmark-util-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-util",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-util/0.40.4/flexmark-util-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "io.undertow",
+                    "name" : "undertow-core",
+                    "version" : "2.0.13.Final",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "undertow-core",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "78cd1da0625d9929d6fa778223db1c5059c40848"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/undertow/undertow-core/2.0.13.Final/undertow-core-2.0.13.Final.jar"
+                        },
+                        {
+                            "name" : "undertow-core",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/undertow/undertow-core/2.0.13.Final/undertow-core-2.0.13.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.lihaoyi",
+                    "name" : "fastparse-utils_2.12",
+                    "version" : "1.0.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0.jar"
+                        },
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0-sources.jar"
+                        },
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.lihaoyi",
+                    "name" : "sourcecode_2.12",
+                    "version" : "0.1.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "sourcecode_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.4/sourcecode_2.12-0.1.4.jar"
+                        },
+                        {
+                            "name" : "sourcecode_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.4/sourcecode_2.12-0.1.4-sources.jar"
+                        },
+                        {
+                            "name" : "sourcecode_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.4/sourcecode_2.12-0.1.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-toc",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-toc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-toc/0.40.4/flexmark-ext-toc-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-toc",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-toc/0.40.4/flexmark-ext-toc-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-toc",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-toc/0.40.4/flexmark-ext-toc-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "trees_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "trees_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "f4a3adc85e185e7924bbcd10abffa3e328e36257"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.1.0/trees_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "trees_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.1.0/trees_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "trees_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.12/4.1.0/trees_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-jekyll-front-matter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-jekyll-front-matter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-front-matter/0.40.4/flexmark-ext-jekyll-front-matter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-jekyll-front-matter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-front-matter/0.40.4/flexmark-ext-jekyll-front-matter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-jekyll-front-matter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-jekyll-front-matter/0.40.4/flexmark-ext-jekyll-front-matter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "quasiquotes_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "quasiquotes_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "0ce22120d202da623e40ba6f780dbc068838ef97"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/quasiquotes_2.12/4.1.0/quasiquotes_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "quasiquotes_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/quasiquotes_2.12/4.1.0/quasiquotes_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "quasiquotes_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/quasiquotes_2.12/4.1.0/quasiquotes_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.jboss.threads",
+                    "name" : "jboss-threads",
+                    "version" : "2.3.0.Beta2",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "jboss-threads",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "907863bb1b863457a762fe5899741cea5691429b"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/threads/jboss-threads/2.3.0.Beta2/jboss-threads-2.3.0.Beta2.jar"
+                        },
+                        {
+                            "name" : "jboss-threads",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/threads/jboss-threads/2.3.0.Beta2/jboss-threads-2.3.0.Beta2-sources.jar"
+                        },
+                        {
+                            "name" : "jboss-threads",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/threads/jboss-threads/2.3.0.Beta2/jboss-threads-2.3.0.Beta2-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "commons-logging",
+                    "name" : "commons-logging",
+                    "version" : "1.2",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "commons-logging",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"
+                        },
+                        {
+                            "name" : "commons-logging",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2-sources.jar"
+                        },
+                        {
+                            "name" : "commons-logging",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-tables",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-tables",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-tables/0.40.4/flexmark-ext-tables-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-tables",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-tables/0.40.4/flexmark-ext-tables-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-tables",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-tables/0.40.4/flexmark-ext-tables-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.geirsson",
+                    "name" : "metaconfig-core_2.12",
+                    "version" : "0.9.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "metaconfig-core_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-core_2.12/0.9.1/metaconfig-core_2.12-0.9.1.jar"
+                        },
+                        {
+                            "name" : "metaconfig-core_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-core_2.12/0.9.1/metaconfig-core_2.12-0.9.1-sources.jar"
+                        },
+                        {
+                            "name" : "metaconfig-core_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-core_2.12/0.9.1/metaconfig-core_2.12-0.9.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.lihaoyi",
+                    "name" : "fansi_2.12",
+                    "version" : "0.2.5",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fansi_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "6e118bee05cac22685f99e826bde32e2f0a7efd7"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.5/fansi_2.12-0.2.5.jar"
+                        },
+                        {
+                            "name" : "fansi_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.5/fansi_2.12-0.2.5-sources.jar"
+                        },
+                        {
+                            "name" : "fansi_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.5/fansi_2.12-0.2.5-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.apache.pdfbox",
+                    "name" : "pdfbox",
+                    "version" : "2.0.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "pdfbox",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/2.0.8/pdfbox-2.0.8.jar"
+                        },
+                        {
+                            "name" : "pdfbox",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/2.0.8/pdfbox-2.0.8-sources.jar"
+                        },
+                        {
+                            "name" : "pdfbox",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/2.0.8/pdfbox-2.0.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-enumerated-reference",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-enumerated-reference",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-enumerated-reference/0.40.4/flexmark-ext-enumerated-reference-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-enumerated-reference",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-enumerated-reference/0.40.4/flexmark-ext-enumerated-reference-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-enumerated-reference",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-enumerated-reference/0.40.4/flexmark-ext-enumerated-reference-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-wikilink",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-wikilink",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-wikilink/0.40.4/flexmark-ext-wikilink-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-wikilink",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-wikilink/0.40.4/flexmark-ext-wikilink-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-wikilink",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-wikilink/0.40.4/flexmark-ext-wikilink-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "tokens_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "tokens_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "f3f21e1285cae01f23af236b0c1d6a0ce4824768"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokens_2.12/4.1.0/tokens_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "tokens_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokens_2.12/4.1.0/tokens_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "tokens_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokens_2.12/4.1.0/tokens_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.slf4j",
+                    "name" : "slf4j-nop",
+                    "version" : "1.8.0-beta2",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "slf4j-nop",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.8.0-beta2/slf4j-nop-1.8.0-beta2.jar"
+                        },
+                        {
+                            "name" : "slf4j-nop",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.8.0-beta2/slf4j-nop-1.8.0-beta2-sources.jar"
+                        },
+                        {
+                            "name" : "slf4j-nop",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.8.0-beta2/slf4j-nop-1.8.0-beta2-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.thesamet.scalapb",
+                    "name" : "lenses_2.12",
+                    "version" : "0.8.0-RC1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "lenses_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "63f6dfbea05fa9793e20368d5b563db9b9444f16"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.12/0.8.0-RC1/lenses_2.12-0.8.0-RC1.jar"
+                        },
+                        {
+                            "name" : "lenses_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.12/0.8.0-RC1/lenses_2.12-0.8.0-RC1-sources.jar"
+                        },
+                        {
+                            "name" : "lenses_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.12/0.8.0-RC1/lenses_2.12-0.8.0-RC1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "io_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "io_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "19638a8afc170049b0d8bcf6042488bdaa79c6b1"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.1.0/io_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "io_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.1.0/io_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "io_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.12/4.1.0/io_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.wildfly.common",
+                    "name" : "wildfly-common",
+                    "version" : "1.3.0.Beta1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "wildfly-common",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "a18ee97cf4b431f7c6257b193d296bd450b2b667"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/common/wildfly-common/1.3.0.Beta1/wildfly-common-1.3.0.Beta1.jar"
+                        },
+                        {
+                            "name" : "wildfly-common",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/common/wildfly-common/1.3.0.Beta1/wildfly-common-1.3.0.Beta1-sources.jar"
+                        },
+                        {
+                            "name" : "wildfly-common",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/common/wildfly-common/1.3.0.Beta1/wildfly-common-1.3.0.Beta1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-autolink",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-autolink",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-autolink/0.40.4/flexmark-ext-autolink-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-autolink",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-autolink/0.40.4/flexmark-ext-autolink-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-autolink",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-autolink/0.40.4/flexmark-ext-autolink-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.nibor.autolink",
+                    "name" : "autolink",
+                    "version" : "0.6.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "autolink",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/nibor/autolink/autolink/0.6.0/autolink-0.6.0.jar"
+                        },
+                        {
+                            "name" : "autolink",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/nibor/autolink/autolink/0.6.0/autolink-0.6.0-sources.jar"
+                        },
+                        {
+                            "name" : "autolink",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/nibor/autolink/autolink/0.6.0/autolink-0.6.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-xwiki-macros",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-xwiki-macros",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-xwiki-macros/0.40.4/flexmark-ext-xwiki-macros-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-xwiki-macros",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-xwiki-macros/0.40.4/flexmark-ext-xwiki-macros-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-xwiki-macros",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-xwiki-macros/0.40.4/flexmark-ext-xwiki-macros-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.openhtmltopdf",
+                    "name" : "openhtmltopdf-jsoup-dom-converter",
+                    "version" : "0.0.1-RC13",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "openhtmltopdf-jsoup-dom-converter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC13/openhtmltopdf-jsoup-dom-converter-0.0.1-RC13.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-jsoup-dom-converter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC13/openhtmltopdf-jsoup-dom-converter-0.0.1-RC13-sources.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-jsoup-dom-converter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC13/openhtmltopdf-jsoup-dom-converter-0.0.1-RC13-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.google.protobuf",
+                    "name" : "protobuf-java",
+                    "version" : "3.5.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "protobuf-java",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "8c3492f7662fa1cbf8ca76a0f5eb1146f7725acd"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.5.1/protobuf-java-3.5.1.jar"
+                        },
+                        {
+                            "name" : "protobuf-java",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.5.1/protobuf-java-3.5.1-sources.jar"
+                        },
+                        {
+                            "name" : "protobuf-java",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.5.1/protobuf-java-3.5.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.wildfly.client",
+                    "name" : "wildfly-client-config",
+                    "version" : "1.0.0.Final",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "wildfly-client-config",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "b2a9bcecdeb8c00f383e023e16ab2d2aeb437df9"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/client/wildfly-client-config/1.0.0.Final/wildfly-client-config-1.0.0.Final.jar"
+                        },
+                        {
+                            "name" : "wildfly-client-config",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/client/wildfly-client-config/1.0.0.Final/wildfly-client-config-1.0.0.Final-sources.jar"
+                        },
+                        {
+                            "name" : "wildfly-client-config",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/wildfly/client/wildfly-client-config/1.0.0.Final/wildfly-client-config-1.0.0.Final-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark/0.40.4/flexmark-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark/0.40.4/flexmark-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark/0.40.4/flexmark-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-abbreviation",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-abbreviation",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-abbreviation/0.40.4/flexmark-ext-abbreviation-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-abbreviation",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-abbreviation/0.40.4/flexmark-ext-abbreviation-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-abbreviation",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-abbreviation/0.40.4/flexmark-ext-abbreviation-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.geirsson",
+                    "name" : "metaconfig-typesafe-config_2.12",
+                    "version" : "0.9.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "metaconfig-typesafe-config_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-typesafe-config_2.12/0.9.1/metaconfig-typesafe-config_2.12-0.9.1.jar"
+                        },
+                        {
+                            "name" : "metaconfig-typesafe-config_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-typesafe-config_2.12/0.9.1/metaconfig-typesafe-config_2.12-0.9.1-sources.jar"
+                        },
+                        {
+                            "name" : "metaconfig-typesafe-config_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/geirsson/metaconfig-typesafe-config_2.12/0.9.1/metaconfig-typesafe-config_2.12-0.9.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-footnotes",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-footnotes",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-footnotes/0.40.4/flexmark-ext-footnotes-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-footnotes",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-footnotes/0.40.4/flexmark-ext-footnotes-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-footnotes",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-footnotes/0.40.4/flexmark-ext-footnotes-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.openhtmltopdf",
+                    "name" : "openhtmltopdf-pdfbox",
+                    "version" : "0.0.1-RC13",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "openhtmltopdf-pdfbox",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-pdfbox/0.0.1-RC13/openhtmltopdf-pdfbox-0.0.1-RC13.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-pdfbox",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-pdfbox/0.0.1-RC13/openhtmltopdf-pdfbox-0.0.1-RC13-sources.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-pdfbox",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-pdfbox/0.0.1-RC13/openhtmltopdf-pdfbox-0.0.1-RC13-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "io.methvin",
+                    "name" : "directory-watcher",
+                    "version" : "0.8.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "directory-watcher",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "b64c7b7e45627f0f7d3c7ab404cfa489a6eaf642"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/methvin/directory-watcher/0.8.0/directory-watcher-0.8.0.jar"
+                        },
+                        {
+                            "name" : "directory-watcher",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/methvin/directory-watcher/0.8.0/directory-watcher-0.8.0-sources.jar"
+                        },
+                        {
+                            "name" : "directory-watcher",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/io/methvin/directory-watcher/0.8.0/directory-watcher-0.8.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.apache.pdfbox",
+                    "name" : "fontbox",
+                    "version" : "2.0.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fontbox",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.8/fontbox-2.0.8.jar"
+                        },
+                        {
+                            "name" : "fontbox",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.8/fontbox-2.0.8-sources.jar"
+                        },
+                        {
+                            "name" : "fontbox",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.8/fontbox-2.0.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-admonition",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-admonition",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-admonition/0.40.4/flexmark-ext-admonition-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-admonition",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-admonition/0.40.4/flexmark-ext-admonition-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-admonition",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-admonition/0.40.4/flexmark-ext-admonition-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-escaped-character",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-escaped-character",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.40.4/flexmark-ext-escaped-character-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-escaped-character",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.40.4/flexmark-ext-escaped-character-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-escaped-character",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.40.4/flexmark-ext-escaped-character-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.jboss.logging",
+                    "name" : "jboss-logging",
+                    "version" : "3.3.2.Final",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "jboss-logging",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "3789d00e859632e6c6206adc0c71625559e6e3b0"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar"
+                        },
+                        {
+                            "name" : "jboss-logging",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final-sources.jar"
+                        },
+                        {
+                            "name" : "jboss-logging",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.googlecode.java-diff-utils",
+                    "name" : "diffutils",
+                    "version" : "1.3.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "diffutils",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "7e060dd5b19431e6d198e91ff670644372f60fbd"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/googlecode/java-diff-utils/diffutils/1.3.0/diffutils-1.3.0.jar"
+                        },
+                        {
+                            "name" : "diffutils",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/googlecode/java-diff-utils/diffutils/1.3.0/diffutils-1.3.0-sources.jar"
+                        },
+                        {
+                            "name" : "diffutils",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/googlecode/java-diff-utils/diffutils/1.3.0/diffutils-1.3.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-ins",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-ins",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-ins/0.40.4/flexmark-ext-ins-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-ins",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-ins/0.40.4/flexmark-ext-ins-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-ins",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-ins/0.40.4/flexmark-ext-ins-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gitlab",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gitlab",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gitlab/0.40.4/flexmark-ext-gitlab-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gitlab",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gitlab/0.40.4/flexmark-ext-gitlab-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gitlab",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gitlab/0.40.4/flexmark-ext-gitlab-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.jboss.xnio",
+                    "name" : "xnio-api",
+                    "version" : "3.6.5.Final",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "xnio-api",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "28e8b81bbf9ed0005b3d849bd87f12089d43b332"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-api/3.6.5.Final/xnio-api-3.6.5.Final.jar"
+                        },
+                        {
+                            "name" : "xnio-api",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-api/3.6.5.Final/xnio-api-3.6.5.Final-sources.jar"
+                        },
+                        {
+                            "name" : "xnio-api",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-api/3.6.5.Final/xnio-api-3.6.5.Final-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "common_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "common_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "7c9dc7d4409090669b8c8f3f9df8dad6310273e7"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.1.0/common_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "common_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.1.0/common_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "common_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.12/4.1.0/common_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "transversers_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "transversers_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "cbb54705bb69bdf9c269e2fbee65f04f45977793"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/transversers_2.12/4.1.0/transversers_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "transversers_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/transversers_2.12/4.1.0/transversers_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "transversers_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/transversers_2.12/4.1.0/transversers_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-pdf-converter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-pdf-converter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-pdf-converter/0.40.4/flexmark-pdf-converter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-pdf-converter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-pdf-converter/0.40.4/flexmark-pdf-converter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-pdf-converter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-pdf-converter/0.40.4/flexmark-pdf-converter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "tokenizers_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "tokenizers_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "1a148a6f75501e17154a619ddf6fb048cb15cb21"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokenizers_2.12/4.1.0/tokenizers_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "tokenizers_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokenizers_2.12/4.1.0/tokenizers_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "tokenizers_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/tokenizers_2.12/4.1.0/tokenizers_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang.modules",
+                    "name" : "scala-xml_2.12",
+                    "version" : "1.0.6",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-xml_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "e22de3366a698a9f744106fb6dda4335838cf6a7"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar"
+                        },
+                        {
+                            "name" : "scala-xml_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6-sources.jar"
+                        },
+                        {
+                            "name" : "scala-xml_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "parsers_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "parsers_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "84ece5c20bc60a3264b40e5ebfe3cad2817f58c9"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.1.0/parsers_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "parsers_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.1.0/parsers_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "parsers_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.12/4.1.0/parsers_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-jira-converter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-jira-converter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-jira-converter/0.40.4/flexmark-jira-converter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-jira-converter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-jira-converter/0.40.4/flexmark-jira-converter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-jira-converter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-jira-converter/0.40.4/flexmark-jira-converter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-aside",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-aside",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-aside/0.40.4/flexmark-ext-aside-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-aside",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-aside/0.40.4/flexmark-ext-aside-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-aside",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-aside/0.40.4/flexmark-ext-aside-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-all",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-all",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-all/0.40.4/flexmark-all-0.40.4.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-superscript",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-superscript",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-superscript/0.40.4/flexmark-ext-superscript-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-superscript",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-superscript/0.40.4/flexmark-ext-superscript-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-superscript",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-superscript/0.40.4/flexmark-ext-superscript-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.thesamet.scalapb",
+                    "name" : "scalapb-runtime_2.12",
+                    "version" : "0.8.0-RC1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scalapb-runtime_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "f9879e234145d4e9e9874509a538f3d64ad205ac"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.12/0.8.0-RC1/scalapb-runtime_2.12-0.8.0-RC1.jar"
+                        },
+                        {
+                            "name" : "scalapb-runtime_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.12/0.8.0-RC1/scalapb-runtime_2.12-0.8.0-RC1-sources.jar"
+                        },
+                        {
+                            "name" : "scalapb-runtime_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.12/0.8.0-RC1/scalapb-runtime_2.12-0.8.0-RC1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.slf4j",
+                    "name" : "slf4j-api",
+                    "version" : "1.8.0-beta2",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "slf4j-api",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.8.0-beta2/slf4j-api-1.8.0-beta2.jar"
+                        },
+                        {
+                            "name" : "slf4j-api",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.8.0-beta2/slf4j-api-1.8.0-beta2-sources.jar"
+                        },
+                        {
+                            "name" : "slf4j-api",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.8.0-beta2/slf4j-api-1.8.0-beta2-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gfm-users",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gfm-users",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-users/0.40.4/flexmark-ext-gfm-users-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-users",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-users/0.40.4/flexmark-ext-gfm-users-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-users",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-users/0.40.4/flexmark-ext-gfm-users-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-formatter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-formatter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-formatter/0.40.4/flexmark-formatter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-formatter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-formatter/0.40.4/flexmark-formatter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-formatter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-formatter/0.40.4/flexmark-formatter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.openhtmltopdf",
+                    "name" : "openhtmltopdf-core",
+                    "version" : "0.0.1-RC13",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "openhtmltopdf-core",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-core/0.0.1-RC13/openhtmltopdf-core-0.0.1-RC13.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-core",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-core/0.0.1-RC13/openhtmltopdf-core-0.0.1-RC13-sources.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-core",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-core/0.0.1-RC13/openhtmltopdf-core-0.0.1-RC13-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gfm-strikethrough",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gfm-strikethrough",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-strikethrough/0.40.4/flexmark-ext-gfm-strikethrough-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-strikethrough",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-strikethrough/0.40.4/flexmark-ext-gfm-strikethrough-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-strikethrough",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-strikethrough/0.40.4/flexmark-ext-gfm-strikethrough-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-emoji",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-emoji",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-emoji/0.40.4/flexmark-ext-emoji-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-emoji",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-emoji/0.40.4/flexmark-ext-emoji-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-emoji",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-emoji/0.40.4/flexmark-ext-emoji-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.apache.pdfbox",
+                    "name" : "xmpbox",
+                    "version" : "2.0.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "xmpbox",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/xmpbox/2.0.8/xmpbox-2.0.8.jar"
+                        },
+                        {
+                            "name" : "xmpbox",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/xmpbox/2.0.8/xmpbox-2.0.8-sources.jar"
+                        },
+                        {
+                            "name" : "xmpbox",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/xmpbox/2.0.8/xmpbox-2.0.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-macros",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-macros",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-macros/0.40.4/flexmark-ext-macros-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-macros",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-macros/0.40.4/flexmark-ext-macros-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-macros",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-macros/0.40.4/flexmark-ext-macros-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-definition",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-definition",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-definition/0.40.4/flexmark-ext-definition-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-definition",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-definition/0.40.4/flexmark-ext-definition-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-definition",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-definition/0.40.4/flexmark-ext-definition-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "semanticdb_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "semanticdb_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "bf31156426e8ae1c2a8ed4255649d81c6e919f81"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb_2.12/4.1.0/semanticdb_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "semanticdb_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb_2.12/4.1.0/semanticdb_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "semanticdb_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb_2.12/4.1.0/semanticdb_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.openhtmltopdf",
+                    "name" : "openhtmltopdf-rtl-support",
+                    "version" : "0.0.1-RC13",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "openhtmltopdf-rtl-support",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-rtl-support/0.0.1-RC13/openhtmltopdf-rtl-support-0.0.1-RC13.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-rtl-support",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-rtl-support/0.0.1-RC13/openhtmltopdf-rtl-support-0.0.1-RC13-sources.jar"
+                        },
+                        {
+                            "name" : "openhtmltopdf-rtl-support",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-rtl-support/0.0.1-RC13/openhtmltopdf-rtl-support-0.0.1-RC13-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "fastparse-utils_2.12",
+                    "version" : "1.0.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "603731e52bbd643b454fc82ed86539d759256afe"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0.jar"
+                        },
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0-sources.jar"
+                        },
+                        {
+                            "name" : "fastparse-utils_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-yaml-front-matter",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-yaml-front-matter",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-yaml-front-matter/0.40.4/flexmark-ext-yaml-front-matter-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-yaml-front-matter",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-yaml-front-matter/0.40.4/flexmark-ext-yaml-front-matter-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-yaml-front-matter",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-yaml-front-matter/0.40.4/flexmark-ext-yaml-front-matter-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.jsoup",
+                    "name" : "jsoup",
+                    "version" : "1.10.2",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "jsoup",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jsoup/jsoup/1.10.2/jsoup-1.10.2.jar"
+                        },
+                        {
+                            "name" : "jsoup",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jsoup/jsoup/1.10.2/jsoup-1.10.2-sources.jar"
+                        },
+                        {
+                            "name" : "jsoup",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/jsoup/jsoup/1.10.2/jsoup-1.10.2-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-typographic",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-typographic",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-typographic/0.40.4/flexmark-ext-typographic-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-typographic",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-typographic/0.40.4/flexmark-ext-typographic-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-typographic",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-typographic/0.40.4/flexmark-ext-typographic-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "dialects_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "dialects_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "535f6c5a00d308a1798b54677fc329a40cf686f7"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/dialects_2.12/4.1.0/dialects_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "dialects_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/dialects_2.12/4.1.0/dialects_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "dialects_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/dialects_2.12/4.1.0/dialects_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-reflect",
+                    "version" : "2.12.8",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-reflect",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "682d33402cdae50258afa2c0860eb54688dab610"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-reflect",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-reflect",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.8/scala-reflect-2.12.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-gfm-issues",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-gfm-issues",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-issues/0.40.4/flexmark-ext-gfm-issues-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-issues",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-issues/0.40.4/flexmark-ext-gfm-issues-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-gfm-issues",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-gfm-issues/0.40.4/flexmark-ext-gfm-issues-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "de.rototor.pdfbox",
+                    "name" : "graphics2d",
+                    "version" : "0.12",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "graphics2d",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/de/rototor/pdfbox/graphics2d/0.12/graphics2d-0.12.jar"
+                        },
+                        {
+                            "name" : "graphics2d",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/de/rototor/pdfbox/graphics2d/0.12/graphics2d-0.12-sources.jar"
+                        },
+                        {
+                            "name" : "graphics2d",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/de/rototor/pdfbox/graphics2d/0.12/graphics2d-0.12-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.lihaoyi",
+                    "name" : "fastparse_2.12",
+                    "version" : "1.0.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "fastparse_2.12",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0.jar"
+                        },
+                        {
+                            "name" : "fastparse_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0-sources.jar"
+                        },
+                        {
+                            "name" : "fastparse_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "scalameta_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "scalameta_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "07898b24b8d554e16166cd630c91f818bc82052d"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.1.0/scalameta_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "scalameta_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.1.0/scalameta_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "scalameta_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.12/4.1.0/scalameta_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.ibm.icu",
+                    "name" : "icu4j",
+                    "version" : "59.1",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "icu4j",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ibm/icu/icu4j/59.1/icu4j-59.1.jar"
+                        },
+                        {
+                            "name" : "icu4j",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ibm/icu/icu4j/59.1/icu4j-59.1-sources.jar"
+                        },
+                        {
+                            "name" : "icu4j",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ibm/icu/icu4j/59.1/icu4j-59.1-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "com.vladsch.flexmark",
+                    "name" : "flexmark-ext-youtube-embedded",
+                    "version" : "0.40.4",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "flexmark-ext-youtube-embedded",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-youtube-embedded/0.40.4/flexmark-ext-youtube-embedded-0.40.4.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-youtube-embedded",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-youtube-embedded/0.40.4/flexmark-ext-youtube-embedded-0.40.4-sources.jar"
+                        },
+                        {
+                            "name" : "flexmark-ext-youtube-embedded",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-youtube-embedded/0.40.4/flexmark-ext-youtube-embedded-0.40.4-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "inputs_2.12",
+                    "version" : "4.1.0",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "inputs_2.12",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "205f7ba1535afb1b222e1682d1362f86f6abfa39"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/inputs_2.12/4.1.0/inputs_2.12-4.1.0.jar"
+                        },
+                        {
+                            "name" : "inputs_2.12",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/inputs_2.12/4.1.0/inputs_2.12-4.1.0-sources.jar"
+                        },
+                        {
+                            "name" : "inputs_2.12",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/inputs_2.12/4.1.0/inputs_2.12-4.1.0-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-compiler",
+                    "version" : "2.12.8",
+                    "configurations" : "optional",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-compiler",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "d373b4ff7f7dcaf3c590813adc39c2ea518eb8c5"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-compiler",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-compiler",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.8/scala-compiler-2.12.8-javadoc.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scala-lang",
+                    "name" : "scala-library",
+                    "version" : "2.12.8",
+                    "configurations" : "optional",
+                    "artifacts" : [
+                        {
+                            "name" : "scala-library",
+                            "checksum" : {
+                                "type" : "sha1",
+                                "digest" : "36b234834d8f842cdde963c8591efae6cf413e3f"
+                            },
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "sources",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-sources.jar"
+                        },
+                        {
+                            "name" : "scala-library",
+                            "classifier" : "javadoc",
+                            "path" : "/Users/domingueza/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8-javadoc.jar"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

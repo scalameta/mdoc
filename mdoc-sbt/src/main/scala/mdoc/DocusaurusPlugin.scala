@@ -107,10 +107,11 @@ object DocusaurusPlugin extends AutoPlugin {
     },
     cleanFiles := {
       val buildFolder = website.value / "build"
+      val nodeModules = website.value / "node_modules"
       val currentCleanFiles = cleanFiles.value
 
-      if (buildFolder.exists()) buildFolder +: currentCleanFiles
-      else currentCleanFiles
+      val docusaurusFolders = Seq(buildFolder, nodeModules).filter(_.exists())
+      docusaurusFolders ++ currentCleanFiles
     },
     doc := {
       val out = docusaurusCreateSite.value
