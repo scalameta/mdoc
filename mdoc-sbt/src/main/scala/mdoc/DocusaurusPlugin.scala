@@ -76,6 +76,13 @@ object DocusaurusPlugin extends AutoPlugin {
        |USE_SSH=true yarn publish-gh-pages
     """.stripMargin
 
+  def installSshWindows: String =
+    """|@echo off
+       |call yarn install
+       |set USE_SSH=true
+       |call yarn publish-gh-pages
+    """.stripMargin
+
   override def projectSettings: Seq[Def.Setting[_]] = List(
     aggregate.in(docusaurusPublishGhpages) := false,
     aggregate.in(docusaurusCreateSite) := false,
@@ -85,8 +92,18 @@ object DocusaurusPlugin extends AutoPlugin {
     ),
     docusaurusPublishGhpages := {
       m.mdoc.toTask(" ").value
-      val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")
-      Files.write(tmp, installSsh.getBytes())
+
+      val tmp =
+        if (scala.util.Properties.isWin) {
+          val tmp = Files.createTempFile("docusaurus", "install_ssh.bat")
+          Files.write(tmp, installSshWindows.getBytes())
+          tmp
+        } else {
+          val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")
+          Files.write(tmp, installSsh.getBytes())
+          tmp
+        }
+
       tmp.toFile.setExecutable(true)
       Process(
         tmp.toString,
