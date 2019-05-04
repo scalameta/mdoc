@@ -160,6 +160,34 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "compile-only",
+    """
+      |```scala mdoc:compile-only
+      |println(42)
+      |```
+    """.stripMargin,
+    """|```scala
+       |println(42)
+       |```
+    """.stripMargin
+  )
+
+  checkError(
+    "compile-only-error",
+    """
+      |```scala mdoc:compile-only
+      |val x: String = 42
+      |```
+    """.stripMargin,
+    """|error: compile-only-error.md:3:17: type mismatch;
+       | found   : Int(42)
+       | required: String
+       |val x: String = 42
+       |                ^^
+    """.stripMargin
+  )
+
   // It's easy to mess up stripMargin multiline strings when generating code with strings.
   check(
     "stripMargin",

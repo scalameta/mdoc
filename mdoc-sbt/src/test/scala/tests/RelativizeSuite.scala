@@ -23,7 +23,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
         "<body>",
         "</body>",
         "<body></body>",
-        "</html>",
+        "</html>"
       )
       val obtained = StringFS
         .asString(root)
@@ -44,7 +44,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
     """
       |/index.html
       |<a href="docs/about.html"></a>
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -56,7 +56,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
     """
       |/index.html
       |<img src="docs/about.html">
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -68,7 +68,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
     """
       |/index.html
       |<script src="myscript.js"></script>
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -80,7 +80,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
     """
       |/index.html
       |<link href="docs/about.html">
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -97,7 +97,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
       |<a href="../index.html"></a>
       |/index.html
       |<a href="docs/about.html"></a>
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -111,7 +111,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
       |/index.html
       |<a href="index.html#header"></a>
       |<a href="docs/about.html#header"></a>
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -123,7 +123,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
     """
       |/index.html
       |<a href="https://cdnjs.cloudflare.com"></a>
-      |""".stripMargin,
+      |""".stripMargin
   )
 
   check(
@@ -145,7 +145,7 @@ class RelativizeSuite extends FunSuite with DiffAssertions {
       |<a href="../users/index.html"></a>
       |/users/index.html
       |Users
-      |""".stripMargin,
+      |""".stripMargin
   )
 
 }

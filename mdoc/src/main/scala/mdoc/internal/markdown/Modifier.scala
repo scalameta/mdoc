@@ -14,7 +14,7 @@ import mdoc.internal.markdown.Mod._
   *
   * Currently, only supports parsing one modifier per code block.
   */
-sealed abstract class Modifier(mods: Set[Mod]) {
+sealed abstract class Modifier(val mods: Set[Mod]) {
   def isDefault: Boolean = mods.isEmpty
   def isFail: Boolean = mods(Fail)
   def isPassthrough: Boolean = mods(Passthrough)
@@ -24,6 +24,7 @@ sealed abstract class Modifier(mods: Set[Mod]) {
   def isCrash: Boolean = mods(Crash)
   def isSilent: Boolean = mods(Silent)
   def isInvisible: Boolean = mods(Invisible)
+  def isCompileOnly: Boolean = mods(CompileOnly)
   def isReset: Boolean = mods(Reset) || isResetClass
   def isResetClass: Boolean = mods(ResetClass)
   def isToString: Boolean = mods(ToString)
@@ -57,7 +58,7 @@ object Modifier {
     }
   }
 
-  case class Builtin(mods: Set[Mod]) extends Modifier(mods)
+  case class Builtin(override val mods: Set[Mod]) extends Modifier(mods)
   case class Str(mod: StringModifier, info: String) extends Modifier(Set.empty)
   case class Post(mod: mdoc.PostModifier, info: String) extends Modifier(Set.empty)
   case class Pre(mod: mdoc.PreModifier, info: String) extends Modifier(Set.empty)
