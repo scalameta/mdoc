@@ -73,7 +73,8 @@ case class Settings(
       "Compiler flags such as compiler plugins '-Xplugin:kind-projector.jar' " +
         "or custom options '-deprecated'. Formatted as a single string with space separated values. " +
         "To pass multiple values: --scalac-options \"-Yrangepos -deprecated\". " +
-        "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any."
+        "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any. " +
+        "When using sbt-mdoc, update the `scalacOptions` sbt setting instead of passing --scalac-options to `mdocExtraArguments`."
     )
     scalacOptions: String = "",
     @Description("Remove all files in the output directory before generating a new site.")

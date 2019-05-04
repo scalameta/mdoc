@@ -41,9 +41,8 @@ object MarkdownCompiler {
     val instrumentedInput = InstrumentedInput(filename, instrumented)
     val compileInput = Input.VirtualFile(filename, instrumented)
     val edit = TokenEditDistance.fromTrees(sectionInputs.map(_.source), compileInput)
-    val doc = compiler.compile(compileInput, reporter, edit) match {
-      case Some(loader) =>
-        val cls = loader.loadClass("repl.Session$")
+    val doc = compiler.compile(compileInput, reporter, edit, "repl.Session$") match {
+      case Some(cls) =>
         val ctor = cls.getDeclaredConstructor()
         ctor.setAccessible(true)
         val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
@@ -119,7 +118,10 @@ class MarkdownCompiler(
   settings.processArgumentString(scalacOptions)
 
   private val sreporter = new FilterStoreReporter(settings)
-  val global = new Global(settings, sreporter)
+  var global = new Global(settings, sreporter)
+  private def reset(): Unit = {
+    global = new Global(settings, sreporter)
+  }
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)
     .map(path => new File(path).toURI.toURL)
@@ -140,7 +142,8 @@ class MarkdownCompiler(
 
   def fail(original: Seq[Tree], input: Input, sectionPos: Position): String = {
     sreporter.reset()
-    val run = new global.Run
+    val g = global
+    val run = new g.Run
     run.compileSources(List(toSource(input)))
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
@@ -161,15 +164,38 @@ class MarkdownCompiler(
   def compileSources(input: Input, vreporter: Reporter, edit: TokenEditDistance): Unit = {
     clearTarget()
     sreporter.reset()
-    val run = new global.Run
+    val g = global
+    val run = new g.Run
     run.compileSources(List(toSource(input)))
     report(vreporter, input, edit)
   }
 
-  def compile(input: Input, vreporter: Reporter, edit: TokenEditDistance): Option[ClassLoader] = {
+  def compile(
+      input: Input,
+      vreporter: Reporter,
+      edit: TokenEditDistance,
+      className: String,
+      retry: Int = 0
+  ): Option[Class[_]] = {
     compileSources(input, vreporter, edit)
     if (!sreporter.hasErrors) {
-      Some(new AbstractFileClassLoader(target, appClassLoader))
+      val loader = new AbstractFileClassLoader(target, appClassLoader)
+      try {
+        Some(loader.loadClass(className))
+      } catch {
+        case _: ClassNotFoundException =>
+          if (retry < 1) {
+            reset()
+            compile(input, vreporter, edit, className, retry + 1)
+          } else {
+            vreporter.error(
+              s"${input.syntax}: skipping file, the compiler produced no classfiles " +
+                "and reported no errors to explain what went wrong during compilation. " +
+                "Please report an issue to https://github.com/scalameta/mdoc/issues."
+            )
+            None
+          }
+      }
     } else {
       None
     }
