@@ -178,6 +178,18 @@ List("with quotes")
 ```
 ````
 
+## `compile-only`
+
+The `compile-only` modifier ensures the code example compiles without evaluating
+the program at runtime. This can be helpful to demonstrate code examples that
+perform side-effects.
+
+````scala mdoc:mdoc
+```scala mdoc:compile-only
+val name = scala.io.StdIn.readLine("Enter your name: ")
+```
+````
+
 ## `scastie`
 
 The `scastie` modifier transforms a Scala code block into a

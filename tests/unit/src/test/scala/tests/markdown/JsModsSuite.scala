@@ -41,4 +41,11 @@ class JsModsSuite extends BaseMarkdownSuite {
        |                 ^^^
     """.stripMargin
   )
+  checkError(
+    "compile-only:invisible",
+    """|error: <input>:1:1: compile-only cannot be used in combination with invisible
+       |compile-only:invisible
+       |^^^^^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
 }

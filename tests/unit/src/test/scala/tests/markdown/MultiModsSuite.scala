@@ -102,4 +102,29 @@ class MultiModsSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  checkError(
+    "compile-only:passthrough",
+    """
+      |```scala mdoc:compile-only:passthrough
+      |val x = 2
+      |```
+    """.stripMargin,
+    """|error: compile-only:passthrough.md:2:15: compile-only cannot be used in combination with passthrough
+       |```scala mdoc:compile-only:passthrough
+       |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
+
+  checkError(
+    "compile-only:multiple",
+    """
+      |```scala mdoc:compile-only:to-string:silent
+      |val x = 2
+      |```
+    """.stripMargin,
+    """|error: compile-only:multiple.md:2:15: compile-only cannot be used in combination with to-string, silent
+       |```scala mdoc:compile-only:to-string:silent
+       |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
 }

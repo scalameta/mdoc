@@ -189,6 +189,23 @@ setInterval(() => {
 }, 1000)
 ```
 
+### `:compile-only`
+
+Use `:compile-only` to validate that a code example compiles successfully
+without evaluating it at runtime.
+
+````md
+```scala mdoc:js:compile-only
+org.scalajs.dom.window.setInterval(() => {
+  println("I'm only compiled, never executed")
+}, 1000)
+```
+````
+
+Note that `compile-only` blocks do not automatically have access to a `node` DOM
+element. Create a leading code fence with `shared:invisible` to expose a hidden
+`node` instance in the scope of a `compile-only` code block.
+
 ## Loading HTML
 
 By default, the `node` variable points to an empty div element. Prefix the code

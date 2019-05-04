@@ -36,6 +36,14 @@ class Instrumenter(sections: List[SectionInput]) {
             .append(");")
           printBinder(binder, section.source.pos)
           sb.println("\n$doc.endStatement();")
+        } else if (section.mod.isCompileOnly) {
+          section.source.stats.foreach { stat =>
+            sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+            sb.println("\n$doc.endStatement();")
+          }
+          sb.println(s"""object ${gensym.fresh("compile")} {""")
+          sb.println(section.source.pos.text)
+          sb.println("\n}")
         } else {
           section.source.stats.foreach { stat =>
             sb.println(s"$$doc.startStatement(${position(stat.pos)});")

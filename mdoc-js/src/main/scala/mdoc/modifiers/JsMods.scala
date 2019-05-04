@@ -5,13 +5,15 @@ import mdoc.internal.pos.PositionSyntax._
 import scala.annotation.tailrec
 import scala.meta.inputs.Input
 
-class JsMods private (mods: Set[String]) {
+class JsMods private (val mods: Set[String]) {
   def isShared: Boolean = mods("shared")
   def isInvisible: Boolean = mods("invisible")
+  def isCompileOnly: Boolean = mods("compile-only")
+  def isEntrypoint: Boolean = !isShared && !isCompileOnly
 }
 
 object JsMods {
-  val all = Set("shared", "invisible")
+  val all = Set("shared", "invisible", "compile-only")
   def parse(info: Input, reporter: Reporter): Option[JsMods] = {
     val text = info.text
     @tailrec def loop(from: Int, accum: Set[String]): Option[Set[String]] = {
@@ -34,6 +36,17 @@ object JsMods {
         }
       }
     }
-    loop(0, Set.empty).map(new JsMods(_))
+    loop(0, Set.empty).map(new JsMods(_)).flatMap { mods =>
+      if (mods.isCompileOnly && mods.mods.size > 1) {
+        val others = (mods.mods - "compile-only").mkString(", ")
+        reporter.error(
+          info.toPosition.addStart(0),
+          s"compile-only cannot be used in combination with $others"
+        )
+        None
+      } else {
+        Some(mods)
+      }
+    }
   }
 }

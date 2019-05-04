@@ -202,6 +202,12 @@ class JsModifier extends mdoc.PreModifier {
     val code: String =
       if (mods.isShared) {
         input.text
+      } else if (mods.isCompileOnly) {
+        new CodeBuilder()
+          .println(s"""object ${gensym.fresh("compile")} {""")
+          .println(input.text)
+          .println("}")
+          .toString
       } else {
         new CodeBuilder()
           .println(s""" @_root_.scala.scalajs.js.annotation.JSExportTopLevel("$id") """)
@@ -213,7 +219,7 @@ class JsModifier extends mdoc.PreModifier {
     runs += code
     new CodeBuilder()
       .printlnIf(!mods.isInvisible, s"```scala\n${input.text}\n```")
-      .printlnIf(!mods.isShared, s"""<div id="$id" data-mdoc-js>$body</div>""")
+      .printlnIf(mods.isEntrypoint, s"""<div id="$id" data-mdoc-js>$body</div>""")
       .toString
   }
 }

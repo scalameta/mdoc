@@ -70,6 +70,18 @@ class BlockInput(ctx: Context, baseInput: Input) {
       invalidCombination(block, "crash", "fail")
     } else if (mod.isSilent && mod.isInvisible) {
       invalidCombination(block, "silent", "invisible")
+    } else if (mod.isCompileOnly) {
+      val others = mod.mods - Mod.CompileOnly
+      if (others.isEmpty) {
+        true
+      } else {
+        val all = others.map(_.toString.toLowerCase).mkString(", ")
+        invalid(
+          block,
+          s"""compile-only cannot be used in combination with $all"""
+        )
+        false
+      }
     } else {
       true
     }
