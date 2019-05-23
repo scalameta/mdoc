@@ -78,4 +78,37 @@ class AsyncSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin
   )
+
+  check(
+    "println",
+    """
+      |```scala mdoc:reset-class
+      |import scala.concurrent._, duration._, ExecutionContext.Implicits.global
+      |val done = scala.concurrent.Promise[Unit]()
+      |global.execute(new Runnable {
+      |  override def run(): Unit = {
+      |    Thread.sleep(20)
+      |    println("Hello from other thread!")
+      |    done.success(())
+      |  }
+      |})
+      |Await.result(done.future, Duration("100ms"))
+      |```
+    """.stripMargin,
+    """|```scala
+       |import scala.concurrent._, duration._, ExecutionContext.Implicits.global
+       |val done = scala.concurrent.Promise[Unit]()
+       |// done: Promise[Unit] = Future(Success(()))
+       |global.execute(new Runnable {
+       |  override def run(): Unit = {
+       |    Thread.sleep(20)
+       |    println("Hello from other thread!")
+       |    done.success(())
+       |  }
+       |})
+       |Await.result(done.future, Duration("100ms"))
+       |// Hello from other thread!
+       |```
+       |""".stripMargin
+  )
 }

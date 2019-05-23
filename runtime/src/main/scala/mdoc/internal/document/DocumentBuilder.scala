@@ -21,6 +21,12 @@ trait DocumentBuilder {
   private var statementPosition = RangePosition.empty
   private var lastPosition = RangePosition.empty
 
+  def print(obj: Any): Unit = {
+    myPs.print(if (null == obj) "null" else obj.toString())
+  }
+  def println(): Unit = myPs.println()
+  def println(x: Any): Unit = myPs.println(x)
+
   object $doc {
 
     def position(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int): RangePosition = {
