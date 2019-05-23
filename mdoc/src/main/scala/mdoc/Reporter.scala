@@ -11,9 +11,11 @@ trait Reporter {
   def warning(msg: String): Unit
   def info(pos: Position, msg: String): Unit
   def info(msg: String): Unit
+  def debug(msg: => String): Unit
   def print(msg: String): Unit
   def println(msg: String): Unit
 
+  private[mdoc] def setDebugEnabled(isDebugEnabled: Boolean): Unit = ()
   private[mdoc] def hasWarnings: Boolean
   private[mdoc] def hasErrors: Boolean
   private[mdoc] def warningCount: Int

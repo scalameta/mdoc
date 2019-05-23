@@ -3,12 +3,14 @@ package mdoc.internal.io
 import fansi.Attrs
 import fansi.Color._
 import java.io.PrintStream
+import java.util.concurrent.atomic.AtomicBoolean
 import scala.meta.Position
 import mdoc.Reporter
 import mdoc.internal.pos.PositionSyntax._
 
 class ConsoleReporter(
     ps: PrintStream,
+    green: Attrs = Green,
     blue: Attrs = Blue,
     yellow: Attrs = Yellow,
     red: Attrs = Red
@@ -17,12 +19,15 @@ class ConsoleReporter(
   def formatMessage(pos: Position, severity: String, message: String): String =
     pos.formatMessage("", message)
 
+  private val myDebug = green("debug")
   private val myInfo = blue("info")
   private val myWarning = yellow("warning")
   private val myError = red("error")
 
   private var myWarnings = 0
   private var myErrors = 0
+
+  private val isDebugEnabled = new AtomicBoolean(false)
 
   override def warningCount: Int = myWarnings
   override def errorCount: Int = myErrors
@@ -48,18 +53,27 @@ class ConsoleReporter(
     myErrors += 1
     ps.println(myError ++ s": $msg")
   }
-  def info(pos: Position, msg: String): Unit = {
-    info(formatMessage(pos.toUnslicedPosition, "info", msg))
-  }
-  def info(msg: String): Unit = {
-    ps.println(myInfo ++ s": $msg")
-  }
   def warning(pos: Position, msg: String): Unit = {
     warning(formatMessage(pos.toUnslicedPosition, "warning", msg))
   }
   def warning(msg: String): Unit = {
     myWarnings += 1
     ps.println(myWarning ++ s": $msg")
+  }
+  def info(pos: Position, msg: String): Unit = {
+    info(formatMessage(pos.toUnslicedPosition, "info", msg))
+  }
+  def info(msg: String): Unit = {
+    ps.println(myInfo ++ s": $msg")
+  }
+  def debug(msg: => String): Unit = {
+    if (isDebugEnabled.get()) {
+      ps.println(myDebug ++ s": $msg")
+    }
+  }
+
+  override def setDebugEnabled(isDebugEnabled: Boolean): Unit = {
+    this.isDebugEnabled.set(isDebugEnabled)
   }
 
   override def print(msg: String): Unit = {

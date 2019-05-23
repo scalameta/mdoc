@@ -37,8 +37,8 @@ object MarkdownCompiler {
       instrumented: String,
       filename: String
   ): EvaluatedDocument = {
-    // Use string builder to avoid accidental stripMargin processing
     val instrumentedInput = InstrumentedInput(filename, instrumented)
+    reporter.debug(s"$filename: instrumented code\n$instrumented")
     val compileInput = Input.VirtualFile(filename, instrumented)
     val edit = TokenEditDistance.fromTrees(sectionInputs.map(_.source), compileInput)
     val doc = compiler.compile(compileInput, reporter, edit, "repl.Session$") match {

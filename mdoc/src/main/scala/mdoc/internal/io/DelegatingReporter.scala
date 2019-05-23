@@ -19,6 +19,8 @@ class DelegatingReporter(underlying: List[Reporter]) extends Reporter {
     underlying.foreach(_.info(pos, msg))
   override def info(msg: String): Unit =
     underlying.foreach(_.info(msg))
+  override def debug(msg: => String): Unit =
+    underlying.foreach(_.debug(msg))
   override def print(msg: String): Unit =
     underlying.foreach(_.print(msg))
   override def println(msg: String): Unit =
