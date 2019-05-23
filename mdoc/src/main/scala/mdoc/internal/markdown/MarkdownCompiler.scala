@@ -177,6 +177,7 @@ class MarkdownCompiler(
       className: String,
       retry: Int = 0
   ): Option[Class[_]] = {
+    reset()
     compileSources(input, vreporter, edit)
     if (!sreporter.hasErrors) {
       val loader = new AbstractFileClassLoader(target, appClassLoader)
