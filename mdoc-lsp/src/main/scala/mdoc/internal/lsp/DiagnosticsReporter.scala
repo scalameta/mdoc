@@ -66,6 +66,7 @@ class DiagnosticsReporter(client: MdocLanguageClient) extends Reporter {
     add(pos, DiagnosticSeverity.Information, msg)
   }
   override def info(msg: String): Unit = logMessage(MessageType.Info, msg)
+  override def debug(msg: => String): Unit = ()
   override def print(msg: String): Unit = logMessage(MessageType.Log, msg)
   override def println(msg: String): Unit = print(msg)
   private def logMessage(tpe: MessageType, msg: String): Unit = {

@@ -25,7 +25,6 @@ object Main {
     val ctx = Settings.fromCliArgs(args.toList, base)
     MainOps.process(ctx, reporter)
   }
-
   def process(settings: MainSettings): Int = {
     MainOps.process(Configured.ok(settings.settings), settings.reporter)
   }

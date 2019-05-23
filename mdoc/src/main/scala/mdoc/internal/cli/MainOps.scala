@@ -227,6 +227,9 @@ object MainOps {
             1
           case Configured.Ok(ctx) =>
             val markdown = Markdown.mdocSettings(ctx)
+            if (ctx.settings.verbose) {
+              ctx.reporter.setDebugEnabled(true)
+            }
             val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
             val exit = runner.run()
             if (exit.isSuccess) {
