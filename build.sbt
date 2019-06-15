@@ -1,9 +1,10 @@
+def scala213 = "2.13.0"
 def scala212 = "2.12.8"
 def scala211 = "2.11.12"
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211),
+    crossScalaVersions := List(scala213, scala212, scala211),
     scalacOptions ++= List(
       "-Xexperimental",
       "-deprecation"
@@ -38,7 +39,7 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.1.0"
+  val scalameta = "4.1.12"
 }
 
 lazy val runtime = project
@@ -46,7 +47,7 @@ lazy val runtime = project
     moduleName := "mdoc-runtime",
     libraryDependencies ++= List(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
-      "com.lihaoyi" %% "pprint" % "0.5.2"
+      "com.lihaoyi" %% "pprint" % "0.5.5"
     )
   )
 
@@ -75,7 +76,7 @@ lazy val mdoc = project
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.1",
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.4",
-      "com.lihaoyi" %% "fansi" % "0.2.5",
+      "com.lihaoyi" %% "fansi" % "0.2.7",
       "io.methvin" % "directory-watcher" % "0.8.0",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
       // live reload
@@ -100,7 +101,7 @@ val jsdocs = project
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     libraryDependencies ++= List(
       "in.nvilla" %%% "monadic-html" % "0.4.0-RC1",
-      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
     ),
     scalaJSUseMainModuleInitializer := true,
     npmDependencies in Compile ++= List(

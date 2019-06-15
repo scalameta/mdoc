@@ -80,7 +80,7 @@ Next, update the `mdocJS` setting to point to a Scala.js project that has
 // build.sbt
 lazy val jsdocs = project
   .settings(
-+   libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6"
++   libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.7"
   )
   .enablePlugins(ScalaJSPlugin)
 lazy val docs = project
