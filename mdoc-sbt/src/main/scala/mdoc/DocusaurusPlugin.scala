@@ -58,7 +58,7 @@ object DocusaurusPlugin extends AutoPlugin {
        |  mkdir -p $HOME/.ssh
        |  ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
        |  git config --global user.name "Docusaurus bot"
-       |  git config --global user.email "$TRAVIS_BUILD_NUMBER@$TRAVIS_COMMIT"
+       |  git config --global user.email "${MDOC_EMAIL:-mdoc@docusaurus}"
        |  git config --global push.default simple
        |  DEPLOY_KEY_FILE=$HOME/.ssh/id_rsa
        |  echo "$GITHUB_DEPLOY_KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
