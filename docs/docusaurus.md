@@ -203,7 +203,20 @@ You can configure a project to include Scaladocs in its site. Below is an exampl
 
 Make sure that you've added the [sbt-unidoc](https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin) dependency to `project/plugins.sbt`.
 
-You could then add a header link to your project's Scaladocs:
+Now the `docs/docusaurusCreateSite` command will generate Scaladocs in the `website/static/api` directory, which you'll probably want to add to your `.gitignore`:
+
+```diff
+  // .gitignore
+  website/translated_docs
+  website/build/
+  website/yarn.lock
+  website/node_modules
+  website/i18n/*
+  !website/i18n/en.json
++ website/static/api
+```
+
+You'll need to tweak your `siteConfig.js` file to make Docusaurus play nicely with Scaladoc's CSS. You may want to add a header link to your API docs too:
 
 ```diff
   // website/siteConfig.js
@@ -217,6 +230,8 @@ You could then add a header link to your project's Scaladocs:
     headerLinks: [
 +    { href: `${baseUrl}api/index.html`, label: 'API'},
     ],
+    // by default Docusaurus combines CSS files in a way that doesn't play nicely with Scaladoc
++   separateCss: ["api"],
     ...
   }
 ```
