@@ -181,3 +181,42 @@ project.
 
 You're all set! Merge a PR to your project and watch the Travis job release the
 docs 😎
+
+## Include Scaladoc in site
+
+You can configure a project to include Scaladocs in its site. Below is an example configuration that uses [sbt-unidoc](https://github.com/sbt/sbt-unidoc) to aggregate Scaladocs across multiple projects.
+
+```diff
+ // build.sbt
+ lazy val docs = project
+   .settings(
+     moduleName := "myproject-docs",
++      unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(myproject1, myproject2),
++      target in (ScalaUnidoc, unidoc) := (baseDirectory in LocalRootProject).value / "website" / "static" / "api",
++      cleanFiles += (target in (ScalaUnidoc, unidoc)).value,
++      docusaurusCreateSite := docusaurusCreateSite.dependsOn(unidoc in Compile).value,
+   )
+-  .enablePlugins(MdocPlugin, DocusaurusPlugin)
++  .enablePlugins(MdocPlugin, DocusaurusPlugin, ScalaUnidocPlugin)
+   .dependsOn(myproject1, myproject2)
+```
+
+Make sure that you've added the [sbt-unidoc](https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin) dependency to `project/plugins.sbt`.
+
+You could then add a header link to your project's Scaladocs:
+
+```diff
+  // website/siteConfig.js
++ const baseUrl = '/my-project/' // Base URL for your project */
+
+  const siteConfig = {
+    ...
+-   baseUrl: /my-project/,
++   baseUrl: baseUrl,
+    ...
+    headerLinks: [
++    { href: `${baseUrl}api/index.html`, label: 'API'},
+    ],
+    ...
+  }
+```
