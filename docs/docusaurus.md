@@ -195,6 +195,7 @@ You can configure a project to include Scaladocs in its site. Below is an exampl
 +      target in (ScalaUnidoc, unidoc) := (baseDirectory in LocalRootProject).value / "website" / "static" / "api",
 +      cleanFiles += (target in (ScalaUnidoc, unidoc)).value,
 +      docusaurusCreateSite := docusaurusCreateSite.dependsOn(unidoc in Compile).value,
++      docusaurusPublishGhpages := docusaurusPublishGhpages.dependsOn(unidoc in Compile).value,
    )
 -  .enablePlugins(MdocPlugin, DocusaurusPlugin)
 +  .enablePlugins(MdocPlugin, DocusaurusPlugin, ScalaUnidocPlugin)
