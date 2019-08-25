@@ -1,9 +1,10 @@
-def scala212 = "2.12.8"
+def scala212 = "2.12.9"
 def scala211 = "2.11.12"
+def scala213 = "2.13.0"
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211),
+    crossScalaVersions := List(scala212, scala211, scala213),
     scalacOptions ++= List(
       "-Xexperimental",
       "-deprecation"
@@ -27,6 +28,7 @@ inThisBuild(
         url("https://geirsson.com")
       )
     ),
+    resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
     publishArtifact.in(packageSrc) := sys.env.contains("CI")
@@ -38,7 +40,17 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.1.0"
+  val scalameta = "4.2.2"
+}
+
+lazy val pprintVersion = Def.setting {
+  if (scalaVersion.value.startsWith("2.11")) "0.5.4"
+  else "0.5.5"
+}
+
+lazy val fansiVersion = Def.setting {
+  if (scalaVersion.value.startsWith("2.11")) "0.2.6"
+  else "0.2.7"
 }
 
 lazy val runtime = project
@@ -46,7 +58,7 @@ lazy val runtime = project
     moduleName := "mdoc-runtime",
     libraryDependencies ++= List(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
-      "com.lihaoyi" %% "pprint" % "0.5.2"
+      "com.lihaoyi" %% "pprint" % pprintVersion.value
     )
   )
 
@@ -73,9 +85,9 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.1",
+      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.4",
-      "com.lihaoyi" %% "fansi" % "0.2.5",
+      "com.lihaoyi" %% "fansi" % fansiVersion.value,
       "io.methvin" % "directory-watcher" % "0.8.0",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
       // live reload
@@ -93,14 +105,31 @@ lazy val testsInput = project
     skip in publish := true
   )
 
+val isScala213 = Def.setting {
+  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
+}
+
+def scala212LibraryDependencies(deps: List[ModuleID]) = List(
+  libraryDependencies ++= {
+    if (isScala213.value) Nil
+    else deps
+  }
+)
+
 val jsdocs = project
   .in(file("tests/jsdocs"))
   .settings(
     skip in publish := true,
     scalaJSModuleKind := ModuleKind.CommonJSModule,
+    libraryDependencies ++= {
+      if (isScala213.value) Nil
+      else
+        List(
+          "in.nvilla" %%% "monadic-html" % "0.4.0-RC1"
+        )
+    },
     libraryDependencies ++= List(
-      "in.nvilla" %%% "monadic-html" % "0.4.0-RC1",
-      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
     ),
     scalaJSUseMainModuleInitializer := true,
     npmDependencies in Compile ++= List(
@@ -114,14 +143,17 @@ lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     skip in publish := true,
-    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.8"),
+    addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
+    scala212LibraryDependencies(
+      List(
+        "com.cibo" %% "evilplot" % "0.6.0"
+      )
+    ),
     libraryDependencies ++= List(
-      "com.cibo" %% "evilplot" % "0.6.0",
-      "co.fs2" %% "fs2-core" % "0.10.4",
-      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-      "org.scalatest" %% "scalatest" % "3.2.0-SNAP10" % Test,
+      "co.fs2" %% "fs2-core" % "1.1.0-M1",
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     // forking causes https://github.com/scalatest/scalatest/issues/556
@@ -144,8 +176,8 @@ lazy val plugin = project
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.11.3",
-      "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-      "org.scalameta" %% "testkit" % "4.0.0-M11" % Test
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
       val out =
@@ -174,9 +206,11 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     moduleName := "mdoc-js",
-    libraryDependencies ++= List(
-      "org.scala-js" % "scalajs-compiler" % "0.6.26" cross CrossVersion.full,
-      "org.scala-js" %% "scalajs-tools" % "0.6.26"
+    scala212LibraryDependencies(
+      List(
+        "org.scala-js" % "scalajs-compiler" % "0.6.28" cross CrossVersion.full,
+        "org.scala-js" %% "scalajs-tools" % "0.6.28"
+      )
     )
   )
   .dependsOn(mdoc)
@@ -185,6 +219,7 @@ lazy val lsp = project
   .in(file("mdoc-lsp"))
   .settings(
     moduleName := "mdoc-lsp",
+    crossScalaVersions := List(scala212),
     libraryDependencies ++= List(
       "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % "0.5.0",
       "com.outr" %% "scribe" % "2.6.0",
@@ -197,6 +232,7 @@ lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
     moduleName := "mdoc-docs",
+    crossScalaVersions := List(scala212),
     skip in publish :=
       !scalaVersion.value.startsWith("2.12") ||
         version.in(ThisBuild).value.endsWith("-SNAPSHOT"),

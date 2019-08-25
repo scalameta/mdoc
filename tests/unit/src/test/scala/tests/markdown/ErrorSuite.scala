@@ -2,6 +2,18 @@ package tests.markdown
 
 class ErrorSuite extends BaseMarkdownSuite {
 
+  override def postProcessObtained: Map[String, String => String] = Map(
+    "2.13" -> { old =>
+      old.linesIterator.filterNot(_.startsWith("did you mean")).mkString("\n")
+    }
+  )
+
+  override def postProcessExpected: Map[String, String => String] = Map(
+    "2.13" -> { old =>
+      old.linesIterator.filterNot(_.contains("<clinit>(crash.md)")).mkString("\n")
+    }
+  )
+
   checkError(
     "crash",
     """
