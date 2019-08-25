@@ -183,7 +183,7 @@ final class MainOps(
   }
 
   def clearScreen(): Unit = {
-    print("\033[H\033[2J")
+    print("\u001b[H\u001b[2J")
   }
 
   def waitingForFileChanges(): Unit = {

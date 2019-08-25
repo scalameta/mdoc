@@ -16,6 +16,7 @@ import mdoc.internal.pos.PositionSyntax
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
 import scala.collection.JavaConverters._
+import scala.collection.Seq
 import scala.meta._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position

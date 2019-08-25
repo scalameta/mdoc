@@ -10,13 +10,15 @@ stages:
 jobs:
   include:
     # default stage is test
-    - env: TEST="scalafmt"
+    - name: Scalafmt
       script: ./bin/scalafmt --test
-    - env: TEST="Scala 2.12"
+    - env: Scala 2.13
+      script: sbt "++2.13.0 test"
+    - env: Scala 2.12
       script: sbt test plugin/scripted
-    - env: TEST="Scala 2.11"
-      script: sbt ++2.11.12 test
-    - env: TEST="Java 11"
+    - env: Scala 2.11
+      script: sbt "++2.11.12 test"
+    - env: Scala 2.12
       script: sbt test plugin/scripted
       jdk: openjdk11
     - stage: release

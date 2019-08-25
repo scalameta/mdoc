@@ -38,6 +38,9 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
         )
       )
       .withProperties(MdocProperties.default(PathIO.workingDirectory))
+
+  def postProcessObtained: Map[String, String => String] = Map.empty
+  def postProcessExpected: Map[String, String => String] = Map.empty
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = {
     new ConsoleReporter(new PrintStream(myStdout))
@@ -68,8 +71,11 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       val input = Input.VirtualFile(name + ".md", original)
       Markdown.toMarkdown(input, getMarkdownSettings(context), reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
-      val obtainedErrors = fansi.Str(myStdout.toString).plainText.trimLineEnds
-      assertNoDiffOrPrintExpected(obtainedErrors, Compat(expected, compat))
+      val obtainedErrors = Compat.postProcess(
+        fansi.Str(myStdout.toString).plainText.trimLineEnds,
+        postProcessObtained
+      )
+      assertNoDiffOrPrintExpected(obtainedErrors, Compat(expected, compat, postProcessExpected))
     }
   }
 
