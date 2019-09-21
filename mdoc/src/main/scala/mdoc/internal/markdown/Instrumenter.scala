@@ -6,6 +6,7 @@ import scala.meta._
 import scala.meta.inputs.Position
 import Instrumenter.position
 import mdoc.internal.markdown.Instrumenter.Binders
+import scala.meta.Mod.Lazy
 
 class Instrumenter(sections: List[SectionInput]) {
   def instrument(): String = {
@@ -122,6 +123,7 @@ object Instrumenter {
     def binders(pat: Pat): List[Name] =
       pat.collect { case m: Member => m.name }
     def unapply(tree: Tree): Option[List[Name]] = tree match {
+      case Defn.Val(mods, _, _, _) if mods.exists(_.isInstanceOf[Lazy]) => Some(Nil)
       case Defn.Val(_, pats, _, _) => Some(pats.flatMap(binders))
       case Defn.Var(_, pats, _, _) => Some(pats.flatMap(binders))
       case _: Defn => Some(Nil)
