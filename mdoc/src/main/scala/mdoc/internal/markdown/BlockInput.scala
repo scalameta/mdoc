@@ -90,17 +90,14 @@ class BlockInput(ctx: Context, baseInput: Input) {
     getModifier(block) match {
       case Some(mod) =>
         if (isValid(block, mod)) {
-          val child = block.getFirstChild
-          if (child != null){
+          Option(block.getFirstChild()).map { child =>
             val start = child.getStartOffset
             val end = child.getEndOffset
             val isNewline = baseInput.chars(end - 1) == '\n'
             val cutoff = if (isNewline) 1 else 0
             val input = Input.Slice(baseInput, start, end - cutoff)
-            Some(ScalaBlockInput(block, input, mod))
+            ScalaBlockInput(block, input, mod)
           }
-          else
-            None
         } else {
           None
         }
