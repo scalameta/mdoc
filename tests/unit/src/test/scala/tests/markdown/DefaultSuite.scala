@@ -70,6 +70,62 @@ class DefaultSuite extends BaseMarkdownSuite {
   )
 
   check(
+    "lazy-val",
+    """
+      |```scala mdoc
+      |lazy val x = ???
+      |List(1).map(_ + 1)
+      |res0.length
+      |```
+      |
+      |```scala mdoc
+      |println(1)
+      |```
+    """.stripMargin,
+    """|```scala
+       |lazy val x = ???
+       |List(1).map(_ + 1)
+       |// res0: List[Int] = List(2)
+       |res0.length
+       |// res1: Int = 1
+       |```
+       |
+       |```scala
+       |println(1)
+       |// 1
+       |```
+    """.stripMargin
+  )
+
+  check(
+    "lazy-val 2",
+    """
+      |```scala mdoc
+      |lazy val x = 3
+      |List(1).map(_ + x)
+      |res0.length
+      |```
+      |
+      |```scala mdoc
+      |println(1)
+      |```
+    """.stripMargin,
+    """|```scala
+       |lazy val x = 3
+       |List(1).map(_ + x)
+       |// res0: List[Int] = List(4)
+       |res0.length
+       |// res1: Int = 1
+       |```
+       |
+       |```scala
+       |println(1)
+       |// 1
+       |```
+    """.stripMargin
+  )
+
+  check(
     "defn",
     """
       |```scala mdoc
