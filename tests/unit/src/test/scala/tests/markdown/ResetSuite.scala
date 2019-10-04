@@ -39,4 +39,33 @@ class ResetSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "empty",
+    """
+      |```scala mdoc
+      |implicit val x: Int = 42
+      |```
+      |
+      |```scala mdoc:reset
+      |```
+      |
+      |```scala mdoc
+      |println(x)
+      |```
+    """.stripMargin,
+    """|```scala
+       |implicit val x: Int = 42
+       |// x: Int = 42
+       |```
+       |
+       |```scala mdoc:reset
+       |```
+       |
+       |```scala
+       |println(x)
+       |// 42
+       |```
+    """.stripMargin
+  )
+
 }

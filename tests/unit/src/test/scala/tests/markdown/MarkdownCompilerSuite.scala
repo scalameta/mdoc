@@ -48,25 +48,36 @@ class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
     """
       |```scala
       |val x = 1.to(10)
-      |// x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      |// x: Range.Inclusive = Range(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
       |```
       |```scala
       |val y = x.length
       |// y: Int = 10
       |```
-    """.stripMargin,
+        """.stripMargin,
     compat = Map(
       "2.11" ->
         """
           |```scala
           |val x = 1.to(10)
-          |// x: Range.Inclusive = Range(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          |// x: Range.Inclusive = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
           |```
           |```scala
           |val y = x.length
           |// y: Int = 10
           |```
-        """.stripMargin
+          |""".stripMargin,
+      "2.12" ->
+        """
+          |```scala
+          |val x = 1.to(10)
+          |// x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          |```
+          |```scala
+          |val y = x.length
+          |// y: Int = 10
+          |```
+          |""".stripMargin
     )
   )
 

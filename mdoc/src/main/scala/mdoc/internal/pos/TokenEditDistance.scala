@@ -3,6 +3,7 @@ package mdoc.internal.pos
 import difflib._
 import difflib.myers.Equalizer
 import scala.annotation.tailrec
+import scala.collection.Seq
 import scala.meta._
 import mdoc.internal.pos.PositionSyntax._
 
