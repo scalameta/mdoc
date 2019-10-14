@@ -194,7 +194,7 @@ class MarkdownCompiler(
         val msg = nullableMessage(msgOrNull)
         val mpos = toMetaPosition(edit, pos)
         if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
-          val severity = gseverity.toString().toLowerCase
+          val severity = gseverity.toString.toLowerCase
           val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
           ps.println(formatted)
         }

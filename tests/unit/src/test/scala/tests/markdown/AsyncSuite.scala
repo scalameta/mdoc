@@ -66,7 +66,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |Caused by: java.util.concurrent.TimeoutException: Future timed out after [10 milliseconds]
            |	at scala.concurrent.impl.Promise$DefaultPromise.tryAwait0(Promise.scala:212)
            |	at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:225)
-           |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:200)
+           |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:201)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
            |	at scala.concurrent.Await$.result(package.scala:124)
            |	at repl.Session$App$.<clinit>(timeout.md:11)
