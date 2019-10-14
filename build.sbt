@@ -1,6 +1,6 @@
 def scala212 = "2.12.10"
 def scala211 = "2.11.12"
-def scala213 = "2.13.0"
+def scala213 = "2.13.1"
 inThisBuild(
   List(
     scalaVersion := scala212,

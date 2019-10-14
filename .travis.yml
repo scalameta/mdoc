@@ -13,7 +13,7 @@ jobs:
     - name: Scalafmt
       script: ./bin/scalafmt --test
     - env: Scala 2.13
-      script: sbt "++2.13.0 test"
+      script: sbt "++2.13.1 test"
     - env: Scala 2.12
       script: sbt test plugin/scripted
     - env: Scala 2.11
@@ -36,4 +36,3 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" -type f -delete
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
   - rm -rf $HOME/.ivy2/local
-
