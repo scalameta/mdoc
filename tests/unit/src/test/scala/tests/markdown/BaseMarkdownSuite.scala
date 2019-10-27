@@ -17,6 +17,7 @@ import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
 import tests.markdown.StringSyntax._
 import mdoc.internal.pos.PositionSyntax._
+import scala.meta.io.RelativePath
 
 abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
   def createTempDirectory(): AbsolutePath = {
@@ -43,6 +44,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
   def postProcessExpected: Map[String, String => String] = Map.empty
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = {
+    myStdout.reset()
     new ConsoleReporter(new PrintStream(myStdout))
   }
   protected def scalacOptions: String = ""
@@ -51,11 +53,6 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
     settings.validate(reporter)
     if (reporter.hasErrors) fail()
     Context(settings, reporter, compiler)
-  }
-
-  def getMarkdownSettings(context: Context): MutableDataSet = {
-    myStdout.reset()
-    Markdown.mdocSettings(context)
   }
 
   def checkError(
@@ -69,7 +66,8 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name + ".md", original)
-      Markdown.toMarkdown(input, getMarkdownSettings(context), reporter, settings)
+      val relpath = RelativePath(input.path)
+      Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = Compat.postProcess(
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
@@ -89,8 +87,9 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name + ".md", original)
+      val relpath = RelativePath(input.path)
       val obtained =
-        Markdown.toMarkdown(input, getMarkdownSettings(context), reporter, settings).trimLineEnds
+        Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
       val colorOut = myStdout.toString()
       print(colorOut)
       val stdout = fansi.Str(colorOut).plainText

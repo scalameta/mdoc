@@ -101,6 +101,26 @@ object Markdown {
 
   def toMarkdown(
       input: Input,
+      context: Context,
+      relativePath: RelativePath,
+      siteVariables: Map[String, String],
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    val textWithVariables = VariableRegex.replaceVariables(
+      input,
+      siteVariables,
+      reporter,
+      settings
+    )
+    val file = MarkdownFile.parse(textWithVariables, relativePath, reporter)
+    val processor = new Processor()(context)
+    processor.processDocument(file)
+    file.renderToString
+  }
+
+  def toMarkdown(
+      input: Input,
       markdownSettings: MutableDataSet,
       reporter: Reporter,
       settings: Settings

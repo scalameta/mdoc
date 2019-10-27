@@ -145,6 +145,8 @@ lazy val unit = project
     skip in publish := true,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
+    libraryDependencies += "com.lihaoyi" %% "utest" % "0.7.1" % Test,
+    testFrameworks += new TestFramework("utest.runner.Framework"),
     scala212LibraryDependencies(
       List(
         "com.cibo" %% "evilplot" % "0.6.0"

@@ -2,8 +2,6 @@ package mdoc.internal.markdown
 
 import com.vladsch.flexmark.ast.FencedCodeBlock
 import com.vladsch.flexmark.util.ast
-import com.vladsch.flexmark.util.ast.Document
-import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.parser.block.DocumentPostProcessor
 import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
 import com.vladsch.flexmark.util.options.MutableDataSet
@@ -24,18 +22,13 @@ import mdoc.internal.pos.PositionSyntax._
 import pprint.TPrintColors
 import scala.meta.io.RelativePath
 
-class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
+class Processor(implicit ctx: Context) {
 
-  override def processDocument(doc: Document): Document = {
-    val docInput = doc
-      .get(Markdown.InputKey)
-      .getOrElse(sys.error(s"Missing DataKey ${Markdown.InputKey}"))
-    val (scalaInputs, customInputs, preInputs) = collectBlockInputs(doc, docInput)
+  def processDocument(doc: MarkdownFile): MarkdownFile = {
+    val docInput = doc.input
+    val (scalaInputs, customInputs, preInputs) = collectFenceInputs(doc)
     val filename = docInput.toFilename(ctx.settings)
-    val inputFile =
-      doc
-        .get(Markdown.RelativePathKey)
-        .getOrElse(throw new NoSuchElementException(s"InputFile: $filename"))
+    val inputFile = doc.relativePath
     customInputs.foreach { block =>
       processStringInput(doc, block)
     }
@@ -65,15 +58,10 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     }
   }
 
-  def postProcess(doc: Document, inputFile: RelativePath): Unit = {}
-
-  def processPreInput(doc: Document, custom: PreBlockInput): Unit = {
-    val PreBlockInput(block, input, Pre(mod, info)) = custom
+  def processPreInput(doc: MarkdownFile, custom: PreFenceInput): Unit = {
+    val PreFenceInput(block, input, Pre(mod, info)) = custom
     try {
-      val inputFile =
-        doc
-          .get(Markdown.RelativePathKey)
-          .getOrElse(throw new NoSuchElementException(s"relativepath"))
+      val inputFile = doc.relativePath
       val preCtx = new PreModifierContext(
         info,
         input,
@@ -92,8 +80,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     }
   }
 
-  def processStringInput(doc: Document, custom: StringBlockInput): Unit = {
-    val StringBlockInput(block, input, Str(mod, info)) = custom
+  def processStringInput(doc: MarkdownFile, custom: StringFenceInput): Unit = {
+    val StringFenceInput(block, input, Str(mod, info)) = custom
     try {
       val newText = mod.process(info, input, ctx.reporter)
       replaceNodeWithText(doc, block, newText)
@@ -107,13 +95,13 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
   }
 
   def processScalaInputs(
-      doc: Document,
-      inputs: List[ScalaBlockInput],
+      doc: MarkdownFile,
+      inputs: List[ScalaFenceInput],
       inputFile: RelativePath,
       filename: String
   ): Unit = {
     val sectionInputs = inputs.map {
-      case ScalaBlockInput(_, input, mod) =>
+      case ScalaFenceInput(_, input, mod) =>
         import scala.meta._
         dialects.Sbt1(input).parse[Source] match {
           case parsers.Parsed.Success(source) =>
@@ -136,8 +124,8 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
       filename
     )
     rendered.sections.zip(inputs).foreach {
-      case (section, ScalaBlockInput(block, _, mod)) =>
-        block.setInfo(CharSubSequence.of("scala"))
+      case (section, ScalaFenceInput(block, _, mod)) =>
+        block.newInfo = Some("scala")
         def defaultRender: String = Renderer.renderEvaluatedSection(
           rendered,
           section,
@@ -188,7 +176,7 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
             } else if (m.isSilent) {
               () // Do nothing
             } else {
-              block.setContent(List[BasedSequence](CharSubSequence.of(defaultRender)).asJava)
+              block.newBody = Some(defaultRender)
             }
           case c: Modifier.Str =>
             throw new IllegalArgumentException(c.toString)
@@ -212,55 +200,35 @@ class MdocPostProcessor(implicit ctx: Context) extends DocumentPostProcessor {
     }
   }
 
-  def asBasedSequence(string: String): util.List[BasedSequence] = {
-    List[BasedSequence](CharSubSequence.of(string)).asJava
-  }
-
-  def appendChild(doc: Document, text: String): Unit = {
+  def appendChild(doc: MarkdownFile, text: String): Unit = {
     if (text.nonEmpty) {
-      doc.appendChild(parseMarkdown(doc, text))
+      doc.appendText(text)
     }
   }
 
-  def parseMarkdown(doc: Document, text: String): Node = {
-    val markdownOptions = new MutableDataSet()
-    markdownOptions.setAll(doc)
-    Markdown.parse(CharSubSequence.of(text), markdownOptions)
+  def replaceNodeWithText(doc: MarkdownFile, toReplace: CodeFence, text: String): Unit = {
+    toReplace.newPart = Some(text)
   }
 
-  def replaceNodeWithText(doc: Document, toReplace: Node, text: String): Unit = {
-    val child = parseMarkdown(doc, text)
-    toReplace.insertAfter(child)
-    toReplace.unlink()
-  }
-
-  def collectBlockInputs(
-      doc: Document,
-      docInput: Input
-  ): (List[ScalaBlockInput], List[StringBlockInput], List[PreBlockInput]) = {
-    val InterestingCodeFence = new BlockInput(ctx, docInput)
-    val inputs = List.newBuilder[ScalaBlockInput]
-    val strings = List.newBuilder[StringBlockInput]
-    val pres = List.newBuilder[PreBlockInput]
-    Markdown.traverse[FencedCodeBlock](doc) {
+  def collectFenceInputs(
+      doc: MarkdownFile
+  ): (List[ScalaFenceInput], List[StringFenceInput], List[PreFenceInput]) = {
+    val InterestingCodeFence = new FenceInput(ctx, doc.input)
+    val inputs = List.newBuilder[ScalaFenceInput]
+    val strings = List.newBuilder[StringFenceInput]
+    val pres = List.newBuilder[PreFenceInput]
+    doc.parts.foreach {
       case InterestingCodeFence(input) =>
         input.mod match {
           case string: Str =>
-            strings += StringBlockInput(input.block, input.input, string)
+            strings += StringFenceInput(input.block, input.input, string)
           case pre: Pre =>
-            pres += PreBlockInput(input.block, input.input, pre)
+            pres += PreFenceInput(input.block, input.input, pre)
           case _ =>
             inputs += input
         }
+      case _ =>
     }
     (inputs.result(), strings.result(), pres.result())
-  }
-}
-
-object MdocPostProcessor {
-  class Factory(context: Context) extends DocumentPostProcessorFactory {
-    override def create(document: ast.Document): DocumentPostProcessor = {
-      new MdocPostProcessor()(context)
-    }
   }
 }
