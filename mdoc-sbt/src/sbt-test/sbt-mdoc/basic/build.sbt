@@ -18,11 +18,8 @@ println(example.Example.greeting)
 ```scala
 println("Hello Scala.js!")
 ```
-
 <div id="mdoc-js-run0" data-mdoc-js></div>
-
 <script type="text/javascript" src="readme.md.js" defer></script>
-
 <script type="text/javascript" src="mdoc.js" defer></script>
 """.trim,
     "\"\"\"\n" + obtained + "\n\"\"\""
