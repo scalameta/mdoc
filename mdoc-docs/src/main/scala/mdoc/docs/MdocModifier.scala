@@ -13,24 +13,25 @@ import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.GitHubIdGenerator
 import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.markdown.MarkdownFile
 
 class MdocModifier(context: Context) extends StringModifier {
   private val myStdout = new ByteArrayOutputStream()
   private val myReporter = new ConsoleReporter(new PrintStream(myStdout))
-  private val markdownSettings = Markdown.mdocSettings(context.copy(reporter = myReporter))
+  private val myContext = context.copy(reporter = myReporter)
   override val name: String = "mdoc"
   override def process(info: String, code: Input, reporter: Reporter): String = {
     myStdout.reset()
     myReporter.reset()
     val cleanInput = Input.VirtualFile(code.filename, code.text)
-    val relpath = RelativePath("readme.md")
+    val relpath = RelativePath(code.filename)
     val markdown = Markdown.toMarkdown(
       cleanInput,
-      context,
+      myContext,
       relpath,
-      Map.empty[String, String],
+      myContext.settings.site,
       myReporter,
-      context.settings
+      myContext.settings
     )
     val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, relpath, cleanInput)
     LinkHygiene.lint(List(links), myReporter, verbose = false)
