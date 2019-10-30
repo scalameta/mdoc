@@ -12,6 +12,8 @@ jobs:
     # default stage is test
     - name: Scalafmt
       script: ./bin/scalafmt --test
+    - name: Website
+      script: sbt docs/mdoc
     - env: Scala 2.13
       script: sbt "++2.13.1 test"
     - env: Scala 2.12
