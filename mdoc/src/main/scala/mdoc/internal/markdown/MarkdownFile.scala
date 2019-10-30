@@ -9,10 +9,13 @@ import scala.meta.io.RelativePath
 
 final case class MarkdownFile(input: Input, relativePath: RelativePath, parts: List[MarkdownPart]) {
   private val appends = mutable.ListBuffer.empty[String]
-  def appendText(text: String): Unit = appends += text
+  def appendText(text: String): Unit = {
+    appends += text
+  }
   def renderToString: String = {
     val out = new StringBuilder()
     parts.foreach(_.renderToString(out))
+    appends.foreach(a => out.append(a).append("\n"))
     out.toString()
   }
 }
@@ -28,8 +31,9 @@ object MarkdownFile {
       Position.Range(input, start, end)
     }
     private def newText(start: Int, end: Int): Text = {
-      val part = Text(text.substring(start, end))
-      part.pos = newPos(start, end)
+      val adaptedEnd = math.max(start, end)
+      val part = Text(text.substring(start, adaptedEnd))
+      part.pos = newPos(start, adaptedEnd)
       part
     }
     private def newCodeFence(
@@ -39,8 +43,9 @@ object MarkdownFile {
     ): CodeFence = {
       val open = newText(state.start, state.start + state.backticks.length())
       val info = newText(open.pos.end, open.pos.end + state.info.length())
-      val body = newText(info.pos.end, backtickStart - 1)
-      val close = newText(backtickStart - 1, backtickEnd)
+      val adaptedBacktickStart = math.max(0, backtickStart - 1)
+      val body = newText(info.pos.end, adaptedBacktickStart)
+      val close = newText(adaptedBacktickStart, backtickEnd)
       val part = CodeFence(open, info, body, close)
       part.pos = newPos(state.start, backtickEnd)
       part

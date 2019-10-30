@@ -87,7 +87,6 @@ class ScalacOptionsSuite extends BaseCliSuite {
        |println("1")
        |// 1
        |```
-       |
        |```scala
        |println("2")
        |// 2

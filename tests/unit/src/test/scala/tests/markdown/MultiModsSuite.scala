@@ -12,8 +12,9 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |```scala mdoc:reset:fail
       |println(x)
       |```
-    """.stripMargin,
-    """|```scala
+      |""".stripMargin,
+    """|
+       |```scala
        |val x = 1
        |// x: Int = 1
        |```
@@ -24,7 +25,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
        |// println(x)
        |//         ^
        |```
-    """.stripMargin
+       |""".stripMargin
   )
 
   check(
@@ -68,6 +69,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
        |val x = 1
        |// x: Int = 1
        |```
+       |
        |
        |```scala
        |println(x)

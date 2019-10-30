@@ -34,17 +34,15 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
     """.stripMargin,
     s"""
        |<script src="https://scastie.scala-lang.org/embedded.js"></script>
-       |
        |<pre class='scastie-snippet-${debugClassSuffix}'></pre>
-       |
        |<script>window.addEventListener('load', function() {
-       |scastie.Embedded('.scastie-snippet-${debugClassSuffix}', {
-       |code: `val x = 1`,
-       |theme: 'light',
-       |isWorksheetMode: true,
-       |targetType: 'jvm',
-       |scalaVersion: '2.12.6'
-       |})
+       | scastie.Embedded('.scastie-snippet-${debugClassSuffix}', {
+       |   code: `val x = 1`,
+       |   theme: 'light',
+       |    isWorksheetMode: true,
+       |    targetType: 'jvm',
+       |    scalaVersion: '2.12.6'
+       |  })
        |})</script>
     """.stripMargin
   )
@@ -58,17 +56,15 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
     """.stripMargin,
     s"""
        |<script src="https://scastie.scala-lang.org/embedded.js"></script>
-       |
        |<pre class='scastie-snippet-${debugClassSuffix}'></pre>
-       |
        |<script>window.addEventListener('load', function() {
-       |scastie.Embedded('.scastie-snippet-${debugClassSuffix}', {
-       |code: `val x = 1`,
-       |theme: 'dark',
-       |isWorksheetMode: true,
-       |targetType: 'jvm',
-       |scalaVersion: '2.12.6'
-       |})
+       | scastie.Embedded('.scastie-snippet-${debugClassSuffix}', {
+       |   code: `val x = 1`,
+       |   theme: 'dark',
+       |    isWorksheetMode: true,
+       |    targetType: 'jvm',
+       |    scalaVersion: '2.12.6'
+       |  })
        |})</script>
     """.stripMargin,
     settings = darkThemeSettings

@@ -46,22 +46,22 @@ class FenceInput(ctx: Context, baseInput: Input) {
               }
           }
           .orElse {
-            ctx.reporter.error(info.pos, s"Invalid mode '$mode'")
+            invalid(info, s"Invalid mode '$mode'")
             None
           }
       }
     }
   }
 
-  private def invalid(block: FencedCodeBlock, message: String): Unit = {
+  private def invalid(info: Text, message: String): Unit = {
     val offset = "scala mdoc:".length
-    val start = block.getInfo.getStartOffset + offset
-    val end = block.getInfo.getEndOffset
+    val start = info.pos.start + offset
+    val end = info.pos.end - 1
     val pos = Position.Range(baseInput, start, end)
     ctx.reporter.error(pos, message)
   }
   private def invalidCombination(info: Text, mod1: String, mod2: String): Boolean = {
-    ctx.reporter.error(info.pos, s"invalid combination of modifiers '$mod1' and '$mod2'")
+    invalid(info, s"invalid combination of modifiers '$mod1' and '$mod2'")
     false
   }
 
@@ -76,8 +76,8 @@ class FenceInput(ctx: Context, baseInput: Input) {
         true
       } else {
         val all = others.map(_.toString.toLowerCase).mkString(", ")
-        ctx.reporter.error(
-          info.pos,
+        invalid(
+          info,
           s"""compile-only cannot be used in combination with $all"""
         )
         false

@@ -16,7 +16,6 @@ class ToStringSuite extends BaseMarkdownSuite {
        |List("a")
        |// res0: List[String] = List(a)
        |```
-       |
        |```scala
        |List("a")
        |// res1: List[String] = List("a")

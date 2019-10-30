@@ -11,21 +11,27 @@ import mdoc.internal.markdown.CodeFence
 import utest._
 import scala.meta.io.RelativePath
 
-object MarkdownFileSuite extends TestSuite {
-  val tests = Tests {
-    val reporter = new ConsoleReporter(System.out)
+object Assertions extends DiffAssertions
 
-    def check(original: String, expected: MarkdownPart*)(
-        implicit path: utest.framework.TestPath
-    ): Unit = {
-      reporter.reset()
-      val input = Input.VirtualFile(path.value.mkString("."), original)
-      val relpath = RelativePath(input.path)
-      val obtained = MarkdownFile.parse(input, relpath, reporter).parts
-      require(!reporter.hasErrors)
-      val expectedParts = expected.toList
-      assert(obtained == expectedParts)
-    }
+object MarkdownFileSuite extends TestSuite {
+  import Assertions._
+  val reporter = new ConsoleReporter(System.out)
+
+  def check(original: String, expected: MarkdownPart*)(
+      implicit path: utest.framework.TestPath
+  ): Unit = {
+    reporter.reset()
+    val input = Input.VirtualFile(path.value.mkString("."), original)
+    val relpath = RelativePath(input.path)
+    val obtained = MarkdownFile.parse(input, relpath, reporter).parts
+    require(!reporter.hasErrors)
+    val expectedParts = expected.toList
+    assertNoDiff(
+      pprint.tokenize(obtained).mkString,
+      pprint.tokenize(expectedParts).mkString
+    )
+  }
+  val tests = Tests {
 
     test("basic") {
       check(
@@ -41,8 +47,8 @@ object MarkdownFileSuite extends TestSuite {
         CodeFence(
           Text("```"),
           Text("scala mdoc\n"),
-          Text("println(42)\n"),
-          Text("```\n")
+          Text("println(42)"),
+          Text("\n```\n")
         ),
         Text("End.\n")
       )
@@ -64,8 +70,8 @@ object MarkdownFileSuite extends TestSuite {
         CodeFence(
           Text("````"),
           Text("scala mdoc\n"),
-          Text("```\nprintln(42)\n```\n"),
-          Text("````\n")
+          Text("```\nprintln(42)\n```"),
+          Text("\n````\n")
         ),
         Text("End.\n")
       )
@@ -100,13 +106,13 @@ object MarkdownFileSuite extends TestSuite {
           Text("````"),
           Text("scala mdoc\n"),
           Text(""),
-          Text("`````\n")
+          Text("\n`````\n")
         ),
         CodeFence(
           Text("````"),
           Text("\n"),
-          Text("42\n"),
-          Text("")
+          Text("42"),
+          Text("\n")
         )
       )
     }

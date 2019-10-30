@@ -33,12 +33,10 @@ class CompileOnlySuite extends BaseMarkdownSuite {
        |val message = "Enter: "
        |// message: String = "Enter: "
        |```
-       |
        |```scala
        |println(message)
        |println(System.in.read())
        |```
-       |
        |```scala
        |println(message)
        |// Enter:

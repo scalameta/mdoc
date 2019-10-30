@@ -50,6 +50,7 @@ class ResetSuite extends BaseMarkdownSuite {
       |```
       |
       |```scala mdoc
+      |implicit val x: Int = 41
       |println(x)
       |```
     """.stripMargin,
@@ -58,12 +59,15 @@ class ResetSuite extends BaseMarkdownSuite {
        |// x: Int = 42
        |```
        |
-       |```scala mdoc:reset
+       |```scala
+       |
        |```
        |
        |```scala
+       |implicit val x: Int = 41
+       |// x: Int = 41
        |println(x)
-       |// 42
+       |// 41
        |```
     """.stripMargin
   )
