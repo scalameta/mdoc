@@ -8,6 +8,7 @@ class SilentSuite extends BaseMarkdownSuite {
       |```scala mdoc:silent
       |val x = 4
       |```
+      |
       |```scala mdoc
       |println(x)
       |```

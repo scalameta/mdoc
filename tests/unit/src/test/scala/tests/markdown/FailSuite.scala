@@ -106,7 +106,6 @@ class FailSuite extends BaseMarkdownSuite {
        |println(42)
        |// 42
        |```
-       |
        |```scala
        |val x: Int = "String"
        |// error: type mismatch;

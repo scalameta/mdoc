@@ -137,7 +137,6 @@ class CliSuite extends BaseCliSuite {
     """
       |/before-index.md
       |# Header
-      |
       |[Head](#head)
     """.stripMargin, // did not generate index.md
     expectedExitCode = 1,

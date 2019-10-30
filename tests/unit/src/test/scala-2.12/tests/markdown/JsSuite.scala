@@ -15,7 +15,6 @@ class JsSuite extends BaseMarkdownSuite {
 
   def suffix(name: String): String =
     s"""|<script type="text/javascript" src="$name.md.js" defer></script>
-        |
         |<script type="text/javascript" src="mdoc.js" defer></script>
         |""".stripMargin
 
@@ -25,15 +24,12 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js
       |println("hello world!")
       |```
-    """.stripMargin,
+      |""".stripMargin,
     """|```scala
        |println("hello world!")
        |```
-       |
        |<div id="mdoc-js-run0" data-mdoc-js></div>
-       |
        |<script type="text/javascript" src="basic.md.js" defer></script>
-       |
        |<script type="text/javascript" src="mdoc.js" defer></script>
     """.stripMargin
   )
@@ -64,21 +60,17 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js
       |println("hello 2!")
       |```
-    """.stripMargin,
+      |""".stripMargin,
     """|```scala
        |println("hello 1!")
        |```
-       |
        |<div id="mdoc-js-run0" data-mdoc-js></div>
        |
        |```scala
        |println("hello 2!")
        |```
-       |
        |<div id="mdoc-js-run1" data-mdoc-js></div>
-       |
        |<script type="text/javascript" src="multi.md.js" defer></script>
-       |
        |<script type="text/javascript" src="mdoc.js" defer></script>
        |""".stripMargin
   )
@@ -143,7 +135,7 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js
       |println(x)
       |```
-    """.stripMargin,
+      |""".stripMargin,
     """|```scala
        |val x = 1
        |```
@@ -151,11 +143,8 @@ class JsSuite extends BaseMarkdownSuite {
        |```scala
        |println(x)
        |```
-       |
        |<div id="mdoc-js-run1" data-mdoc-js></div>
-       |
        |<script type="text/javascript" src="shared.md.js" defer></script>
-       |
        |<script type="text/javascript" src="mdoc.js" defer></script>
     """.stripMargin
   )
@@ -199,7 +188,7 @@ class JsSuite extends BaseMarkdownSuite {
       |  |  c
       | '''.stripMargin
       |```
-    """.stripMargin.triplequoted,
+      |""".stripMargin.triplequoted,
     s"""|```scala
         |val x = '''
         |  |a
@@ -207,9 +196,7 @@ class JsSuite extends BaseMarkdownSuite {
         |  |  c
         | '''.stripMargin
         |```
-        |
         |<div id="mdoc-js-run0" data-mdoc-js></div>
-        |
         |${suffix("stripMargin")}
         |""".stripMargin.triplequoted
   )
@@ -220,10 +207,9 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js:invisible
       |println("Hello!")
       |```
-    """.stripMargin,
+      |""".stripMargin,
     s"""|
         |<div id="mdoc-js-run0" data-mdoc-js></div>
-        |
         |${suffix("invisible")}
         |""".stripMargin
   )
@@ -263,7 +249,7 @@ class JsSuite extends BaseMarkdownSuite {
        |```scala mdoc:js:shared:not
        |println(1)
        |```
-    """.stripMargin,
+       |""".stripMargin,
     """|error: mods-error.md:2:25: invalid modifier 'not'
        |```scala mdoc:js:shared:not
        |                        ^^^
@@ -276,19 +262,14 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js
       |println("Hello!")
       |```
-    """.stripMargin,
+      |""".stripMargin,
     """|```scala
        |println("Hello!")
        |```
-       |
        |<div id="mdoc-js-run0" data-mdoc-js></div>
-       |
        |<script type="text/javascript" src="mdoc-library.js" defer></script>
-       |
        |<script type="text/javascript" src="mdoc-loader.js" defer></script>
-       |
        |<script type="text/javascript" src="commonjs.md.js" defer></script>
-       |
        |<script type="text/javascript" src="mdoc.js" defer></script>
        |""".stripMargin,
     settings = {
@@ -314,14 +295,11 @@ class JsSuite extends BaseMarkdownSuite {
       |```scala mdoc:js:invisible
       |println("Hello!")
       |```
-    """.stripMargin,
+      |""".stripMargin,
     s"""|
         |<div id="mdoc-js-run0" data-mdoc-js></div>
-        |
         |$unpkgReact
-        |
         |<script type="text/javascript" src="html-header.md.js" defer></script>
-        |
         |<script type="text/javascript" src="mdoc.js" defer></script>
         |""".stripMargin,
     settings = {

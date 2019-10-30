@@ -24,10 +24,10 @@ import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 
 final class MainOps(
-    settings: Settings,
-    markdown: MutableDataSet,
-    reporter: Reporter
+    context: Context
 ) {
+  def settings: Settings = context.settings
+  def reporter: Reporter = context.reporter
 
   private var livereload: Option[LiveReload] = None
   private def startLivereload(): Unit = {
@@ -59,9 +59,7 @@ final class MainOps(
     val timer = new Timer
     val source = FileIO.slurp(file.in, settings.charset)
     val input = Input.VirtualFile(file.in.toString(), source)
-    markdown.set(Markdown.InputKey, Some(input))
-    markdown.set(Markdown.RelativePathKey, Some(file.relpath))
-    val md = Markdown.toMarkdown(input, markdown, reporter, settings)
+    val md = Markdown.toMarkdown(input, context, file.relpath, settings.site, reporter, settings)
     val fileHasErrors = reporter.errorCount > originalErrors
     if (!fileHasErrors) {
       writePath(file, md)
@@ -226,11 +224,10 @@ object MainOps {
             error.all.foreach(message => reporter.error(message))
             1
           case Configured.Ok(ctx) =>
-            val markdown = Markdown.mdocSettings(ctx)
             if (ctx.settings.verbose) {
               ctx.reporter.setDebugEnabled(true)
             }
-            val runner = new MainOps(ctx.settings, markdown, ctx.reporter)
+            val runner = new MainOps(ctx)
             val exit = runner.run()
             if (exit.isSuccess) {
               0

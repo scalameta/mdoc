@@ -7,7 +7,7 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
       |# Hey ![version]
     """.stripMargin,
     """
-      |# Hey 1.0
+      |# Hey ![version]
     """.stripMargin
   )
 
@@ -17,7 +17,7 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
       |I am ![version]
     """.stripMargin,
     """
-      |I am 1.0
+      |I am ![version]
     """.stripMargin
   )
 
@@ -32,7 +32,7 @@ class SiteVariableInjectorSuite extends BaseMarkdownSuite {
       |
       || C1 | C2 |
       || == | == |
-      || 1.0 | hello |
+      || ![version] | hello |
     """.stripMargin
   )
 

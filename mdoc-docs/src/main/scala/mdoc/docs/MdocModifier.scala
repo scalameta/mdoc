@@ -23,8 +23,16 @@ class MdocModifier(context: Context) extends StringModifier {
     myStdout.reset()
     myReporter.reset()
     val cleanInput = Input.VirtualFile(code.filename, code.text)
-    val markdown = Markdown.toMarkdown(cleanInput, markdownSettings, myReporter, context.settings)
-    val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, RelativePath("readme.md"), cleanInput)
+    val relpath = RelativePath("readme.md")
+    val markdown = Markdown.toMarkdown(
+      cleanInput,
+      context,
+      relpath,
+      Map.empty[String, String],
+      myReporter,
+      context.settings
+    )
+    val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, relpath, cleanInput)
     LinkHygiene.lint(List(links), myReporter, verbose = false)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {

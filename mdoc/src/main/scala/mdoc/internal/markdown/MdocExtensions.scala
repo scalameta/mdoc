@@ -24,10 +24,7 @@ object MdocExtensions {
     * @return A sequence of extensions to be applied to Flexmark's options.
     */
   def mdoc(context: Context): List[Extension] = {
-    plain ++ List(
-      MdocParserExtension.create(context),
-      MdocFormatterExtension.create(context.settings)
-    )
+    plain
   }
 
   def plain: List[Extension] = {
