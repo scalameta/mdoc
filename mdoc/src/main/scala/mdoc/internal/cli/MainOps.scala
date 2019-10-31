@@ -85,9 +85,11 @@ final class MainOps(
     try {
       if (!settings.isIncluded(file.relpath)) Exit.success
       else {
-        PathIO.extension(file.in.toNIO) match {
-          case "md" => handleMarkdown(file)
-          case _ => handleRegularFile(file)
+        val extension = PathIO.extension(file.in.toNIO)
+        if (settings.isMarkdownFileExtension(extension)) {
+          handleMarkdown(file)
+        } else {
+          handleRegularFile(file)
         }
       }
     } catch {

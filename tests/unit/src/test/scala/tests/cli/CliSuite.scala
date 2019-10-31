@@ -168,4 +168,27 @@ class CliSuite extends BaseCliSuite {
     }
   )
 
+  checkCli(
+    "html",
+    """
+      |/index.html
+      |<h1>My Fantastic Talk!</h1>
+      |<p>
+      |```scala mdoc
+      |println(42)
+      |```
+      |</p>
+      |""".stripMargin,
+    """
+      |/index.html
+      |<h1>My Fantastic Talk!</h1>
+      |<p>
+      |```scala
+      |println(42)
+      |// 42
+      |```
+      |</p>
+      |""".stripMargin
+  )
+
 }

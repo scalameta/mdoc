@@ -96,6 +96,8 @@ case class Settings(
     usage: Boolean = false,
     @Description("Print out the version number and exit")
     version: Boolean = false,
+    @Description("Set of file extensions to treat as markdown files.")
+    markdownExtensions: List[String] = List("md", "html"),
     @Description(
       "Glob to filter which files to process. Defaults to all files. " +
         "Example: --include **/example.md will process only files with the name example.md."
@@ -134,6 +136,8 @@ case class Settings(
     @Description("The pretty printer for variables")
     variablePrinter: Variable => String = ReplVariablePrinter
 ) {
+
+  val isMarkdownFileExtension = markdownExtensions.toSet
 
   def withProperties(props: MdocProperties): Settings =
     copy(
