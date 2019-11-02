@@ -14,6 +14,9 @@ object Mod {
   case object ResetClass extends Mod {
     override def toString: String = "reset-class"
   }
+  case object ResetObject extends Mod {
+    override def toString: String = "reset-object"
+  }
   case object ToString extends Mod {
     override def toString: String = "to-string"
   }
@@ -24,6 +27,7 @@ object Mod {
     CompileOnly,
     Reset,
     ResetClass,
+    ResetObject,
     Fail,
     Crash,
     Silent,
