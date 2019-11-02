@@ -8,6 +8,7 @@ object Compat {
     val processor = compat
       .get(BuildInfo.scalaVersion)
       .orElse(compat.get(BuildInfo.scalaBinaryVersion))
+      .orElse(compat.get("all"))
     processor match {
       case None => default
       case Some(fn) => fn(default)
@@ -21,6 +22,7 @@ object Compat {
     val result = compat
       .get(BuildInfo.scalaVersion)
       .orElse(compat.get(BuildInfo.scalaBinaryVersion))
+      .orElse(compat.get("all"))
       .getOrElse(
         BuildInfo.scalaBinaryVersion match {
           case "2.11" =>

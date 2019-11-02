@@ -25,8 +25,9 @@ sealed abstract class Modifier(val mods: Set[Mod]) {
   def isSilent: Boolean = mods(Silent)
   def isInvisible: Boolean = mods(Invisible)
   def isCompileOnly: Boolean = mods(CompileOnly)
-  def isReset: Boolean = mods(Reset) || isResetClass
-  def isResetClass: Boolean = mods(ResetClass)
+  def isReset: Boolean = isResetClass || isResetObject
+  def isResetClass: Boolean = mods(ResetClass) || mods(Reset)
+  def isResetObject: Boolean = mods(ResetObject)
   def isToString: Boolean = mods(ToString)
 }
 object Modifier {

@@ -208,7 +208,7 @@ class FailSuite extends BaseMarkdownSuite {
   check(
     "value-class",
     """
-      |```scala mdoc
+      |```scala mdoc:reset-object
       |final case class FloatValue(val value: Float) extends AnyVal
       |```
       |

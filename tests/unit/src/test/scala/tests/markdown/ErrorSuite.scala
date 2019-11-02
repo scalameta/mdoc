@@ -3,14 +3,13 @@ package tests.markdown
 class ErrorSuite extends BaseMarkdownSuite {
 
   override def postProcessObtained: Map[String, String => String] = Map(
-    "2.13" -> { old =>
-      old.linesIterator.filterNot(_.startsWith("did you mean")).mkString("\n")
-    }
-  )
-
-  override def postProcessExpected: Map[String, String => String] = Map(
-    "2.13" -> { old =>
-      old.linesIterator.filterNot(_.contains("<clinit>(crash.md)")).mkString("\n")
+    "all" -> { old =>
+      old.linesIterator
+        .filterNot { line =>
+          line.startsWith("did you mean") ||
+          line.contains("(crash.md")
+        }
+        .mkString("\n")
     }
   )
 
@@ -33,11 +32,6 @@ class ErrorSuite extends BaseMarkdownSuite {
        |^^^^^^^^^
        |scala.NotImplementedError: an implementation is missing
        |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |	at repl.Session$App$.crash(crash.md:17)
-       |	at repl.Session$App$.z(crash.md:20)
-       |	at repl.Session$App$.<init>(crash.md:26)
-       |	at repl.Session$App$.<clinit>(crash.md)
-       |	at repl.Session$.app(crash.md:3)
        |""".stripMargin
   )
 

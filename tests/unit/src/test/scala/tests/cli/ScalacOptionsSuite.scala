@@ -54,7 +54,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
   val finalInput: String =
     """
       |/in.md
-      |```scala mdoc
+      |```scala mdoc:reset-object
       |sealed abstract class Maybe[+A] extends Product with Serializable
       |
       |final case class Just[A](value: A) extends Maybe[A]
@@ -68,7 +68,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
       "--scalac-options",
       "-Ywarn-unused -Xfatal-warnings"
     ),
-    expected = finalInput.replaceFirst("scala mdoc", "scala")
+    expected = finalInput.replaceFirst("scala mdoc:reset-object", "scala")
   )
 
   checkCli(
