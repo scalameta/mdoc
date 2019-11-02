@@ -128,41 +128,35 @@ println(x)
 
 ## `reset-class`
 
-The `:reset-class` modifier is like `:reset` except that it wraps the following
-statements in a class instead of an object. By default, statements are wrapped
-in an object but that encoding can cause problems such as deadlocks during
-initialization of multi-threaded code. See
-[this StackOverflow answer](https://stackoverflow.com/questions/15176199/scala-parallel-collection-in-object-initializer-causes-a-program-to-hang)
-for a more detailed explanation.
+This modifier works exactly the same way as `:reset` and is deprecated. Please
+use `:reset` instead.
 
-For example, the following program crashes by default with a timeout exception.
+## `reset-object`
+
+The `:reset-object` modifier is similar to `:reset` except that it wraps the
+following statements in a object instead of a class. By default, statements are
+wrapped in an class but that encoding can cause problems compile errors such as
+
+- "Value class may not be a member of another class": happens when using
+  `extends AnyVal`
+- "The outer reference in this type test cannot be checked at run time": happens
+  when pattern matching on sealed ADT.
+
+Example case where the default class wrapping does not compile:
 
 ````scala mdoc:mdoc:crash
 ```scala mdoc
-import scala.concurrent._, duration._, mdoc.docs.executor
-val x = 1
-Await.result(Future(x), Duration("10ms"))
+final case class Name(val value: String) extends AnyVal
 ```
 ````
 
-Use `:reset-class` to avoid the timeout exception.
+Use `:reset-object` to avoid these compile errors
 
 ````scala mdoc:mdoc
-```scala mdoc:reset-class
-import scala.concurrent._, duration._, mdoc.docs.executor
-val x = 1
-Await.result(Future(x), Duration("10ms"))
+```scala mdoc:reset-object
+final case class Name(val value: String) extends AnyVal
 ```
 ````
-
-Note that `:reset-class` does not support the some language constructs
-including:
-
-- value classes: classes that extend `AnyVal` must be toplevel or enclosed in
-  objects
-- final classes: pattern matching against final inner classes causes "The outer
-  reference in this type test cannot be checked at run time." warnings under
-  `-Xfatal-warnings`.
 
 ## `to-string`
 
