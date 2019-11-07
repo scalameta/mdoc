@@ -26,7 +26,9 @@ object Renderer {
   ): String = {
     val sbt1WithLiteralTypes = dialects.Sbt1.copy(allowLiteralTypes = true)
     val inputs =
-      sections.map(s => SectionInput(s, sbt1WithLiteralTypes(s).parse[Source].get, Modifier.Default()))
+      sections.map(
+        s => SectionInput(s, sbt1WithLiteralTypes(s).parse[Source].get, Modifier.Default())
+      )
     val instrumented = Instrumenter.instrument(inputs)
     val doc =
       MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
