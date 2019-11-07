@@ -103,7 +103,8 @@ class Processor(implicit ctx: Context) {
     val sectionInputs = inputs.map {
       case ScalaFenceInput(_, input, mod) =>
         import scala.meta._
-        dialects.Sbt1(input).parse[Source] match {
+        val sbt1WithLiteralTypes = dialects.Sbt1.copy(allowLiteralTypes = true)
+        sbt1WithLiteralTypes(input).parse[Source] match {
           case parsers.Parsed.Success(source) =>
             SectionInput(input, source, mod)
           case parsers.Parsed.Error(pos, msg, _) =>
