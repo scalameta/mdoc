@@ -13,6 +13,7 @@ import mdoc.PostProcessContext
 import mdoc.PreModifierContext
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
+import scala.meta.dialects.Scala213
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
 import mdoc.internal.cli.Context
@@ -21,6 +22,14 @@ import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
 import pprint.TPrintColors
 import scala.meta.io.RelativePath
+
+object MdocDialect {
+
+  val scala = Scala213.copy(
+    allowToplevelTerms = true,
+    toplevelSeparator = ""
+  )
+}
 
 class Processor(implicit ctx: Context) {
 
@@ -103,7 +112,7 @@ class Processor(implicit ctx: Context) {
     val sectionInputs = inputs.map {
       case ScalaFenceInput(_, input, mod) =>
         import scala.meta._
-        dialects.Sbt1(input).parse[Source] match {
+        MdocDialect.scala(input).parse[Source] match {
           case parsers.Parsed.Success(source) =>
             SectionInput(input, source, mod)
           case parsers.Parsed.Error(pos, msg, _) =>

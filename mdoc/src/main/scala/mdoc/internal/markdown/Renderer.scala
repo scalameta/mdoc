@@ -25,7 +25,9 @@ object Renderer {
       printer: Variable => String
   ): String = {
     val inputs =
-      sections.map(s => SectionInput(s, dialects.Sbt1(s).parse[Source].get, Modifier.Default()))
+      sections.map(
+        s => SectionInput(s, MdocDialect.scala(s).parse[Source].get, Modifier.Default())
+      )
     val instrumented = Instrumenter.instrument(inputs)
     val doc =
       MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
