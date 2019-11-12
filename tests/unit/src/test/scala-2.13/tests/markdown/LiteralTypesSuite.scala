@@ -58,4 +58,20 @@ class LiteralTypesSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "narrowing",
+    """
+      |```scala mdoc
+      |def narrower[T <: Singleton](t: T): T {} = t
+      |narrower(42)
+      |```
+    """.stripMargin,
+    """|```scala
+       |def narrower[T <: Singleton](t: T): T {} = t
+       |narrower(42)
+       |// res0: 42 = 42
+       |```
+    """.stripMargin
+  )
+
 }
