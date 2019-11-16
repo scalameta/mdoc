@@ -53,6 +53,18 @@ lazy val fansiVersion = Def.setting {
   else "0.2.7"
 }
 
+lazy val interfaces = project
+  .in(file("mdoc-interfaces"))
+  .settings(
+    moduleName := "mdoc-interfaces",
+    autoScalaLibrary := false,
+    crossVersion := CrossVersion.disabled,
+    javacOptions in (Compile / doc) ++= List(
+      "-tag",
+      "implNote:a:Implementation Note:"
+    )
+  )
+
 lazy val runtime = project
   .settings(
     moduleName := "mdoc-runtime",
@@ -61,6 +73,7 @@ lazy val runtime = project
       "com.lihaoyi" %% "pprint" % pprintVersion.value
     )
   )
+  .dependsOn(interfaces)
 
 lazy val mdoc = project
   .settings(
@@ -189,6 +202,7 @@ lazy val plugin = project
     },
     publishLocal := publishLocal
       .dependsOn(
+        publishLocal in interfaces,
         publishLocal in runtime,
         publishLocal in mdoc,
         publishLocal in js

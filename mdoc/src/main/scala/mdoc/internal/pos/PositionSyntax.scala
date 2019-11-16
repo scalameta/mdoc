@@ -87,6 +87,13 @@ object PositionSyntax {
       case _ =>
         pos
     }
+    def toMdoc: RangePosition =
+      new RangePosition(
+        pos.startLine,
+        pos.startColumn,
+        pos.endLine,
+        pos.endColumn
+      )
     def contains(offset: Int): Boolean = {
       if (pos.start == pos.end) pos.end == offset
       else {

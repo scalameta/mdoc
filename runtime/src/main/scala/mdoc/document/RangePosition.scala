@@ -9,7 +9,7 @@ final class RangePosition(
     val startColumn: Int,
     val endLine: Int,
     val endColumn: Int
-) {
+) extends mdoc.interfaces.RangePosition {
   def add(other: RangePosition): RangePosition =
     new RangePosition(
       other.startLine + startLine,
