@@ -130,6 +130,12 @@ case class Settings(
     @Description("The input stream to listen for enter key during file watching.")
     inputStream: InputStream = System.in,
     @Hidden()
+    @Description("The width of the screen, used to line wrap pretty-printed objects.")
+    screenWidth: Int = 120,
+    @Hidden()
+    @Description("The height of the screen, used to truncate large pretty-printed objects.")
+    screenHeight: Int = 50,
+    @Hidden()
     @Description("The generator for header IDs, defaults to GitHub ID generator")
     headerIdGenerator: String => String = GitHubIdGenerator,
     @Hidden()

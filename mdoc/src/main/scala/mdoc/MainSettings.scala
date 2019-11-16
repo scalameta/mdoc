@@ -92,6 +92,12 @@ final class MainSettings private (
   def withVariablePrinter(variablePrinter: Variable => String): MainSettings = {
     copy(settings.copy(variablePrinter = variablePrinter))
   }
+  def withScreenWidth(screenWidth: Int): MainSettings = {
+    copy(settings.copy(screenWidth = screenWidth))
+  }
+  def withScreenHeight(screenHeight: Int): MainSettings = {
+    copy(settings.copy(screenHeight = screenHeight))
+  }
 
   private[this] implicit def cwd: AbsolutePath = settings.cwd
   private[this] def copy(
