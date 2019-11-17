@@ -40,7 +40,7 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.2.2"
+  val scalameta = "4.2.5"
 }
 
 lazy val pprintVersion = Def.setting {
