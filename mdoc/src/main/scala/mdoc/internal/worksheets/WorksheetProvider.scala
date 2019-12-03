@@ -4,7 +4,6 @@ import scala.meta._
 import mdoc.internal.cli.Context
 import scala.collection.JavaConverters._
 import mdoc.internal.markdown.SectionInput
-import scala.meta.parsers.Parsed.Success
 import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.Instrumenter
 import mdoc.internal.markdown.MarkdownCompiler
@@ -14,15 +13,14 @@ import mdoc.internal.cli.Settings
 import pprint.TPrintColors
 import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
-import mdoc.interfaces.Diagnostic
 import mdoc.{interfaces => i}
 import mdoc.internal.markdown.MdocDialect
+import WorksheetProvider._
 
 class WorksheetProvider(settings: Settings) {
 
   private val reporter = new StoreReporter()
 
-  private val commentHeader = " // "
   // The smallest column width that worksheet values will use for rendering
   // worksheet decorations.
   private val minimumMargin = 20
@@ -54,8 +52,8 @@ class WorksheetProvider(settings: Settings) {
 
     EvaluatedWorksheet(
       reporter.diagnostics.map(d => d: i.Diagnostic).toSeq.asJava,
-      decorations.toIterator
-        .filterNot(_.summary == commentHeader)
+      decorations
+        .filterNot(_.summary.isEmpty)
         .map(d => d: i.EvaluatedWorksheetStatement)
         .toList
         .asJava
@@ -75,21 +73,21 @@ class WorksheetProvider(settings: Settings) {
       settings.screenWidth - statement.position.endColumn
     )
     val isEmptyValue = isUnitType(statement) || statement.binders.isEmpty
-    val contentText = renderContentText(statement, margin, isEmptyValue)
-    val hoverMessage = renderHoverMessage(statement, margin, isEmptyValue)
-    EvaluatedWorksheetStatement(range, contentText, hoverMessage)
+    val RenderSummaryResult(summary, isSummaryComplete) =
+      renderSummary(statement, margin, isEmptyValue)
+    val details = renderDetails(statement, isEmptyValue)
+    EvaluatedWorksheetStatement(range, summary, details, isSummaryComplete)
   }
 
-  private def renderHoverMessage(
+  private def renderDetails(
       statement: Statement,
-      margin: Int,
       isEmptyValue: Boolean
   ): String = {
     val out = new StringBuilder()
     if (!isEmptyValue) {
       statement.binders.iterator.foreach { binder =>
         out
-          .append("\n")
+          .append(if (out.nonEmpty) "\n" else "")
           .append(binder.name)
           .append(": ")
           .append(binder.tpe.render(TPrintColors.BlackWhite))
@@ -100,46 +98,53 @@ class WorksheetProvider(settings: Settings) {
       }
     }
     statement.out.linesIterator.foreach { line =>
-      out.append("\n// ").append(line)
+      out
+        .append(if (out.nonEmpty) "\n" else "")
+        .append("// ")
+        .append(line)
     }
     out.toString()
   }
 
-  private def renderContentText(
+  private def renderSummary(
       statement: Statement,
       margin: Int,
       isEmptyValue: Boolean
-  ): String = {
+  ): RenderSummaryResult = {
     val out = new StringBuilder()
-    out.append(commentHeader)
-    if (isEmptyValue) {
-      if (!statement.out.isEmpty()) {
-        out.append(statement.out.linesIterator.next())
-      }
-    } else {
-      val isSingle = statement.binders.lengthCompare(1) == 0
-      statement.binders.iterator.zipWithIndex.foreach {
-        case (binder, i) =>
-          if (!isSingle) {
-            out
-              .append(if (i == 0) "" else ", ")
-              .append(binder.name)
-              .append("=")
-          }
-          val truncatedLine = BlackWhite
-            .tokenize(binder.value, width = margin, height = settings.screenHeight)
-            .map(_.getChars)
-            .filterNot(_.iterator.forall(_.isWhitespace))
-            .flatMap(_.iterator)
-            .filter {
-              case '\n' => false
-              case _ => true
+    val isOverMargin =
+      if (isEmptyValue) {
+        if (!statement.out.isEmpty()) {
+          val lines = statement.out.linesIterator
+          out.append(lines.next())
+          lines.hasNext || out.length > margin
+        } else
+          false
+      } else {
+        val isSingle = statement.binders.lengthCompare(1) == 0
+        statement.binders.iterator.foldLeft(false) {
+          case (true, _) => true
+          case (false, binder) =>
+            if (!isSingle) {
+              out
+                .append(if (out.isEmpty) "" else ", ")
+                .append(binder.name)
+                .append("=")
             }
-            .take(margin)
-          out.appendAll(truncatedLine)
+            val chunk = BlackWhite
+              .tokenize(binder.value, width = margin - out.length)
+              .map(_.getChars)
+              .filterNot(_.iterator.forall(_.isWhitespace))
+              .flatMap(_.iterator)
+              .filter {
+                case '\n' => false
+                case _ => true
+              }
+            out.appendAll(chunk)
+            out.length > margin
+        }
       }
-    }
-    out.toString()
+    RenderSummaryResult(out.result().take(margin), isSummaryComplete = !isOverMargin)
   }
 
   private def isUnitType(statement: Statement): Boolean = {
@@ -149,4 +154,10 @@ class WorksheetProvider(settings: Settings) {
     }
 
   }
+}
+
+object WorksheetProvider {
+
+  case class RenderSummaryResult(summary: String, isSummaryComplete: Boolean)
+
 }

@@ -3,16 +3,13 @@ package tests.worksheets
 import java.lang.StringBuilder
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfterAll
-import mdoc.interfaces.Mdoc
+import mdoc.interfaces.{DiagnosticSeverity, Mdoc}
 import scala.meta.testkit.DiffAssertions
 import scala.collection.JavaConverters._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import mdoc.document.RangePosition
 import mdoc.internal.pos.PositionSyntax._
-import mdoc.interfaces.DiagnosticSeverity
 import java.{util => ju}
-import mdoc.PostModifier
 
 class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions {
   var mdoc = ju.ServiceLoader
@@ -84,7 +81,9 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
           .append("<")
           .append(p.text)
           .append(">")
+          .append(" // ")
           .append(stat.summary())
+          .append(if (!stat.isSummaryComplete) "..." else "")
           .append("\n")
           .append(stat.details())
         i = p.end
@@ -101,7 +100,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |""".stripMargin,
     """|
        |<val x = 1.to(4).toVector> // Vector(1, 2, 3, 4)
-       |
        |x: Vector[Int] = Vector(1, 2, 3, 4)
        |""".stripMargin
   )
@@ -113,7 +111,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |""".stripMargin,
     """|
        |<val List(x, y) = List(1, 2)> // x=1, y=2
-       |
        |x: Int = 1
        |y: Int = 2
        |""".stripMargin
@@ -125,8 +122,7 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |Stream.from(10)
       |""".stripMargin,
     """|
-       |<Stream.from(10)> // Stream(10,11,12,...
-       |
+       |<Stream.from(10)> // Stream(10,11,12,13,1...
        |res0: Stream[Int] = Stream(
        |  10,
        |  11,
@@ -141,8 +137,7 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |println(1.to(3).mkString(";\n"))
       |""".stripMargin,
     """|
-       |<println(1.to(3).mkString(";\n"))> // 1;
-       |
+       |<println(1.to(3).mkString(";\n"))> // 1;...
        |// 1;
        |// 2;
        |// 3
@@ -162,7 +157,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
        |  println("hello")
        |  42
        |}> // 42
-       |
        |x: Int = 42
        |// hello
        |""".stripMargin
@@ -177,13 +171,10 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |""".stripMargin,
     """|
        |<val n = 10> // 10
-       |
        |n: Int = 10
        |<println(n)> // 10
-       |
        |// 10
        |<val m = n * 10> // 100
-       |
        |m: Int = 100
        |""".stripMargin
   )
@@ -195,7 +186,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |""".stripMargin,
     """|import scala.concurrent.Future
        |<val n = Future.successful(10)> // Future(Success(10))
-       |
        |n: Future[Int] = Future(Success(10))
        |""".stripMargin
   )
@@ -207,7 +197,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       |""".stripMargin,
     """|case class User(name: String)
        |<val n = User("Susan")> // User("Susan")
-       |
        |n: User = User("Susan")
        |""".stripMargin
   )
