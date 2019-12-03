@@ -5,5 +5,6 @@ public abstract class EvaluatedWorksheetStatement {
   public abstract RangePosition position();
   public abstract String summary();
   public abstract String details();
+  public abstract boolean isSummaryComplete();
 
 }
