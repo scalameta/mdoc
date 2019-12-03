@@ -15,7 +15,6 @@ import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
 import mdoc.internal.markdown.MdocDialect
-import WorksheetProvider._
 
 class WorksheetProvider(settings: Settings) {
 
@@ -73,10 +72,15 @@ class WorksheetProvider(settings: Settings) {
       settings.screenWidth - statement.position.endColumn
     )
     val isEmptyValue = isUnitType(statement) || statement.binders.isEmpty
-    val RenderSummaryResult(summary, isSummaryComplete) =
+    val renderSummaryResult =
       renderSummary(statement, margin, isEmptyValue)
     val details = renderDetails(statement, isEmptyValue)
-    EvaluatedWorksheetStatement(range, summary, details, isSummaryComplete)
+    EvaluatedWorksheetStatement(
+      range,
+      renderSummaryResult.summary,
+      details,
+      renderSummaryResult.isSummaryComplete
+    )
   }
 
   private def renderDetails(
@@ -156,8 +160,4 @@ class WorksheetProvider(settings: Settings) {
   }
 }
 
-object WorksheetProvider {
-
-  case class RenderSummaryResult(summary: String, isSummaryComplete: Boolean)
-
-}
+case class RenderSummaryResult(summary: String, isSummaryComplete: Boolean)
