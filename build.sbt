@@ -236,8 +236,8 @@ lazy val lsp = project
     crossScalaVersions := List(scala212),
     libraryDependencies ++= List(
       "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % "0.5.0",
-      "com.outr" %% "scribe" % "2.6.0",
-      "com.outr" %% "scribe-slf4j" % "2.6.0"
+      "com.outr" %% "scribe" % "2.7.10",
+      "com.outr" %% "scribe-slf4j" % "2.7.10"
     )
   )
   .dependsOn(mdoc)
