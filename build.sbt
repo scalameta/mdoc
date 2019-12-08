@@ -100,7 +100,7 @@ lazy val mdoc = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
-      "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.50.44",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
       "io.methvin" % "directory-watcher" % "0.8.3",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
