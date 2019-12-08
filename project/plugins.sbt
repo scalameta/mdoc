@@ -5,7 +5,7 @@ addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.4.31")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.28")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.14.0")
 libraryDependencies ++= List(
-  "org.jsoup" % "jsoup" % "1.11.3",
+  "org.jsoup" % "jsoup" % "1.12.1",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
 unmanagedSourceDirectories.in(Compile) +=
