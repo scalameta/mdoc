@@ -1,14 +1,14 @@
 package tests.markdown
 
-import org.scalatest.FunSuite
 import scala.meta._
 import scala.meta.testkit.DiffAssertions
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.Renderer
 import mdoc.internal.markdown.ReplVariablePrinter
+import org.scalatest.funsuite.AnyFunSuite
 
-class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
+class MarkdownCompilerSuite extends AnyFunSuite with DiffAssertions {
 
   private val compiler = MarkdownCompiler.default()
   private val reporter = ConsoleReporter.default

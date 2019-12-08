@@ -1,9 +1,9 @@
 package tests.markdown
 
 import mdoc.internal.document.MdocExceptions
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ExceptionSuite extends FunSuite {
+class ExceptionSuite extends AnyFunSuite {
   test("cyclic") {
     var e1Cause: Throwable = null
     val e1 = new Exception {

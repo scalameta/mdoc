@@ -1,14 +1,14 @@
 package tests.markdown
 
 import mdoc.internal.cli.Settings
-import org.scalatest.FunSuite
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath
 import scala.meta.testkit.DiffAssertions
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.GitHubIdGenerator
+import org.scalatest.funsuite.AnyFunSuite
 
-class DocumentLinksSuite extends FunSuite with DiffAssertions {
+class DocumentLinksSuite extends AnyFunSuite with DiffAssertions {
 
   def check(name: String, original: String, fn: DocumentLinks => Unit): Unit = {
     test(name) {

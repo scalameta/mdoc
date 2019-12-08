@@ -1,13 +1,13 @@
 package tests
 
 import java.nio.file.Paths
-import org.scalatest.FunSuite
 import sbtdocusaurus.internal.Relativize
 import scala.meta.internal.io.PathIO
 import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
+import org.scalatest.funsuite.AnyFunSuite
 
-class RelativizeSuite extends FunSuite with DiffAssertions {
+class RelativizeSuite extends AnyFunSuite with DiffAssertions {
 
   def check(name: String, original: String, expected: String): Unit = {
     test(name) {

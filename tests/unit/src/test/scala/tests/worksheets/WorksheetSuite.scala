@@ -1,7 +1,6 @@
 package tests.worksheets
 
 import java.lang.StringBuilder
-import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfterAll
 import mdoc.interfaces.{DiagnosticSeverity, Mdoc}
 import scala.meta.testkit.DiffAssertions
@@ -10,8 +9,9 @@ import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import mdoc.internal.pos.PositionSyntax._
 import java.{util => ju}
+import org.scalatest.funsuite.AnyFunSuite
 
-class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions {
+class WorksheetSuite extends AnyFunSuite with BeforeAndAfterAll with DiffAssertions {
   var mdoc = ju.ServiceLoader
     .load(classOf[Mdoc], this.getClass().getClassLoader())
     .iterator()

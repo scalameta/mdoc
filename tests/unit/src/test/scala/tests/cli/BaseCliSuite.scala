@@ -4,15 +4,15 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
-import org.scalatest.FunSuite
 import scala.meta.io.AbsolutePath
 import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
 import mdoc.Main
+import org.scalatest.funsuite.AnyFunSuite
 
 case class CliFixture(in: Path, out: Path)
 
-abstract class BaseCliSuite extends FunSuite with DiffAssertions {
+abstract class BaseCliSuite extends AnyFunSuite with DiffAssertions {
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
       name: String,

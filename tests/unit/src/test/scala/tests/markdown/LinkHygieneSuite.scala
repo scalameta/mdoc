@@ -2,15 +2,15 @@ package tests.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import org.scalatest.FunSuite
 import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.LinkHygiene
+import org.scalatest.funsuite.AnyFunSuite
 
-class LinkHygieneSuite extends FunSuite with DiffAssertions {
+class LinkHygieneSuite extends AnyFunSuite with DiffAssertions {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
   def check(name: String, original: String, expected: String, verbose: Boolean = false): Unit = {

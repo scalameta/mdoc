@@ -18,8 +18,9 @@ import scala.meta.testkit.DiffAssertions
 import tests.markdown.StringSyntax._
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
+import org.scalatest
 
-abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
+abstract class BaseMarkdownSuite extends scalatest.funsuite.AnyFunSuite with DiffAssertions {
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
     dir.toFile.deleteOnExit()
