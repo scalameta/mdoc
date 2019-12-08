@@ -20,7 +20,7 @@ jobs:
       - uses: olafurpg/setup-scala@v7
       - run: sbt docs/mdoc
   test:
-    name: ${{ matrix.command }}
+    name: ${{ matrix.command }} ${{ matrix.java }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
