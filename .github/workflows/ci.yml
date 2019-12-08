@@ -27,9 +27,9 @@ jobs:
       matrix:
         java: [adopt@1.8, adopt@1.11]
         command:
-          - "++2.11.12 test"
-          - "++2.12.10 test scripted"
-          - "++2.13.1 test"
+          - "'++2.11.12 test'"
+          - "'++2.12.10 test scripted'"
+          - "'++2.13.1 test'"
     steps:
       - uses: actions/checkout@v1
       - uses: olafurpg/setup-scala@v7
