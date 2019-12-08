@@ -31,7 +31,8 @@ inThisBuild(
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
-    publishArtifact.in(packageSrc) := sys.env.contains("CI")
+    publishArtifact.in(packageSrc) := sys.env.contains("CI"),
+    turbo := true
   )
 )
 
@@ -40,7 +41,7 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.2.5"
+  val scalameta = "4.3.0"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -99,14 +100,14 @@ lazy val mdoc = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
-      "com.vladsch.flexmark" % "flexmark-all" % "0.40.4",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.8.0",
+      "io.methvin" % "directory-watcher" % "0.8.3",
       "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
       // live reload
       "io.undertow" % "undertow-core" % "2.0.13.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.6.5.Final",
-      "org.slf4j" % "slf4j-api" % "1.8.0-beta4"
+      "org.jboss.xnio" % "xnio-nio" % "3.6.9.Final",
+      "org.slf4j" % "slf4j-api" % "1.8.0-beta2"
     )
   )
   .dependsOn(runtime)
@@ -160,11 +161,11 @@ lazy val unit = project
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
       List(
-        "com.cibo" %% "evilplot" % "0.6.0"
+        "com.cibo" %% "evilplot" % "0.6.3"
       )
     ),
     libraryDependencies ++= List(
-      "co.fs2" %% "fs2-core" % "1.1.0-M1",
+      "co.fs2" %% "fs2-core" % "1.1.0-M2",
       "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
@@ -188,7 +189,7 @@ lazy val plugin = project
     crossScalaVersions := List(scala212),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
-      "org.jsoup" % "jsoup" % "1.11.3",
+      "org.jsoup" % "jsoup" % "1.12.1",
       "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
@@ -222,22 +223,9 @@ lazy val js = project
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(
-        "org.scala-js" % "scalajs-compiler" % "0.6.28" cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-tools" % "0.6.28"
+        "org.scala-js" % "scalajs-compiler" % "0.6.31" cross CrossVersion.full,
+        "org.scala-js" %% "scalajs-tools" % "0.6.31"
       )
-    )
-  )
-  .dependsOn(mdoc)
-
-lazy val lsp = project
-  .in(file("mdoc-lsp"))
-  .settings(
-    moduleName := "mdoc-lsp",
-    crossScalaVersions := List(scala212),
-    libraryDependencies ++= List(
-      "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % "0.5.0",
-      "com.outr" %% "scribe" % "2.6.0",
-      "com.outr" %% "scribe-slf4j" % "2.6.0"
     )
   )
   .dependsOn(mdoc)
@@ -254,7 +242,7 @@ lazy val docs = project
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "com.cibo" %% "evilplot" % "0.6.0"
+      "com.cibo" %% "evilplot" % "0.6.3"
     ),
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
