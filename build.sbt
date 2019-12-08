@@ -223,8 +223,8 @@ lazy val js = project
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(
-        "org.scala-js" % "scalajs-compiler" % "0.6.28" cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-tools" % "0.6.28"
+        "org.scala-js" % "scalajs-compiler" % "0.6.31" cross CrossVersion.full,
+        "org.scala-js" %% "scalajs-tools" % "0.6.31"
       )
     )
   )
