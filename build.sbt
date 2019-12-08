@@ -160,7 +160,7 @@ lazy val unit = project
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
       List(
-        "com.cibo" %% "evilplot" % "0.6.0"
+        "com.cibo" %% "evilplot" % "0.6.3"
       )
     ),
     libraryDependencies ++= List(
@@ -254,7 +254,7 @@ lazy val docs = project
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "com.cibo" %% "evilplot" % "0.6.0"
+      "com.cibo" %% "evilplot" % "0.6.3"
     ),
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
