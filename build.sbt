@@ -102,12 +102,12 @@ lazy val mdoc = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.9.6",
-      "me.xdrop" % "fuzzywuzzy" % "1.1.10", // for link hygiene "did you mean?"
+      "io.methvin" % "directory-watcher" % "0.8.3",
+      "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
-      "io.undertow" % "undertow-core" % "2.0.13.Final",
+      "io.undertow" % "undertow-core" % "2.0.28.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.6.9.Final",
-      "org.slf4j" % "slf4j-api" % "1.8.0-beta2"
+      "org.slf4j" % "slf4j-api" % "1.8.0-beta4"
     )
   )
   .dependsOn(runtime)
@@ -143,7 +143,7 @@ val jsdocs = project
         )
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.8"
     ),
     scalaJSUseMainModuleInitializer := true,
     npmDependencies in Compile ++= List(
@@ -166,7 +166,7 @@ lazy val unit = project
     ),
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % "1.1.0-M2",
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
@@ -190,7 +190,7 @@ lazy val plugin = project
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
-      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
