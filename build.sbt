@@ -105,7 +105,7 @@ lazy val mdoc = project
       "io.methvin" % "directory-watcher" % "0.8.3",
       "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
-      "io.undertow" % "undertow-core" % "2.0.13.Final",
+      "io.undertow" % "undertow-core" % "2.0.28.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.6.9.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4"
     )
