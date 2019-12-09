@@ -143,7 +143,7 @@ val jsdocs = project
         )
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.8"
     ),
     scalaJSUseMainModuleInitializer := true,
     npmDependencies in Compile ++= List(
