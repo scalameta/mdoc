@@ -1,11 +1,13 @@
 package mdoc
 
 import java.util.ServiceLoader
-import mdoc.internal.cli.Settings
+
+import mdoc.internal.cli.{Exit, Settings}
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
 import metaconfig.ConfError
 import metaconfig.generic.Surface
+
 import scala.meta.inputs.Input
 import scala.meta.io.AbsolutePath
 import scala.collection.JavaConverters._
@@ -13,7 +15,11 @@ import scala.meta.io.RelativePath
 
 trait PostModifier {
   val name: String
+  def onStart(settings: Settings): Unit
+  def preProcess(ctx: PostModifierContext): Unit
   def process(ctx: PostModifierContext): String
+  def postProcess(ctx: PostModifierContext): Unit
+  def onExit(exit: Exit): Unit
 }
 
 object PostModifier {

@@ -1,7 +1,9 @@
 package tests.cli
 
 import java.nio.file.Files
+
 import mdoc.internal.BuildInfo
+import tests.markdown.LifeCycleModifier
 
 class CliSuite extends BaseCliSuite {
 
@@ -190,5 +192,45 @@ class CliSuite extends BaseCliSuite {
       |</p>
       |""".stripMargin
   )
+
+  checkCli(
+    "lifeCycle",
+    """
+      |/file1.md
+      |# file 1
+      |One
+      |```scala mdoc:lifecycle
+      |val x1 = 1
+      |```
+      |/file2.md
+      |# file 2
+      |Two
+      |```scala mdoc:lifecycle
+      |val x2 = 2
+      |```
+      |    """.stripMargin,
+    """
+      |/file1.md
+      |# file 1
+      |One
+      |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0
+      |/file2.md
+      |# file 2
+      |Two
+      |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1
+    """.stripMargin, // did not generate index.md
+    setup = { fixture =>
+      println(s"fixture = $fixture")
+    },
+    onStdout = { out =>
+      assert(out.contains("Compiling 2 files to"))
+      assert(out.contains("Compiled in"))
+      assert(out.contains("(0 errors)"))
+      //assert( LifeCycleModifier.numberOfExists == 1)
+      println(s"?????????????????????????????????? $LifeCycleModifier")
+      println(LifeCycleModifier.numberOfExists)
+    }
+  )
+
 
 }

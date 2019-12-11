@@ -171,7 +171,9 @@ class Processor(implicit ctx: Context) {
               inputFile,
               ctx.settings
             )
+            modifier.preProcess(postCtx)
             val postRender = modifier.process(postCtx)
+            modifier.postProcess(postCtx)
             replaceNodeWithText(doc, block, postRender)
           case m: Modifier.Builtin =>
             if (m.isPassthrough) {

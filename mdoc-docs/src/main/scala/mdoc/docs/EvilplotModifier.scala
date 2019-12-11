@@ -3,7 +3,10 @@ package mdoc.docs
 import com.cibo.evilplot.geometry.Drawable
 import java.nio.file.Files
 import java.nio.file.Paths
+
 import mdoc._
+import mdoc.internal.cli.{Exit, Settings}
+
 import scala.meta.inputs.Position
 
 class EvilplotModifier extends PostModifier {
@@ -36,4 +39,12 @@ class EvilplotModifier extends PostModifier {
         ""
     }
   }
+
+  override def onStart(settings: Settings): Unit = ()
+
+  override def preProcess(ctx: PostModifierContext): Unit = ()
+
+  override def postProcess(ctx: PostModifierContext): Unit = ()
+
+  override def onExit(exit: Exit): Unit = ()
 }

@@ -53,4 +53,24 @@ class PostModifierSuite extends BaseMarkdownSuite {
     "error: expected int runtime value. Obtained message"
   )
 
+  check(
+    "lifecycle-1",
+    """
+      |```scala mdoc:lifecycle
+      |val x = "message"
+      |```
+    """.stripMargin,
+    "numberOfStarts = 0 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0"
+  )
+
+  check(
+    "lifecycle-2",
+    """
+      |```scala mdoc:lifecycle
+      |val x = "message"
+      |```
+    """.stripMargin,
+    "numberOfStarts = 0 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1"
+  )
+
 }

@@ -1,2 +1,4 @@
 tests.markdown.EvilplotPostModifier
 tests.markdown.BulletPostModifier
+tests.markdown.LifeCycleModifier
+

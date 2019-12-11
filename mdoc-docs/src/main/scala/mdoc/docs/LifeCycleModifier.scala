@@ -1,12 +1,13 @@
-package tests.markdown
+package mdoc.docs
 
-import mdoc.PostModifier
-import mdoc.PostModifierContext
+import mdoc._
 import mdoc.internal.cli.{Exit, Settings}
 
-class EvilplotPostModifier extends PostModifier {
-  val name = "evilplot"
-  def process(ctx: PostModifierContext): String = ""
+class LifeCycleModifier extends PostModifier {
+  val name = "lifecycle"
+  def process(ctx: PostModifierContext): String = {
+    "NOT IMPLEMENTED"
+  }
 
   override def onStart(settings: Settings): Unit = ()
 
