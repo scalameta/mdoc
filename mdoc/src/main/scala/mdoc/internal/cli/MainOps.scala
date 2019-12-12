@@ -154,7 +154,6 @@ final class MainOps(
       // exit code doesn't matter when file watching
       Exit.success
     } else {
-      context.settings.postModifiers.foreach( e => println(s"mod 2 = $e"))
       context.settings.postModifiers.foreach(_.onExit(isOk))
       isOk
     }

@@ -63,6 +63,8 @@ class PostModifierSuite extends BaseMarkdownSuite {
     "numberOfStarts = 0 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0"
   )
 
+  // Process counts are per PostModifier instance, starts and exists per mdoc.Main process
+  // Because each test runs its own mdoc.Main process, the process counts are the same
   check(
     "lifecycle-2",
     """
@@ -70,7 +72,7 @@ class PostModifierSuite extends BaseMarkdownSuite {
       |val x = "message"
       |```
     """.stripMargin,
-    "numberOfStarts = 0 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1"
+    "numberOfStarts = 0 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0"
   )
 
 }

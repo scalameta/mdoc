@@ -3,7 +3,7 @@ package tests.cli
 import java.nio.file.Files
 
 import mdoc.internal.BuildInfo
-import tests.markdown.LifeCycleModifier
+import tests.markdown.{LifeCycleCounter, LifeCycleModifier}
 
 class CliSuite extends BaseCliSuite {
 
@@ -218,17 +218,21 @@ class CliSuite extends BaseCliSuite {
       |# file 2
       |Two
       |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1
-    """.stripMargin, // did not generate index.md
+    """.stripMargin, // process counts per PostModifier instance, starts and exists per mdoc.Main process
     setup = { fixture =>
-      println(s"fixture = $fixture")
+      // Global thread local counter updated by all mdoc.Main process
+      // All tests in this test suite run sequentially but change the counter
+      // So make sure we start anew for this test
+      LifeCycleCounter.numberOfStarts.set(0)
+      LifeCycleCounter.numberOfExists.set(0)
     },
     onStdout = { out =>
       assert(out.contains("Compiling 2 files to"))
       assert(out.contains("Compiled in"))
       assert(out.contains("(0 errors)"))
-      //assert( LifeCycleModifier.numberOfExists == 1)
-      println(s"?????????????????????????????????? $LifeCycleModifier")
-      println(LifeCycleModifier.numberOfExists)
+      // Should start and stop one only once in this test (several times for test-suite)
+      assert( LifeCycleCounter.numberOfExists.get() == 1)
+      assert( LifeCycleCounter.numberOfStarts.get() == 1)
     }
   )
 
