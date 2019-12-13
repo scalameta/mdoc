@@ -15,11 +15,11 @@ import scala.meta.io.RelativePath
 
 trait PostModifier {
   val name: String
-  def onStart(settings: Settings): Unit
-  def preProcess(ctx: PostModifierContext): Unit
+  def onStart(settings: Settings): Unit = ()
+  def preProcess(ctx: PostModifierContext): Unit = ()
   def process(ctx: PostModifierContext): String
-  def postProcess(ctx: PostModifierContext): Unit
-  def onExit(exit: Exit): Unit
+  def postProcess(ctx: PostModifierContext): Unit = ()
+  def onExit(exit: Exit): Unit = ()
 }
 
 object PostModifier {

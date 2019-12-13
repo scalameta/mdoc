@@ -4,11 +4,11 @@ import mdoc._
 import mdoc.internal.cli.{Exit, Settings}
 
 /**
- * Global counter used to test the [[mdoc.Main]] process counting.
- */
+  * Global counter used to test the [[mdoc.Main]] process counting.
+  */
 object LifeCycleCounter {
-  val numberOfStarts: ThreadLocal[Integer] = ThreadLocal.withInitial( () => 0 )
-  val numberOfExists: ThreadLocal[Integer] = ThreadLocal.withInitial( () => 0 )
+  val numberOfStarts: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
+  val numberOfExists: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
 }
 
 class LifeCycleModifier extends PostModifier {
@@ -27,22 +27,22 @@ class LifeCycleModifier extends PostModifier {
   }
 
   /**
-   * This is called once when the [[mdoc.Main]] process starts
-   * @param settings CLI or API settings used by mdoc
-   */
+    * This is called once when the [[mdoc.Main]] process starts
+    * @param settings CLI or API settings used by mdoc
+    */
   override def onStart(settings: Settings): Unit = {
     numberOfStarts += 1
     LifeCycleCounter.numberOfStarts.set(LifeCycleCounter.numberOfStarts.get() + 1)
   }
 
-  override def preProcess(ctx: PostModifierContext): Unit = { numberOfPreProcess += 1}
+  override def preProcess(ctx: PostModifierContext): Unit = { numberOfPreProcess += 1 }
 
   override def postProcess(ctx: PostModifierContext): Unit = { numberOfPostProcess += 1 }
 
   /**
-   * This is called once when the [[mdoc.Main]] process finsihes
-   * @param exit is the exit code returned by mdoc's processing
-   */
+    * This is called once when the [[mdoc.Main]] process finsihes
+    * @param exit is the exit code returned by mdoc's processing
+    */
   override def onExit(exit: Exit): Unit = {
     numberOfExists += 1
     LifeCycleCounter.numberOfExists.set(LifeCycleCounter.numberOfExists.get() + 1)
