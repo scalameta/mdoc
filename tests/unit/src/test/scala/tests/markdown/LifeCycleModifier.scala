@@ -10,8 +10,8 @@ import mdoc.internal.cli.{Exit, Settings}
   * the same thread.
   */
 object LifeCycleCounter {
-  val numberOfStarts: ThreadLocal[Integer] = ThreadLocal.withInitial( () => 0 )
-  val numberOfExists: ThreadLocal[Integer] = ThreadLocal.withInitial( () => 0 )
+  val numberOfStarts: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
+  val numberOfExists: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
 }
 
 class LifeCycleModifier extends PostModifier {
@@ -38,7 +38,7 @@ class LifeCycleModifier extends PostModifier {
     LifeCycleCounter.numberOfStarts.set(LifeCycleCounter.numberOfStarts.get() + 1)
   }
 
-  override def preProcess(ctx: PostModifierContext): Unit = { numberOfPreProcess += 1}
+  override def preProcess(ctx: PostModifierContext): Unit = { numberOfPreProcess += 1 }
 
   override def postProcess(ctx: PostModifierContext): Unit = { numberOfPostProcess += 1 }
 
