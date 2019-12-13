@@ -6,7 +6,7 @@ import mdoc.internal.cli.{Exit, Settings}
 
 class EvilplotPostModifier extends PostModifier {
   val name = "evilplot"
-  
+
   def process(ctx: PostModifierContext): String = ""
 
   override def onStart(settings: Settings): Unit = ()
