@@ -51,7 +51,8 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
   }
 
   def assertOneSameOrPrintExpected(obtained: String, expected: List[String], title: String = "")(
-    implicit source: Position): Boolean = {
+      implicit source: Position
+  ): Boolean = {
     try assertAllDiff(obtained, expected, title)
     catch {
       case ex: Exception =>
@@ -72,7 +73,6 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
   // Cannot access these because they are private
   import collection.JavaConverters._
   import org.scalatest.exceptions.{StackDepthException, TestFailedException}
-
 
   def splitIntoLines(string: String): Seq[String] =
     string.trim.replace("\r\n", "\n").split("\n")
@@ -97,18 +97,18 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
   }
 
   case class DiffFailure(
-                                  title: String,
-                                  expected: String,
-                                  obtained: String,
-                                  diff: String,
-                                  source: Position
-                                ) extends TestFailedException(
-    { _: StackDepthException =>
-      Some(title + "\n" + error2message(obtained, expected))
-    },
-    None,
-    source
-  )
+      title: String,
+      expected: String,
+      obtained: String,
+      diff: String,
+      source: Position
+  ) extends TestFailedException(
+        { _: StackDepthException =>
+          Some(title + "\n" + error2message(obtained, expected))
+        },
+        None,
+        source
+      )
 
   def header[T](t: T): String = {
     val line = s"=" * (t.toString.length + 3)
@@ -135,9 +135,10 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
   }
 
   def assertAllDiff(obtained: String, expected: List[String], title: String = "")(
-    implicit source: Position): Boolean = {
-    val theSame = expected.filter( p => compareContents(obtained, p).isEmpty)
-    val result = expected.foldLeft("")( (acc,p) => acc + compareContents(obtained, p) )
+      implicit source: Position
+  ): Boolean = {
+    val theSame = expected.filter(p => compareContents(obtained, p).isEmpty)
+    val result = expected.foldLeft("")((acc, p) => acc + compareContents(obtained, p))
     if (theSame.nonEmpty) true
     else {
       throw DiffFailure(title, expected.mkString(" OR \n"), obtained, result, source)
@@ -145,14 +146,14 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
   }
 
   def checkCliMulti(
-                name: String,
-                original: String,
-                expected: List[String],
-                extraArgs: Array[String] = Array.empty,
-                setup: CliFixture => Unit = _ => (),
-                expectedExitCode: Int = 0,
-                onStdout: String => Unit = _ => ()
-              ): Unit = {
+      name: String,
+      original: String,
+      expected: List[String],
+      extraArgs: Array[String] = Array.empty,
+      setup: CliFixture => Unit = _ => (),
+      expectedExitCode: Int = 0,
+      onStdout: String => Unit = _ => ()
+  ): Unit = {
     test(name) {
       myStdout.reset()
       val in = StringFS.fromString(original)
