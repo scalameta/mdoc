@@ -166,7 +166,7 @@ lazy val unit = project
     ),
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % "2.1.0",
-      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
@@ -190,7 +190,7 @@ lazy val plugin = project
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
-      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
