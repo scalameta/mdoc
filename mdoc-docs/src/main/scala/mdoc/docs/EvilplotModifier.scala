@@ -5,7 +5,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 import mdoc._
-import mdoc.internal.cli.Exit
 
 import scala.meta.inputs.Position
 
@@ -46,5 +45,5 @@ class EvilplotModifier extends PostModifier {
 
   override def postProcess(ctx: PostModifierContext): Unit = ()
 
-  override def onExit(exit: Exit): Unit = ()
+  override def onExit(exit: Int): Unit = ()
 }

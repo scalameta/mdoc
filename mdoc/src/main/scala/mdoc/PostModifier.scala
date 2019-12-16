@@ -2,7 +2,7 @@ package mdoc
 
 import java.util.ServiceLoader
 
-import mdoc.internal.cli.{Exit, Settings}
+import mdoc.internal.cli.Settings
 import metaconfig.ConfDecoder
 import metaconfig.ConfEncoder
 import metaconfig.ConfError
@@ -19,7 +19,7 @@ trait PostModifier {
   def preProcess(ctx: PostModifierContext): Unit = ()
   def process(ctx: PostModifierContext): String
   def postProcess(ctx: PostModifierContext): Unit = ()
-  def onExit(exit: Exit): Unit = ()
+  def onExit(exit: Int): Unit = ()
 }
 
 object PostModifier {

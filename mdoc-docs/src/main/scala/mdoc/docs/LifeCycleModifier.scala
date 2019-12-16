@@ -1,7 +1,6 @@
 package mdoc.docs
 
 import mdoc._
-import mdoc.internal.cli.Exit
 
 /**
   * Global counter used to test the [[mdoc.Main]] process counting.
@@ -43,7 +42,7 @@ class LifeCycleModifier extends PostModifier {
     * This is called once when the [[mdoc.Main]] process finsihes
     * @param exit is the exit code returned by mdoc's processing
     */
-  override def onExit(exit: Exit): Unit = {
+  override def onExit(exit: Int): Unit = {
     numberOfExists += 1
     LifeCycleCounter.numberOfExists.set(LifeCycleCounter.numberOfExists.get() + 1)
   }

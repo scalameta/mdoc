@@ -234,12 +234,13 @@ object MainOps {
             ctx.settings.postModifiers.foreach(_.onStart(settings.get))
             val runner = new MainOps(ctx)
             val exit = runner.run()
-            ctx.settings.postModifiers.foreach(_.onExit(exit))
-            if (exit.isSuccess) {
+            val exitCode = if (exit.isSuccess) {
               0
             } else {
               1 // error
             }
+            ctx.settings.postModifiers.foreach(_.onExit(exitCode))
+            exitCode
         }
     }
   }

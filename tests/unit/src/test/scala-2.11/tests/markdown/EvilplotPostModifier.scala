@@ -1,7 +1,6 @@
 package tests.markdown
 
 import mdoc.{MainSettings, PostModifier, PostModifierContext}
-import mdoc.internal.cli.Exit
 
 class EvilplotPostModifier extends PostModifier {
   val name = "evilplot"
@@ -14,5 +13,5 @@ class EvilplotPostModifier extends PostModifier {
 
   override def postProcess(ctx: PostModifierContext): Unit = ()
 
-  override def onExit(exit: Exit): Unit = ()
+  override def onExit(exit: Int): Unit = ()
 }
