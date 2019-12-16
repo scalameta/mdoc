@@ -13,12 +13,34 @@ import scala.meta.io.AbsolutePath
 import scala.collection.JavaConverters._
 import scala.meta.io.RelativePath
 
+/**
+  * Interface of classes used for processing Markdown code fences.
+  * It provides method calls to set-up resources before processing
+  * sources, process code fences of all source files and release
+  * resource just before mdoc terminates.
+  *
+  */
 trait PostModifier {
   val name: String
+
+  /**
+    * This methods is called once just before mdoc starts processing all of the
+    * source files. Use this to set-up resources required by the post-modifier.
+    *
+    * @param settings setting set via the command line or directly vi the API
+    */
   def onStart(settings: MainSettings): Unit = ()
-  def preProcess(ctx: PostModifierContext): Unit = ()
   def process(ctx: PostModifierContext): String
-  def postProcess(ctx: PostModifierContext): Unit = ()
+
+  /**
+    * This methods is called once just after mdoc finished processing all of the
+    * source files. Use this to release or deactivate any resources that are not
+    * required by the post-modifier anymore.
+    *
+    * @param exit a value of 0 indicates mdoc processed all files with no error.
+    *             a value of 1 indicates mdoc processing resulted in at least
+    *             one error.
+    */
   def onExit(exit: Int): Unit = ()
 }
 

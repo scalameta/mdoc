@@ -194,7 +194,7 @@ class CliSuite extends BaseCliSuite {
   )
 
   checkCliMulti(
-    "lifeCycle",
+    "lifeCycle-0",
     """
       |/file1.md
       |# file 1
@@ -214,21 +214,21 @@ class CliSuite extends BaseCliSuite {
         |/file1.md
         |# file 1
         |One
-        |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0
+        |numberOfStarts = 1 ; numberOfExists = 0
         |/file2.md
         |# file 2
         |Two
-        |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1
+        |numberOfStarts = 1 ; numberOfExists = 0
     """.stripMargin,
       """
         |/file1.md
         |# file 1
         |One
-        |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 2 ; numberOfPostProcess = 1
+        |numberOfStarts = 1 ; numberOfExists = 0
         |/file2.md
         |# file 2
         |Two
-        |numberOfStarts = 1 ; numberOfExists = 0 ; numberOfPreProcess = 1 ; numberOfPostProcess = 0
+        |numberOfStarts = 1 ; numberOfExists = 0
     """.stripMargin
     ), // process counts per PostModifier instance, starts and exists per mdoc.Main process
     setup = { fixture =>

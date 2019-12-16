@@ -1,7 +1,6 @@
 package tests.markdown
 
 import mdoc._
-import mdoc.internal.cli.Exit
 
 /**
   * Global counter used to test the [[mdoc.Main]] process counting.
@@ -20,13 +19,10 @@ class LifeCycleModifier extends PostModifier {
   // Starts and stops per instance
   var numberOfStarts = 0
   var numberOfExists = 0
-  // Pre and post processing per instance
-  var numberOfPreProcess = 0
-  var numberOfPostProcess = 0
 
   def process(ctx: PostModifierContext): String = {
     // Used for checking the counting between threads
-    s"numberOfStarts = $numberOfStarts ; numberOfExists = $numberOfExists ; numberOfPreProcess = $numberOfPreProcess ; numberOfPostProcess = $numberOfPostProcess"
+    s"numberOfStarts = $numberOfStarts ; numberOfExists = $numberOfExists"
   }
 
   /**
@@ -37,10 +33,6 @@ class LifeCycleModifier extends PostModifier {
     numberOfStarts += 1
     LifeCycleCounter.numberOfStarts.set(LifeCycleCounter.numberOfStarts.get() + 1)
   }
-
-  override def preProcess(ctx: PostModifierContext): Unit = { numberOfPreProcess += 1 }
-
-  override def postProcess(ctx: PostModifierContext): Unit = { numberOfPostProcess += 1 }
 
   /**
     * This is called once when the [[mdoc.Main]] process finishes

@@ -16,10 +16,6 @@ class BulletPostModifier extends PostModifier {
 
   override def onStart(settings: MainSettings): Unit = ()
 
-  override def preProcess(ctx: PostModifierContext): Unit = ()
-
-  override def postProcess(ctx: PostModifierContext): Unit = ()
-
   override def onExit(exit: Int): Unit = ()
 
 }
