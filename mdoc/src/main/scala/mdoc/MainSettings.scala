@@ -11,7 +11,7 @@ import scala.meta.io.AbsolutePath
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 
-final class MainSettings private (
+final class MainSettings private[mdoc] (
     private[mdoc] val settings: Settings,
     private[mdoc] val reporter: Reporter
 ) {

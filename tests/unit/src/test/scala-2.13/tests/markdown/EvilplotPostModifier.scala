@@ -1,14 +1,13 @@
 package tests.markdown
 
-import mdoc.PostModifier
-import mdoc.PostModifierContext
-import mdoc.internal.cli.{Exit, Settings}
+import mdoc.{MainSettings, PostModifier, PostModifierContext}
+import mdoc.internal.cli.Exit
 
 class EvilplotPostModifier extends PostModifier {
   val name = "evilplot"
   def process(ctx: PostModifierContext): String = ""
 
-  override def onStart(settings: Settings): Unit = ()
+  override def onStart(settings: MainSettings): Unit = ()
 
   override def preProcess(ctx: PostModifierContext): Unit = ()
 

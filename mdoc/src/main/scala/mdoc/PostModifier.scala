@@ -15,7 +15,7 @@ import scala.meta.io.RelativePath
 
 trait PostModifier {
   val name: String
-  def onStart(settings: Settings): Unit = ()
+  def onStart(settings: MainSettings): Unit = ()
   def preProcess(ctx: PostModifierContext): Unit = ()
   def process(ctx: PostModifierContext): String
   def postProcess(ctx: PostModifierContext): Unit = ()

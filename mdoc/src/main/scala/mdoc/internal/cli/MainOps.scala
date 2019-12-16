@@ -6,7 +6,8 @@ import io.methvin.watcher.DirectoryChangeEvent
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.Executors
-import mdoc.Reporter
+
+import mdoc.{MainSettings, Reporter}
 import mdoc.internal.BuildInfo
 import mdoc.internal.io.IO
 import mdoc.internal.io.MdocFileListener
@@ -17,6 +18,7 @@ import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.markdown.Markdown
 import mdoc.internal.pos.DiffUtils
 import metaconfig.Configured
+
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
@@ -146,7 +148,6 @@ final class MainOps(
     if (settings.watch) {
       startLivereload()
     }
-    context.settings.postModifiers.foreach(_.onStart(settings))
     val isOk = generateCompleteSite()
     if (settings.isFileWatching) {
       waitingForFileChanges()
@@ -154,7 +155,6 @@ final class MainOps(
       // exit code doesn't matter when file watching
       Exit.success
     } else {
-      context.settings.postModifiers.foreach(_.onExit(isOk))
       isOk
     }
   }
@@ -211,19 +211,19 @@ final class MainOps(
 }
 
 object MainOps {
-  def process(settings: Configured[Settings], reporter: Reporter): Int = {
+  def process(settings: Configured[MainSettings], reporter: Reporter): Int = {
     settings match {
-      case Configured.Ok(setting) if setting.help =>
+      case Configured.Ok(setting) if setting.settings.help =>
         reporter.println(Settings.help(BuildInfo.version, 80))
         0
-      case Configured.Ok(setting) if setting.usage =>
+      case Configured.Ok(setting) if setting.settings.usage =>
         reporter.println(Settings.usage)
         0
-      case Configured.Ok(setting) if setting.version =>
+      case Configured.Ok(setting) if setting.settings.version =>
         reporter.println(Settings.version(BuildInfo.version))
         0
       case els =>
-        els.andThen(_.validate(reporter)) match {
+        els.andThen(_.settings.validate(reporter)) match {
           case Configured.NotOk(error) =>
             error.all.foreach(message => reporter.error(message))
             1
@@ -231,8 +231,10 @@ object MainOps {
             if (ctx.settings.verbose) {
               ctx.reporter.setDebugEnabled(true)
             }
+            ctx.settings.postModifiers.foreach(_.onStart(settings.get))
             val runner = new MainOps(ctx)
             val exit = runner.run()
+            ctx.settings.postModifiers.foreach(_.onExit(exit))
             if (exit.isSuccess) {
               0
             } else {

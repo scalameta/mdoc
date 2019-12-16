@@ -1,7 +1,7 @@
 package tests.markdown
 
 import mdoc._
-import mdoc.internal.cli.{Exit, Settings}
+import mdoc.internal.cli.Exit
 
 /**
   * Global counter used to test the [[mdoc.Main]] process counting.
@@ -33,7 +33,7 @@ class LifeCycleModifier extends PostModifier {
     * This is called once when the [[mdoc.Main]] process starts
     * @param settings CLI or API settings used by mdoc
     */
-  override def onStart(settings: Settings): Unit = {
+  override def onStart(settings: MainSettings): Unit = {
     numberOfStarts += 1
     LifeCycleCounter.numberOfStarts.set(LifeCycleCounter.numberOfStarts.get() + 1)
   }

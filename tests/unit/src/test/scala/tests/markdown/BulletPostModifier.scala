@@ -1,8 +1,7 @@
 package tests.markdown
 
-import mdoc.PostModifier
-import mdoc.PostModifierContext
-import mdoc.internal.cli.{Exit, Settings}
+import mdoc.{MainSettings, PostModifier, PostModifierContext}
+import mdoc.internal.cli.Exit
 
 class BulletPostModifier extends PostModifier {
   val name = "bullet"
@@ -16,7 +15,7 @@ class BulletPostModifier extends PostModifier {
     }
   }
 
-  override def onStart(settings: Settings): Unit = ()
+  override def onStart(settings: MainSettings): Unit = ()
 
   override def preProcess(ctx: PostModifierContext): Unit = ()
 
