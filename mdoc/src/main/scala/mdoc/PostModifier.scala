@@ -41,7 +41,7 @@ trait PostModifier {
     *             a value of 1 indicates mdoc processing resulted in at least
     *             one error.
     */
-  def onExit(exit: Int): Unit = ()
+  def onExit(exit: Exit): Unit = ()
 }
 
 object PostModifier {

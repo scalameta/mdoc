@@ -35,7 +35,7 @@ class LifeCycleModifier extends PostModifier {
     * This is called once when the [[mdoc.Main]] process finsihes
     * @param exit is the exit code returned by mdoc's processing
     */
-  override def onExit(exit: Int): Unit = {
+  override def onExit(exit: Exit): Unit = {
     numberOfExists += 1
     LifeCycleCounter.numberOfExists.set(LifeCycleCounter.numberOfExists.get() + 1)
   }
