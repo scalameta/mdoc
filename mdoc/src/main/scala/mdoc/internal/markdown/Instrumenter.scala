@@ -16,11 +16,25 @@ class Instrumenter(sections: List[SectionInput]) {
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   val gensym = new Gensym()
+  private var nestCount = 0
+  private def nest(): Unit = {
+    nestCount += 1
+    sb.append(s"_root_.scala.Predef.locally {\n")
+  }
+  private def unnest(): Unit = {
+    1.to(nestCount).foreach { _ =>
+      sb.print("}")
+    }
+    nestCount = 0
+  }
   private def printAsScript(): Unit = {
     sections.zipWithIndex.foreach {
       case (section, i) =>
         if (section.mod.isReset) {
+          unnest()
           sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
+        } else if (section.mod.isNest) {
+          nest()
         }
         sb.println("\n$doc.startSection();")
         if (section.mod.isFail) {
@@ -54,6 +68,7 @@ class Instrumenter(sections: List[SectionInput]) {
         }
         sb.println("$doc.endSection();")
     }
+    unnest()
   }
 
   private def printBinder(name: String, pos: Position): Unit = {

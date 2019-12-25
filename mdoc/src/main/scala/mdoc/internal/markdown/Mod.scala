@@ -20,6 +20,7 @@ object Mod {
   case object ToString extends Mod {
     override def toString: String = "to-string"
   }
+  case object Nest extends Mod
 
   def all: List[Mod] = List(
     Passthrough,
@@ -31,7 +32,8 @@ object Mod {
     Fail,
     Crash,
     Silent,
-    ToString
+    ToString,
+    Nest
   )
   def unapply(string: String): Option[Mod] = {
     all.find(_.toString.equalsIgnoreCase(string))

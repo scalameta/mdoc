@@ -158,6 +158,69 @@ final case class Name(val value: String) extends AnyVal
 ```
 ````
 
+## `nest`
+
+The `nest` modifier starts a new scope similar to `reset` but previous variables
+in the scope are still accessible. This can be helpful to redefine variable
+names while still being able to access existing variables in scope.
+
+````scala mdoc:mdoc
+```scala mdoc
+val x = 40
+val y = 1
+```
+
+```scala mdoc:nest
+val x: Int = 41
+println(x + y)
+```
+````
+
+Without `nest` in the example above, the document would fail to compile because
+the variable `x` was already defined in scope.
+
+A `nest` block wraps subsequent code blocks inside
+`_root_.scala.Predef.locally{...}`. This encoding means that it's not possible
+to define value classes inside a nested block.
+
+````scala mdoc:mdoc:crash
+```scala mdoc
+val x: Int = 41
+```
+
+```scala mdoc:nest
+case class Foo(val y: Int) extends AnyVal
+Foo(x)
+```
+````
+
+Also, nested scopes do not ambiguate between conflicting implicits.
+
+````scala mdoc:mdoc:crash
+```scala mdoc
+implicit val x: Int = 41
+```
+
+```scala mdoc:nest
+implicit val y: Int = 41
+implicitly[Int]
+```
+````
+
+A workaround for ambiguous implicits in nested scopes is to shadow one implicit
+by redefining its variable name.
+
+````scala mdoc:mdoc
+```scala mdoc
+implicit val shadowMe: Int = 41
+```
+
+```scala mdoc:nest
+implicit val shadowMe: Int = 42
+implicitly[Int]
+```
+````
+
 ## `to-string`
 
 The `toString` modifier changes the pretty-printer for runtime values to use
