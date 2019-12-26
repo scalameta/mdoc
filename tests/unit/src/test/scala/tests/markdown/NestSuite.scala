@@ -151,15 +151,16 @@ class NestSuite extends BaseMarkdownSuite {
       |```
       |```scala mdoc:nest
       |val x = 4
-      |require(x > 4)
+      |def boom(cond: Boolean) = if (!cond) throw new IllegalArgumentException()
+      |boom(x > 4)
       |```
     """.stripMargin,
-    """|error: stacktrace.md:13:1: requirement failed
-       |require(x > 4)
-       |^^^^^^^^^^^^^^
-       |java.lang.IllegalArgumentException: requirement failed
-       |	at scala.Predef$.require(Predef.scala:268)
-       |	at repl.Session$App.<init>(stacktrace.md:32)
+    """|error: stacktrace.md:14:1: null
+       |boom(x > 4)
+       |^^^^^^^^^^^
+       |java.lang.IllegalArgumentException
+       |	at repl.Session$App.boom$1(stacktrace.md:32)
+       |	at repl.Session$App.<init>(stacktrace.md:35)
        |	at repl.Session$.app(stacktrace.md:3)
        |""".stripMargin
   )
