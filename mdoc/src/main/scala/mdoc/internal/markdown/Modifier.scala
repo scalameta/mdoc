@@ -28,6 +28,8 @@ sealed abstract class Modifier(val mods: Set[Mod]) {
   def isReset: Boolean = isResetClass || isResetObject
   def isResetClass: Boolean = mods(ResetClass) || mods(Reset)
   def isResetObject: Boolean = mods(ResetObject)
+  def isNest: Boolean = mods(Nest)
+
   def isToString: Boolean = mods(ToString)
 }
 object Modifier {

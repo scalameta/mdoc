@@ -73,7 +73,10 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
         postProcessObtained
       )
-      assertNoDiffOrPrintExpected(obtainedErrors, Compat(expected, compat, postProcessExpected))
+      assertNoDiffOrPrintExpected(
+        Compat(obtainedErrors, compat, postProcessObtained),
+        Compat(expected, compat, postProcessExpected)
+      )
     }
   }
 

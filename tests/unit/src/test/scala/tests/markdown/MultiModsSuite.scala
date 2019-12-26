@@ -117,6 +117,33 @@ class MultiModsSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "nest:multi",
+    """
+      |```scala mdoc:nest:passthrough:to-string
+      |println("* 42")
+      |```
+    """.stripMargin,
+    """|* 42
+    """.stripMargin
+  )
+
+  checkError(
+    "nest:reset",
+    """
+      |```scala mdoc
+      |val x = "* 42"
+      |```
+      |```scala mdoc:nest:reset
+      |val x = "* 43"
+      |```
+    """.stripMargin,
+    """|error: nest:reset.md:5:15: the modifier 'nest' is redundant when used in combination with 'reset'. To fix this error, remove 'nest'
+       |```scala mdoc:nest:reset
+       |              ^^^^^^^^^^
+       |""".stripMargin
+  )
+
   checkError(
     "compile-only:multiple",
     """

@@ -74,8 +74,8 @@ The tut `:fail` modifier is split in two separate mdoc modifiers.
 
 ## Double binding
 
-It's not possible to bind the same variable twice in mdoc without `:reset`. In
-tut, the following program is valid.
+It's not possible by default to define the same variable name twice with mdoc.
+In tut, the following program is valid.
 
 ````md
 ```tut
@@ -84,8 +84,8 @@ val x = 2
 ```
 ````
 
-In mdoc, that program does not compile because the same variable name can't be
-redefined.
+In mdoc, that program does not compile because the document is compiled as a
+normal Scala program.
 
 ````scala mdoc:mdoc:crash
 ```scala mdoc
@@ -96,7 +96,20 @@ val x = 2
 ```
 ````
 
-One possible workaround is to use a separate variable name.
+One workaround is to use the [`mdoc:nest`](modifiers.md#nest) modifier, which
+wraps subsequent code blocks in `scala.Predef.locally{...}`.
+
+````scala mdoc:mdoc:crash
+```scala mdoc
+val x = 1
+val y = 2
+```
+```scala mdoc:nest
+val x = 3 + y
+```
+````
+
+Another workaround is to define a separate variable name.
 
 ````diff
  ```scala mdoc
@@ -105,7 +118,7 @@ One possible workaround is to use a separate variable name.
  ```
 ````
 
-Another possible workaround is to use the `:reset` modifier.
+Another workaround is to use the `:reset` modifier.
 
 ````diff
 -```scala mdoc
