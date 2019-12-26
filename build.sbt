@@ -102,11 +102,11 @@ lazy val mdoc = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.8.3",
+      "io.methvin" % "directory-watcher" % "0.9.6",
       "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
       "io.undertow" % "undertow-core" % "2.0.28.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.6.9.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.7.7.Final",
       "org.slf4j" % "slf4j-api" % "1.8.0-beta4"
     )
   )
@@ -165,9 +165,9 @@ lazy val unit = project
       )
     ),
     libraryDependencies ++= List(
-      "co.fs2" %% "fs2-core" % "1.1.0-M2",
-      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
-      "org.scalatest" %% "scalatest" % "3.1.0" % Test,
+      "co.fs2" %% "fs2-core" % "2.1.0",
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     // forking causes https://github.com/scalatest/scalatest/issues/556
@@ -190,7 +190,7 @@ lazy val plugin = project
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
-      "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
