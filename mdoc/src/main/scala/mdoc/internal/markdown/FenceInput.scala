@@ -70,6 +70,13 @@ class FenceInput(ctx: Context, baseInput: Input) {
       invalidCombination(info, "crash", "fail")
     } else if (mod.isSilent && mod.isInvisible) {
       invalidCombination(info, "silent", "invisible")
+    } else if (mod.isReset && mod.isNest) {
+      invalid(
+        info,
+        "the modifier 'nest' is redundant when used in combination with 'reset'. " +
+          "To fix this error, remove 'nest'"
+      )
+      false
     } else if (mod.isCompileOnly) {
       val others = mod.mods - Mod.CompileOnly
       if (others.isEmpty) {

@@ -70,6 +70,57 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   check(
+    "multi-nest",
+    """
+      |```scala mdoc
+      |val x = 1
+      |val a = 1
+      |```
+      |```scala mdoc:nest
+      |val y = "y"
+      |val b = 2
+      |```
+      |```scala mdoc:nest
+      |val z = List(1)
+      |val c = 3
+      |```
+      |```scala mdoc
+      |println(x)
+      |println(y)
+      |println(z)
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |val x = 1
+       |// x: Int = 1
+       |val a = 1
+       |// a: Int = 1
+       |```
+       |```scala
+       |val y = "y"
+       |// y: String = "y"
+       |val b = 2
+       |// b: Int = 2
+       |```
+       |```scala
+       |val z = List(1)
+       |// z: List[Int] = List(1)
+       |val c = 3
+       |// c: Int = 3
+       |```
+       |```scala
+       |println(x)
+       |// 1
+       |println(y)
+       |// y
+       |println(z)
+       |// List(1)
+       |```
+       |""".stripMargin
+  )
+
+  check(
     "implicit-ok",
     """
       |```scala mdoc
@@ -96,6 +147,65 @@ class NestSuite extends BaseMarkdownSuite {
        |// res0: Int = 1
        |```
        |
+       |""".stripMargin
+  )
+
+  checkError(
+    "reset",
+    """
+      |```scala mdoc
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|error: reset.md:9:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |""".stripMargin
+  )
+
+  checkError(
+    "multi-reset",
+    """
+      |```scala mdoc
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|error: multi-reset.md:15:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |error: multi-reset.md:27:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
        |""".stripMargin
   )
 

@@ -23,7 +23,7 @@ class Instrumenter(sections: List[SectionInput]) {
   }
   private def unnest(): Unit = {
     1.to(nestCount).foreach { _ =>
-      sb.print("}")
+      sb.print("};")
     }
     nestCount = 0
   }
