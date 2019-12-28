@@ -9,7 +9,7 @@ final class Exit private[mdoc] (val exit: CliExit) {
 }
 
 object Exit {
-  def apply(exit: CliExit): Exit = {
+  private[mdoc] def apply(exit: CliExit): Exit = {
     new Exit(exit)
   }
   def apply(): Exit = {

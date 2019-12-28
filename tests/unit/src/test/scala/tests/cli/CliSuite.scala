@@ -235,8 +235,7 @@ class CliSuite extends BaseCliSuite {
       // Global thread local counter updated by all mdoc.Main process
       // All tests in this test suite run sequentially but change the counter
       // So make sure we start anew for this test
-      LifeCycleCounter.numberOfStarts.set(0)
-      LifeCycleCounter.numberOfExists.set(0)
+      LifeCycleCounter.reset()
     },
     onStdout = { out =>
       assert(out.contains("Compiling 2 files to"))

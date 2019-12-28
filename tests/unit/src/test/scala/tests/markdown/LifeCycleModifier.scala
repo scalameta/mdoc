@@ -11,8 +11,19 @@ import mdoc._
 object LifeCycleCounter {
   val numberOfStarts: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
   val numberOfExists: ThreadLocal[Integer] = ThreadLocal.withInitial(() => 0)
+
+  /**
+   * Reset counters to zero.
+   */
+  def reset(): Unit = {
+    LifeCycleCounter.numberOfStarts.set(0)
+    LifeCycleCounter.numberOfExists.set(0)
+  }
 }
 
+/**
+ * PostModifier used for testing the [[onStart()]] and [[onExit()]] calls.
+ */
 class LifeCycleModifier extends PostModifier {
   val name = "lifecycle"
 
