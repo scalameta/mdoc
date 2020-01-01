@@ -84,8 +84,10 @@ trait DocumentBuilder {
         }
       } catch {
         case MdocNonFatal(e) =>
+          endStatement()
+          endSection()
           MdocExceptions.trimStacktrace(e)
-          throw new PositionedException(mySections.length, lastPosition, e)
+          throw new DocumentException(mySections.toList, lastPosition, e)
       }
       val document = Document(input, mySections.toList)
       mySections.clear()
