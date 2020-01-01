@@ -30,7 +30,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
     test(name) {
       val filename = name + ".scala"
       val worksheet = mdoc.evaluateWorksheet(filename, original)
-      assert(worksheet.statements.isEmpty, worksheet.statements)
       val input = Input.VirtualFile(name, original)
       val out = new StringBuilder()
       var i = 0
@@ -65,9 +64,6 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
       val input = Input.VirtualFile(name, original)
       val out = new StringBuilder()
       var i = 0
-      val hasErrors =
-        worksheet.diagnostics().asScala.exists(_.severity() == DiagnosticSeverity.Error)
-      require(!hasErrors, worksheet.diagnostics())
       statements.foreach { stat =>
         val p = Position.Range(
           input,
@@ -228,6 +224,19 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
        |
        |crash(filename)
        |^^^^^^^^^^^^^^^
+       |""".stripMargin
+  )
+
+  checkDecorations(
+    "partial-exception",
+    """
+      |val x = "foobar".stripSuffix("bar")
+      |throw new RuntimeException("boom")
+      |val y = "foobar".stripSuffix("bar")
+      |""".stripMargin,
+    """|
+       |<val x = "foobar".stripSuffix("bar")> // "foo"
+       |x: String = "foo"
        |""".stripMargin
   )
 

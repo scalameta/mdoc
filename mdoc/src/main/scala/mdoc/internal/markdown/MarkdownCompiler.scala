@@ -52,8 +52,9 @@ object MarkdownCompiler {
         try {
           doc.build(instrumentedInput)
         } catch {
-          case e: PositionedException =>
-            val input = sectionInputs(e.section).input
+          case e: DocumentException =>
+            val index = e.sections.length - 1
+            val input = sectionInputs(index).input
             val pos =
               if (e.pos.isEmpty) {
                 Position.Range(input, 0, 0)
@@ -68,7 +69,7 @@ object MarkdownCompiler {
                 slice.toUnslicedPosition
               }
             reporter.error(pos, e.getCause)
-            Document.empty(instrumentedInput)
+            Document(instrumentedInput, e.sections)
           case MdocNonFatal(e) =>
             reporter.error(e)
             Document.empty(instrumentedInput)
