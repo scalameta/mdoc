@@ -102,7 +102,7 @@ lazy val mdoc = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.4",
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.9.6",
+      "io.methvin" % "directory-watcher" % "0.9.7",
       "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
       "io.undertow" % "undertow-core" % "2.0.28.Final",
