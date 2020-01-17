@@ -12,6 +12,7 @@ import sbtdocusaurus.internal.Relativize
 import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 import mdoc.MdocPlugin.{autoImport => m}
+import scala.util.Try
 
 object DocusaurusPlugin extends AutoPlugin {
   override def requires: Plugins = JvmPlugin && MdocPlugin
@@ -45,8 +46,9 @@ object DocusaurusPlugin extends AutoPlugin {
 
   def gitUser(): String =
     sys.env.getOrElse("GIT_USER", {
-      import sys.process._
-      "git config user.email".!!.trim
+      import scala.sys.process._
+      Try("git config user.email".!!.trim)
+        .getOrElse("docusaurus@scalameta.org")
     })
   def installSsh: String =
     """|#!/usr/bin/env bash
