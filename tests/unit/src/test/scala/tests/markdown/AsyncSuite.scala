@@ -89,7 +89,7 @@ class AsyncSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "println",
+    "println".flaky,
     """
       |```scala mdoc
       |import scala.concurrent._, duration._, ExecutionContext.Implicits.global

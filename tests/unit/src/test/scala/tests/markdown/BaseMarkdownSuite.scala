@@ -19,6 +19,7 @@ import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
 
 abstract class BaseMarkdownSuite extends munit.FunSuite {
+  def munitFlakyOK = true
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
     dir.toFile.deleteOnExit()
