@@ -191,7 +191,8 @@ lazy val plugin = project
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
       "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
-      "org.scalameta" %% "munit" % V.munit % Test
+      "org.scalameta" %% "munit" % V.munit % Test,
+      "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {
       val out =
