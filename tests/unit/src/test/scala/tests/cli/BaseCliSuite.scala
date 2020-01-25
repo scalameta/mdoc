@@ -4,15 +4,14 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
-import org.scalatest.FunSuite
+import munit.FunSuite
 import scala.meta.io.AbsolutePath
-import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
 import mdoc.Main
 
 case class CliFixture(in: Path, out: Path)
 
-abstract class BaseCliSuite extends FunSuite with DiffAssertions {
+abstract class BaseCliSuite extends FunSuite {
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
       name: String,
@@ -42,7 +41,7 @@ abstract class BaseCliSuite extends FunSuite with DiffAssertions {
       val stdout = fansi.Str(myStdout.toString()).plainText
       assert(code == expectedExitCode, stdout)
       val obtained = StringFS.asString(AbsolutePath(out))
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
       onStdout(stdout)
     }
   }

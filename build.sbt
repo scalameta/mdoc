@@ -28,6 +28,7 @@ inThisBuild(
         url("https://geirsson.com")
       )
     ),
+    testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
@@ -42,6 +43,7 @@ crossScalaVersions := Nil
 
 val V = new {
   val scalameta = "4.3.0"
+  val munit = "0.3.6"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -167,11 +169,9 @@ lazy val unit = project
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % "2.1.0",
       "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
-    // forking causes https://github.com/scalatest/scalatest/issues/556
-    //    fork := true,
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
@@ -191,6 +191,7 @@ lazy val plugin = project
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
       "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     resourceGenerators.in(Compile) += Def.task {

@@ -1,15 +1,15 @@
 package tests
 
 import java.nio.file.Paths
-import org.scalatest.FunSuite
+import munit.TestOptions
+import munit.FunSuite
 import sbtdocusaurus.internal.Relativize
 import scala.meta.internal.io.PathIO
-import scala.meta.testkit.DiffAssertions
 import scala.meta.testkit.StringFS
 
-class RelativizeSuite extends FunSuite with DiffAssertions {
+class RelativizeSuite extends FunSuite {
 
-  def check(name: String, original: String, expected: String): Unit = {
+  def check(name: TestOptions, original: String, expected: String): Unit = {
     test(name) {
       val root = StringFS.fromString(original)
       Relativize.htmlSite(root.toNIO)
