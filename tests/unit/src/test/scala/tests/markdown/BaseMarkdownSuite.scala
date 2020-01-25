@@ -17,9 +17,10 @@ import scala.meta.io.AbsolutePath
 import tests.markdown.StringSyntax._
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
+import munit.TestOptions
 
 abstract class BaseMarkdownSuite extends munit.FunSuite {
-  def munitFlakyOK = true
+  override def munitFlakyOK = true
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
     dir.toFile.deleteOnExit()
@@ -56,7 +57,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
   }
 
   def checkError(
-      name: String,
+      name: TestOptions,
       original: String,
       expected: String,
       settings: Settings = baseSettings,
@@ -65,7 +66,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
     test(name) {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
-      val input = Input.VirtualFile(name + ".md", original)
+      val input = Input.VirtualFile(name.name + ".md", original)
       val relpath = RelativePath(input.path)
       Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
@@ -81,7 +82,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
   }
 
   def checkCompiles(
-      name: String,
+      name: TestOptions,
       original: String,
       settings: Settings = baseSettings,
       onOutput: String => Unit = _ => ()
@@ -89,7 +90,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
     test(name) {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
-      val input = Input.VirtualFile(name + ".md", original)
+      val input = Input.VirtualFile(name.name + ".md", original)
       val relpath = RelativePath(input.path)
       val obtained =
         Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
@@ -103,7 +104,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
   }
 
   def check(
-      name: String,
+      name: TestOptions,
       original: String,
       expected: String,
       settings: Settings = baseSettings
