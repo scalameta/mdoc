@@ -1,14 +1,13 @@
 package tests.markdown
 
 import mdoc.internal.cli.Settings
-import org.scalatest.FunSuite
+import munit.FunSuite
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath
-import scala.meta.testkit.DiffAssertions
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.GitHubIdGenerator
 
-class DocumentLinksSuite extends FunSuite with DiffAssertions {
+class DocumentLinksSuite extends FunSuite {
 
   def check(name: String, original: String, fn: DocumentLinks => Unit): Unit = {
     test(name) {
@@ -22,14 +21,14 @@ class DocumentLinksSuite extends FunSuite with DiffAssertions {
   def references(name: String, original: String, expected: String): Unit = {
     check(name, original, { links =>
       val obtained = links.references.map(_.url).mkString("\n")
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
     })
   }
 
   def definitions(name: String, original: String, expected: String): Unit = {
     check(name, original, { links =>
       val obtained = links.definitions.mkString("\n")
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
     })
   }
 

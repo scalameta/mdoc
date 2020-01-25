@@ -14,12 +14,11 @@ import mdoc.internal.markdown.MarkdownCompiler
 import scala.meta.inputs.Input
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
-import scala.meta.testkit.DiffAssertions
 import tests.markdown.StringSyntax._
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
 
-abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAssertions {
+abstract class BaseMarkdownSuite extends munit.FunSuite {
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
     dir.toFile.deleteOnExit()
@@ -51,7 +50,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
   private val compiler = MarkdownCompiler.fromClasspath("", scalacOptions)
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
     settings.validate(reporter)
-    if (reporter.hasErrors) fail()
+    if (reporter.hasErrors) fail("reporter has errors")
     Context(settings, reporter, compiler)
   }
 
@@ -73,7 +72,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
         postProcessObtained
       )
-      assertNoDiffOrPrintExpected(
+      assertNoDiff(
         Compat(obtainedErrors, compat, postProcessObtained),
         Compat(expected, compat, postProcessExpected)
       )
@@ -109,7 +108,7 @@ abstract class BaseMarkdownSuite extends org.scalatest.FunSuite with DiffAsserti
       settings: Settings = baseSettings
   ): Unit = {
     checkCompiles(name, original, settings, obtained => {
-      assertNoDiffOrPrintExpected(obtained, Compat(expected, Map.empty))
+      assertNoDiff(obtained, Compat(expected, Map.empty))
     })
   }
 

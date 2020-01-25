@@ -2,13 +2,12 @@ package tests.cli
 
 import java.nio.file.Files
 import mdoc.internal.cli.Feedback
-import org.scalatest.FunSuite
+import munit.FunSuite
 import scala.meta.internal.io.PathIO
-import scala.meta.testkit.DiffAssertions
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 
-class CliArgsSuite extends FunSuite with DiffAssertions {
+class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
   private val base = Settings.default(PathIO.workingDirectory)
 

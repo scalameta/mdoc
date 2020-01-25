@@ -1,7 +1,7 @@
 package tests.markdown
 
 import mdoc.internal.document.MdocExceptions
-import org.scalatest.FunSuite
+import munit.FunSuite
 
 class ExceptionSuite extends FunSuite {
   test("cyclic") {

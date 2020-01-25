@@ -2,15 +2,14 @@ package tests.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import org.scalatest.FunSuite
-import scala.meta.testkit.DiffAssertions
+import munit.FunSuite
 import scala.meta.testkit.StringFS
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.LinkHygiene
 
-class LinkHygieneSuite extends FunSuite with DiffAssertions {
+class LinkHygieneSuite extends FunSuite {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
   def check(name: String, original: String, expected: String, verbose: Boolean = false): Unit = {
@@ -24,7 +23,7 @@ class LinkHygieneSuite extends FunSuite with DiffAssertions {
       val links = DocumentLinks.fromGeneratedSite(settings, reporter)
       LinkHygiene.lint(links, reporter, verbose)
       val obtained = fansi.Str(myOut.toString()).plainText
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
     }
   }
 

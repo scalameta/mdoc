@@ -20,13 +20,13 @@ class JsModsSuite extends BaseMarkdownSuite {
   }
   def checkError(str: String, expected: String): Unit = {
     parsed(str, (err, res) => {
-      assertNoDiffOrPrintExpected(err, expected)
+      assertNoDiff(err, expected)
       assert(res.isEmpty)
     })
   }
   def checkOK(str: String): Unit = {
     parsed(str, (err, res) => {
-      assertNoDiffOrPrintExpected(err, "")
+      assertNoDiff(err, "")
       assert(res.isDefined)
     })
   }

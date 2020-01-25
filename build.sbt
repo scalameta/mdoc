@@ -28,6 +28,7 @@ inThisBuild(
         url("https://geirsson.com")
       )
     ),
+    testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := sys.env.contains("CI"),
@@ -167,6 +168,7 @@ lazy val unit = project
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % "2.1.0",
       "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalameta" %% "munit" % "0.3.6" % Test,
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),

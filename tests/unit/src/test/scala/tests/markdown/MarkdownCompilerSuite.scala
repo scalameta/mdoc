@@ -1,20 +1,19 @@
 package tests.markdown
 
-import org.scalatest.FunSuite
+import munit.FunSuite
 import scala.meta._
-import scala.meta.testkit.DiffAssertions
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.Renderer
 import mdoc.internal.markdown.ReplVariablePrinter
 
-class MarkdownCompilerSuite extends FunSuite with DiffAssertions {
+class MarkdownCompilerSuite extends FunSuite {
 
   private val compiler = MarkdownCompiler.default()
   private val reporter = ConsoleReporter.default
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
-    ignore(name) {}
+    test(name.ignore) {}
 
   def check(name: String, original: String, expected: String): Unit =
     check(name, original :: Nil, expected)

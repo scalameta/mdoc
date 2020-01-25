@@ -1,17 +1,15 @@
 package tests.worksheets
 
 import java.lang.StringBuilder
-import org.scalatest.FunSuite
-import org.scalatest.BeforeAndAfterAll
+import munit.FunSuite
 import mdoc.interfaces.{DiagnosticSeverity, Mdoc}
-import scala.meta.testkit.DiffAssertions
 import scala.collection.JavaConverters._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import mdoc.internal.pos.PositionSyntax._
 import java.{util => ju}
 
-class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions {
+class WorksheetSuite extends FunSuite {
   var mdoc = ju.ServiceLoader
     .load(classOf[Mdoc], this.getClass().getClassLoader())
     .iterator()
@@ -48,7 +46,7 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
         out.append(message).append("\n")
       }
       val obtained = out.toString()
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
     }
   }
 
@@ -85,7 +83,7 @@ class WorksheetSuite extends FunSuite with BeforeAndAfterAll with DiffAssertions
         i = p.end
       }
       val obtained = out.toString()
-      assertNoDiffOrPrintExpected(obtained, expected)
+      assertNoDiff(obtained, expected)
     }
   }
 

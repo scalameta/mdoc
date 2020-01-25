@@ -1,7 +1,6 @@
 package tests.markdown
 
-import org.scalatest.FunSuite
-import scala.meta.testkit.DiffAssertions
+import munit.FunSuite
 import mdoc.internal.markdown.MarkdownFile
 import scala.meta.inputs.Input
 import mdoc.internal.io.ConsoleReporter
@@ -10,7 +9,7 @@ import mdoc.internal.markdown.MarkdownPart
 import mdoc.internal.markdown.CodeFence
 import scala.meta.io.RelativePath
 
-class MarkdownFileSuite extends FunSuite with DiffAssertions {
+class MarkdownFileSuite extends FunSuite {
   val reporter = new ConsoleReporter(System.out)
 
   def check(name: String, original: String, expected: MarkdownPart*): Unit = {
