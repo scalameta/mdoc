@@ -43,7 +43,7 @@ crossScalaVersions := Nil
 
 val V = new {
   val scalameta = "4.3.0"
-  val munit = "0.4.0"
+  val munit = "0.4.1"
 }
 
 lazy val pprintVersion = Def.setting {
