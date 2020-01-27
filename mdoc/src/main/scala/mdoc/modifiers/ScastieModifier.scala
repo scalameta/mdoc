@@ -53,6 +53,8 @@ class ScastieModifier(theme: String = "light", debugClassSuffix: Option[String] 
 
   }
 
+  def this() = this("light", None)
+
   def scastieSnippet(snippetId: String): String = {
     s"<script src='https://scastie.scala-lang.org/${snippetId}.js?theme=$theme'></script>"
   }
