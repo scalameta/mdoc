@@ -119,6 +119,7 @@ The sbt-mdoc plugin supports the following settings.
 
 ```
 
+
 ## Command-line
 
 Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
