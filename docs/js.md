@@ -93,28 +93,46 @@ lazy val docs = project
 
 ### Command-line
 
-First add a dependency on the `org.scalameta:mdoc-js` library.
+First, install [Coursier](https://get-coursier.io/docs/cli-overview).
 
-```diff
- coursier launch \
-     org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
-+    org.scalameta:mdoc-js_@SCALA_BINARY_VERSION@:@VERSION@
+Next, construct an `mdoc.properties` file with the necessary Scala.js
+configuration
+
+```sh
+cat <<EOT > mdoc.properties
+js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:0.6.32 org.scala-js:scalajs-dom_sjs0.6_2.12:1.0.0 -p)
+js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.10:0.6.32)
+EOT
 ```
 
-This dependency enables the `mdoc:js` modifier which requires the site variables
-`js-classpath` and `js-scalacOptions`.
+Next, create a basic Markdown files with an `mdoc:js` modifier:
 
-```diff
- coursier launch \
-     org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
-     org.scalameta:mdoc-js_@SCALA_BINARY_VERSION@:@VERSION@ -- \
-+  --site.js-classpath CLASSPATH_OF_SCALAJS_PROJECT
-+  --site.js-scalacOption OPTIONS_OF_SCALAJS_PROJECT
+```sh
+mkdir docs
+cat <<EOT > docs/index.md
+\`\`\`scala mdoc:js
+org.scalajs.dom.window.setInterval(() => {
+  node.innerHTML = new java.util.Date().toString
+}, 1000)
+\`\`\`
+EOT
 ```
 
-- `js-scalacOptions` must contain `-Xplugin:path/to/scalajs-compiler.jar` to
-  enable the Scala.js compiler. - `js-classpath` value must include a dependency
-  on the library `org.scala-js:scalajs-dom`
+Next, launch mdoc with the `org.scalameta:mdoc-js` module instead of
+`org.scalameta:mdoc`:
+
+```sh
+coursier launch org.scalameta:mdoc-js_@SCALA_BINARY_VERSION@:@VERSION@ --extra-jars $(pwd) -- --watch
+```
+
+Some notes:
+
+- The `--extra-jars $(pwd)` flag is needed to pick up the `mdoc.properties`
+  configuration.
+- The `js-scalacOptions` field in `mdoc.properties` must contain
+  `-Xplugin:path/to/scalajs-compiler.jar` to enable the Scala.js compiler.
+- The `js-classpath` field in `mdoc.properties` must include a dependency on the
+  library `org.scala-js:scalajs-dom`
 
 ## Modifiers
 
