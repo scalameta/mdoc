@@ -80,7 +80,7 @@ Next, update the `mdocJS` setting to point to a Scala.js project that has
 // build.sbt
 lazy val jsdocs = project
   .settings(
-+   libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.7"
++   libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "@SCALAJS_DOM_VERSION@"
   )
   .enablePlugins(ScalaJSPlugin)
 lazy val docs = project
@@ -100,8 +100,8 @@ configuration
 
 ```sh
 cat <<EOT > mdoc.properties
-js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:0.6.32 org.scala-js:scalajs-dom_sjs0.6_2.12:1.0.0 -p)
-js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.10:0.6.32)
+js-classpath=$(coursier fetch org.scala-js:scalajs-library_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ org.scala-js:scalajs-dom_sjs@SCALAJS_BINARY_VERSION@_@SCALA_BINARY_VERSION@:@SCALAJS_DOM_VERSION@ -p)
+js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_@SCALA_VERSION@:@SCALAJS_VERSION@)
 EOT
 ```
 
@@ -124,6 +124,9 @@ Next, launch mdoc with the `org.scalameta:mdoc-js` module instead of
 ```sh
 coursier launch org.scalameta:mdoc-js_@SCALA_BINARY_VERSION@:@VERSION@ --extra-jars $(pwd) -- --watch
 ```
+
+Open the URL http://localhost:4001/index.md to see a live preview of the
+generated Markdown.
 
 Some notes:
 

@@ -1,6 +1,9 @@
 def scala212 = "2.12.10"
 def scala211 = "2.11.12"
 def scala213 = "2.13.1"
+def scalajs = "0.6.32"
+def scalajsBinaryVersion = "0.6"
+def scalajsDom = "1.0.0"
 inThisBuild(
   List(
     scalaVersion := scala212,
@@ -145,7 +148,7 @@ val jsdocs = project
         )
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
     scalaJSUseMainModuleInitializer := true,
     npmDependencies in Compile ++= List(
@@ -224,8 +227,8 @@ lazy val js = project
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(
-        "org.scala-js" % "scalajs-compiler" % "0.6.32" cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-tools" % "0.6.32"
+        "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
+        "org.scala-js" %% "scalajs-tools" % scalajs
       )
     )
   )
@@ -256,7 +259,10 @@ lazy val docs = project
       Map(
         "VERSION" -> stableVersion,
         "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
-        "SCALA_VERSION" -> scalaVersion.value
+        "SCALA_VERSION" -> scalaVersion.value,
+        "SCALAJS_VERSION" -> scalajs,
+        "SCALAJS_BINARY_VERSION" -> scalajsBinaryVersion,
+        "SCALAJS_DOM_VERSION" -> scalajsDom
       )
     }
   )
