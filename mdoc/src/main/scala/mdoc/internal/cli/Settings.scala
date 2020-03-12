@@ -66,7 +66,9 @@ case class Settings(
     @Section("Compiler options")
     @Description(
       "Classpath to use when compiling Scala code examples. " +
-        "Defaults to the current thread's classpath."
+        "Defaults to the current thread's classpath." +
+        "You can use Coursier's fetch command to generate the classpath for you:" +
+        "`--classpath $(cs fetch --classpath org::artifact:version)`"
     )
     classpath: String = "",
     @Description(
