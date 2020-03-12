@@ -84,4 +84,68 @@ class CrashSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "fatal",
+    """
+      |```scala mdoc:crash
+      |throw new StackOverflowError()
+      |```
+    """.stripMargin,
+    """|```scala
+       |throw new StackOverflowError()
+       |// java.lang.StackOverflowError
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal.md:9)
+       |```
+       |""".stripMargin
+  )
+
+  check(
+    "fatal2",
+    """
+      |```scala mdoc:crash
+      |throw new NoClassDefFoundError()
+      |```
+    """.stripMargin,
+    """|```scala
+       |throw new NoClassDefFoundError()
+       |// java.lang.NoClassDefFoundError
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal2.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal2.md:9)
+       |```
+       |""".stripMargin
+  )
+
+  check(
+    "fatal3",
+    """
+      |```scala mdoc:crash
+      |throw new NoSuchMethodError()
+      |```
+    """.stripMargin,
+    """|```scala
+       |throw new NoSuchMethodError()
+       |// java.lang.NoSuchMethodError
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal3.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal3.md:9)
+       |```
+       |""".stripMargin
+  )
+
+  check(
+    "fatal4",
+    """
+      |```scala mdoc:crash
+      |throw new IncompatibleClassChangeError()
+      |```
+    """.stripMargin,
+    """|```scala
+       |throw new IncompatibleClassChangeError()
+       |// java.lang.IncompatibleClassChangeError
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal4.md:9)
+       |// 	at repl.Session$App$$anonfun$1.apply(fatal4.md:9)
+       |```
+       |""".stripMargin
+  )
+
 }
