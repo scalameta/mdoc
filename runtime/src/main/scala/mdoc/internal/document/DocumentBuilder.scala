@@ -69,7 +69,7 @@ trait DocumentBuilder {
           thunk
           CrashResult.Success(pos)
         } catch {
-          case NonFatal(e) =>
+          case e: Throwable =>
             CrashResult.Crashed(e, pos)
         }
       myBinders.append(Binder.generate(result, pos))
