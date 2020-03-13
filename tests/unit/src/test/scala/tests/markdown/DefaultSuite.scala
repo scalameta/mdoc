@@ -292,4 +292,35 @@ class DefaultSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  check(
+    "backtick",
+    // see https://github.com/scalameta/mdoc/issues/97
+    """
+      |```scala mdoc
+      |type `0` = Int
+      |```
+    """.stripMargin,
+    """|```scala
+       |type `0` = Int
+       |```
+       |""".stripMargin
+  )
+
+  checkError(
+    "fatal-exception",
+    // see https://github.com/scalameta/metals/issues/1456
+    """
+      |```scala mdoc
+      |throw new StackOverflowError()
+      |```
+    """.stripMargin,
+    """|error: fatal-exception.md:3:1: null
+       |throw new StackOverflowError()
+       |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       |java.lang.StackOverflowError
+       |	at repl.Session$App.<init>(fatal-exception.md:8)
+       |	at repl.Session$.app(fatal-exception.md:3)
+       |""".stripMargin
+  )
+
 }
