@@ -34,8 +34,8 @@ inThisBuild(
     testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
-    publishArtifact.in(packageDoc) := sys.env.contains("CI"),
-    publishArtifact.in(packageSrc) := sys.env.contains("CI"),
+    publishArtifact.in(packageDoc) := "true" == System.getenv("CI"),
+    publishArtifact.in(packageSrc) := "true" == System.getenv("CI"),
     turbo := true
   )
 )
