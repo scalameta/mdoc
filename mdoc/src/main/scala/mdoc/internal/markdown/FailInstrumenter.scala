@@ -7,6 +7,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   private val gensym = new Gensym()
+  private val nest = new Nesting(sb)
   def instrument(): String = {
     printAsScript()
     out.toString
@@ -20,7 +21,10 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
         if (j > i) ()
         else {
           if (section.mod.isReset) {
+            nest.unnest()
             sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
+          } else if (section.mod.isNest) {
+            nest.nest()
           }
           if (j == i || !section.mod.isFail) {
             sb.println(section.input.text)
@@ -28,5 +32,6 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
         }
     }
     sb.println("\n  }\n}")
+    nest.unnest()
   }
 }

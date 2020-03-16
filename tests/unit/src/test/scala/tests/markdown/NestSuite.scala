@@ -275,4 +275,29 @@ class NestSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  check(
+    "fail",
+    """
+      |```scala mdoc
+      |case class Foo(i: Int)
+      |```
+      |
+      |```scala mdoc:nest:fail
+      |case class Foo(i: Int) { val x = y }
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |case class Foo(i: Int)
+       |```
+       |
+       |```scala
+       |case class Foo(i: Int) { val x = y }
+       |// error: not found: value y
+       |// case class Foo(i: Int) { val x = y }
+       |//                                  ^
+       |```
+    """.stripMargin
+  )
+
 }
