@@ -231,4 +231,29 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin
   )
+
+  check(
+    "after-nest",
+    """
+      |```scala mdoc:nest
+      |case class Foo(i: Int)
+      |```
+      |
+      |```scala mdoc:fail
+      |case class Foo(i: Int) { val x = y }
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |case class Foo(i: Int)
+       |```
+       |
+       |```scala
+       |case class Foo(i: Int) { val x = y }
+       |// error: not found: value y
+       |// case class Foo(i: Int) { val x = y }
+       |//                                  ^
+       |```
+    """.stripMargin
+  )
 }
