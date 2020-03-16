@@ -17,7 +17,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
     sb.println("  object App {")
     sections.zipWithIndex.foreach {
       case (section, j) =>
-        if (j > i) ()
+        if (j > i || section.mod.isNest) ()
         else {
           if (section.mod.isReset) {
             sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
