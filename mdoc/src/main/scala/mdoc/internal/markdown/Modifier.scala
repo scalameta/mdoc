@@ -16,7 +16,9 @@ import mdoc.internal.markdown.Mod._
   */
 sealed abstract class Modifier(val mods: Set[Mod]) {
   def isDefault: Boolean = mods.isEmpty
+  def isFailOrWarn: Boolean = isFail || isWarn
   def isFail: Boolean = mods(Fail)
+  def isWarn: Boolean = mods(Warn)
   def isPassthrough: Boolean = mods(Passthrough)
   def isString: Boolean = this.isInstanceOf[Modifier.Str]
   def isPre: Boolean = this.isInstanceOf[Modifier.Pre]
@@ -42,7 +44,11 @@ object Modifier {
   }
   object Fail {
     def unapply(m: Modifier): Boolean =
-      m.isFail
+      m.isFailOrWarn
+  }
+  object Warn {
+    def unapply(m: Modifier): Boolean =
+      m.isWarn
   }
   object PrintVariable {
     def unapply(m: Modifier): Boolean =

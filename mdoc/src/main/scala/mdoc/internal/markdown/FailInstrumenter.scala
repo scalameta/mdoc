@@ -26,7 +26,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
           } else if (section.mod.isNest) {
             nest.nest()
           }
-          if (j == i || !section.mod.isFail) {
+          if (j == i || !section.mod.isFailOrWarn) {
             sb.println(section.input.text)
           }
         }

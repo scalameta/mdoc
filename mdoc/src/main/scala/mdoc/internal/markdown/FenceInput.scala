@@ -66,7 +66,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
   }
 
   private def isValid(info: Text, mod: Modifier): Boolean = {
-    if (mod.isFail && mod.isCrash) {
+    if (mod.isFailOrWarn && mod.isCrash) {
       invalidCombination(info, "crash", "fail")
     } else if (mod.isSilent && mod.isInvisible) {
       invalidCombination(info, "silent", "invisible")

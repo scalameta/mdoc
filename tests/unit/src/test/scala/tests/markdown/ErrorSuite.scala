@@ -60,11 +60,10 @@ class ErrorSuite extends BaseMarkdownSuite {
       |List(1)
       |```
     """.stripMargin,
-    """
-      |error: silent.md:7:1: Expected compile error but statement typechecked successfully
-      |List(1)
-      |^^^^^^^
-    """.stripMargin
+    """|error: silent.md:7:1: Expected compile errors but program compiled successfully without errors
+       |List(1)
+       |^^^^^^^
+       |""".stripMargin
   )
   checkError(
     "parse-error",
