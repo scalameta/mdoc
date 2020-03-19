@@ -68,7 +68,7 @@ class AsyncSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "reset-class",
+    "reset-class".flaky,
     """
       |```scala mdoc
       |import scala.concurrent._, duration._, ExecutionContext.Implicits.global

@@ -1,4 +1,4 @@
-def scala212 = "2.12.10"
+def scala212 = "2.12.11"
 def scala211 = "2.11.12"
 def scala213 = "2.13.1"
 def scalajs = "0.6.32"
@@ -45,8 +45,8 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.3.0"
-  val munit = "0.5.2"
+  val scalameta = "4.3.6"
+  val munit = "0.6.0-M1"
 }
 
 lazy val pprintVersion = Def.setting {
