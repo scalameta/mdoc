@@ -62,7 +62,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       expected: String,
       settings: Settings = baseSettings,
       compat: Map[String, String] = Map.empty
-  ): Unit = {
+  )(implicit loc: munit.Location): Unit = {
     test(name) {
       val reporter = newReporter()
       val context = newContext(settings, reporter)

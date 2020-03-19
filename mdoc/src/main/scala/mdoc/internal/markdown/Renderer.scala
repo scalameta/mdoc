@@ -100,7 +100,7 @@ object Renderer {
     val stats = section.source.stats.lift
     val input = section.source.pos.input
     val totalStats = section.source.stats.length
-    if (section.mod.isFail) {
+    if (section.mod.isFailOrWarn) {
       sb.print(section.input.text)
     }
     section.section.statements.zip(section.source.stats).zipWithIndex.foreach {
@@ -113,12 +113,12 @@ object Renderer {
             previousStatement.pos.end
         }
         val leadingTrivia = Position.Range(input, leadingStart, pos.start)
-        if (!section.mod.isFail) {
+        if (!section.mod.isFailOrWarn) {
           sb.append(leadingTrivia.text)
         }
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
-        if (!section.mod.isFail) {
+        if (!section.mod.isFailOrWarn) {
           sb.append(endOfLinePosition.text)
         }
         if (statement.out.nonEmpty) {
@@ -129,7 +129,7 @@ object Renderer {
         statement.binders.zipWithIndex.foreach {
           case (binder, i) =>
             section.mod match {
-              case Modifier.Fail() =>
+              case Modifier.Fail() | Modifier.Warn() =>
                 sb.append('\n')
                 binder.value match {
                   case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
@@ -138,11 +138,22 @@ object Renderer {
                       Input.String(instrumented),
                       section.source.pos
                     )
-                    if (compiled.isEmpty) {
-                      val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
+                    val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
+                    val pos = tpos.toMeta(section)
+                    if (section.mod.isWarn && compiler.hasErrors) {
                       reporter.error(
-                        tpos.toMeta(section),
-                        s"Expected compile error but statement typechecked successfully"
+                        pos,
+                        s"Expected compile warnings but program failed to compile"
+                      )
+                    } else if (section.mod.isWarn && !compiler.hasWarnings) {
+                      reporter.error(
+                        pos,
+                        s"Expected compile warnings but program compiled successfully without warnings"
+                      )
+                    } else if (section.mod.isFail && !compiler.hasErrors) {
+                      reporter.error(
+                        pos,
+                        s"Expected compile errors but program compiled successfully without errors"
                       )
                     }
                     appendFreshMultiline(sb, compiled)

@@ -203,6 +203,9 @@ class MarkdownCompiler(
     out.toString()
   }
 
+  def hasErrors: Boolean = sreporter.hasErrors
+  def hasWarnings: Boolean = sreporter.hasWarnings
+
   def compileSources(input: Input, vreporter: Reporter, edit: TokenEditDistance): Unit = {
     clearTarget()
     sreporter.reset()

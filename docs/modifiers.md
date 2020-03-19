@@ -57,6 +57,39 @@ val x: String = ""
 > Note that `fail` does not assert that the program compiles but crashes at
 > runtime. To assert runtime exceptions, use the `crash` modifier.
 
+## `warn`
+
+The `warn` modifier is similar to `fail` except that it asserts the code
+compiles successfully but with a warning message.
+
+````scala mdoc:mdoc
+```scala mdoc:warn
+List(1) match {
+  case Nil =>
+}
+```
+````
+
+The build fails when a `warn` code fence compiles without warnings.
+
+````scala mdoc:mdoc:crash
+```scala mdoc:warn
+List(1) match {
+  case head :: tail =>
+  case Nil =>
+}
+```
+````
+
+The build also fails when a `warn` code fence fails to compile, even if the
+program has a warning. Use `fail` in these cases instead.
+
+````scala mdoc:mdoc:crash
+```scala mdoc:warn
+val x: Int = ""
+```
+````
+
 ## `crash`
 
 The `crash` modifier asserts that the code block throws an exception at runtime

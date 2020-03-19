@@ -3,6 +3,7 @@ package mdoc.internal.markdown
 sealed abstract class Mod extends Product with Serializable
 object Mod {
   case object Fail extends Mod
+  case object Warn extends Mod
   case object Crash extends Mod
   case object Silent extends Mod
   case object Passthrough extends Mod
@@ -30,6 +31,7 @@ object Mod {
     ResetClass,
     ResetObject,
     Fail,
+    Warn,
     Crash,
     Silent,
     ToString,

@@ -27,7 +27,7 @@ class Instrumenter(sections: List[SectionInput]) {
           nest.nest()
         }
         sb.println("\n$doc.startSection();")
-        if (section.mod.isFail) {
+        if (section.mod.isFailOrWarn) {
           sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
           val out = new FailInstrumenter(sections, i).instrument()
           val literal = Instrumenter.stringLiteral(out)

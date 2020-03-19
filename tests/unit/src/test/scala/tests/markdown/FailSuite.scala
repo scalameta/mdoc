@@ -66,11 +66,10 @@ class FailSuite extends BaseMarkdownSuite {
       |1.to(2)
       |```
     """.stripMargin,
-    """
-      |error: fail-success.md:3:1: Expected compile error but statement typechecked successfully
-      |1.to(2)
-      |^^^^^^^
-      |""".stripMargin
+    """|error: fail-success.md:3:1: Expected compile errors but program compiled successfully without errors
+       |1.to(2)
+       |^^^^^^^
+       |""".stripMargin
   )
 
   // Compile-error causes nothing to run
