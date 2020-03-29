@@ -111,7 +111,7 @@ lazy val mdoc = project
       "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
       "io.undertow" % "undertow-core" % "2.0.29.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.7.7.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
   )
