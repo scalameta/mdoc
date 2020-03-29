@@ -116,9 +116,7 @@ object MdocPlugin extends AutoPlugin {
             s"js-classpath",
             options.classpath.mkString(File.pathSeparator)
           )
-          options.moduleKind.foreach { moduleKind =>
-            props.put(s"js-module-kind", moduleKind)
-          }
+          options.moduleKind.foreach { moduleKind => props.put(s"js-module-kind", moduleKind) }
         }
         props.put(
           s"js-libraries",

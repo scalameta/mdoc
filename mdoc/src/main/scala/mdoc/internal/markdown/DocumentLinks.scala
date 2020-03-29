@@ -80,9 +80,7 @@ object DocumentLinks {
         }
       case h: HtmlInline if !h.getChars.startsWith("</") =>
         def handleRegex(r: Regex): Unit =
-          r.findAllMatchIn(h.getChars).foreach { m =>
-            definitions += m.group(1)
-          }
+          r.findAllMatchIn(h.getChars).foreach { m => definitions += m.group(1) }
         handleRegex(HtmlId)
         handleRegex(HtmlName)
       case link: Link =>

@@ -9,9 +9,7 @@ class Nesting(sb: PrintStream) {
     sb.append(s"_root_.scala.Predef.locally {\n")
   }
   def unnest(): Unit = {
-    1.to(nestCount).foreach { _ =>
-      sb.print("};")
-    }
+    1.to(nestCount).foreach { _ => sb.print("};") }
     nestCount = 0
   }
 }

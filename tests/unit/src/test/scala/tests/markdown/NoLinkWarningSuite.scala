@@ -17,9 +17,7 @@ class NoLinkWarningSuite extends BaseCliSuite {
     extraArgs = Array(
       "--no-link-hygiene"
     ),
-    onStdout = { out =>
-      assert(!out.contains("warning"))
-    }
+    onStdout = { out => assert(!out.contains("warning")) }
   )
 
 }

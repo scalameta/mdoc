@@ -152,11 +152,7 @@ object TokenEditDistance {
     val instrumentedTokens = instrumented.tokenize.get
     val originalTokens: Array[Token] = {
       val buf = Array.newBuilder[Token]
-      original.foreach { tokens =>
-        tokens.foreach { token =>
-          buf += token
-        }
-      }
+      original.foreach { tokens => tokens.foreach { token => buf += token } }
       buf.result()
     }
     TokenEditDistance(originalTokens, instrumentedTokens)

@@ -96,9 +96,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
       "--scalac-options",
       "-Ywarn-value-discard"
     ),
-    onStdout = { out =>
-      assert(!out.contains("discarded non-Unit value"))
-    }
+    onStdout = { out => assert(!out.contains("discarded non-Unit value")) }
   )
 
   checkCli(

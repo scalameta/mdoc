@@ -64,9 +64,7 @@ object Relativize {
     val doc = Jsoup.parse(file.toFile, StandardCharsets.UTF_8.name(), originUri.toString)
     val attributesToRelativize = List("href", "src")
     attributesToRelativize.foreach { attribute =>
-      doc.select(s"[$attribute]").forEach { element =>
-        relativizeAttribute(element, attribute)
-      }
+      doc.select(s"[$attribute]").forEach { element => relativizeAttribute(element, attribute) }
     }
     val renderedHtml = doc.outerHtml()
     Files.write(file, renderedHtml.getBytes(StandardCharsets.UTF_8))
@@ -75,9 +73,7 @@ object Relativize {
   private def relativeUri(relativePath: Path): URI = {
     require(!relativePath.isAbsolute, relativePath)
     val names = relativePath.iterator().asScala
-    val uris = names.map { name =>
-      new URI(null, null, name.toString, null)
-    }
+    val uris = names.map { name => new URI(null, null, name.toString, null) }
     URI.create(uris.mkString("", "/", ""))
   }
 }

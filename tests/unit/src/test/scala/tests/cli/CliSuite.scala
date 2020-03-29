@@ -153,9 +153,7 @@ class CliSuite extends BaseCliSuite {
     "",
     "",
     extraArgs = Array("--help"),
-    onStdout = { out =>
-      assert(out.contains("mdoc is a documentation tool"))
-    }
+    onStdout = { out => assert(out.contains("mdoc is a documentation tool")) }
   )
 
   checkCli(
@@ -163,9 +161,7 @@ class CliSuite extends BaseCliSuite {
     "",
     "",
     extraArgs = Array("--usage"),
-    onStdout = { out =>
-      assert(out.contains("mdoc [<option> ...]"))
-    }
+    onStdout = { out => assert(out.contains("mdoc [<option> ...]")) }
   )
 
   checkCli(

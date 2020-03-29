@@ -10,11 +10,7 @@ trait MetaconfigScalametaImplicits {
   implicit val pathMatcherPrint: TPrint[PathMatcher] =
     TPrint.make[PathMatcher](_ => "<glob>")
   implicit def optionPrint[T](implicit ev: pprint.TPrint[T]): TPrint[Option[T]] =
-    TPrint.make { implicit cfg =>
-      ev.render
-    }
+    TPrint.make { implicit cfg => ev.render }
   implicit def iterablePrint[C[x] <: Iterable[x], T](implicit ev: pprint.TPrint[T]): TPrint[C[T]] =
-    TPrint.make { implicit cfg =>
-      s"[${ev.render} ...]"
-    }
+    TPrint.make { implicit cfg => s"[${ev.render} ...]" }
 }

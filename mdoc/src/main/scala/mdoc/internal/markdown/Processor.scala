@@ -38,12 +38,8 @@ class Processor(implicit ctx: Context) {
     val (scalaInputs, customInputs, preInputs) = collectFenceInputs(doc)
     val filename = docInput.toFilename(ctx.settings)
     val inputFile = doc.relativePath
-    customInputs.foreach { block =>
-      processStringInput(doc, block)
-    }
-    preInputs.foreach { block =>
-      processPreInput(doc, block)
-    }
+    customInputs.foreach { block => processStringInput(doc, block) }
+    preInputs.foreach { block => processPreInput(doc, block) }
     if (scalaInputs.nonEmpty) {
       processScalaInputs(doc, scalaInputs, inputFile, filename)
     }
