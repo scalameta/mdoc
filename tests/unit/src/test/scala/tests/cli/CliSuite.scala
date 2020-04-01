@@ -1,7 +1,9 @@
 package tests.cli
 
 import java.nio.file.Files
+
 import mdoc.internal.BuildInfo
+import tests.markdown.{LifeCycleCounter, LifeCycleModifier}
 
 class CliSuite extends BaseCliSuite {
 
@@ -185,6 +187,48 @@ class CliSuite extends BaseCliSuite {
       |```
       |</p>
       |""".stripMargin
+  )
+
+  checkCli(
+    "lifeCycle-0",
+    """
+      |/file1.md
+      |# file 1
+      |One
+      |```scala mdoc:lifecycle
+      |val x1 = 1
+      |```
+      |/file2.md
+      |# file 2
+      |Two
+      |```scala mdoc:lifecycle
+      |val x2 = 2
+      |```
+      |    """.stripMargin,
+    """
+      |/file1.md
+      |# file 1
+      |One
+      |numberOfStarts = 1 ; numberOfExists = 0
+      |/file2.md
+      |# file 2
+      |Two
+      |numberOfStarts = 1 ; numberOfExists = 0
+    """.stripMargin, // process counts per PostModifier instance, starts and exists per mdoc.Main process
+    setup = { fixture =>
+      // Global thread local counter updated by all mdoc.Main process
+      // All tests in this test suite run sequentially but change the counter
+      // So make sure we start anew for this test
+      LifeCycleCounter.reset()
+    },
+    onStdout = { out =>
+      assert(out.contains("Compiling 2 files to"))
+      assert(out.contains("Compiled in"))
+      assert(out.contains("(0 errors"))
+      // Should start and stop one only once in this test (several times for test-suite)
+      assert(LifeCycleCounter.numberOfExists.get() == 1)
+      assert(LifeCycleCounter.numberOfStarts.get() == 1)
+    }
   )
 
 }

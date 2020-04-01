@@ -397,6 +397,19 @@ val message = "hello world!"
 ```
 ````
 
+In addition to the `process` method, the `PostModifier` trait also has several 
+life-cycle methods that signal when a `PostModifier` instance:
+* Has started for the first time (`onStart`) when MDoc is launched;
+* Just before compilation and processing occurs (`preProcess`) on each source 
+document file;
+* Just after compilation and processing has finished (`postProcess`) on each 
+source document file;
+* Has finished after processing the last source document file (`onExit`)
+before MDoc terminates.
+These methods can be used to initialize and deactivate resources required by 
+the `PostModifier` instances.  
+
+
 ## StringModifier
 
 A `StringModifier` is a custom modifier that processes the plain text contents
