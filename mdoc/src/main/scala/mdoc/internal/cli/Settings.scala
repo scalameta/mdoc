@@ -161,7 +161,11 @@ case class Settings(
   def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
-    val relpath = infile.toRelative(in)
+    val relpath = if (infile == in) {
+      RelativePath(in.toFile.getName)
+    } else {
+      infile.toRelative(in)
+    }
     if (isIncluded(relpath)) {
       val outfile = out.resolve(relpath)
       Some(InputFile(relpath, infile, outfile))
