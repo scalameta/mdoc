@@ -2,6 +2,8 @@ package tests.cli
 
 import java.nio.file.Files
 import mdoc.internal.BuildInfo
+import scala.meta.io.AbsolutePath
+import java.nio.file.Paths
 
 class CliSuite extends BaseCliSuite {
 
@@ -185,6 +187,26 @@ class CliSuite extends BaseCliSuite {
       |```
       |</p>
       |""".stripMargin
+  )
+
+  checkCli(
+    "single-file",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |""".stripMargin,
+    """
+      |/index.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    configureInFlag = { in => in + "/index.md" }
   )
 
 }

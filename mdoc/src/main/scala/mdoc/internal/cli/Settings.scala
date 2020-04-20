@@ -35,9 +35,9 @@ class Section(val name: String) extends StaticAnnotation
 case class Settings(
     @Section("Common options")
     @Description(
-      "The input directory containing markdown and other documentation sources. " +
-        "Markdown files will be processed by mdoc while other files will be copied " +
-        "verbatim to the output directory."
+      "The input directory containing markdown and other documentation sources " +
+        "or an individual file that you'd like to target. Markdown files will be " +
+        "processed by mdoc while other files will be copied verbatim to the output directory."
     )
     @ExtraName("i")
     in: AbsolutePath,
@@ -162,7 +162,7 @@ case class Settings(
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
     val relpath = if (infile == in) {
-      RelativePath(in.toFile.getName)
+      RelativePath(in.toNIO.getFileName.toString)
     } else {
       infile.toRelative(in)
     }

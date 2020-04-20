@@ -19,6 +19,7 @@ abstract class BaseCliSuite extends FunSuite {
       expected: String,
       extraArgs: Array[String] = Array.empty,
       setup: CliFixture => Unit = _ => (),
+      configureInFlag: AbsolutePath => String = _.toString(),
       expectedExitCode: Int = 0,
       onStdout: String => Unit = _ => ()
   ): Unit = {
@@ -29,7 +30,7 @@ abstract class BaseCliSuite extends FunSuite {
       setup(CliFixture(in.toNIO, out))
       val args = Array[String](
         "--in",
-        in.toString,
+        configureInFlag(in),
         "--out",
         out.toString,
         "--cwd",

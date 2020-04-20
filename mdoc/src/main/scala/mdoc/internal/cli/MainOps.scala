@@ -121,11 +121,9 @@ final class MainOps(
   }
 
   def generateCompleteSite(): Exit = {
-    val inIsFile = settings.in.toFile.isFile
-    val files = if (inIsFile) {
-      settings
-        .toInputFile(settings.in)
-        .fold(List.empty: List[InputFile])(List(_))
+    val isFile = settings.in.toFile.isFile
+    val files = if (isFile) {
+      settings.toInputFile(settings.in).toList
     } else {
       IO.inputFiles(settings)
     }

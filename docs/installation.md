@@ -151,6 +151,14 @@ contained, by default the `docs/` directory is used.
 +  --in mydocs
 ```
 
+The `--in` flag doesn't have to be a directory, it also supports individual
+files.
+
+```diff
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --in mydocs/readme.md
+```
+
 Use `--site.VARIABLE=value` to add site variables that can be referenced from
 markdown as `@@VARIABLE@`.
 
