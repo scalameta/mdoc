@@ -190,7 +190,7 @@ class CliSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "single-file",
+    "single-in",
     """
       |/index.md
       |# Single file
@@ -206,7 +206,77 @@ class CliSuite extends BaseCliSuite {
       |// one file
       |```
       |""".stripMargin,
-    configureInFlag = { in => in + "/index.md" }
+    configureInFlag = { in => in.resolve("index.md").toString }
+  )
+
+  checkCli(
+    "single-in-only",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |/second.md
+      |```scala mdoc
+      |println("second file")
+      |```
+      |""".stripMargin,
+    """
+      |/index.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    configureInFlag = { in => in.resolve("index.md").toString }
+  )
+
+  checkCli(
+    "single-in-single-out",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |""".stripMargin,
+    """
+      |/out.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    configureInFlag = { in => in.resolve("index.md").toString },
+    configureOutFlag = { out => out.resolve("out.md").toString }
+  )
+
+  checkCli(
+    "single-in-single-out-only",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |/second.md
+      |```scala mdoc
+      |println("second file")
+      |```
+      |""".stripMargin,
+    """
+      |/out.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    configureInFlag = { in => in.resolve("index.md").toString },
+    configureOutFlag = { out => out.resolve("out.md").toString }
   )
 
 }

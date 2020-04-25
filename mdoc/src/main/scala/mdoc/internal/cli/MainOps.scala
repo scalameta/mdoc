@@ -121,7 +121,7 @@ final class MainOps(
   }
 
   def generateCompleteSite(): Exit = {
-    val isFile = settings.in.toFile.isFile
+    val isFile = Files.isRegularFile(settings.in.toNIO)
     val files = if (isFile) {
       settings.toInputFile(settings.in).toList
     } else {

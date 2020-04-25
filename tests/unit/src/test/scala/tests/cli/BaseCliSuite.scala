@@ -19,7 +19,8 @@ abstract class BaseCliSuite extends FunSuite {
       expected: String,
       extraArgs: Array[String] = Array.empty,
       setup: CliFixture => Unit = _ => (),
-      configureInFlag: AbsolutePath => String = _.toString(),
+      configureInFlag: AbsolutePath => String = _.toString,
+      configureOutFlag: Path => String = _.toString,
       expectedExitCode: Int = 0,
       onStdout: String => Unit = _ => ()
   ): Unit = {
@@ -32,7 +33,7 @@ abstract class BaseCliSuite extends FunSuite {
         "--in",
         configureInFlag(in),
         "--out",
-        out.toString,
+        configureOutFlag(out),
         "--cwd",
         in.toString,
         "--site.version",

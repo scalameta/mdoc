@@ -41,7 +41,11 @@ case class Settings(
     )
     @ExtraName("i")
     in: AbsolutePath,
-    @Description("The output directory to generate the mdoc site.")
+    @Description(
+      "The output directory where you'd like to generate your markdown or other documentation " +
+        "sources. This can also be an individual filename, but it then assumes that your `--in` " +
+        "was also an indiviudal file."
+    )
     @ExtraName("o")
     out: AbsolutePath,
     @Description("Start a file watcher and incrementally re-generate the site on file save.")
@@ -161,21 +165,27 @@ case class Settings(
   def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
-    val relpath = if (infile == in) {
+    val relativeIn = if (infile == in) {
       RelativePath(in.toNIO.getFileName.toString)
     } else {
       infile.toRelative(in)
     }
-    if (isIncluded(relpath)) {
-      val outfile = out.resolve(relpath)
-      Some(InputFile(relpath, infile, outfile))
+    if (isIncluded(relativeIn)) {
+      val outfile = if (assumedRegularFile(out)) {
+        out
+      } else {
+        out.resolve(relativeIn)
+      }
+      Some(InputFile(relativeIn, infile, outfile))
     } else {
       None
     }
   }
+
   def isExplicitlyExcluded(path: RelativePath): Boolean = {
     exclude.exists(_.matches(path.toNIO))
   }
+
   def isIncluded(path: RelativePath): Boolean = {
     (include.isEmpty || include.exists(_.matches(path.toNIO))) &&
     !isExplicitlyExcluded(path)
@@ -185,10 +195,13 @@ case class Settings(
     val ctx = new OnLoadContext(reporter, this)
     preModifiers.foreach(_.onLoad(ctx))
   }
+
   def validate(logger: Reporter): Configured[Context] = {
     if (Files.exists(in.toNIO)) {
-      if (out.toNIO.startsWith(in.toNIO)) {
+      if (out.toNIO.startsWith(in.toNIO) && !assumedRegularFile(out)) {
         Configured.error(Feedback.outSubdirectoryOfIn(in.toNIO, out.toNIO))
+      } else if (assumedRegularFile(out) && Files.isDirectory(in.toNIO)) {
+        Configured.error("your 'in' must be a file if 'out' is a file")
       } else {
         val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
         onLoad(logger)
@@ -202,13 +215,12 @@ case class Settings(
       ConfError.fileDoesNotExist(in.toNIO).notOk
     }
   }
-  def resolveIn(relpath: RelativePath): AbsolutePath = {
-    in.resolve(relpath)
+
+  private def assumedRegularFile(absPath: AbsolutePath): Boolean = {
+    val extension = PathIO.extension(absPath.toNIO)
+    markdownExtensions.toSet.contains(extension)
   }
 
-  def resolveOut(relpath: RelativePath): AbsolutePath = {
-    out.resolve(relpath)
-  }
   def withWorkingDirectory(dir: AbsolutePath): Settings = {
     copy(
       in = dir.resolve("docs"),

@@ -167,12 +167,21 @@ markdown as `@@VARIABLE@`.
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
-Use `--out` to customize the directory where markdown sources are generated, by
+Use `--out` to customize where your markdown sources are generated, by
 default the `out/` directory is used.
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --out target/docs
+```
+
+The `--out` flag doesn't have to be a directory, it can also be an individual
+file. However, this assume that your `--in` was also an individual file.
+
+```diff
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --in mydocs/readme.template.md \
++  --out readme.md
 ```
 
 Use `--watch` to start the file watcher with livereload. It's recommended to use

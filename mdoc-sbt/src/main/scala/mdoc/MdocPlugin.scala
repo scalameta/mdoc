@@ -23,8 +23,9 @@ object MdocPlugin extends AutoPlugin {
       )
     val mdocOut =
       settingKey[File](
-        "Output directory for mdoc generated markdown. " +
-          "Defaults to the target/mdoc directory of this project."
+        "Output directory or output file name for mdoc generated markdown. " +
+          "Defaults to the target/mdoc directory of this project. " +
+          "If this is a file name, it assumes your `in` was also an indidivual file"
       )
     val mdocExtraArguments =
       settingKey[Seq[String]](

@@ -36,6 +36,12 @@ class CliArgsSuite extends FunSuite {
     s"File $tmp does not exist."
   )
 
+  private val anotherTemp = Files.createTempDirectory("mdoc")
+  checkError(
+    "--in" :: anotherTemp.toString :: "--out" :: "fake.md" :: Nil,
+    "your 'in' must be a file if 'out' is a file"
+  )
+
   checkOk(
     "--site.VERSION" :: "1.0" :: Nil,
     _.site == Map("VERSION" -> "1.0")
