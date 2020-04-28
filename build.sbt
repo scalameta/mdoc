@@ -45,7 +45,7 @@ skip in publish := true
 crossScalaVersions := Nil
 
 val V = new {
-  val scalameta = "4.3.7"
+  val scalameta = "4.3.10"
   val munit = "0.7.1"
 }
 
