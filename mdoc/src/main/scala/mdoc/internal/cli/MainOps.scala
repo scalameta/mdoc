@@ -22,6 +22,11 @@ import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
+import io.methvin.watcher.hashing.FileHasher
+import scala.collection.concurrent.TrieMap
+import java.nio.file.Path
+import io.methvin.watcher.hashing.HashCode
+import scala.collection.mutable
 
 final class MainOps(
     context: Context
@@ -34,7 +39,7 @@ final class MainOps(
     if (settings.noLivereload) ()
     else {
       val livereload = UndertowLiveReload(
-        settings.out.toNIO,
+        settings.out.head.toNIO,
         host = settings.host,
         preferredPort = settings.port,
         reporter = reporter
@@ -45,38 +50,40 @@ final class MainOps(
   }
 
   def lint(): Unit = {
-    if (settings.out.isDirectory && !settings.noLinkHygiene) {
-      val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
-      LinkHygiene.lint(docs, reporter, settings.verbose)
+    settings.out.foreach { out =>
+      if (out.isDirectory && !settings.noLinkHygiene) {
+        val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
+        LinkHygiene.lint(docs, reporter, settings.verbose)
+      }
     }
   }
 
   def handleMarkdown(file: InputFile): Exit = synchronized {
     val originalErrors = reporter.errorCount
     if (settings.verbose) {
-      reporter.info(s"Compiling ${file.in}")
+      reporter.info(s"Compiling ${file.inputFile}")
     }
     val timer = new Timer
-    val source = FileIO.slurp(file.in, settings.charset)
-    val input = Input.VirtualFile(file.in.toString(), source)
-    val md = Markdown.toMarkdown(input, context, file.relpath, settings.site, reporter, settings)
+    val source = FileIO.slurp(file.inputFile, settings.charset)
+    val input = Input.VirtualFile(file.inputFile.toString(), source)
+    val md = Markdown.toMarkdown(input, context, file, settings.site, reporter, settings)
     val fileHasErrors = reporter.errorCount > originalErrors
     if (!fileHasErrors) {
       writePath(file, md)
       if (settings.verbose) {
-        reporter.info(f"  done => ${file.out} ($timer)")
+        reporter.info(f"  done => ${file.outputFile} ($timer)")
       }
-      livereload.foreach(_.reload(file.out.toNIO))
+      livereload.foreach(_.reload(file.outputFile.toNIO))
     }
     if (reporter.hasErrors) Exit.error
     else Exit.success
   }
 
   def handleRegularFile(file: InputFile): Exit = {
-    Files.createDirectories(file.out.toNIO.getParent)
-    Files.copy(file.in.toNIO, file.out.toNIO, StandardCopyOption.REPLACE_EXISTING)
+    Files.createDirectories(file.outputFile.toNIO.getParent)
+    Files.copy(file.inputFile.toNIO, file.outputFile.toNIO, StandardCopyOption.REPLACE_EXISTING)
     if (settings.verbose) {
-      reporter.info(s"Copied    ${file.out.toNIO}")
+      reporter.info(s"Copied    ${file.outputFile.toNIO}")
     }
     Exit.success
   }
@@ -85,7 +92,7 @@ final class MainOps(
     try {
       if (!settings.isIncluded(file.relpath)) Exit.success
       else {
-        val extension = PathIO.extension(file.in.toNIO)
+        val extension = PathIO.extension(file.inputFile.toNIO)
         if (settings.isMarkdownFileExtension(extension)) {
           handleMarkdown(file)
         } else {
@@ -94,17 +101,17 @@ final class MainOps(
       }
     } catch {
       case NonFatal(e) =>
-        new FileException(file.in, e).printStackTrace()
+        new FileException(file.inputFile, e).printStackTrace()
         Exit.error
     }
   }
 
   def writePath(file: InputFile, string: String): Unit = {
     if (settings.check) {
-      if (!file.out.isFile) return
-      val expected = FileIO.slurp(file.out, settings.charset)
+      if (!file.outputFile.isFile) return
+      val expected = FileIO.slurp(file.outputFile, settings.charset)
       if (expected != string) {
-        val filename = file.out.toString()
+        val filename = file.outputFile.toString()
         val diff = DiffUtils.unifiedDiff(
           s"$filename (on disk)",
           s"$filename (expected output)",
@@ -114,19 +121,19 @@ final class MainOps(
         )
         reporter.error(s"--test failed! To fix this problem, re-generate the documentation\n$diff")
       }
+    } else if (file.outputFile.isDirectory) {
+      reporter.error(
+        s"can't write output file '${file.outputFile}' because it's a directory. " +
+          "To fix this problem, either remove this directory or point the --out argument to another path."
+      )
     } else {
-      Files.createDirectories(file.out.toNIO.getParent)
-      Files.write(file.out.toNIO, string.getBytes(settings.charset))
+      Files.createDirectories(file.outputFile.toNIO.getParent)
+      Files.write(file.outputFile.toNIO, string.getBytes(settings.charset))
     }
   }
 
   def generateCompleteSite(): Exit = {
-    val isFile = Files.isRegularFile(settings.in.toNIO)
-    val files = if (isFile) {
-      settings.toInputFile(settings.in).toList
-    } else {
-      IO.inputFiles(settings)
-    }
+    val files = IO.inputFiles(settings)
     val timer = new Timer()
     val n = files.length
     compilingFiles(n)
@@ -145,8 +152,10 @@ final class MainOps(
   }
 
   def run(): Exit = {
-    if (settings.cleanTarget && Files.exists(settings.out.toNIO)) {
-      IO.cleanTarget(settings.out)
+    settings.out.foreach { out =>
+      if (settings.cleanTarget && Files.exists(out.toNIO)) {
+        IO.cleanTarget(out)
+      }
     }
     if (settings.watch) {
       startLivereload()
@@ -162,20 +171,28 @@ final class MainOps(
     }
   }
 
+  val hashes = mutable.Map.empty[Path, HashCode]
   def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
-    if (PathIO.extension(event.path()) == "md") {
-      clearScreen()
-    }
     val path = AbsolutePath(event.path())
     settings.toInputFile(path) match {
       case Some(inputFile) =>
-        reporter.reset()
-        val timer = new Timer()
-        compilingFiles(1)
-        handleFile(inputFile)
-        lint()
-        compiledFiles(1, timer)
-        waitingForFileChanges()
+        hashes.synchronized {
+          val oldHash = hashes.get(event.path())
+          val newHash = FileHasher.DEFAULT_FILE_HASHER.hash(event.path())
+          if (!oldHash.contains(newHash)) {
+            if (PathIO.extension(event.path()) == "md") {
+              clearScreen()
+            }
+            hashes.put(event.path(), newHash)
+            reporter.reset()
+            val timer = new Timer()
+            compilingFiles(1)
+            handleFile(inputFile)
+            lint()
+            compiledFiles(1, timer)
+            waitingForFileChanges()
+          }
+        }
       case None => ()
     }
   }
@@ -208,7 +225,7 @@ final class MainOps(
 
   def compilingFiles(n: Int): Unit = {
     val files = Messages.count("file", n)
-    reporter.info(s"Compiling $files to ${settings.out}")
+    reporter.info(s"Compiling $files to ${settings.out.mkString(", ")}")
   }
 
 }

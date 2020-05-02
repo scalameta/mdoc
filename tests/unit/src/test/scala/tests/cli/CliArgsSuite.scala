@@ -6,25 +6,31 @@ import munit.FunSuite
 import scala.meta.internal.io.PathIO
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
+import scala.meta.io.AbsolutePath
+import cats.instances.set
 
 class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
   private val base = Settings.default(PathIO.workingDirectory)
 
-  def checkOk(args: List[String], isExpected: Settings => Boolean): Unit = {
-    test(args.mkString(" ")) {
+  def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(
+      implicit loc: munit.Location
+  ): Unit = {
+    test(name) {
       val obtained = Settings.fromCliArgs(args, base).get
-      assert(isExpected(obtained))
+      onSuccess(obtained)
     }
   }
 
-  def checkError(args: List[String], expected: String): Unit = {
-    test(args.mkString(" ")) {
+  def checkError(name: String, args: List[String], expected: String)(
+      implicit loc: munit.Location
+  ): Unit = {
+    test(name) {
       Settings.fromCliArgs(args, base).andThen(_.validate(reporter)).toEither match {
         case Left(obtained) =>
           assertNoDiff(obtained.toString(), expected)
         case Right(ok) =>
-          fail(s"Expected error. Obtained $ok")
+          fail(s"Expected error but the arguments parsed successfully.")
       }
     }
   }
@@ -32,26 +38,78 @@ class CliArgsSuite extends FunSuite {
   private val tmp = Files.createTempDirectory("mdoc")
   Files.delete(tmp)
   checkError(
-    "--in" :: tmp.toString :: Nil,
+    "non-exists",
+    List("--in", tmp.toString),
     s"File $tmp does not exist."
-  )
-
-  private val anotherTemp = Files.createTempDirectory("mdoc")
-  checkError(
-    "--in" :: anotherTemp.toString :: "--out" :: "fake.md" :: Nil,
-    "your 'in' must be a file if 'out' is a file"
-  )
-
-  checkOk(
-    "--site.VERSION" :: "1.0" :: Nil,
-    _.site == Map("VERSION" -> "1.0")
   )
 
   private val in2 = Files.createTempDirectory("mdoc")
   private val out2 = in2.resolve("out")
   checkError(
-    "--in" :: in2.toString :: "--out" :: out2.toString :: Nil,
+    "out-subdirectory",
+    List("--in", in2.toString, "--out", out2.toString),
     Feedback.outSubdirectoryOfIn(in2, out2)
+  )
+
+  private val tmpDirectory = Files.createTempDirectory("mdoc")
+  private val tmpFile = Files.createFile(Files.createTempDirectory("mdoc").resolve("readme.md"))
+  private val tmpFile2 = Files.createFile(Files.createTempDirectory("mdoc").resolve("readme.md"))
+  checkError(
+    "in-dir-out-file",
+    List("--in", tmpDirectory.toString, "--out", tmpFile.toString),
+    Feedback.outputCannotBeRegularFile(AbsolutePath(tmpDirectory), AbsolutePath(tmpFile))
+  )
+  checkError(
+    "in-equal-out",
+    List("--in", tmpFile.toString, "--out", tmpFile.toString),
+    Feedback.inputEqualOutput(AbsolutePath(tmpFile))
+  )
+
+  private val tmpReadmeDirectory = {
+    val dir = Files.createTempDirectory("mdoc")
+    Files.createDirectories(dir.resolve("readme.md"))
+    dir
+  }
+  checkError(
+    "in-file-out-dir",
+    List("--in", tmpFile.toString, "--out", tmpReadmeDirectory.toString),
+    Feedback.outputCannotBeDirectory(
+      AbsolutePath(tmpFile),
+      AbsolutePath(tmpReadmeDirectory).resolve("readme.md")
+    )
+  )
+  checkError(
+    "in-different-length-out",
+    List("--in", tmpFile.toString, "--in", tmpFile2.toString, "--out", tmpDirectory.toString),
+    Feedback.inputDifferentLengthOutput(
+      List(AbsolutePath(tmpFile), AbsolutePath(tmpFile2)),
+      List(AbsolutePath(tmpDirectory))
+    )
+  )
+
+  checkOK(
+    "site-variable",
+    List("--site.VERSION", "1.0"),
+    onSuccess = { obtained => assertEquals(obtained.site.get("VERSION"), Some("1.0")) }
+  )
+
+  checkOK(
+    "single-in-no-out",
+    List("--in", tmpFile.toString)
+  )
+
+  checkOK(
+    "single-in-single-out",
+    List("--in", tmpFile.toString, tmpDirectory.toString)
+  )
+
+  checkOK(
+    "relative-by-cwd",
+    List("--cwd", tmpDirectory.toString(), "--in", "readme.template.md", "--out", "readme.md"),
+    onSuccess = { settings =>
+      assertEquals(settings.in, List(AbsolutePath(tmpDirectory.resolve("readme.template.md"))))
+      assertEquals(settings.out, List(AbsolutePath(tmpDirectory.resolve("readme.md"))))
+    }
   )
 
 }

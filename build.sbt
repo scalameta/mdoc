@@ -9,6 +9,7 @@ inThisBuild(
     scalaVersion := scala212,
     crossScalaVersions := List(scala212, scala211, scala213),
     scalacOptions ++= List(
+      "-Yrangepos",
       "-Xexperimental",
       "-deprecation"
     ),
@@ -36,7 +37,8 @@ inThisBuild(
     // faster publishLocal:
     publishArtifact.in(packageDoc) := "true" == System.getenv("CI"),
     publishArtifact.in(packageSrc) := "true" == System.getenv("CI"),
-    turbo := true
+    turbo := true,
+    useSuperShell := false // overlaps with MUnit test failure reports.
   )
 )
 

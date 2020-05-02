@@ -1,8 +1,10 @@
-package tests.markdown
+package tests.js
 
 import mdoc.internal.cli.Settings
 import scala.meta.io.Classpath
 import tests.markdown.StringSyntax._
+import tests.markdown.BaseMarkdownSuite
+import tests.js.JsTests.suffix
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
@@ -12,11 +14,6 @@ class JsSuite extends BaseMarkdownSuite {
       "js-opt" -> "fast"
     )
   )
-
-  def suffix(name: String): String =
-    s"""|<script type="text/javascript" src="$name.md.js" defer></script>
-        |<script type="text/javascript" src="mdoc.js" defer></script>
-        |""".stripMargin
 
   check(
     "basic",

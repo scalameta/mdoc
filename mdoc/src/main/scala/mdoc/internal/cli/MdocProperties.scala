@@ -4,13 +4,14 @@ import java.nio.file.Files
 import java.util.Properties
 import scala.collection.JavaConverters._
 import scala.meta.io.AbsolutePath
+import java.io.File
 
 case class MdocProperties(
     scalacOptions: String = "",
     classpath: String = "",
     site: Map[String, String] = Map.empty,
-    in: Option[AbsolutePath] = None,
-    out: Option[AbsolutePath] = None
+    in: Option[List[AbsolutePath]] = None,
+    out: Option[List[AbsolutePath]] = None
 )
 
 object MdocProperties {
@@ -22,8 +23,11 @@ object MdocProperties {
     fromProps(props, path)
   }
   def fromProps(props: Properties, cwd: AbsolutePath): MdocProperties = {
-    def getPath(key: String): Option[AbsolutePath] =
-      Option(props.getProperty(key)).map(AbsolutePath(_)(cwd))
+    def getPath(key: String): Option[List[AbsolutePath]] = {
+      Option(props.getProperty(key)).map { paths =>
+        paths.split(File.pathSeparatorChar).toList.map(path => AbsolutePath(path)(cwd))
+      }
+    }
     MdocProperties(
       scalacOptions = props.getProperty("scalacOptions", ""),
       classpath = props.getProperty("classpath", ""),

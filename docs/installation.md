@@ -119,7 +119,6 @@ The sbt-mdoc plugin supports the following settings.
 
 ```
 
-
 ## Command-line
 
 Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
@@ -167,8 +166,8 @@ markdown as `@@VARIABLE@`.
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
-Use `--out` to customize where your markdown sources are generated, by
-default the `out/` directory is used.
+Use `--out` to customize where your markdown sources are generated, by default
+the `out/` directory is used.
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
@@ -176,7 +175,7 @@ default the `out/` directory is used.
 ```
 
 The `--out` flag doesn't have to be a directory, it can also be an individual
-file. However, this assume that your `--in` was also an individual file.
+file. However, this assumes that your `--in` was also an individual file.
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \

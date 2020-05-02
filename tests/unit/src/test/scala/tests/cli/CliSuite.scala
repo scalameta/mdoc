@@ -118,9 +118,9 @@ class CliSuite extends BaseCliSuite {
       |/licence.txt
       |MIT
     """.stripMargin,
-    setup = { fixture =>
+    setup = { () =>
       // This file should be overwritten
-      Files.write(fixture.out.resolve("licence.txt"), "Apache".getBytes())
+      Files.write(out().resolve("licence.txt").toNIO, "Apache".getBytes())
     }
   )
 
@@ -197,40 +197,19 @@ class CliSuite extends BaseCliSuite {
       |```scala mdoc
       |println("one file")
       |```
-      |""".stripMargin,
-    """
-      |/index.md
-      |# Single file
-      |```scala
-      |println("one file")
-      |// one file
-      |```
-      |""".stripMargin,
-    configureInFlag = { in => in.resolve("index.md").toString }
-  )
-
-  checkCli(
-    "single-in-only",
-    """
-      |/index.md
-      |# Single file
-      |```scala mdoc
-      |println("one file")
-      |```
       |/second.md
       |```scala mdoc
       |println("second file")
       |```
       |""".stripMargin,
-    """
-      |/index.md
-      |# Single file
-      |```scala
-      |println("one file")
-      |// one file
-      |```
-      |""".stripMargin,
-    configureInFlag = { in => in.resolve("index.md").toString }
+    """|/index.md
+       |# Single file
+       |```scala
+       |println("one file")
+       |// one file
+       |```
+       |""".stripMargin,
+    input = { in().resolve("index.md").toString }
   )
 
   checkCli(
@@ -250,8 +229,8 @@ class CliSuite extends BaseCliSuite {
       |// one file
       |```
       |""".stripMargin,
-    configureInFlag = { in => in.resolve("index.md").toString },
-    configureOutFlag = { out => out.resolve("out.md").toString }
+    input = { in().resolve("index.md").toString },
+    output = { out().resolve("out.md").toString }
   )
 
   checkCli(
@@ -275,8 +254,41 @@ class CliSuite extends BaseCliSuite {
       |// one file
       |```
       |""".stripMargin,
-    configureInFlag = { in => in.resolve("index.md").toString },
-    configureOutFlag = { out => out.resolve("out.md").toString }
+    input = { in().resolve("index.md").toString },
+    output = { out().resolve("out.md").toString }
+  )
+
+  checkCli(
+    "multiple-in",
+    """
+      |/index1.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/index2.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |/index3.md
+      |```scala mdoc
+      |println("3 file")
+      |```
+      |""".stripMargin,
+    """
+      |/out1.md
+      |```scala
+      |println("1 file")
+      |// 1 file
+      |```
+      |/out2.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "index1.md",
+    output = out().resolve("out1.md").toString,
+    extraArgs = Array("--in", "index2.md", "--out", out().resolve("out2.md").toString)
   )
 
 }

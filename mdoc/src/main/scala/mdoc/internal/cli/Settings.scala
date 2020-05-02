@@ -29,6 +29,7 @@ import mdoc.StringModifier
 import mdoc.Variable
 import mdoc.Reporter
 import mdoc.internal.markdown.{GitHubIdGenerator, MarkdownCompiler, ReplVariablePrinter}
+import mdoc.internal.pos.PositionSyntax._
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -40,14 +41,14 @@ case class Settings(
         "processed by mdoc while other files will be copied verbatim to the output directory."
     )
     @ExtraName("i")
-    in: AbsolutePath,
+    in: List[AbsolutePath],
     @Description(
       "The output directory where you'd like to generate your markdown or other documentation " +
         "sources. This can also be an individual filename, but it then assumes that your `--in` " +
         "was also an indiviudal file."
     )
     @ExtraName("o")
-    out: AbsolutePath,
+    out: List[AbsolutePath],
     @Description("Start a file watcher and incrementally re-generate the site on file save.")
     @ExtraName("w")
     watch: Boolean = false,
@@ -151,6 +152,21 @@ case class Settings(
 
   val isMarkdownFileExtension = markdownExtensions.toSet
 
+  lazy val outputByInput = in
+    .zip(out)
+    .iterator
+    .map {
+      case (input, output) =>
+        // NOTE(olafur): we automatically infer a filename for --out when --out
+        // is a directory and --in points to a regular file. For example, the
+        // command `mdoc --in readme.md` writes the output to the path
+        // `out/readme.md` even if the default value for --out is `out/`
+        // (without `readme.md`).
+        if (input.isFile && output.isDirectory) input -> output.resolve(input.filename)
+        else input -> output
+    }
+    .toMap
+
   def withProperties(props: MdocProperties): Settings =
     copy(
       scalacOptions = props.scalacOptions,
@@ -165,20 +181,23 @@ case class Settings(
   def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
-    val relativeIn = if (infile == in) {
-      RelativePath(in.toNIO.getFileName.toString)
-    } else {
-      infile.toRelative(in)
-    }
-    if (isIncluded(relativeIn)) {
-      val outfile = if (assumedRegularFile(out)) {
-        out
-      } else {
-        out.resolve(relativeIn)
-      }
-      Some(InputFile(relativeIn, infile, outfile))
-    } else {
-      None
+    outputByInput.get(infile) match {
+      case Some(outfile) =>
+        Some(
+          InputFile(
+            RelativePath(infile.toNIO.getFileName()),
+            infile,
+            outfile,
+            infile.parent,
+            outfile.parent
+          )
+        )
+      case None =>
+        outputByInput.collectFirst {
+          case (inputDir, outputDir) if infile.toNIO.startsWith(inputDir.toNIO) =>
+            val relpath = infile.toRelative(inputDir)
+            InputFile(relpath, infile, outputDir.resolve(relpath), inputDir, outputDir)
+        }
     }
   }
 
@@ -197,22 +216,47 @@ case class Settings(
   }
 
   def validate(logger: Reporter): Configured[Context] = {
-    if (Files.exists(in.toNIO)) {
-      if (out.toNIO.startsWith(in.toNIO) && !assumedRegularFile(out)) {
-        Configured.error(Feedback.outSubdirectoryOfIn(in.toNIO, out.toNIO))
-      } else if (assumedRegularFile(out) && Files.isDirectory(in.toNIO)) {
-        Configured.error("your 'in' must be a file if 'out' is a file")
-      } else {
-        val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
-        onLoad(logger)
-        if (logger.hasErrors) {
-          Configured.error("Failed to load modifiers")
-        } else {
-          Configured.ok(Context(this, logger, compiler))
-        }
-      }
+    if (in.isEmpty) {
+      Configured.error(Feedback.mustBeNonEmpty("in"))
+    } else if (out.isEmpty) {
+      Configured.error(Feedback.mustBeNonEmpty("out"))
+    } else if (in.length != out.length) {
+      Configured.error(Feedback.inputDifferentLengthOutput(in, out))
     } else {
-      ConfError.fileDoesNotExist(in.toNIO).notOk
+      val errors: List[Option[ConfError]] = outputByInput.iterator.map {
+        case (input, output) => validateInputOutputPair(input, output)
+      }.toList
+      errors.flatten match {
+        case Nil =>
+          val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
+          onLoad(logger)
+          if (logger.hasErrors) {
+            Configured.error("Failed to load modifiers")
+          } else {
+            Configured.ok(Context(this, logger, compiler))
+          }
+        case errors =>
+          errors.foldLeft(ConfError.empty)(_ combine _).notOk
+      }
+    }
+  }
+
+  private def validateInputOutputPair(
+      input: AbsolutePath,
+      output: AbsolutePath
+  ): Option[ConfError] = {
+    if (!Files.exists(input.toNIO)) {
+      Some(ConfError.fileDoesNotExist(input.toNIO))
+    } else if (input == output) {
+      Some(ConfError.message(Feedback.inputEqualOutput(input)))
+    } else if (output.toNIO.startsWith(input.toNIO) && !assumedRegularFile(output)) {
+      Some(ConfError.message(Feedback.outSubdirectoryOfIn(input.toNIO, output.toNIO)))
+    } else if (input.isFile && output.isDirectory) {
+      Some(ConfError.message(Feedback.outputCannotBeDirectory(input, output)))
+    } else if (input.isDirectory && output.isFile) {
+      Some(ConfError.message(Feedback.outputCannotBeRegularFile(input, output)))
+    } else {
+      None
     }
   }
 
@@ -221,10 +265,13 @@ case class Settings(
     markdownExtensions.toSet.contains(extension)
   }
 
+  def addSite(extraVariables: Map[String, String]): Settings = {
+    copy(site = extraVariables ++ site)
+  }
   def withWorkingDirectory(dir: AbsolutePath): Settings = {
     copy(
-      in = dir.resolve("docs"),
-      out = dir.resolve("out"),
+      in = List(dir.resolve("docs")),
+      out = List(dir.resolve("out")),
       cwd = dir
     )
   }
@@ -233,8 +280,8 @@ case class Settings(
 object Settings extends MetaconfigScalametaImplicits {
   def baseDefault(cwd: AbsolutePath): Settings = {
     new Settings(
-      in = cwd.resolve("docs"),
-      out = cwd.resolve("out"),
+      in = List(cwd.resolve("docs")),
+      out = List(cwd.resolve("out")),
       cwd = cwd
     )
   }
@@ -246,7 +293,11 @@ object Settings extends MetaconfigScalametaImplicits {
   def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
-      .andThen(_.as[Settings](decoder(base)))
+      .andThen(conf => {
+        val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
+        conf.as[Settings](decoder(base.copy(cwd = cwd)))
+      })
+      .map(_.addSite(base.site))
   }
   def version(displayVersion: String) =
     s"mdoc v$displayVersion"
