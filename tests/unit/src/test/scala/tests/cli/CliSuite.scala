@@ -291,4 +291,64 @@ class CliSuite extends BaseCliSuite {
     extraArgs = Array("--in", "index2.md", "--out", out().resolve("out2.md").toString)
   )
 
+  checkCli(
+    "multiple-out-directories",
+    """
+      |/in1/index.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/in2/index.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |/in3/index.md
+      |```scala mdoc
+      |println("3 file")
+      |```
+      |""".stripMargin,
+    """
+      |/out1/index.md
+      |```scala
+      |println("1 file")
+      |// 1 file
+      |```
+      |/out2/index.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "in1",
+    output = out().resolve("out1").toString,
+    extraArgs = Array("--in", "in2", "--out", out().resolve("out2").toString)
+  )
+
+  checkCli(
+    "conflicting-out",
+    """
+      |/in1/index.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/in2/index.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |""".stripMargin,
+    // NOTE(olafur) Last one wins in case of conflict. Feel free to update the
+    // expected behavior here if we want to error instead. This test is only to
+    // document that the current behavior even if this behavior is undesirable.
+    """
+      |/out/index.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "in1",
+    output = out().resolve("out").toString,
+    extraArgs = Array("--in", "in2", "--out", out().resolve("out").toString)
+  )
+
 }

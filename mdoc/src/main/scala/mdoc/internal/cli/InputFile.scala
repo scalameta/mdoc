@@ -23,6 +23,12 @@ case class InputFile(
 )
 
 object InputFile {
+  implicit val ordering: Ordering[InputFile] = new Ordering[InputFile] {
+    def compare(x: InputFile, y: InputFile): Int = {
+      x.inputFile.toNIO.compareTo(y.inputFile.toNIO)
+    }
+  }
+
   def fromSettings(filename: String, settings: Settings): InputFile = {
     val relpath = RelativePath(filename)
     val inputDir = settings.in.head

@@ -133,7 +133,9 @@ final class MainOps(
   }
 
   def generateCompleteSite(): Exit = {
-    val files = IO.inputFiles(settings)
+    // NOTE(olafur): we sort the input files for reproducible output in cases
+    // where multiple input files write to the same output file.
+    val files = IO.inputFiles(settings).sorted
     val timer = new Timer()
     val n = files.length
     compilingFiles(n)

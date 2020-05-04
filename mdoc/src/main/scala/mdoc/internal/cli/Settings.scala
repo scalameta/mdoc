@@ -36,16 +36,15 @@ class Section(val name: String) extends StaticAnnotation
 case class Settings(
     @Section("Common options")
     @Description(
-      "The input directory containing markdown and other documentation sources " +
-        "or an individual file that you'd like to target. Markdown files will be " +
-        "processed by mdoc while other files will be copied verbatim to the output directory."
+      "The input directory or regular file containing markdown and other documentation sources that should be processed. " +
+        "Markdown files are processed by mdoc while non-markdown files are copied verbatim to the output directory. " +
+        "Can be repeated to process multiple input directories/files."
     )
     @ExtraName("i")
     in: List[AbsolutePath],
     @Description(
-      "The output directory where you'd like to generate your markdown or other documentation " +
-        "sources. This can also be an individual filename, but it then assumes that your `--in` " +
-        "was also an indiviudal file."
+      "The output directory or regular where you'd like to generate your markdown or other documentation sources. " +
+        "Must be repeated to match the number of `--in` arguments and must be a directory when the matching `--in` argument is a directory."
     )
     @ExtraName("o")
     out: List[AbsolutePath],
@@ -303,11 +302,13 @@ object Settings extends MetaconfigScalametaImplicits {
     s"mdoc v$displayVersion"
   def usage: String =
     """|Usage:   mdoc [<option> ...]
-       |Example: mdoc --in <path> --out <path> (customize input/output directories)
+       |Example: mdoc --in mydocs --out _site  (custom input/output directories)
        |         mdoc --watch                  (watch for file changes)
        |         mdoc --site.VERSION 1.0.0     (pass in site variables)
        |         mdoc --include **/example.md  (process only files named example.md)
        |         mdoc --exclude node_modules   (don't process node_modules directory)
+       |         mdoc --in readme.template.md --out readme.md \
+       |              --in examples.template.md --out examples.md (multiple input/output pairs)
        |""".stripMargin
   def description: Doc =
     Doc.paragraph(
