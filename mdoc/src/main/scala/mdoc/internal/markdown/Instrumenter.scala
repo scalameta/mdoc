@@ -7,12 +7,16 @@ import scala.meta.inputs.Position
 import Instrumenter.position
 import mdoc.internal.markdown.Instrumenter.Binders
 import scala.meta.Mod.Lazy
+import scala.collection.mutable
+import mdoc.Reporter
 
 class Instrumenter(sections: List[SectionInput]) {
-  def instrument(): String = {
+  def instrument(reporter: Reporter): Instrumented = {
     printAsScript()
-    out.toString
+    Instrumented.fromSource(out.toString, dependencies.toList, repositories.toList, reporter)
   }
+  private val dependencies = mutable.ListBuffer.empty[Name.Indeterminate]
+  private val repositories = mutable.ListBuffer.empty[Name.Indeterminate]
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   val gensym = new Gensym()
@@ -80,7 +84,27 @@ class Instrumenter(sections: List[SectionInput]) {
           sb.print(s"val $fresh = ")
           List(Name(fresh) -> stat.pos)
       }
-      sb.print(stat.pos.text)
+      stat match {
+        case i: Import =>
+          i.importers.foreach {
+            case Importer(
+                Term.Name("$ivy" | "$dep"),
+                List(Importee.Name(dep: Name.Indeterminate))
+                ) =>
+              dependencies += dep
+            case Importer(
+                Term.Name("$repo"),
+                List(Importee.Name(repo: Name.Indeterminate))
+                ) =>
+              repositories += repo
+            case importer =>
+              sb.print("import ")
+              sb.print(importer.syntax)
+              sb.print(";")
+          }
+        case _ =>
+          sb.print(stat.pos.text)
+      }
       binders.foreach {
         case (name, pos) =>
           printBinder(name.syntax, pos)
@@ -98,9 +122,9 @@ object Instrumenter {
       else "object"
     s"$ctor\n}\n$keyword $identifier {\n"
   }
-  def instrument(sections: List[SectionInput]): String = {
-    val body = new Instrumenter(sections).instrument()
-    wrapBody(body)
+  def instrument(sections: List[SectionInput], reporter: Reporter): Instrumented = {
+    val instrumented = new Instrumenter(sections).instrument(reporter)
+    instrumented.copy(source = wrapBody(instrumented.source))
   }
 
   def position(pos: Position): String = {

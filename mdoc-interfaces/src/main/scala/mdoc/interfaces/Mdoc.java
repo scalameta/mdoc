@@ -13,6 +13,7 @@ public abstract class Mdoc {
   public abstract Mdoc withConsoleReporter(PrintStream out);
   public abstract Mdoc withScreenHeight(int screenHeight);
   public abstract Mdoc withScreenWidth(int screenWidth);
+  public abstract Mdoc withCoursierLogger(coursierapi.Logger logger);
   public abstract void shutdown();
 
 }

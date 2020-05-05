@@ -54,7 +54,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
     settings.validate(reporter)
     if (reporter.hasErrors) fail("reporter has errors")
-    Context(settings, reporter, compiler)
+    Context.fromCompiler(settings, reporter, compiler)
   }
 
   def checkError(

@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.meta.Position
 import mdoc.Reporter
 import mdoc.internal.pos.PositionSyntax._
+import coursierapi.Logger
 
 class ConsoleReporter(
     ps: PrintStream,

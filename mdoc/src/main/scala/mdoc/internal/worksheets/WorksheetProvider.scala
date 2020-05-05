@@ -35,12 +35,12 @@ class WorksheetProvider(settings: Settings) {
       Modifier.Default()
     )
     val sectionInputs = List(sectionInput)
-    val instrumented = Instrumenter.instrument(sectionInputs)
+    val instrumented = Instrumenter.instrument(sectionInputs, reporter)
     val rendered = MarkdownCompiler.buildDocument(
       ctx.compiler,
       reporter,
       sectionInputs,
-      instrumented,
+      instrumented.source,
       input.path
     )
 

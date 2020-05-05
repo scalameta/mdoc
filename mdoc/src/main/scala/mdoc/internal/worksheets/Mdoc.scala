@@ -14,6 +14,7 @@ import mdoc.internal.markdown.MarkdownCompiler
 import scala.meta.inputs.Input
 import mdoc.internal.worksheets.Compat._
 import mdoc.MainSettings
+import coursierapi.Logger
 
 class Mdoc(settings: MainSettings) extends i.Mdoc {
 
@@ -33,6 +34,8 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
     new Mdoc(this.settings.withScreenWidth(screenWidth))
   def withScreenHeight(screenHeight: Int): i.Mdoc =
     new Mdoc(this.settings.withScreenHeight(screenHeight))
+  def withCoursierLogger(logger: Logger): mdoc.interfaces.Mdoc =
+    new Mdoc(this.settings.withCoursierLogger(logger))
 
   def shutdown(): Unit = {
     if (myContext != null) {
@@ -49,14 +52,7 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
 
   private def context(): Context = {
     if (myContext == null) {
-      myContext = Context(
-        settings.settings,
-        settings.reporter,
-        MarkdownCompiler.fromClasspath(
-          settings.settings.classpath,
-          settings.settings.scalacOptions
-        )
-      )
+      myContext = Context.fromOptions(settings.settings, settings.reporter)
     }
     myContext
   }

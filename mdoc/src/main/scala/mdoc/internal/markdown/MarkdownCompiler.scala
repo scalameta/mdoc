@@ -298,6 +298,7 @@ class MarkdownCompiler(
           case sreporter.ERROR => vreporter.error(mpos, actualMessage)
           case sreporter.INFO => vreporter.info(mpos, actualMessage)
           case sreporter.WARNING => vreporter.warning(mpos, actualMessage)
+          case _ =>
         }
       case _ =>
     }

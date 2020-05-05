@@ -22,6 +22,9 @@ import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
 import pprint.TPrintColors
 import scala.meta.io.RelativePath
+import coursierapi.error.SimpleResolutionError
+import coursierapi.error.CoursierError
+import coursierapi.error.MultipleResolutionError
 
 object MdocDialect {
 
@@ -116,16 +119,62 @@ class Processor(implicit ctx: Context) {
             SectionInput(input, Source(Nil), mod)
         }
     }
-    val instrumented = Instrumenter.instrument(sectionInputs)
+    val instrumented = Instrumenter.instrument(sectionInputs, ctx.reporter)
+    if (ctx.reporter.hasErrors) {
+      return
+    }
     if (ctx.settings.verbose) {
       ctx.reporter.info(s"Instrumented $filename")
-      ctx.reporter.println(instrumented)
+      ctx.reporter.println(instrumented.source)
     }
-    val rendered = MarkdownCompiler.buildDocument(
-      ctx.compiler,
-      ctx.reporter,
+    val compiler =
+      try {
+        ctx.compiler(instrumented)
+      } catch {
+        case e: CoursierError =>
+          handleCoursierError(instrumented, e)
+          ctx.compiler
+      }
+    processScalaInputs(
+      doc,
+      inputs,
+      relpath,
+      filename,
       sectionInputs,
       instrumented,
+      compiler
+    )
+  }
+  def handleCoursierError(instrumented: Instrumented, e: CoursierError): Unit = {
+    e match {
+      case m: MultipleResolutionError =>
+        m.getErrors().forEach(simpleError => handleCoursierError(instrumented, simpleError))
+      case _ =>
+        val pos = instrumented.positionedDependencies
+          .collectFirst {
+            case dep if e.getMessage().contains(dep.syntax) =>
+              dep.pos
+          }
+          .orElse(instrumented.dependencyImports.headOption.map(_.pos))
+          .getOrElse(Position.None)
+        ctx.reporter.error(pos, e.getMessage())
+    }
+  }
+
+  def processScalaInputs(
+      doc: MarkdownFile,
+      inputs: List[ScalaFenceInput],
+      relpath: RelativePath,
+      filename: String,
+      sectionInputs: List[SectionInput],
+      instrumented: Instrumented,
+      markdownCompiler: MarkdownCompiler
+  ): Unit = {
+    val rendered = MarkdownCompiler.buildDocument(
+      markdownCompiler,
+      ctx.reporter,
+      sectionInputs,
+      instrumented.source,
       filename
     )
     rendered.sections.zip(inputs).foreach {

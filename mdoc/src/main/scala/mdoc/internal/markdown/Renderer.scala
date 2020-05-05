@@ -26,9 +26,9 @@ object Renderer {
   ): String = {
     val inputs =
       sections.map(s => SectionInput(s, MdocDialect.scala(s).parse[Source].get, Modifier.Default()))
-    val instrumented = Instrumenter.instrument(inputs)
+    val instrumented = Instrumenter.instrument(inputs, reporter)
     val doc =
-      MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
+      MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented.source, filename)
     doc.sections
       .map(s => s"""```scala
                    |${Renderer.renderEvaluatedSection(doc, s, reporter, printer, compiler)}
