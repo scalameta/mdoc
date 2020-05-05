@@ -43,7 +43,7 @@ case class Settings(
     @ExtraName("i")
     in: List[AbsolutePath],
     @Description(
-      "The output directory or regular where you'd like to generate your markdown or other documentation sources. " +
+      "The output directory or regular file where you'd like to generate your markdown or other documentation sources. " +
         "Must be repeated to match the number of `--in` arguments and must be a directory when the matching `--in` argument is a directory."
     )
     @ExtraName("o")

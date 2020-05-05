@@ -28,8 +28,11 @@ object IO {
           }
           override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
             val relpath = AbsolutePath(dir).toRelative(root)
-            if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
-            else FileVisitResult.CONTINUE
+            if (settings.isExplicitlyExcluded(relpath)) {
+              FileVisitResult.SKIP_SUBTREE
+            } else {
+              FileVisitResult.CONTINUE
+            }
           }
         }
       )

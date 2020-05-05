@@ -38,14 +38,27 @@ final class MainOps(
   private def startLivereload(): Unit = {
     if (settings.noLivereload) ()
     else {
-      val livereload = UndertowLiveReload(
-        settings.out.head.toNIO,
-        host = settings.host,
-        preferredPort = settings.port,
-        reporter = reporter
-      )
-      livereload.start()
-      this.livereload = Some(livereload)
+      settings.out match {
+        case Nil =>
+          reporter.error(
+            "Can't start LiveReload server since --out is empty. To fix this problem, specify an --out argument."
+          )
+        case out :: tail =>
+          if (tail.nonEmpty) {
+            reporter.warning(
+              s"Starting LiveReload server at directory $out and ignoring --out value(s) ${tail.mkString(", ")}. " +
+                "To LiveReload another directory, place that directory as the first --out argument."
+            )
+          }
+          val livereload = UndertowLiveReload(
+            out.toNIO,
+            host = settings.host,
+            preferredPort = settings.port,
+            reporter = reporter
+          )
+          livereload.start()
+          this.livereload = Some(livereload)
+      }
     }
   }
 

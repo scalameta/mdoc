@@ -11,7 +11,7 @@ object Feedback {
       s"  --out=$out"
   }
   def mustBeNonEmpty(what: String): String = {
-    s"--$what must be non-empty. To fix this problem, add an argument for the `--$what <value>` argument."
+    s"--$what must be non-empty. To fix this problem, add a value for the `--$what <value>` argument."
   }
   def inputDifferentLengthOutput(input: List[AbsolutePath], output: List[AbsolutePath]): String = {
     val diff = math.abs(input.length - output.length)
