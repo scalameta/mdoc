@@ -19,7 +19,7 @@ class LinkHygieneSuite extends FunSuite {
       val root = StringFS.fromString(original)
       val settings = Settings
         .default(root)
-        .copy(reportRelativePaths = true, in = root, out = root)
+        .copy(reportRelativePaths = true, in = List(root), out = List(root))
       val links = DocumentLinks.fromGeneratedSite(settings, reporter)
       LinkHygiene.lint(links, reporter, verbose)
       val obtained = fansi.Str(myOut.toString()).plainText

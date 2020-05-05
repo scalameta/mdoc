@@ -6,8 +6,9 @@ import mdoc.Reporter
 import scala.collection.mutable
 import scala.tools.nsc.doc.DocParser
 import scala.meta.io.RelativePath
+import mdoc.internal.cli.InputFile
 
-final case class MarkdownFile(input: Input, relativePath: RelativePath, parts: List[MarkdownPart]) {
+final case class MarkdownFile(input: Input, file: InputFile, parts: List[MarkdownPart]) {
   private val appends = mutable.ListBuffer.empty[String]
   def appendText(text: String): Unit = {
     appends += text
@@ -82,10 +83,10 @@ object MarkdownFile {
       parts.toList
     }
   }
-  def parse(input: Input, relativePath: RelativePath, reporter: Reporter): MarkdownFile = {
+  def parse(input: Input, file: InputFile, reporter: Reporter): MarkdownFile = {
     val parser = new Parser(input, reporter)
     val parts = parser.acceptParts()
-    MarkdownFile(input, relativePath, parts)
+    MarkdownFile(input, file, parts)
   }
 }
 

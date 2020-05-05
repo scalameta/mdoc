@@ -51,15 +51,27 @@ final class MdocFileListener(
 }
 
 object MdocFileListener {
-  def create(dir: AbsolutePath, executor: ExecutorService, in: InputStream)(
+  def create(inputs: List[AbsolutePath], executor: ExecutorService, in: InputStream)(
       runAction: DirectoryChangeEvent => Unit
   ): MdocFileListener = {
     val listener = new MdocFileListener(executor, in, runAction)
+    val paths = inputs
+      .map(_.toNIO)
+      .map {
+        case file if Files.isRegularFile(file) => file.getParent()
+        case path => path
+      }
+      .distinct
+      .asJava
     val watcher = DirectoryWatcher
       .builder()
-      .path(dir.toNIO)
+      .paths(paths)
       .listener(listener)
-      .fileHashing(true)
+      // NOTE(olafur): we don't use the built-in file hasher because it's slow
+      // on startup for large directories (can take minutes). To prevent
+      // duplicate notifications, we implement file hashing only for files the
+      // files we're interested in, see MainOps.
+      .fileHashing(false)
       .logger(NOPLogger.NOP_LOGGER)
       .build()
     listener.watcher = watcher

@@ -8,6 +8,11 @@ import mdoc.internal.markdown.Text
 import mdoc.internal.markdown.MarkdownPart
 import mdoc.internal.markdown.CodeFence
 import scala.meta.io.RelativePath
+import mdoc.internal.cli.InputFile
+import scala.meta.io.AbsolutePath
+import java.nio.file.Files
+import mdoc.internal.cli.Settings
+import scala.meta.internal.io.PathIO
 
 class MarkdownFileSuite extends FunSuite {
   val reporter = new ConsoleReporter(System.out)
@@ -16,8 +21,8 @@ class MarkdownFileSuite extends FunSuite {
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name, original)
-      val relpath = RelativePath(input.path)
-      val obtained = MarkdownFile.parse(input, relpath, reporter).parts
+      val file = InputFile.fromSettings(name, Settings.default(PathIO.workingDirectory))
+      val obtained = MarkdownFile.parse(input, file, reporter).parts
       require(!reporter.hasErrors)
       val expectedParts = expected.toList
       assertNoDiff(

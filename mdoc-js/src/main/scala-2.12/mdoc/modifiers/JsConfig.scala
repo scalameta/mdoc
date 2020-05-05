@@ -15,7 +15,8 @@ case class JsConfig(
     libraries: List[AbsolutePath] = Nil,
     mountNode: String = "node",
     minLevel: Level = Level.Info,
-    outDirectory: AbsolutePath = PathIO.workingDirectory,
+    outDirectories: List[AbsolutePath] = List(PathIO.workingDirectory),
+    outPrefix: Option[String] = None,
     fullOpt: Boolean = true,
     htmlPrefix: String = "",
     relativeLinkPrefix: String = ""
@@ -65,14 +66,8 @@ object JsConfig {
       ctx.site.getOrElse("js-html-header", ""),
       Classpath(ctx.site.getOrElse("js-libraries", "")).entries,
       mountNode = ctx.site.getOrElse("js-mount-node", base.mountNode),
-      outDirectory = ctx.site.get("js-out-prefix") match {
-        case Some(value) =>
-          // This is needed for Docusaurus that requires assets (non markdown) files to live under
-          // `docs/assets/`: https://docusaurus.io/docs/en/doc-markdown#linking-to-images-and-other-assets
-          ctx.settings.out.resolve(value)
-        case None =>
-          ctx.settings.out
-      },
+      outDirectories = ctx.settings.out,
+      outPrefix = ctx.site.get("js-out-prefix"),
       minLevel = ctx.site.get("js-level") match {
         case None => Level.Info
         case Some("info") => Level.Info

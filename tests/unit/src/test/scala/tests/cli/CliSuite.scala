@@ -2,6 +2,8 @@ package tests.cli
 
 import java.nio.file.Files
 import mdoc.internal.BuildInfo
+import scala.meta.io.AbsolutePath
+import java.nio.file.Paths
 
 class CliSuite extends BaseCliSuite {
 
@@ -116,9 +118,9 @@ class CliSuite extends BaseCliSuite {
       |/licence.txt
       |MIT
     """.stripMargin,
-    setup = { fixture =>
+    setup = { () =>
       // This file should be overwritten
-      Files.write(fixture.out.resolve("licence.txt"), "Apache".getBytes())
+      Files.write(out().resolve("licence.txt").toNIO, "Apache".getBytes())
     }
   )
 
@@ -185,6 +187,168 @@ class CliSuite extends BaseCliSuite {
       |```
       |</p>
       |""".stripMargin
+  )
+
+  checkCli(
+    "single-in",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |/second.md
+      |```scala mdoc
+      |println("second file")
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |# Single file
+       |```scala
+       |println("one file")
+       |// one file
+       |```
+       |""".stripMargin,
+    input = { in().resolve("index.md").toString }
+  )
+
+  checkCli(
+    "single-in-single-out",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |""".stripMargin,
+    """
+      |/out.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    input = { in().resolve("index.md").toString },
+    output = { out().resolve("out.md").toString }
+  )
+
+  checkCli(
+    "single-in-single-out-only",
+    """
+      |/index.md
+      |# Single file
+      |```scala mdoc
+      |println("one file")
+      |```
+      |/second.md
+      |```scala mdoc
+      |println("second file")
+      |```
+      |""".stripMargin,
+    """
+      |/out.md
+      |# Single file
+      |```scala
+      |println("one file")
+      |// one file
+      |```
+      |""".stripMargin,
+    input = { in().resolve("index.md").toString },
+    output = { out().resolve("out.md").toString }
+  )
+
+  checkCli(
+    "multiple-in",
+    """
+      |/index1.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/index2.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |/index3.md
+      |```scala mdoc
+      |println("3 file")
+      |```
+      |""".stripMargin,
+    """
+      |/out1.md
+      |```scala
+      |println("1 file")
+      |// 1 file
+      |```
+      |/out2.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "index1.md",
+    output = out().resolve("out1.md").toString,
+    extraArgs = Array("--in", "index2.md", "--out", out().resolve("out2.md").toString)
+  )
+
+  checkCli(
+    "multiple-out-directories",
+    """
+      |/in1/index.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/in2/index.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |/in3/index.md
+      |```scala mdoc
+      |println("3 file")
+      |```
+      |""".stripMargin,
+    """
+      |/out1/index.md
+      |```scala
+      |println("1 file")
+      |// 1 file
+      |```
+      |/out2/index.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "in1",
+    output = out().resolve("out1").toString,
+    extraArgs = Array("--in", "in2", "--out", out().resolve("out2").toString)
+  )
+
+  checkCli(
+    "conflicting-out",
+    """
+      |/in1/index.md
+      |```scala mdoc
+      |println("1 file")
+      |```
+      |/in2/index.md
+      |```scala mdoc
+      |println("2 file")
+      |```
+      |""".stripMargin,
+    // NOTE(olafur) Last one wins in case of conflict. Feel free to update the
+    // expected behavior here if we want to error instead. This test is only to
+    // document that the current behavior even if this behavior is undesirable.
+    """
+      |/out/index.md
+      |```scala
+      |println("2 file")
+      |// 2 file
+      |```
+      |""".stripMargin,
+    input = "in1",
+    output = out().resolve("out").toString,
+    extraArgs = Array("--in", "in2", "--out", out().resolve("out").toString)
   )
 
 }

@@ -53,12 +53,6 @@ object Markdown {
       .set(Parser.LISTS_ITEM_INDENT, Integer.valueOf(1))
   }
 
-  def dummyInputFile(input: Input): InputFile = {
-    val relativePath = RelativePath(Paths.get(input.syntax).getFileName)
-    val tmp = AbsolutePath(Files.createTempFile("mdoc", relativePath.toString()))
-    InputFile(relativePath, tmp, tmp)
-  }
-
   def toDocument(
       input: Input,
       markdownSettings: MutableDataSet,
@@ -99,10 +93,24 @@ object Markdown {
     )
   }
 
+  final val DeprecatedInternal =
+    "Methods in the `mdoc.internal` package are only intended to be used by mdoc itself so they are subject to breaking changes without notice. If you rely on this method, please open an issue to discuss how to expose it through the public mdoc library APIs https://github.com/scalameta/mdoc/"
+  @deprecated(DeprecatedInternal, "2.2.0")
   def toMarkdown(
       input: Input,
       context: Context,
       relativePath: RelativePath,
+      siteVariables: Map[String, String],
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    throw new UnsupportedOperationException(DeprecatedInternal)
+  }
+
+  def toMarkdown(
+      input: Input,
+      context: Context,
+      inputFile: InputFile,
       siteVariables: Map[String, String],
       reporter: Reporter,
       settings: Settings
@@ -113,7 +121,7 @@ object Markdown {
       reporter,
       settings
     )
-    val file = MarkdownFile.parse(textWithVariables, relativePath, reporter)
+    val file = MarkdownFile.parse(textWithVariables, inputFile, reporter)
     val processor = new Processor()(context)
     processor.processDocument(file)
     file.renderToString

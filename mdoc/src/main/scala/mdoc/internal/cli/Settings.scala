@@ -29,21 +29,25 @@ import mdoc.StringModifier
 import mdoc.Variable
 import mdoc.Reporter
 import mdoc.internal.markdown.{GitHubIdGenerator, MarkdownCompiler, ReplVariablePrinter}
+import mdoc.internal.pos.PositionSyntax._
 
 class Section(val name: String) extends StaticAnnotation
 
 case class Settings(
     @Section("Common options")
     @Description(
-      "The input directory containing markdown and other documentation sources. " +
-        "Markdown files will be processed by mdoc while other files will be copied " +
-        "verbatim to the output directory."
+      "The input directory or regular file containing markdown and other documentation sources that should be processed. " +
+        "Markdown files are processed by mdoc while non-markdown files are copied verbatim to the output directory. " +
+        "Can be repeated to process multiple input directories/files."
     )
     @ExtraName("i")
-    in: AbsolutePath,
-    @Description("The output directory to generate the mdoc site.")
+    in: List[AbsolutePath],
+    @Description(
+      "The output directory or regular file where you'd like to generate your markdown or other documentation sources. " +
+        "Must be repeated to match the number of `--in` arguments and must be a directory when the matching `--in` argument is a directory."
+    )
     @ExtraName("o")
-    out: AbsolutePath,
+    out: List[AbsolutePath],
     @Description("Start a file watcher and incrementally re-generate the site on file save.")
     @ExtraName("w")
     watch: Boolean = false,
@@ -147,6 +151,21 @@ case class Settings(
 
   val isMarkdownFileExtension = markdownExtensions.toSet
 
+  lazy val outputByInput = in
+    .zip(out)
+    .iterator
+    .map {
+      case (input, output) =>
+        // NOTE(olafur): we automatically infer a filename for --out when --out
+        // is a directory and --in points to a regular file. For example, the
+        // command `mdoc --in readme.md` writes the output to the path
+        // `out/readme.md` even if the default value for --out is `out/`
+        // (without `readme.md`).
+        if (input.isFile && output.isDirectory) input -> output.resolve(input.filename)
+        else input -> output
+    }
+    .toMap
+
   def withProperties(props: MdocProperties): Settings =
     copy(
       scalacOptions = props.scalacOptions,
@@ -161,17 +180,30 @@ case class Settings(
   def isFileWatching: Boolean = watch && !check
 
   def toInputFile(infile: AbsolutePath): Option[InputFile] = {
-    val relpath = infile.toRelative(in)
-    if (isIncluded(relpath)) {
-      val outfile = out.resolve(relpath)
-      Some(InputFile(relpath, infile, outfile))
-    } else {
-      None
+    outputByInput.get(infile) match {
+      case Some(outfile) =>
+        Some(
+          InputFile(
+            RelativePath(infile.toNIO.getFileName()),
+            infile,
+            outfile,
+            infile.parent,
+            outfile.parent
+          )
+        )
+      case None =>
+        outputByInput.collectFirst {
+          case (inputDir, outputDir) if infile.toNIO.startsWith(inputDir.toNIO) =>
+            val relpath = infile.toRelative(inputDir)
+            InputFile(relpath, infile, outputDir.resolve(relpath), inputDir, outputDir)
+        }
     }
   }
+
   def isExplicitlyExcluded(path: RelativePath): Boolean = {
     exclude.exists(_.matches(path.toNIO))
   }
+
   def isIncluded(path: RelativePath): Boolean = {
     (include.isEmpty || include.exists(_.matches(path.toNIO))) &&
     !isExplicitlyExcluded(path)
@@ -181,34 +213,64 @@ case class Settings(
     val ctx = new OnLoadContext(reporter, this)
     preModifiers.foreach(_.onLoad(ctx))
   }
+
   def validate(logger: Reporter): Configured[Context] = {
-    if (Files.exists(in.toNIO)) {
-      if (out.toNIO.startsWith(in.toNIO)) {
-        Configured.error(Feedback.outSubdirectoryOfIn(in.toNIO, out.toNIO))
-      } else {
-        val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
-        onLoad(logger)
-        if (logger.hasErrors) {
-          Configured.error("Failed to load modifiers")
-        } else {
-          Configured.ok(Context(this, logger, compiler))
-        }
-      }
+    if (in.isEmpty) {
+      Configured.error(Feedback.mustBeNonEmpty("in"))
+    } else if (out.isEmpty) {
+      Configured.error(Feedback.mustBeNonEmpty("out"))
+    } else if (in.length != out.length) {
+      Configured.error(Feedback.inputDifferentLengthOutput(in, out))
     } else {
-      ConfError.fileDoesNotExist(in.toNIO).notOk
+      val errors: List[Option[ConfError]] = outputByInput.iterator.map {
+        case (input, output) => validateInputOutputPair(input, output)
+      }.toList
+      errors.flatten match {
+        case Nil =>
+          val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
+          onLoad(logger)
+          if (logger.hasErrors) {
+            Configured.error("Failed to load modifiers")
+          } else {
+            Configured.ok(Context(this, logger, compiler))
+          }
+        case errors =>
+          errors.foldLeft(ConfError.empty)(_ combine _).notOk
+      }
     }
   }
-  def resolveIn(relpath: RelativePath): AbsolutePath = {
-    in.resolve(relpath)
+
+  private def validateInputOutputPair(
+      input: AbsolutePath,
+      output: AbsolutePath
+  ): Option[ConfError] = {
+    if (!Files.exists(input.toNIO)) {
+      Some(ConfError.fileDoesNotExist(input.toNIO))
+    } else if (input == output) {
+      Some(ConfError.message(Feedback.inputEqualOutput(input)))
+    } else if (output.toNIO.startsWith(input.toNIO) && !assumedRegularFile(output)) {
+      Some(ConfError.message(Feedback.outSubdirectoryOfIn(input.toNIO, output.toNIO)))
+    } else if (input.isFile && output.isDirectory) {
+      Some(ConfError.message(Feedback.outputCannotBeDirectory(input, output)))
+    } else if (input.isDirectory && output.isFile) {
+      Some(ConfError.message(Feedback.outputCannotBeRegularFile(input, output)))
+    } else {
+      None
+    }
   }
 
-  def resolveOut(relpath: RelativePath): AbsolutePath = {
-    out.resolve(relpath)
+  private def assumedRegularFile(absPath: AbsolutePath): Boolean = {
+    val extension = PathIO.extension(absPath.toNIO)
+    markdownExtensions.toSet.contains(extension)
+  }
+
+  def addSite(extraVariables: Map[String, String]): Settings = {
+    copy(site = extraVariables ++ site)
   }
   def withWorkingDirectory(dir: AbsolutePath): Settings = {
     copy(
-      in = dir.resolve("docs"),
-      out = dir.resolve("out"),
+      in = List(dir.resolve("docs")),
+      out = List(dir.resolve("out")),
       cwd = dir
     )
   }
@@ -217,8 +279,8 @@ case class Settings(
 object Settings extends MetaconfigScalametaImplicits {
   def baseDefault(cwd: AbsolutePath): Settings = {
     new Settings(
-      in = cwd.resolve("docs"),
-      out = cwd.resolve("out"),
+      in = List(cwd.resolve("docs")),
+      out = List(cwd.resolve("out")),
       cwd = cwd
     )
   }
@@ -230,17 +292,23 @@ object Settings extends MetaconfigScalametaImplicits {
   def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
-      .andThen(_.as[Settings](decoder(base)))
+      .andThen(conf => {
+        val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
+        conf.as[Settings](decoder(base.copy(cwd = cwd)))
+      })
+      .map(_.addSite(base.site))
   }
   def version(displayVersion: String) =
     s"mdoc v$displayVersion"
   def usage: String =
     """|Usage:   mdoc [<option> ...]
-       |Example: mdoc --in <path> --out <path> (customize input/output directories)
+       |Example: mdoc --in mydocs --out _site  (custom input/output directories)
        |         mdoc --watch                  (watch for file changes)
        |         mdoc --site.VERSION 1.0.0     (pass in site variables)
        |         mdoc --include **/example.md  (process only files named example.md)
        |         mdoc --exclude node_modules   (don't process node_modules directory)
+       |         mdoc --in readme.template.md --out readme.md \
+       |              --in examples.template.md --out examples.md (multiple input/output pairs)
        |""".stripMargin
   def description: Doc =
     Doc.paragraph(

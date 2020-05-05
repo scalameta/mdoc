@@ -14,25 +14,29 @@ import mdoc.internal.cli.Settings
 object IO {
 
   def foreachOutput(settings: Settings)(fn: (AbsolutePath, RelativePath) => Unit): Unit = {
-    val root = settings.out
-    Files.walkFileTree(
-      root.toNIO,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-          val path = AbsolutePath(file)
-          val relpath = path.toRelative(root)
-          if (!settings.isExplicitlyExcluded(relpath)) {
-            fn(path, relpath)
+    settings.out.foreach { root =>
+      Files.walkFileTree(
+        root.toNIO,
+        new SimpleFileVisitor[Path] {
+          override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+            val path = AbsolutePath(file)
+            val relpath = path.toRelative(root)
+            if (!settings.isExplicitlyExcluded(relpath)) {
+              fn(path, relpath)
+            }
+            FileVisitResult.CONTINUE
           }
-          FileVisitResult.CONTINUE
+          override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
+            val relpath = AbsolutePath(dir).toRelative(root)
+            if (settings.isExplicitlyExcluded(relpath)) {
+              FileVisitResult.SKIP_SUBTREE
+            } else {
+              FileVisitResult.CONTINUE
+            }
+          }
         }
-        override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
-          val relpath = AbsolutePath(dir).toRelative(root)
-          if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
-          else FileVisitResult.CONTINUE
-        }
-      }
-    )
+      )
+    }
   }
   def inputFiles(settings: Settings): List[InputFile] = {
     val buf = List.newBuilder[InputFile]
@@ -42,28 +46,30 @@ object IO {
 
   def foreachInputFile(settings: Settings)(fn: InputFile => Unit): Unit = {
     implicit val cwd = settings.cwd
-    val root = settings.in.toNIO
-    val visitor = new SimpleFileVisitor[Path] {
-      override def visitFile(
-          file: Path,
-          attrs: BasicFileAttributes
-      ): FileVisitResult = {
-        settings.toInputFile(AbsolutePath(file)) match {
-          case Some(inputFile) =>
-            fn(inputFile)
-          case None =>
-            () // excluded
+    def handle(file: AbsolutePath): Unit =
+      settings.toInputFile(file).foreach(fn)
+    settings.in.foreach { root =>
+      val visitor = new SimpleFileVisitor[Path] {
+        override def visitFile(
+            file: Path,
+            attrs: BasicFileAttributes
+        ): FileVisitResult = {
+          handle(AbsolutePath(file))
+          FileVisitResult.CONTINUE
         }
-        FileVisitResult.CONTINUE
-      }
 
-      override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        val relpath = RelativePath(root.relativize(dir))
-        if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
-        else FileVisitResult.CONTINUE
+        override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
+          val relpath = RelativePath(root.toNIO.relativize(dir))
+          if (settings.isExplicitlyExcluded(relpath)) FileVisitResult.SKIP_SUBTREE
+          else FileVisitResult.CONTINUE
+        }
+      }
+      if (root.isFile) {
+        handle(root)
+      } else if (root.isDirectory) {
+        Files.walkFileTree(root.toNIO, visitor)
       }
     }
-    Files.walkFileTree(root, visitor)
   }
 
   val deleteVisitor: SimpleFileVisitor[Path] = new SimpleFileVisitor[Path] {

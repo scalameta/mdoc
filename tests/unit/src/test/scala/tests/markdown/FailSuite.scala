@@ -146,16 +146,16 @@ class FailSuite extends BaseMarkdownSuite {
     "double",
     """
       |```scala mdoc:fail
-      |println(a)
+      |println(notfound)
       |println(b)
       |```
     """.stripMargin,
     """|```scala
-       |println(a)
+       |println(notfound)
        |println(b)
-       |// error: not found: value a
-       |// println(a)
-       |//         ^
+       |// error: not found: value notfound
+       |// println(notfound)
+       |//         ^^^^^^^^
        |// error: not found: value b
        |// println(b)
        |//         ^
@@ -168,7 +168,7 @@ class FailSuite extends BaseMarkdownSuite {
     """
       |```scala mdoc:fail
       |val x = 1
-      |println(a)
+      |println(notfound)
       |println(b)
       |```
       |
@@ -180,11 +180,11 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """|```scala
        |val x = 1
-       |println(a)
+       |println(notfound)
        |println(b)
-       |// error: not found: value a
-       |// println(a)
-       |//         ^
+       |// error: not found: value notfound
+       |// println(notfound)
+       |//         ^^^^^^^^
        |// error: not found: value b
        |// println(b)
        |//         ^

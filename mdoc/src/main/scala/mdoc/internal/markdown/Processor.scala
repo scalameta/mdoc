@@ -37,14 +37,14 @@ class Processor(implicit ctx: Context) {
     val docInput = doc.input
     val (scalaInputs, customInputs, preInputs) = collectFenceInputs(doc)
     val filename = docInput.toFilename(ctx.settings)
-    val inputFile = doc.relativePath
+    val inputFile = doc.file.relpath
     customInputs.foreach { block => processStringInput(doc, block) }
     preInputs.foreach { block => processPreInput(doc, block) }
     if (scalaInputs.nonEmpty) {
       processScalaInputs(doc, scalaInputs, inputFile, filename)
     }
     if (preInputs.nonEmpty) {
-      val post = new PostProcessContext(ctx.reporter, inputFile, ctx.settings)
+      val post = new PostProcessContext(ctx.reporter, doc.file, ctx.settings)
       ctx.settings.preModifiers.foreach { pre =>
         runModifier(pre.name, () => {
           appendChild(doc, pre.postProcess(post))
@@ -66,12 +66,12 @@ class Processor(implicit ctx: Context) {
   def processPreInput(doc: MarkdownFile, custom: PreFenceInput): Unit = {
     val PreFenceInput(block, input, Pre(mod, info)) = custom
     try {
-      val inputFile = doc.relativePath
+      val inputFile = doc.file.relpath
       val preCtx = new PreModifierContext(
         info,
         input,
         ctx.reporter,
-        inputFile,
+        doc.file,
         ctx.settings
       )
       val out = mod.process(preCtx)
@@ -102,7 +102,7 @@ class Processor(implicit ctx: Context) {
   def processScalaInputs(
       doc: MarkdownFile,
       inputs: List[ScalaFenceInput],
-      inputFile: RelativePath,
+      relpath: RelativePath,
       filename: String
   ): Unit = {
     val sectionInputs = inputs.map {
@@ -164,7 +164,7 @@ class Processor(implicit ctx: Context) {
               defaultRender,
               variables,
               ctx.reporter,
-              inputFile,
+              doc.file,
               ctx.settings
             )
             val postRender = modifier.process(postCtx)
@@ -190,7 +190,7 @@ class Processor(implicit ctx: Context) {
               c.info,
               section.input,
               ctx.reporter,
-              inputFile,
+              doc.file,
               ctx.settings
             )
             val out =

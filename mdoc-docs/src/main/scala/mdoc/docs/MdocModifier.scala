@@ -14,6 +14,7 @@ import mdoc.internal.markdown.GitHubIdGenerator
 import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.markdown.MarkdownFile
+import mdoc.internal.cli.InputFile
 
 class MdocModifier(context: Context) extends StringModifier {
   private val myStdout = new ByteArrayOutputStream()
@@ -24,16 +25,16 @@ class MdocModifier(context: Context) extends StringModifier {
     myStdout.reset()
     myReporter.reset()
     val cleanInput = Input.VirtualFile(code.filename, code.text)
-    val relpath = RelativePath(code.filename)
+    val file = InputFile.fromSettings(code.filename, context.settings)
     val markdown = Markdown.toMarkdown(
       cleanInput,
       myContext,
-      relpath,
+      file,
       myContext.settings.site,
       myReporter,
       myContext.settings
     )
-    val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, relpath, cleanInput)
+    val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, file.relpath, cleanInput)
     LinkHygiene.lint(List(links), myReporter, verbose = false)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {

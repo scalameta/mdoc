@@ -18,6 +18,7 @@ import tests.markdown.StringSyntax._
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
 import munit.TestOptions
+import mdoc.internal.cli.InputFile
 
 abstract class BaseMarkdownSuite extends munit.FunSuite {
   override def munitFlakyOK = true
@@ -67,8 +68,8 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val relpath = RelativePath(input.path)
-      Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
+      val file = InputFile.fromSettings(input.path, settings)
+      Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = Compat.postProcess(
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
@@ -91,9 +92,9 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val relpath = RelativePath(input.path)
+      val file = InputFile.fromSettings(input.path, settings)
       val obtained =
-        Markdown.toMarkdown(input, context, relpath, baseSettings.site, reporter, settings)
+        Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       val colorOut = myStdout.toString()
       print(colorOut)
       val stdout = fansi.Str(colorOut).plainText
@@ -108,7 +109,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       original: String,
       expected: String,
       settings: Settings = baseSettings
-  ): Unit = {
+  )(implicit loc: munit.Location): Unit = {
     checkCompiles(name, original, settings, obtained => {
       assertNoDiff(obtained, Compat(expected, Map.empty))
     })

@@ -119,7 +119,6 @@ The sbt-mdoc plugin supports the following settings.
 
 ```
 
-
 ## Command-line
 
 Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
@@ -135,6 +134,8 @@ info: Compiling 1 file to website/target/docs
 info: Compiled in 1.2s (0 errors)
 ```
 
+### Add library dependencies to classpath
+
 Add libraries to the launched classpath to include them for compilation.
 
 ```diff
@@ -143,13 +144,27 @@ Add libraries to the launched classpath to include them for compilation.
 +  org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0
 ```
 
-Use `--in` to customize the input directory where markdown sources are
-contained, by default the `docs/` directory is used.
+### Customize input directory
+
+By default the `docs/` directory is processed as input. Use `--in` to customize
+the input directory where markdown sources are contained,
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --in mydocs
 ```
+
+### Process single markdown file
+
+The `--in` flag doesn't have to be a directory, it also supports individual
+files.
+
+```diff
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --in mydocs/readme.md
+```
+
+### Configure site variables like `@@VERSION@`
 
 Use `--site.VARIABLE=value` to add site variables that can be referenced from
 markdown as `@@VARIABLE@`.
@@ -159,13 +174,43 @@ markdown as `@@VARIABLE@`.
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
-Use `--out` to customize the directory where markdown sources are generated, by
-default the `out/` directory is used.
+### Customize output directory
+
+Use `--out` to customize where your markdown sources are generated, by default
+the `out/` directory is used.
 
 ```diff
  coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
 +  --out target/docs
 ```
+
+### Generate single output file instead of directory
+
+The `--out` flag doesn't have to be a directory when the `--in` argument is a
+regular file, it can also be an individual file.
+
+```diff
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --in readme.template.md \
++  --out readme.md
+```
+
+### Process multiple input directories and files
+
+Repeat the `--in` and `--out` arguments to process multiple directories and
+regular files.
+
+```diff
+ coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --in readme.template.md \
++  --out readme.md \
++  --in changelog.template.md \
++  --out changelog.md \
++  --in mydocs-directory \
++  --out out-directory \
+```
+
+### Live reload HTML preview on file save
 
 Use `--watch` to start the file watcher with livereload. It's recommended to use
 `--watch` while writing documentation to enjoy 3-4x faster compilation

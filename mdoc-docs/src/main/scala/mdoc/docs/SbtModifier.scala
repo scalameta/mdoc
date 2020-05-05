@@ -39,5 +39,5 @@ class SbtModifier extends StringModifier {
       </tr>
       {rows}
     </table>
-  }.toString()
+  }.toString() + "\n\n"
 }

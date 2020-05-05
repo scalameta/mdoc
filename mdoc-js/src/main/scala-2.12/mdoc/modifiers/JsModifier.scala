@@ -25,6 +25,8 @@ import scala.meta.Term
 import scala.meta.inputs.Input
 import scala.meta.io.Classpath
 import scala.reflect.io.VirtualDirectory
+import mdoc.internal.cli.InputFile
+import scala.meta.io.AbsolutePath
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -153,19 +155,40 @@ class JsModifier extends mdoc.PreModifier {
     } else {
       val output = WritableMemVirtualJSFile("output.js")
       linker.link(virtualIrFiles ++ sjsir, Nil, output, sjsLogger)
-      val outjsfile = config.outDirectory.resolve(ctx.relativePath.resolveSibling(_ + ".js"))
-      outjsfile.write(output.content)
-      val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
-      outmdoc.write(Resources.readPath("/mdoc.js"))
-      val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
-      val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
-      new CodeBuilder()
-        .println(config.htmlHeader)
-        .lines(config.libraryScripts(outjsfile, ctx))
-        .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
-        .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
-        .toString
+      ctx.settings.toInputFile(ctx.inputFile) match {
+        case None =>
+          ctx.reporter.error(
+            s"unable to find output file matching the input file '${ctx.inputFile}'. " +
+              s"To fix this problem, make sure that  --in points to a directory that contains the file ${ctx.inputFile}."
+          )
+          ""
+        case Some(inputFile) =>
+          val outjsfile = resolveOutputJsFile(inputFile)
+          outjsfile.write(output.content)
+          val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
+          outmdoc.write(Resources.readPath("/mdoc.js"))
+          val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
+          val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
+          new CodeBuilder()
+            .println(config.htmlHeader)
+            .lines(config.libraryScripts(outjsfile, ctx))
+            .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
+            .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
+            .toString
+      }
     }
+  }
+
+  private def resolveOutputJsFile(file: InputFile): AbsolutePath = {
+    val outputDirectory = config.outPrefix match {
+      case None =>
+        file.outputDirectory
+      case Some(prefix) =>
+        // This is needed for Docusaurus that requires assets (non markdown) files to live under
+        // `docs/assets/`: https://docusaurus.io/docs/en/doc-markdown#linking-to-images-and-other-assets
+        file.outputDirectory.resolve(prefix)
+    }
+    outputDirectory.resolve(file.relpath).resolveSibling(_ + ".js")
   }
 
   override def process(ctx: PreModifierContext): String = {

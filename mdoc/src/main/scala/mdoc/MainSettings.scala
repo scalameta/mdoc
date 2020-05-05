@@ -44,10 +44,16 @@ final class MainSettings private (
     copy(settings.withWorkingDirectory(AbsolutePath(cwd)))
   }
   def withOut(out: Path): MainSettings = {
-    copy(settings.copy(out = AbsolutePath(out)))
+    withOutputPaths(List(out))
+  }
+  def withOutputPaths(out: List[Path]): MainSettings = {
+    copy(settings.copy(out = out.map(AbsolutePath(_)(settings.cwd))))
   }
   def withIn(in: Path): MainSettings = {
-    copy(settings.copy(in = AbsolutePath(in)))
+    withInputPaths(List(in))
+  }
+  def withInputPaths(in: List[Path]): MainSettings = {
+    copy(settings.copy(in = in.map(AbsolutePath(_)(settings.cwd))))
   }
   def withClasspath(classpath: String): MainSettings = {
     copy(settings.copy(classpath = classpath))
