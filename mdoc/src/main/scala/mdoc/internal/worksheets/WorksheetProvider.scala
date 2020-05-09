@@ -15,6 +15,7 @@ import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
 import mdoc.internal.markdown.MdocDialect
+import java.{util => ju}
 
 class WorksheetProvider(settings: Settings) {
 
@@ -36,8 +37,9 @@ class WorksheetProvider(settings: Settings) {
     )
     val sectionInputs = List(sectionInput)
     val instrumented = Instrumenter.instrument(sectionInputs, reporter)
+    val compiler = ctx.compiler(instrumented)
     val rendered = MarkdownCompiler.buildDocument(
-      ctx.compiler,
+      compiler,
       reporter,
       sectionInputs,
       instrumented.source,
@@ -55,7 +57,11 @@ class WorksheetProvider(settings: Settings) {
         .filterNot(_.summary.isEmpty)
         .map(d => d: i.EvaluatedWorksheetStatement)
         .toList
-        .asJava
+        .asJava,
+      instrumented.scalacOptionImports.map(_.value).asJava,
+      compiler.classpathEntries.asJava,
+      instrumented.dependencies.toSeq.asJava,
+      instrumented.repositories.toSeq.asJava
     )
   }
 

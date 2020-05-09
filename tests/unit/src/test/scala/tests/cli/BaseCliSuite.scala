@@ -10,8 +10,11 @@ import scala.meta.testkit.StringFS
 import mdoc.Main
 import scala.meta.internal.io.PathIO
 import scala.meta.io.RelativePath
+import munit.TestOptions
+import mdoc.internal.BuildInfo
+import tests.BaseSuite
 
-abstract class BaseCliSuite extends FunSuite {
+abstract class BaseCliSuite extends BaseSuite {
   class TemporaryDirectory(name: String) extends Fixture[AbsolutePath](name) {
     var path: AbsolutePath = _
     def apply(): AbsolutePath = path
@@ -24,7 +27,7 @@ abstract class BaseCliSuite extends FunSuite {
   override def munitFixtures: Seq[Fixture[_]] = List(in, out)
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
-      name: String,
+      name: TestOptions,
       original: String,
       expected: String,
       extraArgs: => Array[String] = Array.empty,

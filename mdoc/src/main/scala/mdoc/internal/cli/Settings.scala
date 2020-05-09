@@ -76,9 +76,7 @@ case class Settings(
     )
     classpath: String = "",
     @Description(
-      "Compiler flags such as compiler plugins '-Xplugin:kind-projector.jar' " +
-        "or custom options '-deprecated'. Formatted as a single string with space separated values. " +
-        "To pass multiple values: --scalac-options \"-Yrangepos -deprecated\". " +
+      "Space separated list of compiler flags such as '-Xplugin:kind-projector.jar -deprecation -Yrangepos'. " +
         "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any. " +
         "When using sbt-mdoc, update the `scalacOptions` sbt setting instead of passing --scalac-options to `mdocExtraArguments`."
     )

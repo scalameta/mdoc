@@ -15,6 +15,7 @@ import coursierapi.error.CoursierError
 
 case class Instrumented(
     source: String,
+    scalacOptionImports: List[Name.Indeterminate],
     dependencyImports: List[Name.Indeterminate],
     repositoryImports: List[Name.Indeterminate],
     positionedDependencies: List[PositionedDependency],
@@ -25,6 +26,7 @@ case class Instrumented(
 object Instrumented {
   def fromSource(
       source: String,
+      scalacOptionImports: List[Name.Indeterminate],
       dependencyImports: List[Name.Indeterminate],
       repositoryImports: List[Name.Indeterminate],
       reporter: Reporter
@@ -49,6 +51,7 @@ object Instrumented {
       } yield repo
     Instrumented(
       source,
+      scalacOptionImports,
       dependencyImports,
       repositoryImports,
       positioned,

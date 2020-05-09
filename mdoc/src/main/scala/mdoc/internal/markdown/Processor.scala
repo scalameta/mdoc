@@ -185,7 +185,7 @@ class Processor(implicit ctx: Context) {
           section,
           ctx.reporter,
           ctx.settings.variablePrinter,
-          ctx.compiler
+          markdownCompiler
         )
         mod match {
           case Modifier.Post(modifier, info) =>

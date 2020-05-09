@@ -1,4 +1,6 @@
-package tests.markdown
+package tests.imports
+
+import tests.markdown.BaseMarkdownSuite
 
 class DependencySuite extends BaseMarkdownSuite {
   val userHome = System.getProperty("user.home")
@@ -13,11 +15,10 @@ class DependencySuite extends BaseMarkdownSuite {
         .mkString("\n")
     }
   )
-  override def munitIgnore: Boolean = mdoc.internal.BuildInfo.scalaBinaryVersion != "2.12"
 
   List("dep", "ivy").foreach { dep =>
     check(
-      dep,
+      dep.tag(OnlyScala213),
       s"""
          |```scala mdoc
          |import $$$dep.`org.dhallj::dhall-scala:0.3.0`, org.dhallj.syntax._
@@ -36,7 +37,7 @@ class DependencySuite extends BaseMarkdownSuite {
   }
 
   check(
-    "repo",
+    "repo".tag(OnlyScala213),
     """
       |```scala mdoc
       |import $repo.`https://conjars.org/repo/`
@@ -54,7 +55,7 @@ class DependencySuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "repo-error",
+    "repo-error".tag(OnlyScala213),
     """
       |```scala mdoc
       |import $repo.`sbt-plugin:foobar`
@@ -68,7 +69,7 @@ class DependencySuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "dep-error",
+    "dep-error".tag(OnlyScala213),
     """
       |```scala mdoc
       |import $dep.`org.scalameta::mmunit:2.3.4`, $dep.`org.scalameta:foobar:1.2.1`
@@ -82,20 +83,21 @@ class DependencySuite extends BaseMarkdownSuite {
        |  not found: https://repo1.maven.org/maven2/org/scalameta/foobar/1.2.1/foobar-1.2.1.pom
        |import $dep.`org.scalameta::mmunit:2.3.4`, $dep.`org.scalameta:foobar:1.2.1`
        |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.12.11:2.3.4
+       |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.13.2:2.3.4
        |<redacted user.home>
-       |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_2.12.11/2.3.4/not-exists_2.12.11-2.3.4.pom
+       |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_2.13.2/2.3.4/not-exists_2.13.2-2.3.4.pom
        |import $dep.`org.scalameta:::not-exists:2.3.4`
        |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |error: dep-error.md:3:13: Error downloading org.scalameta:mmunit_2.12:2.3.4
+       |error: dep-error.md:3:13: Error downloading org.scalameta:mmunit_2.13:2.3.4
        |<redacted user.home>
-       |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.12/2.3.4/mmunit_2.12-2.3.4.pom
+       |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.13/2.3.4/mmunit_2.13-2.3.4.pom
        |import $dep.`org.scalameta::mmunit:2.3.4`, $dep.`org.scalameta:foobar:1.2.1`
        |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |""".stripMargin
   )
+
   checkError(
-    "dep-syntax-error",
+    "dep-syntax-error".tag(OnlyScala213),
     """
       |```scala mdoc
       |import $dep.`org.scalameta:no-version`

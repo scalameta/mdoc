@@ -13,8 +13,15 @@ import mdoc.Reporter
 class Instrumenter(sections: List[SectionInput]) {
   def instrument(reporter: Reporter): Instrumented = {
     printAsScript()
-    Instrumented.fromSource(out.toString, dependencies.toList, repositories.toList, reporter)
+    Instrumented.fromSource(
+      out.toString,
+      scalacOptions.toList,
+      dependencies.toList,
+      repositories.toList,
+      reporter
+    )
   }
+  private val scalacOptions = mutable.ListBuffer.empty[Name.Indeterminate]
   private val dependencies = mutable.ListBuffer.empty[Name.Indeterminate]
   private val repositories = mutable.ListBuffer.empty[Name.Indeterminate]
   private val out = new ByteArrayOutputStream()
@@ -97,6 +104,11 @@ class Instrumenter(sections: List[SectionInput]) {
                 List(Importee.Name(repo: Name.Indeterminate))
                 ) =>
               repositories += repo
+            case Importer(
+                Term.Name("$scalac"),
+                List(Importee.Name(option: Name.Indeterminate))
+                ) =>
+              scalacOptions += option
             case importer =>
               sb.print("import ")
               sb.print(importer.syntax)

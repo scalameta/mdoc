@@ -20,7 +20,7 @@ import scala.meta.io.RelativePath
 import munit.TestOptions
 import mdoc.internal.cli.InputFile
 
-abstract class BaseMarkdownSuite extends munit.FunSuite {
+abstract class BaseMarkdownSuite extends tests.BaseSuite {
   override def munitFlakyOK = true
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
@@ -111,7 +111,10 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       settings: Settings = baseSettings
   )(implicit loc: munit.Location): Unit = {
     checkCompiles(name, original, settings, obtained => {
-      assertNoDiff(obtained, Compat(expected, Map.empty))
+      assertNoDiff(
+        Compat(obtained, Map.empty, postProcessObtained),
+        Compat(expected, Map.empty, postProcessExpected)
+      )
     })
   }
 

@@ -10,6 +10,7 @@ import mdoc.internal.markdown.Instrumented
 import coursierapi.ResolutionParams
 import coursierapi.Cache
 import coursierapi.Logger
+import scala.collection.immutable.Nil
 
 object Dependencies {
   def newCompiler(
@@ -26,6 +27,12 @@ object Dependencies {
       .map(_.toPath())
     val classpath =
       Classpath(Classpath(settings.classpath).entries ++ jars.map(AbsolutePath(_)))
-    MarkdownCompiler.fromClasspath(classpath.syntax, settings.scalacOptions)
+    val scalacOptions = instrumented.scalacOptionImports match {
+      case Nil =>
+        settings.scalacOptions
+      case options =>
+        s"${settings.scalacOptions} ${options.map(_.value).mkString(" ")}"
+    }
+    MarkdownCompiler.fromClasspath(classpath.syntax, scalacOptions)
   }
 }

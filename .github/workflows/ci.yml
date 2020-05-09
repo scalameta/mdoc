@@ -29,7 +29,7 @@ jobs:
         command:
           - "'++2.11.12 test'"
           - "'++2.12.11 test' scripted"
-          - "'++2.13.1 test'"
+          - "'++2.13.2 test'"
     steps:
       - uses: actions/checkout@v1
       - uses: olafurpg/setup-scala@v7

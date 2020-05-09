@@ -144,7 +144,7 @@ object MarkdownCompiler {
 
 class MarkdownCompiler(
     classpath: String,
-    scalacOptions: String,
+    val scalacOptions: String,
     target: AbstractFile = new VirtualDirectory("(memory)", None)
 ) {
   private val settings = new Settings()
@@ -158,6 +158,8 @@ class MarkdownCompiler(
   //   https://github.com/scalameta/mdoc/issues/124
   settings.Ydelambdafy.value = "inline"
   settings.processArgumentString(scalacOptions)
+
+  def classpathEntries: Seq[Path] = global.classPath.asURLs.map(url => Paths.get(url.toURI()))
 
   private val sreporter = new FilterStoreReporter(settings)
   var global = new Global(settings, sreporter)
