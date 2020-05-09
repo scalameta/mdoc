@@ -16,6 +16,7 @@ import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
 import mdoc.internal.markdown.MdocDialect
 import java.{util => ju}
+import mdoc.internal.cli.InputFile
 
 class WorksheetProvider(settings: Settings) {
 
@@ -36,15 +37,11 @@ class WorksheetProvider(settings: Settings) {
       Modifier.Default()
     )
     val sectionInputs = List(sectionInput)
-    val instrumented = Instrumenter.instrument(sectionInputs, reporter)
+    val file = InputFile.fromRelativeFilename(input.path, settings)
+    val instrumented = Instrumenter.instrument(file, sectionInputs, settings, reporter)
     val compiler = ctx.compiler(instrumented)
-    val rendered = MarkdownCompiler.buildDocument(
-      compiler,
-      reporter,
-      sectionInputs,
-      instrumented.source,
-      input.path
-    )
+    val rendered =
+      MarkdownCompiler.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
 
     val decorations = for {
       section <- rendered.sections.iterator

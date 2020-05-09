@@ -42,8 +42,6 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       )
       .withProperties(MdocProperties.default(PathIO.workingDirectory))
 
-  def postProcessObtained: Map[String, String => String] = Map.empty
-  def postProcessExpected: Map[String, String => String] = Map.empty
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = {
     myStdout.reset()
@@ -68,7 +66,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val file = InputFile.fromSettings(input.path, settings)
+      val file = InputFile.fromRelativeFilename(input.path, settings)
       Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = Compat.postProcess(
@@ -92,7 +90,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val file = InputFile.fromSettings(input.path, settings)
+      val file = InputFile.fromRelativeFilename(input.path, settings)
       val obtained =
         Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       val colorOut = myStdout.toString()

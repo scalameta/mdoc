@@ -14,6 +14,7 @@ import mdoc.internal.markdown.EvaluatedSection
 import scala.meta.internal.io.PathIO
 import scala.util.control.NonFatal
 import coursierapi.Dependency
+import scala.meta.internal.io.FileIO
 
 object PositionSyntax {
   implicit class XtensionInputMdoc(input: Input) {
@@ -185,6 +186,7 @@ object PositionSyntax {
   implicit class XtensionAbsolutePathLink(path: AbsolutePath) {
     def filename: String = path.toNIO.getFileName.toString
     def extension: String = PathIO.extension(path.toNIO)
+    def readText: String = FileIO.slurp(path, StandardCharsets.UTF_8)
     def copyTo(out: AbsolutePath): Unit = {
       Files.createDirectories(path.toNIO.getParent)
       Files.copy(path.toNIO, out.toNIO, StandardCopyOption.REPLACE_EXISTING)

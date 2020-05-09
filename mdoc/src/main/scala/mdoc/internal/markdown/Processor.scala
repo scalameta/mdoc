@@ -25,9 +25,15 @@ import scala.meta.io.RelativePath
 import coursierapi.error.SimpleResolutionError
 import coursierapi.error.CoursierError
 import coursierapi.error.MultipleResolutionError
+import scala.meta.io.AbsolutePath
+import scala.meta.parsers.Parsed
+import scala.meta.Source
 
 object MdocDialect {
 
+  def parse(path: AbsolutePath): Parsed[Source] = {
+    scala(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
+  }
   val scala = Scala213.copy(
     allowToplevelTerms = true,
     toplevelSeparator = ""
@@ -119,7 +125,7 @@ class Processor(implicit ctx: Context) {
             SectionInput(input, Source(Nil), mod)
         }
     }
-    val instrumented = Instrumenter.instrument(sectionInputs, ctx.reporter)
+    val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
     if (ctx.reporter.hasErrors) {
       return
     }
@@ -174,7 +180,7 @@ class Processor(implicit ctx: Context) {
       markdownCompiler,
       ctx.reporter,
       sectionInputs,
-      instrumented.source,
+      instrumented,
       filename
     )
     rendered.sections.zip(inputs).foreach {

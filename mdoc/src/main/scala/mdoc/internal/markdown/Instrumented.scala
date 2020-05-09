@@ -18,6 +18,7 @@ case class Instrumented(
     scalacOptionImports: List[Name.Indeterminate],
     dependencyImports: List[Name.Indeterminate],
     repositoryImports: List[Name.Indeterminate],
+    fileImports: List[FileImport],
     positionedDependencies: List[PositionedDependency],
     dependencies: Set[Dependency],
     repositories: List[Repository]
@@ -29,6 +30,7 @@ object Instrumented {
       scalacOptionImports: List[Name.Indeterminate],
       dependencyImports: List[Name.Indeterminate],
       repositoryImports: List[Name.Indeterminate],
+      fileImports: List[FileImport],
       reporter: Reporter
   ): Instrumented = {
     val positioned = dependencyImports.flatMap(i => PositionedDependency.fromName(i, reporter))
@@ -54,6 +56,7 @@ object Instrumented {
       scalacOptionImports,
       dependencyImports,
       repositoryImports,
+      fileImports,
       positioned,
       dependencies,
       repositories

@@ -21,7 +21,7 @@ class MarkdownFileSuite extends FunSuite {
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name, original)
-      val file = InputFile.fromSettings(name, Settings.default(PathIO.workingDirectory))
+      val file = InputFile.fromRelativeFilename(name, Settings.default(PathIO.workingDirectory))
       val obtained = MarkdownFile.parse(input, file, reporter).parts
       require(!reporter.hasErrors)
       val expectedParts = expected.toList

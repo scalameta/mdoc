@@ -37,9 +37,9 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
                 case i: Import =>
                   i.importers.foreach {
                     case Importer(
-                        Term.Name("$ivy" | "$dep" | "$scalac"),
-                        List(Importee.Name(dep: Name.Indeterminate))
-                        ) =>
+                        Term.Name(name),
+                        List(Importee.Name(_: Name.Indeterminate))
+                        ) if Instrumenter.magicImports(name) =>
                     case importer =>
                       sb.print("import ")
                       sb.print(importer.syntax)

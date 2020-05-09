@@ -29,10 +29,16 @@ object InputFile {
     }
   }
 
-  def fromSettings(filename: String, settings: Settings): InputFile = {
+  def fromRelativeFilename(filename: String, settings: Settings): InputFile = {
     val relpath = RelativePath(filename)
     val inputDir = settings.in.head
     val outputDir = settings.out.head
-    InputFile(relpath, inputDir.resolve(filename), outputDir.resolve(filename), inputDir, outputDir)
+    InputFile(
+      relpath,
+      inputDir.resolve(filename),
+      outputDir.resolve(filename),
+      inputDir,
+      outputDir
+    )
   }
 }

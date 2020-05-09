@@ -137,7 +137,7 @@ class JsModifier extends mdoc.PreModifier {
     val input = Input.VirtualFile(ctx.relativePath.toString(), wrapped)
     val edit = TokenEditDistance.fromInputs(inputs, input)
     val oldErrors = ctx.reporter.errorCount
-    compiler.compileSources(input, ctx.reporter, edit)
+    compiler.compileSources(input, ctx.reporter, edit, fileImports = Nil)
     val hasErrors = ctx.reporter.errorCount > oldErrors
     val sjsir = for {
       x <- target.toList
