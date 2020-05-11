@@ -22,6 +22,8 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
 
   def this() = this(MainSettings())
 
+  def withWorkingDirectory(cwd: Path): i.Mdoc =
+    new Mdoc(this.settings.withWorkingDirectory(cwd))
   def withClasspath(classpath: ju.List[Path]): i.Mdoc =
     new Mdoc(this.settings.withClasspath(classpath.iterator().asScala.mkString(File.pathSeparator)))
   def withScalacOptions(options: ju.List[String]): i.Mdoc =

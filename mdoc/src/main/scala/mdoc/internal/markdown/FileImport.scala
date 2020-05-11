@@ -15,6 +15,8 @@ import mdoc.internal.cli.Settings
 import scala.meta.inputs.Position
 import mdoc.internal.pos.TokenEditDistance
 import scala.meta.Import
+import mdoc.interfaces.ImportedScriptFile
+import scala.collection.JavaConverters._
 
 final case class FileImport(
     path: AbsolutePath,
@@ -44,6 +46,16 @@ final case class FileImport(
     Input.VirtualFile(path.syntax, out.toString())
   }
   val edit = TokenEditDistance(Input.VirtualFile(path.syntax, source), toInput)
+  def toInterface: ImportedScriptFile = {
+    mdoc.internal.worksheets.ImportedScriptFile(
+      path.toNIO,
+      packageName,
+      objectName,
+      toInput.text,
+      source,
+      dependencies.map(_.toInterface).asJava
+    )
+  }
 }
 object FileImport {
   class Matcher(

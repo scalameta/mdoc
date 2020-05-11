@@ -13,10 +13,10 @@ class ScalacSuite extends BaseMarkdownSuite {
       |println(42)
       |```
       |""".stripMargin,
-    """|warning: import.md:4:1: Unused import
+    """|error: No warnings can be incurred under -Werror.
+       |warning: import.md:4:1: Unused import
        |import scala.util.Try
        |^^^^^^^^^^^^^^^^^^^^^
-       |error: No warnings can be incurred under -Werror.
        |""".stripMargin
   )
 

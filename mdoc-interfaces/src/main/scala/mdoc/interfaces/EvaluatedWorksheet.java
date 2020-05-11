@@ -10,7 +10,8 @@ public abstract class EvaluatedWorksheet {
   public abstract List<Diagnostic> diagnostics();
   public abstract List<EvaluatedWorksheetStatement> statements();
 
-  public abstract List<String> scalacOptions();
+  public abstract List<ImportedScriptFile> files();
+  public abstract List<String> scalac();
   public abstract List<Path> classpath();
   public abstract List<Dependency> dependencies();
   public abstract List<Repository> repositories();

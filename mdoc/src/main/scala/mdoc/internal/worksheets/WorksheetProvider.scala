@@ -55,6 +55,7 @@ class WorksheetProvider(settings: Settings) {
         .map(d => d: i.EvaluatedWorksheetStatement)
         .toList
         .asJava,
+      instrumented.fileImports.map(_.toInterface).asJava,
       instrumented.scalacOptionImports.map(_.value).asJava,
       compiler.classpathEntries.asJava,
       instrumented.dependencies.toSeq.asJava,

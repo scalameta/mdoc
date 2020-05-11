@@ -3,7 +3,6 @@ package tests
 import munit.FunSuite
 import munit.Location
 import tests.markdown.Compat
-import breeze.numerics.exp
 
 class BaseSuite extends FunSuite {
   def postProcessObtained: Map[String, String => String] = Map.empty
