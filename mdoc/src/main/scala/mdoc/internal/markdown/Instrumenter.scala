@@ -7,12 +7,30 @@ import scala.meta.inputs.Position
 import Instrumenter.position
 import mdoc.internal.markdown.Instrumenter.Binders
 import scala.meta.Mod.Lazy
+import scala.collection.mutable
+import mdoc.Reporter
+import mdoc.internal.cli.InputFile
+import java.nio.file.Path
+import mdoc.internal.cli.Settings
 
-class Instrumenter(sections: List[SectionInput]) {
-  def instrument(): String = {
+class Instrumenter(
+    file: InputFile,
+    sections: List[SectionInput],
+    settings: Settings,
+    reporter: Reporter
+) {
+  def instrument(): Instrumented = {
     printAsScript()
-    out.toString
+    Instrumented.fromSource(
+      out.toString,
+      magic.scalacOptions.toList,
+      magic.dependencies.toList,
+      magic.repositories.toList,
+      magic.files.values.toList,
+      reporter
+    )
   }
+  val magic = new MagicImports(settings, reporter, file)
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   val gensym = new Gensym()
@@ -80,7 +98,23 @@ class Instrumenter(sections: List[SectionInput]) {
           sb.print(s"val $fresh = ")
           List(Name(fresh) -> stat.pos)
       }
-      sb.print(stat.pos.text)
+      stat match {
+        case i: Import =>
+          def printImporter(importer: Importer): Unit = {
+            sb.print("import ")
+            sb.print(importer.syntax)
+            sb.print(";")
+          }
+          i.importers.foreach {
+            case importer @ magic.Printable(_) =>
+              printImporter(importer)
+            case magic.NonPrintable() =>
+            case importer =>
+              printImporter(importer)
+          }
+        case _ =>
+          sb.print(stat.pos.text)
+      }
       binders.foreach {
         case (name, pos) =>
           printBinder(name.syntax, pos)
@@ -89,6 +123,13 @@ class Instrumenter(sections: List[SectionInput]) {
   }
 }
 object Instrumenter {
+  val magicImports = Set(
+    "$file",
+    "$scalac",
+    "$repo",
+    "$dep",
+    "$ivy"
+  )
   def reset(mod: Modifier, identifier: String): String = {
     val ctor =
       if (mod.isResetClass) s"new $identifier()"
@@ -98,9 +139,14 @@ object Instrumenter {
       else "object"
     s"$ctor\n}\n$keyword $identifier {\n"
   }
-  def instrument(sections: List[SectionInput]): String = {
-    val body = new Instrumenter(sections).instrument()
-    wrapBody(body)
+  def instrument(
+      file: InputFile,
+      sections: List[SectionInput],
+      settings: Settings,
+      reporter: Reporter
+  ): Instrumented = {
+    val instrumented = new Instrumenter(file, sections, settings, reporter).instrument()
+    instrumented.copy(source = wrapBody(instrumented.source))
   }
 
   def position(pos: Position): String = {

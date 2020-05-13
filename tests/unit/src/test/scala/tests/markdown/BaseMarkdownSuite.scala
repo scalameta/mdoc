@@ -20,7 +20,7 @@ import scala.meta.io.RelativePath
 import munit.TestOptions
 import mdoc.internal.cli.InputFile
 
-abstract class BaseMarkdownSuite extends munit.FunSuite {
+abstract class BaseMarkdownSuite extends tests.BaseSuite {
   override def munitFlakyOK = true
   def createTempDirectory(): AbsolutePath = {
     val dir = AbsolutePath(Files.createTempDirectory("mdoc"))
@@ -42,8 +42,6 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       )
       .withProperties(MdocProperties.default(PathIO.workingDirectory))
 
-  def postProcessObtained: Map[String, String => String] = Map.empty
-  def postProcessExpected: Map[String, String => String] = Map.empty
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = {
     myStdout.reset()
@@ -54,7 +52,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
     settings.validate(reporter)
     if (reporter.hasErrors) fail("reporter has errors")
-    Context(settings, reporter, compiler)
+    Context.fromCompiler(settings, reporter, compiler)
   }
 
   def checkError(
@@ -68,7 +66,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val file = InputFile.fromSettings(input.path, settings)
+      val file = InputFile.fromRelativeFilename(input.path, settings)
       Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = Compat.postProcess(
@@ -92,7 +90,7 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name + ".md", original)
-      val file = InputFile.fromSettings(input.path, settings)
+      val file = InputFile.fromRelativeFilename(input.path, settings)
       val obtained =
         Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
       val colorOut = myStdout.toString()
@@ -111,7 +109,10 @@ abstract class BaseMarkdownSuite extends munit.FunSuite {
       settings: Settings = baseSettings
   )(implicit loc: munit.Location): Unit = {
     checkCompiles(name, original, settings, obtained => {
-      assertNoDiff(obtained, Compat(expected, Map.empty))
+      assertNoDiff(
+        Compat(obtained, Map.empty, postProcessObtained),
+        Compat(expected, Map.empty, postProcessExpected)
+      )
     })
   }
 

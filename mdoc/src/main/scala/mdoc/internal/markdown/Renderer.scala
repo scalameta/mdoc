@@ -14,21 +14,31 @@ import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
 import scala.meta._
 import scala.meta.inputs.Position
+import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.Settings
 
 object Renderer {
 
   def render(
+      file: InputFile,
       sections: List[Input],
       compiler: MarkdownCompiler,
+      settings: Settings,
       reporter: Reporter,
       filename: String,
       printer: Variable => String
   ): String = {
     val inputs =
       sections.map(s => SectionInput(s, MdocDialect.scala(s).parse[Source].get, Modifier.Default()))
-    val instrumented = Instrumenter.instrument(inputs)
+    val instrumented = Instrumenter.instrument(file, inputs, settings, reporter)
     val doc =
-      MarkdownCompiler.buildDocument(compiler, reporter, inputs, instrumented, filename)
+      MarkdownCompiler.buildDocument(
+        compiler,
+        reporter,
+        inputs,
+        instrumented,
+        filename
+      )
     doc.sections
       .map(s => s"""```scala
                    |${Renderer.renderEvaluatedSection(doc, s, reporter, printer, compiler)}

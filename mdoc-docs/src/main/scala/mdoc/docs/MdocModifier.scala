@@ -25,7 +25,7 @@ class MdocModifier(context: Context) extends StringModifier {
     myStdout.reset()
     myReporter.reset()
     val cleanInput = Input.VirtualFile(code.filename, code.text)
-    val file = InputFile.fromSettings(code.filename, context.settings)
+    val file = InputFile.fromRelativeFilename(code.filename, context.settings)
     val markdown = Markdown.toMarkdown(
       cleanInput,
       myContext,

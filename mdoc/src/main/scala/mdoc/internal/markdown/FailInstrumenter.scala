@@ -2,6 +2,11 @@ package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import scala.meta.Import
+import scala.meta.Importer
+import scala.meta.Term
+import scala.meta.Importee
+import scala.meta.Name
 
 final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   private val out = new ByteArrayOutputStream()
@@ -27,7 +32,23 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
             nest.nest()
           }
           if (j == i || !section.mod.isFailOrWarn) {
-            sb.println(section.input.text)
+            section.source.stats.foreach { stat =>
+              stat match {
+                case i: Import =>
+                  i.importers.foreach {
+                    case Importer(
+                        Term.Name(name),
+                        List(Importee.Name(_: Name.Indeterminate))
+                        ) if Instrumenter.magicImports(name) =>
+                    case importer =>
+                      sb.print("import ")
+                      sb.print(importer.syntax)
+                      sb.print(";")
+                  }
+                case _ =>
+                  sb.println(stat.pos.text)
+              }
+            }
           }
         }
     }

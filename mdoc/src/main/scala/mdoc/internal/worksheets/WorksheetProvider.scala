@@ -15,6 +15,8 @@ import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
 import mdoc.internal.markdown.MdocDialect
+import java.{util => ju}
+import mdoc.internal.cli.InputFile
 
 class WorksheetProvider(settings: Settings) {
 
@@ -35,14 +37,11 @@ class WorksheetProvider(settings: Settings) {
       Modifier.Default()
     )
     val sectionInputs = List(sectionInput)
-    val instrumented = Instrumenter.instrument(sectionInputs)
-    val rendered = MarkdownCompiler.buildDocument(
-      ctx.compiler,
-      reporter,
-      sectionInputs,
-      instrumented,
-      input.path
-    )
+    val file = InputFile.fromRelativeFilename(input.path, settings)
+    val instrumented = Instrumenter.instrument(file, sectionInputs, settings, reporter)
+    val compiler = ctx.compiler(instrumented)
+    val rendered =
+      MarkdownCompiler.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
 
     val decorations = for {
       section <- rendered.sections.iterator
@@ -55,7 +54,12 @@ class WorksheetProvider(settings: Settings) {
         .filterNot(_.summary.isEmpty)
         .map(d => d: i.EvaluatedWorksheetStatement)
         .toList
-        .asJava
+        .asJava,
+      instrumented.fileImports.map(_.toInterface).asJava,
+      instrumented.scalacOptionImports.map(_.value).asJava,
+      compiler.classpathEntries.asJava,
+      instrumented.dependencies.toSeq.asJava,
+      instrumented.repositories.toSeq.asJava
     )
   }
 

@@ -6,11 +6,15 @@ import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.Renderer
 import mdoc.internal.markdown.ReplVariablePrinter
+import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.Settings
+import scala.meta.internal.io.PathIO
 
 class MarkdownCompilerSuite extends FunSuite {
 
   private val compiler = MarkdownCompiler.default()
   private val reporter = ConsoleReporter.default
+  private val settings = Settings.default(PathIO.workingDirectory)
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     test(name.ignore) {}
@@ -26,7 +30,16 @@ class MarkdownCompilerSuite extends FunSuite {
   ): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
-      val obtained = Renderer.render(inputs, compiler, reporter, name + ".md", ReplVariablePrinter)
+      val file = InputFile.fromRelativeFilename(name + ".md", settings)
+      val obtained = Renderer.render(
+        file,
+        inputs,
+        compiler,
+        settings,
+        reporter,
+        name + ".md",
+        ReplVariablePrinter
+      )
       assertNoDiff(
         obtained,
         Compat(expected, compat)

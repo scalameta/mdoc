@@ -76,9 +76,7 @@ case class Settings(
     )
     classpath: String = "",
     @Description(
-      "Compiler flags such as compiler plugins '-Xplugin:kind-projector.jar' " +
-        "or custom options '-deprecated'. Formatted as a single string with space separated values. " +
-        "To pass multiple values: --scalac-options \"-Yrangepos -deprecated\". " +
+      "Space separated list of compiler flags such as '-Xplugin:kind-projector.jar -deprecation -Yrangepos'. " +
         "Defaults to the value of 'scalacOptions' in the 'mdoc.properties' resource file, if any. " +
         "When using sbt-mdoc, update the `scalacOptions` sbt setting instead of passing --scalac-options to `mdocExtraArguments`."
     )
@@ -146,7 +144,10 @@ case class Settings(
     headerIdGenerator: String => String = GitHubIdGenerator,
     @Hidden()
     @Description("The pretty printer for variables")
-    variablePrinter: Variable => String = ReplVariablePrinter
+    variablePrinter: Variable => String = ReplVariablePrinter,
+    @Hidden()
+    @Description("The Coursier logger used to report progress bars when downloading dependencies")
+    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
 ) {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
@@ -227,12 +228,12 @@ case class Settings(
       }.toList
       errors.flatten match {
         case Nil =>
-          val compiler = MarkdownCompiler.fromClasspath(classpath, scalacOptions)
+          val context = Context.fromOptions(this, logger)
           onLoad(logger)
           if (logger.hasErrors) {
             Configured.error("Failed to load modifiers")
           } else {
-            Configured.ok(Context(this, logger, compiler))
+            Configured.ok(context)
           }
         case errors =>
           errors.foldLeft(ConfError.empty)(_ combine _).notOk
@@ -343,6 +344,17 @@ object Settings extends MetaconfigScalametaImplicits {
 
   implicit val pathMatcherDecoder: ConfDecoder[PathMatcher] =
     ConfDecoder.stringConfDecoder.map(glob => FileSystems.getDefault.getPathMatcher("glob:" + glob))
+  implicit val LoggerEncoder: ConfEncoder[coursierapi.Logger] =
+    ConfEncoder.StringEncoder.contramap(_.toString())
+  implicit val LoggerDecoder: ConfDecoder[coursierapi.Logger] =
+    ConfDecoder.stringConfDecoder.flatMap {
+      case "nop" => Configured.ok(coursierapi.Logger.nop())
+      case "progress-bars" => Configured.ok(coursierapi.Logger.progressBars())
+      case unknown =>
+        Configured.error(
+          s"unknown coursier logger '$unknown'. Expected one of 'nop' or 'progress-bars'"
+        )
+    }
   implicit val CharsetDecoder: ConfDecoder[Charset] =
     ConfDecoder.stringConfDecoder.flatMap { str =>
       try {

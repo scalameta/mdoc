@@ -22,9 +22,18 @@ import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
 import pprint.TPrintColors
 import scala.meta.io.RelativePath
+import coursierapi.error.SimpleResolutionError
+import coursierapi.error.CoursierError
+import coursierapi.error.MultipleResolutionError
+import scala.meta.io.AbsolutePath
+import scala.meta.parsers.Parsed
+import scala.meta.Source
 
 object MdocDialect {
 
+  def parse(path: AbsolutePath): Parsed[Source] = {
+    scala(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
+  }
   val scala = Scala213.copy(
     allowToplevelTerms = true,
     toplevelSeparator = ""
@@ -116,13 +125,59 @@ class Processor(implicit ctx: Context) {
             SectionInput(input, Source(Nil), mod)
         }
     }
-    val instrumented = Instrumenter.instrument(sectionInputs)
+    val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
+    if (ctx.reporter.hasErrors) {
+      return
+    }
     if (ctx.settings.verbose) {
       ctx.reporter.info(s"Instrumented $filename")
-      ctx.reporter.println(instrumented)
+      ctx.reporter.println(instrumented.source)
     }
+    val compiler =
+      try {
+        ctx.compiler(instrumented)
+      } catch {
+        case e: CoursierError =>
+          handleCoursierError(instrumented, e)
+          ctx.compiler
+      }
+    processScalaInputs(
+      doc,
+      inputs,
+      relpath,
+      filename,
+      sectionInputs,
+      instrumented,
+      compiler
+    )
+  }
+  def handleCoursierError(instrumented: Instrumented, e: CoursierError): Unit = {
+    e match {
+      case m: MultipleResolutionError =>
+        m.getErrors().forEach(simpleError => handleCoursierError(instrumented, simpleError))
+      case _ =>
+        val pos = instrumented.positionedDependencies
+          .collectFirst {
+            case dep if e.getMessage().contains(dep.syntax) =>
+              dep.pos
+          }
+          .orElse(instrumented.dependencyImports.headOption.map(_.pos))
+          .getOrElse(Position.None)
+        ctx.reporter.error(pos, e.getMessage())
+    }
+  }
+
+  def processScalaInputs(
+      doc: MarkdownFile,
+      inputs: List[ScalaFenceInput],
+      relpath: RelativePath,
+      filename: String,
+      sectionInputs: List[SectionInput],
+      instrumented: Instrumented,
+      markdownCompiler: MarkdownCompiler
+  ): Unit = {
     val rendered = MarkdownCompiler.buildDocument(
-      ctx.compiler,
+      markdownCompiler,
       ctx.reporter,
       sectionInputs,
       instrumented,
@@ -136,7 +191,7 @@ class Processor(implicit ctx: Context) {
           section,
           ctx.reporter,
           ctx.settings.variablePrinter,
-          ctx.compiler
+          markdownCompiler
         )
         mod match {
           case Modifier.Post(modifier, info) =>

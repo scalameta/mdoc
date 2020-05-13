@@ -98,6 +98,9 @@ final class MainSettings private (
   def withVariablePrinter(variablePrinter: Variable => String): MainSettings = {
     copy(settings.copy(variablePrinter = variablePrinter))
   }
+  def withCoursierLogger(logger: coursierapi.Logger): MainSettings = {
+    copy(settings.copy(coursierLogger = logger))
+  }
   def withScreenWidth(screenWidth: Int): MainSettings = {
     copy(settings.copy(screenWidth = screenWidth))
   }

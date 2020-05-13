@@ -8,11 +8,6 @@ inThisBuild(
   List(
     scalaVersion := scala212,
     crossScalaVersions := List(scala212, scala211, scala213),
-    scalacOptions ++= List(
-      "-Yrangepos",
-      "-Xexperimental",
-      "-deprecation"
-    ),
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -45,10 +40,20 @@ inThisBuild(
 name := "mdocRoot"
 skip in publish := true
 crossScalaVersions := Nil
+lazy val sharedSettings = List(
+  scalacOptions ++= {
+    val buf = collection.mutable.ListBuffer.empty[String]
+    buf ++= List("-target:jvm-1.8", "-Yrangepos", "-deprecation")
+    if (!scalaBinaryVersion.value.startsWith("2.13"))
+      buf += "-Xexperimental"
+    buf.toList
+  }
+)
 
 val V = new {
   val scalameta = "4.3.10"
   val munit = "0.7.1"
+  val coursier = "0.0.22"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -66,6 +71,9 @@ lazy val interfaces = project
   .settings(
     moduleName := "mdoc-interfaces",
     autoScalaLibrary := false,
+    libraryDependencies ++= List(
+      "io.get-coursier" % "interface" % V.coursier
+    ),
     crossVersion := CrossVersion.disabled,
     javacOptions in (Compile / doc) ++= List(
       "-tag",
@@ -75,6 +83,7 @@ lazy val interfaces = project
 
 lazy val runtime = project
   .settings(
+    sharedSettings,
     moduleName := "mdoc-runtime",
     libraryDependencies ++= List(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
@@ -85,6 +94,7 @@ lazy val runtime = project
 
 lazy val mdoc = project
   .settings(
+    sharedSettings,
     moduleName := "mdoc",
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
@@ -104,6 +114,7 @@ lazy val mdoc = project
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
+      "io.get-coursier" % "interface" % V.coursier,
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
@@ -123,6 +134,7 @@ lazy val mdoc = project
 lazy val testsInput = project
   .in(file("tests/input"))
   .settings(
+    sharedSettings,
     skip in publish := true
   )
 
@@ -140,6 +152,7 @@ def scala212LibraryDependencies(deps: List[ModuleID]) = List(
 val jsdocs = project
   .in(file("tests/jsdocs"))
   .settings(
+    sharedSettings,
     skip in publish := true,
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     libraryDependencies ++= {
@@ -163,6 +176,7 @@ val jsdocs = project
 lazy val unit = project
   .in(file("tests/unit"))
   .settings(
+    sharedSettings,
     skip in publish := true,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
@@ -189,6 +203,7 @@ lazy val unit = project
 lazy val plugin = project
   .in(file("mdoc-sbt"))
   .settings(
+    sharedSettings,
     sbtPlugin := true,
     sbtVersion in pluginCrossBuild := "1.0.0",
     crossScalaVersions := List(scala212),
@@ -226,6 +241,7 @@ lazy val plugin = project
 lazy val js = project
   .in(file("mdoc-js"))
   .settings(
+    sharedSettings,
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(
@@ -239,6 +255,7 @@ lazy val js = project
 lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
+    sharedSettings,
     moduleName := "mdoc-docs",
     crossScalaVersions := List(scala212),
     skip in publish :=

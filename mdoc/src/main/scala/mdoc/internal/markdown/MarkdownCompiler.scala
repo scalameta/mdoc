@@ -28,6 +28,7 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import sun.misc.Unsafe
+import scala.annotation.implicitNotFound
 
 object MarkdownCompiler {
 
@@ -37,14 +38,21 @@ object MarkdownCompiler {
       compiler: MarkdownCompiler,
       reporter: Reporter,
       sectionInputs: List[SectionInput],
-      instrumented: String,
+      instrumented: Instrumented,
       filename: String
   ): EvaluatedDocument = {
-    val instrumentedInput = InstrumentedInput(filename, instrumented)
+    val instrumentedInput = InstrumentedInput(filename, instrumented.source)
     reporter.debug(s"$filename: instrumented code\n$instrumented")
-    val compileInput = Input.VirtualFile(filename, instrumented)
+    val compileInput = Input.VirtualFile(filename, instrumented.source)
     val edit = TokenEditDistance.fromTrees(sectionInputs.map(_.source), compileInput)
-    val doc = compiler.compile(compileInput, reporter, edit, "repl.Session$") match {
+    val compiled = compiler.compile(
+      compileInput,
+      reporter,
+      edit,
+      "repl.Session$",
+      instrumented.fileImports
+    )
+    val doc = compiled match {
       case Some(cls) =>
         val ctor = cls.getDeclaredConstructor()
         ctor.setAccessible(true)
@@ -144,7 +152,7 @@ object MarkdownCompiler {
 
 class MarkdownCompiler(
     classpath: String,
-    scalacOptions: String,
+    val scalacOptions: String,
     target: AbstractFile = new VirtualDirectory("(memory)", None)
 ) {
   private val settings = new Settings()
@@ -158,6 +166,8 @@ class MarkdownCompiler(
   //   https://github.com/scalameta/mdoc/issues/124
   settings.Ydelambdafy.value = "inline"
   settings.processArgumentString(scalacOptions)
+
+  def classpathEntries: Seq[Path] = global.classPath.asURLs.map(url => Paths.get(url.toURI()))
 
   private val sreporter = new FilterStoreReporter(settings)
   var global = new Global(settings, sreporter)
@@ -206,13 +216,19 @@ class MarkdownCompiler(
   def hasErrors: Boolean = sreporter.hasErrors
   def hasWarnings: Boolean = sreporter.hasWarnings
 
-  def compileSources(input: Input, vreporter: Reporter, edit: TokenEditDistance): Unit = {
+  def compileSources(
+      input: Input,
+      vreporter: Reporter,
+      edit: TokenEditDistance,
+      fileImports: List[FileImport]
+  ): Unit = {
     clearTarget()
     sreporter.reset()
     val g = global
     val run = new g.Run
-    run.compileSources(List(toSource(input)))
-    report(vreporter, input, edit)
+    val inputs = input :: fileImports.map(_.toInput)
+    run.compileSources(inputs.map(toSource))
+    report(vreporter, input, edit, fileImports)
   }
 
   def compile(
@@ -220,10 +236,11 @@ class MarkdownCompiler(
       vreporter: Reporter,
       edit: TokenEditDistance,
       className: String,
+      fileImports: List[FileImport],
       retry: Int = 0
   ): Option[Class[_]] = {
     reset()
-    compileSources(input, vreporter, edit)
+    compileSources(input, vreporter, edit, fileImports)
     if (!sreporter.hasErrors) {
       val loader = new AbstractFileClassLoader(target, appClassLoader)
       try {
@@ -232,7 +249,7 @@ class MarkdownCompiler(
         case _: ClassNotFoundException =>
           if (retry < 1) {
             reset()
-            compile(input, vreporter, edit, className, retry + 1)
+            compile(input, vreporter, edit, className, fileImports, retry + 1)
           } else {
             vreporter.error(
               s"${input.syntax}: skipping file, the compiler produced no classfiles " +
@@ -274,33 +291,61 @@ class MarkdownCompiler(
 
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
-  private def report(vreporter: Reporter, input: Input, edit: TokenEditDistance): Unit = {
-    sreporter.infos.foreach {
+  private def report(
+      vreporter: Reporter,
+      input: Input,
+      edit: TokenEditDistance,
+      fileImports: List[FileImport]
+  ): Unit = {
+    val infos = sreporter.infos.toSeq.sortBy(_.pos.source.path)
+    infos.foreach {
       case sreporter.Info(pos, msgOrNull, severity) =>
         val msg = nullableMessage(msgOrNull)
-        val mpos = toMetaPosition(edit, pos)
+        val actualEdit =
+          if (pos.source.file.name.endsWith(".sc")) {
+            fileImports
+              .collectFirst {
+                case fileImport if fileImport.path.toNIO.endsWith(pos.source.file.name) =>
+                  fileImport.edit
+              }
+              .flatten
+              .getOrElse(edit)
+          } else {
+            edit
+          }
+        val mpos = toMetaPosition(actualEdit, pos)
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent
             if (line.nonEmpty) {
-              new CodeBuilder()
-                .println(s"${input.syntax}:${pos.line} (mdoc generated code) $msg")
-                .println(pos.lineContent)
-                .println(pos.lineCaret)
-                .toString
+              formatMessage(pos, msg)
             } else {
               msg
             }
           } else {
             msg
           }
-        severity match {
-          case sreporter.ERROR => vreporter.error(mpos, actualMessage)
-          case sreporter.INFO => vreporter.info(mpos, actualMessage)
-          case sreporter.WARNING => vreporter.warning(mpos, actualMessage)
-        }
+        reportMessage(vreporter, severity, mpos, actualMessage)
       case _ =>
     }
   }
+
+  private def reportMessage(
+      vreporter: Reporter,
+      severity: sreporter.Severity,
+      mpos: Position,
+      message: String
+  ): Unit = severity match {
+    case sreporter.ERROR => vreporter.error(mpos, message)
+    case sreporter.INFO => vreporter.info(mpos, message)
+    case sreporter.WARNING => vreporter.warning(mpos, message)
+    case _ =>
+  }
+  private def formatMessage(pos: GPosition, message: String): String =
+    new CodeBuilder()
+      .println(s"${pos.source.file.path}:${pos.line + 1} (mdoc generated code) $message")
+      .println(pos.lineContent)
+      .println(pos.lineCaret)
+      .toString
 
 }
