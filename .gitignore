@@ -25,6 +25,11 @@ out/
 
 .mdoc/
 
+# Metals specific
+.metals/
+.bloop/
+project/metals.sbt
+
 website/translated_docs
 website/build/
 website/yarn.lock

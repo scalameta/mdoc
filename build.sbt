@@ -1,6 +1,6 @@
 def scala212 = "2.12.11"
 def scala211 = "2.11.12"
-def scala213 = "2.13.1"
+def scala213 = "2.13.2"
 def scalajs = "0.6.32"
 def scalajsBinaryVersion = "0.6"
 def scalajsDom = "1.0.0"
