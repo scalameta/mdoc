@@ -134,7 +134,7 @@ https://travis-ci.org/scalameta/mdoc/settings.
 
 Add the following values:
 
-- `GITHUB_DEPLOY_KEY`: the base64 encoded secret key. Note, the secret key is
+- `GITHUB_DEPLOY_KEY` or `DEPLOY_KEY`: the base64 encoded secret key. Note, the secret key is
   the file without the `.pub` extension
   ```sh
   # macOS
