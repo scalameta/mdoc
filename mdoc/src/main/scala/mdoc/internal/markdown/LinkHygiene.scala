@@ -2,7 +2,7 @@ package mdoc.internal.markdown
 
 import java.net.URI
 import mdoc.Reporter
-import me.xdrop.fuzzywuzzy.FuzzySearch
+import metaconfig.internal.Levenshtein
 
 object LinkHygiene {
   def lint(docs: List[DocumentLinks], reporter: Reporter, verbose: Boolean): Unit = {
@@ -18,19 +18,13 @@ object LinkHygiene {
       val isAbsolutePath = uri.getPath.startsWith("/")
       val debug =
         if (verbose) {
-          val query = uri.toString
-          val candidates = isValidHeading
-            .map { candidate =>
-              val score = FuzzySearch.ratio(candidate.toString, query)
-              score -> f"$score%-3s $candidate"
-            }
-            .toSeq
-            .sortBy(-_._1)
-            .map(_._2)
-            .mkString("\n  ")
-          s"\nisValidHeading:\n  $candidates"
-        } else ""
-      val help = getSimilarHeading(isValidHeading, uri) match {
+          val headings = isValidHeading.map(_.toString()).toSeq.sorted.mkString("\n  ")
+          s"\nisValidHeading:\n  ${headings}"
+        } else {
+          ""
+        }
+      val candidates = isValidHeading.map(_.toString()).toSeq
+      val help = closestCandidate(uri.toString(), candidates) match {
         case None => "."
         case Some(similar) => s", did you mean '$similar'?"
       }
@@ -42,16 +36,23 @@ object LinkHygiene {
     }
   }
 
-  private def getSimilarHeading(candidates: Set[URI], query: URI): Option[URI] = {
-    val queryString = query.toString
-    val similar = for {
-      candidate <- candidates.iterator
-      score = FuzzySearch.ratio(queryString, candidate.toString)
-      if score > 90 // discard noisy candidates
-    } yield score -> candidate
-    if (similar.isEmpty) None
-    else Some(similar.maxBy(_._1)._2)
+  def closestCandidate(
+      query: String,
+      candidates: Seq[String]
+  ): Option[String] = {
+    if (candidates.isEmpty) {
+      None
+    } else {
+      val candidate = candidates.sortBy(Levenshtein.distance(query)).head
+      val maxLength = query.length() + candidate.length()
+      val minDifference = math.abs(query.length() - candidate.length())
+      val difference = Levenshtein.distance(candidate)(query).toDouble - minDifference
+      val ratio = (maxLength - difference).toDouble / maxLength
+      if (ratio > 0.9) Some(candidate)
+      else None // Don't return candidate when difference is large.
+    }
   }
+
   private def resolve(baseUri: URI, reference: String): Option[URI] = {
     try {
       Some(baseUri.resolve(reference).normalize())
