@@ -54,7 +54,7 @@ object DocusaurusPlugin extends AutoPlugin {
     """|#!/usr/bin/env bash
        |
        |set -eu
-       |
+       |DEPLOY_KEY=${GIT_DEPLOY_KEY:-$GITHUB_DEPLOY_KEY}
        |set-up-ssh() {
        |  echo "Setting up ssh..."
        |  mkdir -p $HOME/.ssh
@@ -63,15 +63,16 @@ object DocusaurusPlugin extends AutoPlugin {
        |  git config --global user.email "${MDOC_EMAIL:-mdoc@docusaurus}"
        |  git config --global push.default simple
        |  DEPLOY_KEY_FILE=$HOME/.ssh/id_rsa
-       |  echo "$GITHUB_DEPLOY_KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
+       |  echo "$DEPLOY_KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
        |  chmod 600 ${DEPLOY_KEY_FILE}
        |  eval "$(ssh-agent -s)"
        |  ssh-add ${DEPLOY_KEY_FILE}
        |}
-       |DEPLOY_KEY=${GITHUB_DEPLOY_KEY:-}
        |
-       |if [[ -n "$DEPLOY_KEY" ]]; then
+       |if [[ -n "${DEPLOY_KEY:-}" ]]; then
        |  set-up-ssh
+       |else
+       |  echo "Can't setup SSH. To fix this problem, set the GIT_DEPLOY_KEY environment variable."
        |fi
        |
        |yarn install
