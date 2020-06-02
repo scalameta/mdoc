@@ -4,7 +4,6 @@ import com.vladsch.flexmark.ast.FencedCodeBlock
 import com.vladsch.flexmark.util.ast
 import com.vladsch.flexmark.parser.block.DocumentPostProcessor
 import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
-import com.vladsch.flexmark.util.options.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
 import java.util
