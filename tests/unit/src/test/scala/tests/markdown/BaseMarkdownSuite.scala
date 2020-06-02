@@ -1,6 +1,5 @@
 package tests.markdown
 
-import com.vladsch.flexmark.util.options.MutableDataSet
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files

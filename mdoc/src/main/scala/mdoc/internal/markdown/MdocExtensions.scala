@@ -1,6 +1,5 @@
 package mdoc.internal.markdown
 
-import com.vladsch.flexmark.Extension
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.ext.definition.DefinitionExtension
 import com.vladsch.flexmark.ext.emoji.EmojiExtension
@@ -11,6 +10,7 @@ import com.vladsch.flexmark.ext.toc.SimTocExtension
 import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.ext.wikilink.WikiLinkExtension
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension
+import com.vladsch.flexmark.util.misc.Extension
 import mdoc.internal.cli.Context
 
 object MdocExtensions {
