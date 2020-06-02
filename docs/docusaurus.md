@@ -62,9 +62,9 @@ several steps:
   http://static.javadoc.io/
 
 The static website gets generated in the `website/build` directory. You can copy
-these files over to any static HTTP server to host your website. A simple `sbt docs/clean`
-will delete the previous folder since the `DocusaurusPlugin` will also bind it to the
-standard SBT `clean` task. 
+these files over to any static HTTP server to host your website. A simple
+`sbt docs/clean` will delete the previous folder since the `DocusaurusPlugin`
+will also bind it to the standard SBT `clean` task.
 
 ## Publish to GitHub pages locally
 
@@ -134,8 +134,8 @@ https://travis-ci.org/scalameta/mdoc/settings.
 
 Add the following values:
 
-- `GITHUB_DEPLOY_KEY` or `DEPLOY_KEY`: the base64 encoded secret key. Note, the secret key is
-  the file without the `.pub` extension
+- `GITHUB_DEPLOY_KEY` or `GIT_DEPLOY_KEY`: the base64 encoded secret key. Note,
+  the secret key is the file without the `.pub` extension
   ```sh
   # macOS
   cat myproject | base64 | pbcopy
@@ -184,7 +184,9 @@ docs 😎
 
 ## Include Scaladoc in site
 
-You can configure a project to include Scaladocs in its site. Below is an example configuration that uses [sbt-unidoc](https://github.com/sbt/sbt-unidoc) to aggregate Scaladocs across multiple projects.
+You can configure a project to include Scaladocs in its site. Below is an
+example configuration that uses [sbt-unidoc](https://github.com/sbt/sbt-unidoc)
+to aggregate Scaladocs across multiple projects.
 
 ```diff
  // build.sbt
@@ -202,9 +204,13 @@ You can configure a project to include Scaladocs in its site. Below is an exampl
    .dependsOn(myproject1, myproject2)
 ```
 
-Make sure that you've added the [sbt-unidoc](https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin) dependency to `project/plugins.sbt`.
+Make sure that you've added the
+[sbt-unidoc](https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin)
+dependency to `project/plugins.sbt`.
 
-Now the `docs/docusaurusCreateSite` command will generate Scaladocs in the `website/static/api` directory, which you'll probably want to add to your `.gitignore`:
+Now the `docs/docusaurusCreateSite` command will generate Scaladocs in the
+`website/static/api` directory, which you'll probably want to add to your
+`.gitignore`:
 
 ```diff
   // .gitignore
@@ -217,7 +223,8 @@ Now the `docs/docusaurusCreateSite` command will generate Scaladocs in the `webs
 + website/static/api
 ```
 
-You'll need to tweak your `siteConfig.js` file to make Docusaurus play nicely with Scaladoc's CSS. You may want to add a header link to your API docs too:
+You'll need to tweak your `siteConfig.js` file to make Docusaurus play nicely
+with Scaladoc's CSS. You may want to add a header link to your API docs too:
 
 ```diff
   // website/siteConfig.js

@@ -54,9 +54,8 @@ object DocusaurusPlugin extends AutoPlugin {
     """|#!/usr/bin/env bash
        |
        |set -eu
-       |
+       |DEPLOY_KEY=${GIT_DEPLOY_KEY:-$GITHUB_DEPLOY_KEY}
        |set-up-ssh() {
-       |  KEY=$1
        |  echo "Setting up ssh..."
        |  mkdir -p $HOME/.ssh
        |  ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
@@ -64,18 +63,17 @@ object DocusaurusPlugin extends AutoPlugin {
        |  git config --global user.email "${MDOC_EMAIL:-mdoc@docusaurus}"
        |  git config --global push.default simple
        |  DEPLOY_KEY_FILE=$HOME/.ssh/id_rsa
-       |  echo "$KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
+       |  echo "$DEPLOY_KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
        |  chmod 600 ${DEPLOY_KEY_FILE}
        |  eval "$(ssh-agent -s)"
        |  ssh-add ${DEPLOY_KEY_FILE}
        |}
        |
-       | if [[ -n "${GITHUB_DEPLOY_KEY:-}" ]]; then
-       | set-up-ssh ${GITHUB_DEPLOY_KEY}
-       | elif [[ -n "${DEPLOY_KEY:-}" ]]; then
-       | echo "Using fallback env var DEPLOY_KEY."
-       | set-up-ssh ${DEPLOY_KEY}
-       | fi
+       |if [[ -n "${DEPLOY_KEY:-}" ]]; then
+       |  set-up-ssh
+       |else
+       |  echo "Can't setup SSH. To fix this problem, set the GIT_DEPLOY_KEY environment variable."
+       |fi
        |
        |yarn install
        |USE_SSH=true yarn publish-gh-pages
