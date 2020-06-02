@@ -121,7 +121,6 @@ lazy val mdoc = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.40.34",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
       "io.methvin" % "directory-watcher" % "0.9.10",
-      "me.xdrop" % "fuzzywuzzy" % "1.2.0", // for link hygiene "did you mean?"
       // live reload
       "io.undertow" % "undertow-core" % "2.1.1.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",

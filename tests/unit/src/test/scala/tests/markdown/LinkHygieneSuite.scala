@@ -12,7 +12,12 @@ import mdoc.internal.markdown.LinkHygiene
 class LinkHygieneSuite extends FunSuite {
   private val myOut = new ByteArrayOutputStream()
   private val reporter = new ConsoleReporter(new PrintStream(myOut))
-  def check(name: String, original: String, expected: String, verbose: Boolean = false): Unit = {
+  def check(
+      name: String,
+      original: String,
+      expected: String,
+      verbose: Boolean = false
+  )(implicit loc: munit.Location): Unit = {
     test(name) {
       myOut.reset()
       reporter.reset()
@@ -106,10 +111,10 @@ class LinkHygieneSuite extends FunSuite {
       |/a.md
       |[absolute](/absolute.md)
     """.stripMargin,
-    """|warning: a.md:1:1: Unknown link '/absolute.md'. To fix this problem, either make the link relative or turn it into complete URL such as http://example.com/absolute.md.
+    """|warning: a.md:1:1: Unknown link '/absolute.md', did you mean 'a.md'? To fix this problem, either make the link relative or turn it into complete URL such as http://example.com/absolute.md.
        |[absolute](/absolute.md)
        |^^^^^^^^^^^^^^^^^^^^^^^^
-    """.stripMargin
+       |""".stripMargin
   )
 
   check(
@@ -123,10 +128,10 @@ class LinkHygieneSuite extends FunSuite {
     """.stripMargin,
     """|warning: a.md:2:1: Unknown link 'b.md#header', did you mean 'b.md#header-2'?
        |isValidHeading:
-       |  92  b.md#header-2
-       |  83  a.md#header-1
-       |  53  b.md
-       |  40  a.md
+       |  a.md
+       |  a.md#header-1
+       |  b.md
+       |  b.md#header-2
        |[2](b.md#header)
        |^^^^^^^^^^^^^^^^
        |""".stripMargin,
