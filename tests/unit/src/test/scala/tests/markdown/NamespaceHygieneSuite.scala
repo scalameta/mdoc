@@ -22,12 +22,11 @@ class NamespaceHygieneSuite extends BaseMarkdownSuite {
        |val x = MdocSession.nextInt(1)
        |```""".stripMargin,
     """|error: cannot import something called MdocSession.md:3:9: reference to MdocSession is ambiguous;
-      |it is both defined in package repl and imported subsequently by
-      |import scala.util.{Random=>MdocSession}
-      |val x = MdocSession.nextInt(1)
-      |        ^^^^^^^^^^^
-      |""".stripMargin
+       |it is both defined in package repl and imported subsequently by
+       |import scala.util.{Random=>MdocSession}
+       |val x = MdocSession.nextInt(1)
+       |        ^^^^^^^^^^^
+       |""".stripMargin
   )
-
 
 }
