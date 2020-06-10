@@ -216,9 +216,9 @@ class WorksheetSuite extends FunSuite {
       |crash(filename)
       |""".stripMargin,
     """|crash:4:1: error: java.lang.RuntimeException: boom
-       |	at repl.Session$App.crash(crash.scala:8)
-       |	at repl.Session$App.<init>(crash.scala:14)
-       |	at repl.Session$.app(crash.scala:3)
+       |	at repl.MdocSession$App.crash(crash.scala:8)
+       |	at repl.MdocSession$App.<init>(crash.scala:14)
+       |	at repl.MdocSession$.app(crash.scala:3)
        |
        |crash(filename)
        |^^^^^^^^^^^^^^^

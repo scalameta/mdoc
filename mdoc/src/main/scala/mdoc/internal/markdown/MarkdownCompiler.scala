@@ -49,7 +49,7 @@ object MarkdownCompiler {
       compileInput,
       reporter,
       edit,
-      "repl.Session$",
+      "repl.MdocSession$",
       instrumented.fileImports
     )
     val doc = compiled match {
