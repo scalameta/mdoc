@@ -19,7 +19,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   }
   private def printAsScript(): Unit = {
     sb.println("package repl")
-    sb.println("object Session {")
+    sb.println("object MdocSession {")
     sb.println("  object App {")
     sections.zipWithIndex.foreach {
       case (section, j) =>

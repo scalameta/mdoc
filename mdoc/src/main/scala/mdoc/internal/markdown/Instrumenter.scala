@@ -161,7 +161,7 @@ object Instrumenter {
   def wrapBody(body: String): String = {
     val wrapped = new StringBuilder()
       .append("package repl\n")
-      .append("object Session extends _root_.mdoc.internal.document.DocumentBuilder {\n")
+      .append("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder {\n")
       .append("  def app(): _root_.scala.Unit = {val _ = new App()}\n")
       .append("  class App {\n")
       .append(body)

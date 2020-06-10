@@ -14,8 +14,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |???
        |// scala.NotImplementedError: an implementation is missing
        |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |// 	at repl.Session$App$$anonfun$2.apply(basic.md:14)
-       |// 	at repl.Session$App$$anonfun$2.apply(basic.md:14)
+       |// 	at repl.MdocSession$App$$anonfun$2.apply(basic.md:14)
+       |// 	at repl.MdocSession$App$$anonfun$2.apply(basic.md:14)
        |```
     """.stripMargin
   )
@@ -62,7 +62,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |  case 2 => // boom!
        |}
        |// scala.MatchError: 1 (of class java.lang.Integer)
-       |// 	at repl.Session$App$$anonfun$1.apply(comments.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(comments.md:9)
        |```
     """.stripMargin
   )
@@ -78,8 +78,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |???
        |// scala.NotImplementedError: an implementation is missing
        |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |// 	at repl.Session$App$$anonfun$1.apply(relative.md:9)
-       |// 	at repl.Session$App$$anonfun$1.apply(relative.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
        |```
     """.stripMargin
   )
@@ -94,8 +94,8 @@ class CrashSuite extends BaseMarkdownSuite {
     """|```scala
        |throw new StackOverflowError()
        |// java.lang.StackOverflowError
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal.md:9)
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal.md:9)
        |```
        |""".stripMargin
   )
@@ -110,8 +110,8 @@ class CrashSuite extends BaseMarkdownSuite {
     """|```scala
        |throw new NoClassDefFoundError()
        |// java.lang.NoClassDefFoundError
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal2.md:9)
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal2.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal2.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal2.md:9)
        |```
        |""".stripMargin
   )
@@ -126,8 +126,8 @@ class CrashSuite extends BaseMarkdownSuite {
     """|```scala
        |throw new NoSuchMethodError()
        |// java.lang.NoSuchMethodError
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal3.md:9)
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal3.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal3.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal3.md:9)
        |```
        |""".stripMargin
   )
@@ -142,8 +142,8 @@ class CrashSuite extends BaseMarkdownSuite {
     """|```scala
        |throw new IncompatibleClassChangeError()
        |// java.lang.IncompatibleClassChangeError
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal4.md:9)
-       |// 	at repl.Session$App$$anonfun$1.apply(fatal4.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal4.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal4.md:9)
        |```
        |""".stripMargin
   )

@@ -34,8 +34,8 @@ class AsyncSuite extends BaseMarkdownSuite {
        |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:220)
        |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:57)
        |	at scala.concurrent.Await$.result(package.scala:146)
-       |	at repl.Session$App.<init>(timeout.md:11)
-       |	at repl.Session$.app(timeout.md:3)
+       |	at repl.MdocSession$App.<init>(timeout.md:11)
+       |	at repl.MdocSession$.app(timeout.md:3)
        |""".stripMargin,
     compat = Map(
       "2.11" ->
@@ -48,8 +48,8 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$$anonfun$result$1.apply(package.scala:190)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:53)
            |	at scala.concurrent.Await$.result(package.scala:190)
-           |	at repl.Session$App.<init>(timeout.md:11)
-           |	at repl.Session$.app(timeout.md:3)
+           |	at repl.MdocSession$App.<init>(timeout.md:11)
+           |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
       "2.13" ->
         """|error: timeout.md:4:1: Future timed out after [10 milliseconds]
@@ -61,8 +61,8 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:201)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
            |	at scala.concurrent.Await$.result(package.scala:124)
-           |	at repl.Session$App.<init>(timeout.md:11)
-           |	at repl.Session$.app(timeout.md:3)
+           |	at repl.MdocSession$App.<init>(timeout.md:11)
+           |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin
     )
   )
