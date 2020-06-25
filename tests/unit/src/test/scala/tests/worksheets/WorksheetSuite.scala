@@ -238,4 +238,20 @@ class WorksheetSuite extends FunSuite {
        |""".stripMargin
   )
 
+  checkDecorations(
+    "fastparse",
+    """
+      |import $dep.`com.lihaoyi::fastparse:2.3.0`
+      |import fastparse._, MultiLineWhitespace._
+      |def p[_:P] = P("a")
+      |parse("a", p(_))
+      |""".stripMargin,
+    """|import $dep.`com.lihaoyi::fastparse:2.3.0`
+       |import fastparse._, MultiLineWhitespace._
+       |def p[_:P] = P("a")
+       |<parse("a", p(_))> // Success((), 1)
+       |res0: Parsed[Unit] = Success((), 1)
+       |""".stripMargin
+  )
+
 }
