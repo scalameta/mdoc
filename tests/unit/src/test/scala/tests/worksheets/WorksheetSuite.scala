@@ -8,8 +8,10 @@ import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import mdoc.internal.pos.PositionSyntax._
 import java.{util => ju}
+import tests.BaseSuite
+import munit.TestOptions
 
-class WorksheetSuite extends FunSuite {
+class WorksheetSuite extends BaseSuite {
   var mdoc = ju.ServiceLoader
     .load(classOf[Mdoc], this.getClass().getClassLoader())
     .iterator()
@@ -21,14 +23,14 @@ class WorksheetSuite extends FunSuite {
   }
 
   def checkDiagnostics(
-      name: String,
+      options: TestOptions,
       original: String,
       expected: String
   ): Unit = {
-    test(name) {
-      val filename = name + ".scala"
+    test(options) {
+      val filename = options.name + ".scala"
       val worksheet = mdoc.evaluateWorksheet(filename, original)
-      val input = Input.VirtualFile(name, original)
+      val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
       var i = 0
       val diagnostics =
@@ -51,15 +53,15 @@ class WorksheetSuite extends FunSuite {
   }
 
   def checkDecorations(
-      name: String,
+      options: TestOptions,
       original: String,
       expected: String
   ): Unit = {
-    test(name) {
-      val filename = name + ".scala"
+    test(options) {
+      val filename = options.name + ".scala"
       val worksheet = mdoc.evaluateWorksheet(filename, original)
       val statements = worksheet.statements().asScala.sortBy(_.position().startLine())
-      val input = Input.VirtualFile(name, original)
+      val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
       var i = 0
       statements.foreach { stat =>
@@ -239,7 +241,7 @@ class WorksheetSuite extends FunSuite {
   )
 
   checkDecorations(
-    "fastparse",
+    "fastparse".tag(SkipScala211),
     """
       |import $dep.`com.lihaoyi::fastparse:2.3.0`
       |import fastparse._, MultiLineWhitespace._
