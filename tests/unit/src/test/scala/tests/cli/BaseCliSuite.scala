@@ -47,7 +47,7 @@ abstract class BaseCliSuite extends BaseSuite {
       expectedExitCode: => Int = 0,
       onStdout: String => Unit = _ => (),
       includeOutputPath: RelativePath => Boolean = _ => true
-  ): Unit = {
+  )(implicit loc: munit.Location): Unit = {
     test(name) {
       myStdout.reset()
       StringFS.fromString(original, in())

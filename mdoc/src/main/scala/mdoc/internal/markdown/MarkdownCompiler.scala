@@ -94,7 +94,16 @@ object MarkdownCompiler {
       if (classpath.isEmpty) defaultClasspath(_ => true)
       else {
         val base = Classpath(classpath)
-        val runtime = defaultClasspath(path => path.toString.contains("mdoc-runtime"))
+        val runtime = defaultClasspath(path => {
+          val pathString = path.toString
+          pathString.contains("scala-library") ||
+          pathString.contains("scala-reflect") ||
+          pathString.contains("sourcecode") ||
+          pathString.contains("fansi") ||
+          pathString.contains("pprint") ||
+          pathString.contains("mdoc-interfaces") ||
+          (pathString.contains("mdoc") && pathString.contains("runtime"))
+        })
         base ++ runtime
       }
     new MarkdownCompiler(fullClasspath.syntax, scalacOptions)
@@ -102,8 +111,9 @@ object MarkdownCompiler {
 
   private def defaultClasspath(fn: Path => Boolean): Classpath = {
     val paths =
-      getURLs(getClass.getClassLoader)
+      getURLs(getClass.getClassLoader).iterator
         .map(url => AbsolutePath(Paths.get(url.toURI)))
+        .filter(p => fn(p.toNIO))
     Classpath(paths.toList)
   }
 
