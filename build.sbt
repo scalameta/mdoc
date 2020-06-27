@@ -122,7 +122,7 @@ lazy val mdoc = project
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
       "io.methvin" % "directory-watcher" % "0.9.10",
       // live reload
-      "io.undertow" % "undertow-core" % "2.1.1.Final",
+      "io.undertow" % "undertow-core" % "2.1.3.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
