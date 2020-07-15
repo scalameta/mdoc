@@ -99,10 +99,11 @@ lazy val mdoc = project
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
     test in assembly := {},
-    assemblyMergeStrategy.in(assembly) ~= { old => {
-      case PathList("META-INF", "CHANGES") => MergeStrategy.discard
-      case x => old(x)
-    }
+    assemblyMergeStrategy.in(assembly) ~= { old =>
+      {
+        case PathList("META-INF", "CHANGES") => MergeStrategy.discard
+        case x => old(x)
+      }
     },
     fork in run := true,
     buildInfoPackage := "mdoc.internal",
