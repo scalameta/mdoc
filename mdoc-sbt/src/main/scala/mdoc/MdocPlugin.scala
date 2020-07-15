@@ -186,7 +186,7 @@ object MdocPlugin extends AutoPlugin {
         fullClasspath.in(ref, Compile).value.map(_.data),
         classloadedSetting(
           ref,
-          "org.scalajs.core.tools.linker.backend.ModuleKind",
+          "org.scalajs.linker.interface.ModuleKind",
           "scalaJSModuleKind"
         ).value.map(_.toString)
       )

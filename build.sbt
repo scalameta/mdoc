@@ -1,8 +1,8 @@
 def scala212 = "2.12.11"
 def scala211 = "2.11.12"
 def scala213 = "2.13.2"
-def scalajs = "0.6.32"
-def scalajsBinaryVersion = "0.6"
+def scalajs = "1.1.1"
+def scalajsBinaryVersion = "1.1"
 def scalajsDom = "1.0.0"
 inThisBuild(
   List(
@@ -99,11 +99,10 @@ lazy val mdoc = project
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
     test in assembly := {},
-    assemblyMergeStrategy.in(assembly) ~= { old =>
-      {
-        case PathList("META-INF", "CHANGES") => MergeStrategy.discard
-        case x => old(x)
-      }
+    assemblyMergeStrategy.in(assembly) ~= { old => {
+      case PathList("META-INF", "CHANGES") => MergeStrategy.discard
+      case x => old(x)
+    }
     },
     fork in run := true,
     buildInfoPackage := "mdoc.internal",
@@ -141,6 +140,10 @@ val isScala213 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
 }
 
+val isScalaJs1 = Def.setting {
+  VersionNumber(scalaJSVersion).matchesSemVer(SemanticSelector(">=1.0.0"))
+}
+
 def scala212LibraryDependencies(deps: List[ModuleID]) = List(
   libraryDependencies ++= {
     if (isScala213.value) Nil
@@ -153,9 +156,11 @@ val jsdocs = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+    },
     libraryDependencies ++= {
-      if (isScala213.value) Nil
+      if (isScala213.value || isScalaJs1.value) Nil
       else
         List(
           "in.nvilla" %%% "monadic-html" % "0.4.0-RC1"
@@ -245,7 +250,8 @@ lazy val js = project
     scala212LibraryDependencies(
       List(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-tools" % scalajs
+        "org.scala-js" %% "scalajs-linker" % scalajs,
+        "org.scala-js" %% "scalajs-logging" % scalajs
       )
     )
   )

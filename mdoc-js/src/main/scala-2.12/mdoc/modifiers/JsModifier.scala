@@ -1,42 +1,31 @@
 package mdoc.modifiers
 
-import mdoc.OnLoadContext
-import mdoc.PostProcessContext
-import mdoc.PreModifierContext
+import mdoc.{OnLoadContext, PostProcessContext, PreModifierContext}
+import mdoc.internal.cli.InputFile
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.livereload.Resources
-import mdoc.internal.markdown.CodeBuilder
-import mdoc.internal.markdown.Gensym
-import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.{CodeBuilder, Gensym, MarkdownCompiler}
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
-import org.scalajs.core.tools.io.IRFileCache
-import org.scalajs.core.tools.io.IRFileCache.VirtualRelativeIRFile
-import org.scalajs.core.tools.io.MemVirtualSerializedScalaJSIRFile
-import org.scalajs.core.tools.io.VirtualScalaJSIRFile
-import org.scalajs.core.tools.io.WritableMemVirtualJSFile
-import org.scalajs.core.tools.linker.Linker
-import org.scalajs.core.tools.linker.StandardLinker
-import org.scalajs.core.tools.logging.Level
-import org.scalajs.core.tools.logging.Logger
-import org.scalajs.core.tools.sem.Semantics
+import org.scalajs.linker.interface.{IRContainer, Linker, Semantics}
+import org.scalajs.linker.standard.StandardIRFileCache
+import org.scalajs.logging.{Level, Logger}
+
 import scala.collection.mutable.ListBuffer
 import scala.meta.Term
 import scala.meta.inputs.Input
-import scala.meta.io.Classpath
+import scala.meta.io.{AbsolutePath, Classpath}
 import scala.reflect.io.VirtualDirectory
-import mdoc.internal.cli.InputFile
-import scala.meta.io.AbsolutePath
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
   override def toString: String = s"JsModifier($config)"
-  val irCache = new IRFileCache
+  val irCache = new StandardIRFileCache
   val target = new VirtualDirectory("(memory)", None)
   var maybeCompiler: Option[MarkdownCompiler] = None
   var config = JsConfig()
   var linker: Linker = newLinker()
-  var virtualIrFiles: Seq[VirtualRelativeIRFile] = Nil
+  var virtualIrFiles: Seq[IRContainer] = Nil
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
