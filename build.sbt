@@ -120,7 +120,7 @@ lazy val mdoc = project
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.0",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.9.10",
+      "io.methvin" % "directory-watcher" % "0.10.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.1.1.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
