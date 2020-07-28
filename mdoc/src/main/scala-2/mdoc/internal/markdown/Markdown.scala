@@ -7,9 +7,11 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.ast.Document
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.ast.NodeVisitor
+import com.vladsch.flexmark.util.ast.Visitor
 import com.vladsch.flexmark.util.ast.VisitHandler
 import com.vladsch.flexmark.util.data.DataKey
 import com.vladsch.flexmark.util.data.MutableDataSet
+import com.vladsch.flexmark.util.misc.Extension
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -37,14 +39,18 @@ object Markdown {
     */
   def mdocSettings(context: Context): MutableDataSet = {
     // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
+    val key: DataKey[java.util.Collection[Extension]] = Parser.EXTENSIONS
+    val value: java.util.Collection[Extension] = MdocExtensions.mdoc(context).asJava
     baseSettings()
-      .set(Parser.EXTENSIONS, MdocExtensions.mdoc(context).asJava)
+      .set(key, value)
       .set(SiteVariables, Some(context.settings.site))
   }
 
   def plainSettings(): MutableDataSet = {
+    val key: DataKey[java.util.Collection[Extension]] = Parser.EXTENSIONS
+    val value: java.util.Collection[Extension] = MdocExtensions.plain.asJava
     baseSettings()
-      .set(Parser.EXTENSIONS, MdocExtensions.plain.asJava)
+      .set(key, value)
   }
 
   def baseSettings(): MutableDataSet = {
@@ -151,10 +157,12 @@ object Markdown {
     val lifted = f.lift
     val clazz = ev.runtimeClass.asInstanceOf[Class[T]]
     class Madness {
-      val visitor = new NodeVisitor(new VisitHandler[T](clazz, visit))
-      def visit(e: T): Unit = {
-        lifted.apply(e)
-        visitor.visitChildren(e)
+      val visitor = new NodeVisitor(new VisitHandler[T](clazz, new MadnessVisitor))
+      class MadnessVisitor extends Visitor[T] {
+        def visit(e: T): Unit = {
+          lifted.apply(e)
+          visitor.visitChildren(e)
+        }
       }
     }
     new Madness().visitor.visit(node)

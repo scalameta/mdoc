@@ -41,7 +41,7 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
 
   def shutdown(): Unit = {
     if (myContext != null) {
-      myContext.compiler.global.close()
+      myContext.compiler.shutdown()
       usedDummy()
     }
   }
@@ -49,7 +49,7 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
   def evaluateWorksheet(filename: String, text: String): EvaluatedWorksheet =
     new WorksheetProvider(settings.settings).evaluateWorksheet(
       Input.VirtualFile(filename, text),
-      context
+      context()
     )
 
   private def context(): Context = {

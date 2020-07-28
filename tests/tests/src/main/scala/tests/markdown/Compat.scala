@@ -1,6 +1,6 @@
 package tests.markdown
 
-import mdoc.internal.BuildInfo
+import tests.BuildInfo
 
 object Compat {
   def isScala212: Boolean = BuildInfo.scalaVersion.startsWith("2.12")

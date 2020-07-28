@@ -28,7 +28,8 @@ out/
 # Metals specific
 .metals/
 .bloop/
-project/metals.sbt
+metals.sbt
+.vscode/
 
 website/translated_docs
 website/build/

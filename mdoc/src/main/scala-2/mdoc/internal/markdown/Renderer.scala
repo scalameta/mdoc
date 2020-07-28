@@ -32,7 +32,7 @@ object Renderer {
       sections.map(s => SectionInput(s, MdocDialect.scala(s).parse[Source].get, Modifier.Default()))
     val instrumented = Instrumenter.instrument(file, inputs, settings, reporter)
     val doc =
-      MarkdownCompiler.buildDocument(
+      MarkdownBuilder.buildDocument(
         compiler,
         reporter,
         inputs,

@@ -11,7 +11,6 @@ import mdoc.Reporter
 import scala.meta.Importer
 import mdoc.internal.cli.InputFile
 import scala.collection.mutable
-import mdoc.internal.cli.Settings
 import scala.meta.inputs.Position
 import mdoc.internal.pos.TokenEditDistance
 import scala.meta.Import
@@ -59,13 +58,12 @@ final case class FileImport(
 }
 object FileImport {
   class Matcher(
-      settings: Settings,
       file: InputFile,
       reporter: Reporter
   ) {
     def unapply(importer: Importer): Option[List[FileImport]] = importer match {
       case importer @ Importer(qual, importees) if isFileQualifier(qual) =>
-        val parsed = FileImport.fromImportees(file.inputFile, qual, importees, reporter, settings)
+        val parsed = FileImport.fromImportees(file.inputFile, qual, importees, reporter)
         if (parsed.forall(_.isDefined)) Some(parsed.map(_.get))
         else None
       case _ =>
@@ -82,14 +80,13 @@ object FileImport {
       base: AbsolutePath,
       qual: Term,
       importees: List[Importee],
-      reporter: Reporter,
-      settings: Settings
+      reporter: Reporter
   ): List[Option[FileImport]] = {
     importees.collect {
       case Importee.Name(name: Name.Indeterminate) =>
-        fromImport(base, qual, name, reporter, settings)
+        fromImport(base, qual, name, reporter)
       case Importee.Rename(name: Name.Indeterminate, _) =>
-        fromImport(base, qual, name, reporter, settings)
+        fromImport(base, qual, name, reporter)
       case i @ Importee.Wildcard() =>
         reporter.error(
           i.pos,
@@ -110,8 +107,7 @@ object FileImport {
       base: AbsolutePath,
       qual: Term,
       fileImport: Name.Indeterminate,
-      reporter: Reporter,
-      settings: Settings
+      reporter: Reporter
   ): Option[FileImport] = {
     def loop(path: Path, parts: List[String]): Path = parts match {
       case Nil => path

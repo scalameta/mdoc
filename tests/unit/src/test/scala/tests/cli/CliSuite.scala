@@ -43,7 +43,7 @@ class CliSuite extends BaseCliSuite {
     """.stripMargin,
     extraArgs = Array(
       "--classpath",
-      tests.BuildInfo.testsInputClassDirectory.getAbsolutePath
+      tests.cli.BuildInfo.testsInputClassDirectory.getAbsolutePath
     )
   )
 

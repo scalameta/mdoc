@@ -24,7 +24,7 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
   val files = mutable.Map.empty[AbsolutePath, FileImport]
 
   class Printable(inputFile: InputFile, parents: List[FileImport]) {
-    private val File = new FileImport.Matcher(settings, inputFile, reporter)
+    private val File = new FileImport.Matcher(inputFile, reporter)
     def unapply(importer: Importer): Option[List[FileImport]] = {
       importer match {
         case File(fileImports) =>

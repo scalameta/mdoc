@@ -10,7 +10,6 @@ import java.nio.file.Paths
 import mdoc.Reporter
 import mdoc.document.Document
 import mdoc.document._
-import mdoc.internal.document.DocumentBuilder
 import mdoc.internal.document.MdocNonFatal
 import mdoc.internal.pos.PositionSyntax
 import mdoc.internal.pos.PositionSyntax._
@@ -27,138 +26,9 @@ import scala.tools.nsc.Global
 import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
-import sun.misc.Unsafe
 import scala.annotation.implicitNotFound
-
-object MarkdownCompiler {
-
-  def default(): MarkdownCompiler = fromClasspath(classpath = "", scalacOptions = "")
-
-  def buildDocument(
-      compiler: MarkdownCompiler,
-      reporter: Reporter,
-      sectionInputs: List[SectionInput],
-      instrumented: Instrumented,
-      filename: String
-  ): EvaluatedDocument = {
-    val instrumentedInput = InstrumentedInput(filename, instrumented.source)
-    reporter.debug(s"$filename: instrumented code\n$instrumented")
-    val compileInput = Input.VirtualFile(filename, instrumented.source)
-    val edit = TokenEditDistance.fromTrees(sectionInputs.map(_.source), compileInput)
-    val compiled = compiler.compile(
-      compileInput,
-      reporter,
-      edit,
-      "repl.MdocSession$",
-      instrumented.fileImports
-    )
-    val doc = compiled match {
-      case Some(cls) =>
-        val ctor = cls.getDeclaredConstructor()
-        ctor.setAccessible(true)
-        val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
-        try {
-          doc.build(instrumentedInput)
-        } catch {
-          case e: DocumentException =>
-            val index = e.sections.length - 1
-            val input = sectionInputs(index).input
-            val pos =
-              if (e.pos.isEmpty) {
-                Position.Range(input, 0, 0)
-              } else {
-                val slice = Position.Range(
-                  input,
-                  e.pos.startLine,
-                  e.pos.startColumn,
-                  e.pos.endLine,
-                  e.pos.endColumn
-                )
-                slice.toUnslicedPosition
-              }
-            reporter.error(pos, e.getCause)
-            Document(instrumentedInput, e.sections)
-          case MdocNonFatal(e) =>
-            reporter.error(e)
-            Document.empty(instrumentedInput)
-        }
-      case None =>
-        // An empty document will render as the original markdown
-        Document.empty(instrumentedInput)
-    }
-    EvaluatedDocument(doc, sectionInputs)
-  }
-
-  def fromClasspath(classpath: String, scalacOptions: String): MarkdownCompiler = {
-    val fullClasspath =
-      if (classpath.isEmpty) defaultClasspath(_ => true)
-      else {
-        val base = Classpath(classpath)
-        val runtime = defaultClasspath(path => {
-          val pathString = path.toString
-          pathString.contains("scala-library") ||
-          pathString.contains("scala-reflect") ||
-          pathString.contains("sourcecode") ||
-          pathString.contains("fansi") ||
-          pathString.contains("pprint") ||
-          pathString.contains("mdoc-interfaces") ||
-          (pathString.contains("mdoc") && pathString.contains("runtime"))
-        })
-        base ++ runtime
-      }
-    new MarkdownCompiler(fullClasspath.syntax, scalacOptions)
-  }
-
-  private def defaultClasspath(fn: Path => Boolean): Classpath = {
-    val paths =
-      getURLs(getClass.getClassLoader).iterator
-        .map(url => AbsolutePath(Paths.get(url.toURI)))
-        .filter(p => fn(p.toNIO))
-    Classpath(paths.toList)
-  }
-
-  /**
-    * Utility to get SystemClassLoader/ClassLoader urls in java8 and java9+
-    *   Based upon: https://gist.github.com/hengyunabc/644f8e84908b7b405c532a51d8e34ba9
-    */
-  private def getURLs(classLoader: ClassLoader): Seq[URL] = {
-    if (classLoader.isInstanceOf[URLClassLoader]) {
-      classLoader.asInstanceOf[URLClassLoader].getURLs()
-      // java9+
-    } else if (classLoader
-        .getClass()
-        .getName()
-        .startsWith("jdk.internal.loader.ClassLoaders$")) {
-      try {
-        val field = classOf[Unsafe].getDeclaredField("theUnsafe")
-        field.setAccessible(true)
-        val unsafe = field.get(null).asInstanceOf[Unsafe]
-
-        // jdk.internal.loader.ClassLoaders.AppClassLoader.ucp
-        val ucpField = classLoader.getClass().getDeclaredField("ucp")
-        val ucpFieldOffset: Long = unsafe.objectFieldOffset(ucpField)
-        val ucpObject = unsafe.getObject(classLoader, ucpFieldOffset)
-
-        // jdk.internal.loader.URLClassPath.path
-        val pathField = ucpField.getType().getDeclaredField("path")
-        val pathFieldOffset = unsafe.objectFieldOffset(pathField)
-        val paths: Seq[URL] = unsafe
-          .getObject(ucpObject, pathFieldOffset)
-          .asInstanceOf[java.util.ArrayList[URL]]
-          .asScala
-
-        paths
-      } catch {
-        case ex: Exception =>
-          ex.printStackTrace()
-          Nil
-      }
-    } else {
-      Nil
-    }
-  }
-
-}
+import mdoc.internal.CompatClassloader
+import mdoc.internal.worksheets.Compat._
 
 class MarkdownCompiler(
     classpath: String,
@@ -200,6 +70,10 @@ class MarkdownCompiler(
   private def toSource(input: Input): BatchSourceFile = {
     val filename = Paths.get(input.syntax).getFileName.toString
     new BatchSourceFile(filename, new String(input.chars))
+  }
+
+  def shutdown(): Unit = {
+    global.close()
   }
 
   def fail(original: Seq[Tree], input: Input, sectionPos: Position): String = {

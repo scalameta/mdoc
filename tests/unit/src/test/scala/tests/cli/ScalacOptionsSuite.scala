@@ -160,6 +160,29 @@ class ScalacOptionsSuite extends BaseCliSuite {
     extraArgs = Array(
       "--scalac-options",
       "-Ywarn-value-discard"
+    ),
+    compat = Map(
+      "2.13" ->
+        """|/index.md
+           |```scala
+           |final case class Test(value: Int)
+           |
+           |val test = Test(123)
+           |// test: Test = Test(value = 123)
+           |
+           |test.value
+           |// res0: Int = 123
+           |```
+           |
+           |```scala
+           |val x: Int = "123"
+           |// error: type mismatch;
+           |//  found   : String("123")
+           |//  required: Int
+           |// val x: Int = "123"
+           |//              ^^^^^
+           |```
+           |""".stripMargin
     )
   )
 

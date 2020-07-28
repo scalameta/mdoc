@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 import mdoc.internal.markdown.SectionInput
 import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.Instrumenter
-import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.MarkdownBuilder
 import mdoc.document.Statement
 import mdoc.document.RangePosition
 import mdoc.internal.cli.Settings
@@ -14,7 +14,6 @@ import pprint.TPrintColors
 import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
-import mdoc.internal.markdown.MdocDialect
 import java.{util => ju}
 import mdoc.internal.cli.InputFile
 
@@ -30,18 +29,13 @@ class WorksheetProvider(settings: Settings) {
       input: Input.VirtualFile,
       ctx: Context
   ): EvaluatedWorksheet = {
-    val source = MdocDialect.scala(input).parse[Source].getOrElse(Source(Nil))
-    val sectionInput = SectionInput(
-      input,
-      source,
-      Modifier.Default()
-    )
+    val sectionInput = SectionInput(input, ctx)
     val sectionInputs = List(sectionInput)
     val file = InputFile.fromRelativeFilename(input.path, settings)
     val instrumented = Instrumenter.instrument(file, sectionInputs, settings, reporter)
     val compiler = ctx.compiler(instrumented)
     val rendered =
-      MarkdownCompiler.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
+      MarkdownBuilder.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
 
     val decorations = for {
       section <- rendered.sections.iterator
@@ -98,7 +92,7 @@ class WorksheetProvider(settings: Settings) {
           .append(if (out.nonEmpty) "\n" else "")
           .append(binder.name)
           .append(": ")
-          .append(binder.tpe.render(TPrintColors.BlackWhite))
+          .append(binder.tpeString)
           .append(" = ")
         BlackWhite
           .tokenize(binder.value, width = settings.screenWidth, height = settings.screenHeight)

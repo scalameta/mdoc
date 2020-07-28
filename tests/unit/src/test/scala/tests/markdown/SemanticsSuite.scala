@@ -1,6 +1,7 @@
 package tests.markdown
 
 class SemanticsSuite extends BaseMarkdownSuite {
+
   check(
     "overload",
     """
@@ -38,7 +39,19 @@ class SemanticsSuite extends BaseMarkdownSuite {
        |List(User("Susan"), User("John")).sorted
        |// res0: List[User] = List(User("John"), User("Susan"))
        |```
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "2.13" ->
+        """|```scala
+           |case class User(name: String)
+           |object User {
+           |  implicit val ordering: Ordering[User] = Ordering.by(_.name)
+           |}
+           |List(User("Susan"), User("John")).sorted
+           |// res0: List[User] = List(User(name = "John"), User(name = "Susan"))
+           |```
+           |""".stripMargin
+    )
   )
 
   check(
