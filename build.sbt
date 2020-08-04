@@ -52,8 +52,8 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.3.10"
-  val munit = "0.7.10"
-  val coursier = "0.0.22"
+  val munit = "0.7.7"
+  val coursier = "0.0.24"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -118,11 +118,11 @@ lazy val mdoc = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scalameta" %% "scalameta" % V.scalameta,
       "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
-      "com.vladsch.flexmark" % "flexmark-all" % "0.62.0",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
       "com.lihaoyi" %% "fansi" % fansiVersion.value,
-      "io.methvin" % "directory-watcher" % "0.9.10",
+      "io.methvin" % "directory-watcher" % "0.10.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.1.1.Final",
+      "io.undertow" % "undertow-core" % "2.1.3.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
