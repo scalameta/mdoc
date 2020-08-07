@@ -4,6 +4,7 @@ import munit.FunSuite
 import scala.meta._
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.MarkdownBuilder
 import mdoc.internal.markdown.Renderer
 import mdoc.internal.markdown.ReplVariablePrinter
 import mdoc.internal.cli.InputFile
@@ -12,7 +13,7 @@ import scala.meta.internal.io.PathIO
 
 class MarkdownCompilerSuite extends FunSuite {
 
-  private val compiler = MarkdownCompiler.default()
+  private val compiler = MarkdownBuilder.default()
   private val reporter = ConsoleReporter.default
   private val settings = Settings.default(PathIO.workingDirectory)
 

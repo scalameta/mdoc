@@ -15,6 +15,7 @@ import scala.meta.internal.io.PathIO
 import scala.util.control.NonFatal
 import coursierapi.Dependency
 import scala.meta.internal.io.FileIO
+import scala.meta.internal.inputs._
 
 object PositionSyntax {
   implicit class XtensionInputMdoc(input: Input) {

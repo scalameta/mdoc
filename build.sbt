@@ -1,13 +1,67 @@
+import scala.collection.mutable
+
 def scala212 = "2.12.11"
 def scala211 = "2.11.12"
 def scala213 = "2.13.2"
+def scala3 = "0.26.0-RC1"
+
 def scalajs = "0.6.32"
 def scalajsBinaryVersion = "0.6"
 def scalajsDom = "1.0.0"
+
+def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
+def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
+def isScala211(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 11)
+def isScala3(v: Option[(Long, Long)]): Boolean =
+  v.exists(_._1 == 0) || v.exists(_._1 == 3)
+
+val isScala213 = Def.setting {
+  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
+}
+
+val isScala3 = Def.setting {
+  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=3.0.0"))
+}
+
+def multiScalaDirectories(projectName: String) = Def.setting {
+  val root = baseDirectory.in(ThisBuild).value / projectName
+  val base = root / "src" / "main"
+  val result = mutable.ListBuffer.empty[File]
+  val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
+  partialVersion.collect {
+    case (major, minor) =>
+      result += base / s"scala-$major.$minor"
+  }
+  if (isScala3.value) {
+    result += base / "scala-3"
+  }
+
+  if (!isScala3.value) {
+    result += base / "scala-2"
+  }
+  result.toList
+}
+
+def crossSetting[A](
+    scalaVersion: String,
+    if2: List[A] = Nil,
+    if3: List[A] = Nil,
+    if211: List[A] = Nil,
+    if212: List[A] = Nil
+): List[A] =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case partialVersion if isScala2(partialVersion) => if2
+    case partialVersion if isScala3(partialVersion) => if3
+    case partialVersion if isScala211(partialVersion) => if2 ::: if211
+    case partialVersion if isScala212(partialVersion) => if2 ::: if212
+    case _ => Nil
+  }
+
 inThisBuild(
   List(
+    version := "2.2.4-SNAPSHOT",
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211, scala213),
+    crossScalaVersions := List(scala212, scala211, scala213, scala3),
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -41,24 +95,24 @@ name := "mdocRoot"
 skip in publish := true
 crossScalaVersions := Nil
 lazy val sharedSettings = List(
-  scalacOptions ++= {
-    val buf = collection.mutable.ListBuffer.empty[String]
-    buf ++= List("-target:jvm-1.8", "-Yrangepos", "-deprecation")
-    if (!scalaBinaryVersion.value.startsWith("2.13"))
-      buf += "-Xexperimental"
-    buf.toList
-  }
+  scalacOptions ++= crossSetting(
+    scalaVersion.value,
+    if2 = List("-target:jvm-1.8", "-Yrangepos", "-deprecation"),
+    if212 = List("-Xexperimental"),
+    if211 = List("-Xexperimental"),
+    if3 = List("-language:implicitConversions", "-Ximport-suggestion-timeout", "0")
+  )
 )
 
 val V = new {
   val scalameta = "4.3.20"
-  val munit = "0.7.7"
+  val munit = "0.7.10"
   val coursier = "0.0.24"
 }
 
 lazy val pprintVersion = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "0.5.4"
-  else "0.5.5"
+  else "0.6.0"
 }
 
 lazy val fansiVersion = Def.setting {
@@ -85,16 +139,22 @@ lazy val runtime = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
-    libraryDependencies ++= List(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
-      "com.lihaoyi" %% "pprint" % pprintVersion.value
+    libraryDependencies += "com.lihaoyi" %% "pprint" % pprintVersion.value,
+    libraryDependencies ++= crossSetting(
+      scalaVersion.value,
+      if2 = List(
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
+      )
     )
   )
   .dependsOn(interfaces)
 
+val excludePprint = ExclusionRule(organization = "com.lihaoyi")
+
 lazy val mdoc = project
   .settings(
     sharedSettings,
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("mdoc").value,
     moduleName := "mdoc",
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
@@ -112,14 +172,28 @@ lazy val mdoc = project
       scalaVersion,
       scalaBinaryVersion
     ),
+    libraryDependencies ++= crossSetting(
+      scalaVersion.value,
+      if3 = List(
+        "ch.epfl.lamp" %% "dotty-compiler" % scalaVersion.value,
+        ("org.scalameta" %% "scalameta" % V.scalameta)
+          .excludeAll(excludePprint)
+          .withDottyCompat(scalaVersion.value),
+        ("com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10")
+          .excludeAll(excludePprint)
+          .withDottyCompat(scalaVersion.value)
+      ),
+      if2 = List(
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+        "org.scalameta" %% "scalameta" % V.scalameta,
+        "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
+        "com.lihaoyi" %% "fansi" % fansiVersion.value
+      )
+    ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.get-coursier" % "interface" % V.coursier,
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "org.scalameta" %% "scalameta" % V.scalameta,
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      "com.lihaoyi" %% "fansi" % fansiVersion.value,
       "io.methvin" % "directory-watcher" % "0.10.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.1.3.Final",
@@ -137,16 +211,27 @@ lazy val testsInput = project
     skip in publish := true
   )
 
-val isScala213 = Def.setting {
-  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
-}
-
 def scala212LibraryDependencies(deps: List[ModuleID]) = List(
   libraryDependencies ++= {
-    if (isScala213.value) Nil
+    if (isScala213.value || isScala3.value) Nil
     else deps
   }
 )
+val tests = project
+  .in(file("tests/tests"))
+  .settings(
+    sharedSettings,
+    skip in publish := true,
+    libraryDependencies ++= List(
+      "org.scalameta" %% "munit" % V.munit
+    ),
+    buildInfoPackage := "tests",
+    buildInfoKeys := Seq[BuildInfoKey](
+      scalaVersion,
+      scalaBinaryVersion
+    )
+  )
+  .enablePlugins(BuildInfoPlugin)
 
 val jsdocs = project
   .in(file("tests/jsdocs"))
@@ -154,6 +239,7 @@ val jsdocs = project
     sharedSettings,
     skip in publish := true,
     scalaJSModuleKind := ModuleKind.CommonJSModule,
+    crossScalaVersions -= scala3,
     libraryDependencies ++= {
       if (isScala213.value) Nil
       else
@@ -172,11 +258,23 @@ val jsdocs = project
   )
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
 
+lazy val worksheets = project
+  .in(file("tests/worksheets"))
+  .settings(
+    sharedSettings,
+    skip in publish := true,
+    libraryDependencies ++= List(
+      "org.scalameta" %% "munit" % V.munit % Test
+    )
+  )
+  .dependsOn(mdoc, tests)
+
 lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     sharedSettings,
     skip in publish := true,
+    crossScalaVersions -= scala3,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
@@ -190,13 +288,13 @@ lazy val unit = project
       "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
-    buildInfoPackage := "tests",
+    buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     ),
     mdocJS := Some(jsdocs)
   )
-  .dependsOn(mdoc, js, testsInput)
+  .dependsOn(mdoc, js, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 lazy val plugin = project
@@ -241,6 +339,7 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
+    crossScalaVersions -= scala3,
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(

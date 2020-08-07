@@ -153,7 +153,7 @@ class Processor(implicit ctx: Context) {
   def handleCoursierError(instrumented: Instrumented, e: CoursierError): Unit = {
     e match {
       case m: MultipleResolutionError =>
-        m.getErrors().forEach(simpleError => handleCoursierError(instrumented, simpleError))
+        m.getErrors().asScala.foreach(simpleError => handleCoursierError(instrumented, simpleError))
       case _ =>
         val pos = instrumented.positionedDependencies
           .collectFirst {
@@ -175,7 +175,7 @@ class Processor(implicit ctx: Context) {
       instrumented: Instrumented,
       markdownCompiler: MarkdownCompiler
   ): Unit = {
-    val rendered = MarkdownCompiler.buildDocument(
+    val rendered = MarkdownBuilder.buildDocument(
       markdownCompiler,
       ctx.reporter,
       sectionInputs,

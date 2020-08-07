@@ -6,6 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.Seq
 import scala.meta._
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.BuildInfo
 
 /** Helper to map between position between two similar strings. */
 final class TokenEditDistance private (matching: Array[MatchingToken]) {
@@ -71,6 +72,10 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
 }
 
 object TokenEditDistance {
+
+  implicit val dialect: scala.meta.Dialect =
+    if (BuildInfo.scalaBinaryVersion.startsWith("2.")) scala.meta.dialects.Scala213
+    else scala.meta.dialects.Dotty
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 

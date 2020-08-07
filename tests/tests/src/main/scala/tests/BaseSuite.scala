@@ -17,12 +17,17 @@ class BaseSuite extends FunSuite {
     )
   }
   object OnlyScala213 extends munit.Tag("OnlyScala213")
+  object OnlyScala3 extends munit.Tag("OnlyScala3")
   object SkipScala211 extends munit.Tag("SkipScala211")
   override def munitTestTransforms: List[TestTransform] = super.munitTestTransforms ++ List(
     new TestTransform(OnlyScala213.value, { test =>
-      if (test.tags(OnlyScala213) && mdoc.internal.BuildInfo.scalaBinaryVersion != "2.13")
+      val binaryVersion = tests.BuildInfo.scalaBinaryVersion
+      if (test.tags(OnlyScala213) && binaryVersion != "2.13")
         test.tag(munit.Ignore)
-      else if (test.tags(SkipScala211) && mdoc.internal.BuildInfo.scalaBinaryVersion == "2.11")
+      else if (test
+          .tags(OnlyScala3) && !(binaryVersion.startsWith("0.") || binaryVersion.startsWith("3.")))
+        test.tag(munit.Ignore)
+      else if (test.tags(SkipScala211) && binaryVersion == "2.11")
         test.tag(munit.Ignore)
       else test
     })
