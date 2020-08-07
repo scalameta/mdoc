@@ -59,7 +59,6 @@ def crossSetting[A](
 
 inThisBuild(
   List(
-    version := "2.2.4-SNAPSHOT",
     scalaVersion := scala212,
     crossScalaVersions := List(scala212, scala211, scala213, scala3),
     organization := "org.scalameta",
