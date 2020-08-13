@@ -188,9 +188,13 @@ class MdocLanguageServer(
 
   @JsonRequest("mdoc/index")
   def index(uri: String): CompletableFuture[String] = {
-    sh.schedule(new Runnable {
-      def run(): Unit = preview(uri)
-    }, 100, TimeUnit.MILLISECONDS)
+    sh.schedule(
+      new Runnable {
+        def run(): Unit = preview(uri)
+      },
+      100,
+      TimeUnit.MILLISECONDS
+    )
     val html = PreviewHtml.wrapHtmlBody(
       currentPreview.get(),
       currentToc.get(),

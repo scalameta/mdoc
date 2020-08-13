@@ -67,8 +67,10 @@ object MarkdownFile {
               parts += newText(curr, end)
             }
           case s: State.CodeFence =>
-            if (line.startsWith(s.backticks) &&
-              line.forall(ch => ch == '`' || ch.isWhitespace)) {
+            if (
+              line.startsWith(s.backticks) &&
+              line.forall(ch => ch == '`' || ch.isWhitespace)
+            ) {
               parts += newCodeFence(s, curr, end)
               state = State.Text
             }
@@ -92,33 +94,34 @@ object MarkdownFile {
 
 sealed abstract class MarkdownPart {
   var pos: Position = Position.None
-  final def renderToString(out: StringBuilder): Unit = this match {
-    case Text(value) =>
-      out.append(value)
-    case fence: CodeFence =>
-      fence.newPart match {
-        case Some(newPart) =>
-          out.append(newPart)
-        case None =>
-          fence.openBackticks.renderToString(out)
-          fence.newInfo match {
-            case None =>
-              fence.info.renderToString(out)
-            case Some(newInfo) =>
-              out.append(newInfo)
-              if (!newInfo.endsWith("\n")) {
-                out.append("\n")
-              }
-          }
-          fence.newBody match {
-            case None =>
-              fence.body.renderToString(out)
-            case Some(newBody) =>
-              out.append(newBody)
-          }
-          fence.closeBackticks.renderToString(out)
-      }
-  }
+  final def renderToString(out: StringBuilder): Unit =
+    this match {
+      case Text(value) =>
+        out.append(value)
+      case fence: CodeFence =>
+        fence.newPart match {
+          case Some(newPart) =>
+            out.append(newPart)
+          case None =>
+            fence.openBackticks.renderToString(out)
+            fence.newInfo match {
+              case None =>
+                fence.info.renderToString(out)
+              case Some(newInfo) =>
+                out.append(newInfo)
+                if (!newInfo.endsWith("\n")) {
+                  out.append("\n")
+                }
+            }
+            fence.newBody match {
+              case None =>
+                fence.body.renderToString(out)
+              case Some(newBody) =>
+                out.append(newBody)
+            }
+            fence.closeBackticks.renderToString(out)
+        }
+    }
 }
 final case class Text(value: String) extends MarkdownPart
 final case class CodeFence(openBackticks: Text, info: Text, body: Text, closeBackticks: Text)

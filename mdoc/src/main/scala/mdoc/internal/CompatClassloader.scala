@@ -15,10 +15,12 @@ object CompatClassloader {
     if (classLoader.isInstanceOf[URLClassLoader]) {
       classLoader.asInstanceOf[URLClassLoader].getURLs()
       // java9+
-    } else if (classLoader
+    } else if (
+      classLoader
         .getClass()
         .getName()
-        .startsWith("jdk.internal.loader.ClassLoaders$")) {
+        .startsWith("jdk.internal.loader.ClassLoaders$")
+    ) {
       try {
         val field = classOf[Unsafe].getDeclaredField("theUnsafe")
         field.setAccessible(true)

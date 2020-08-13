@@ -62,10 +62,11 @@ class MarkdownCompiler(
     this.getClass.getClassLoader
   )
 
-  private def clearTarget(): Unit = target match {
-    case vdir: VirtualDirectory => vdir.clear()
-    case _ =>
-  }
+  private def clearTarget(): Unit =
+    target match {
+      case vdir: VirtualDirectory => vdir.clear()
+      case _ =>
+    }
 
   private def toSource(input: Input): BatchSourceFile = {
     val filename = Paths.get(input.syntax).getFileName.toString
@@ -219,12 +220,13 @@ class MarkdownCompiler(
       severity: sreporter.Severity,
       mpos: Position,
       message: String
-  ): Unit = severity match {
-    case sreporter.ERROR => vreporter.error(mpos, message)
-    case sreporter.INFO => vreporter.info(mpos, message)
-    case sreporter.WARNING => vreporter.warning(mpos, message)
-    case _ =>
-  }
+  ): Unit =
+    severity match {
+      case sreporter.ERROR => vreporter.error(mpos, message)
+      case sreporter.INFO => vreporter.info(mpos, message)
+      case sreporter.WARNING => vreporter.warning(mpos, message)
+      case _ =>
+    }
   private def formatMessage(pos: GPosition, message: String): String =
     new CodeBuilder()
       .println(s"${pos.source.file.path}:${pos.line + 1} (mdoc generated code) $message")

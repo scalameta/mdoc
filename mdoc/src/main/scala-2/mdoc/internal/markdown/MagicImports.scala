@@ -37,26 +37,27 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
   object Printable extends Printable(file, Nil)
 
   object NonPrintable {
-    def unapply(importer: Importer): Boolean = importer match {
-      case Importer(
-          Term.Name(qualifier),
-          List(Importee.Name(name: Name.Indeterminate))
-          ) if Instrumenter.magicImports(qualifier) =>
-        qualifier match {
-          case "$ivy" | "$dep" =>
-            dependencies += name
-            true
-          case "$repo" =>
-            repositories += name
-            true
-          case "$scalac" =>
-            scalacOptions += name
-            true
-          case _ =>
-            false
-        }
-      case _ => false
-    }
+    def unapply(importer: Importer): Boolean =
+      importer match {
+        case Importer(
+              Term.Name(qualifier),
+              List(Importee.Name(name: Name.Indeterminate))
+            ) if Instrumenter.magicImports(qualifier) =>
+          qualifier match {
+            case "$ivy" | "$dep" =>
+              dependencies += name
+              true
+            case "$repo" =>
+              repositories += name
+              true
+            case "$scalac" =>
+              scalacOptions += name
+              true
+            case _ =>
+              false
+          }
+        case _ => false
+      }
   }
 
   private def visitFile(fileImport: FileImport, parents: List[FileImport]): FileImport = {

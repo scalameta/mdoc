@@ -54,9 +54,12 @@ class Processor(implicit ctx: Context) {
     if (preInputs.nonEmpty) {
       val post = new PostProcessContext(ctx.reporter, doc.file, ctx.settings)
       ctx.settings.preModifiers.foreach { pre =>
-        runModifier(pre.name, () => {
-          appendChild(doc, pre.postProcess(post))
-        })
+        runModifier(
+          pre.name,
+          () => {
+            appendChild(doc, pre.postProcess(post))
+          }
+        )
       }
     }
     doc
@@ -185,13 +188,14 @@ class Processor(implicit ctx: Context) {
     rendered.sections.zip(inputs).foreach {
       case (section, ScalaFenceInput(block, _, mod)) =>
         block.newInfo = Some("scala")
-        def defaultRender: String = Renderer.renderEvaluatedSection(
-          rendered,
-          section,
-          ctx.reporter,
-          ctx.settings.variablePrinter,
-          markdownCompiler
-        )
+        def defaultRender: String =
+          Renderer.renderEvaluatedSection(
+            rendered,
+            section,
+            ctx.reporter,
+            ctx.settings.variablePrinter,
+            markdownCompiler
+          )
         mod match {
           case Modifier.Post(modifier, info) =>
             val variables = for {

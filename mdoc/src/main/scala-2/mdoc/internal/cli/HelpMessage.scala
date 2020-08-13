@@ -87,8 +87,9 @@ final class HelpMessage[T: generic.Surface: ConfEncoder](
         if (setting.annotations.exists(_.isInstanceOf[Inline])) {
           for {
             underlying <- setting.underlying.toList
-            (field, (_, fieldDefault)) <- underlying.settings
-              .zip(value.asInstanceOf[Conf.Obj].values)
+            (field, (_, fieldDefault)) <-
+              underlying.settings
+                .zip(value.asInstanceOf[Conf.Obj].values)
           } {
             printOption(field, fieldDefault)
           }

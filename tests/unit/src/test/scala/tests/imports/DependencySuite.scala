@@ -4,17 +4,18 @@ import tests.markdown.BaseMarkdownSuite
 
 class DependencySuite extends BaseMarkdownSuite {
   val userHome = System.getProperty("user.home")
-  override def postProcessObtained: Map[String, String => String] = Map(
-    "all" -> { old =>
-      old.linesIterator
-        .map {
-          case line if line.contains(userHome) =>
-            "<redacted user.home>"
-          case line => line
-        }
-        .mkString("\n")
-    }
-  )
+  override def postProcessObtained: Map[String, String => String] =
+    Map(
+      "all" -> { old =>
+        old.linesIterator
+          .map {
+            case line if line.contains(userHome) =>
+              "<redacted user.home>"
+            case line => line
+          }
+          .mkString("\n")
+      }
+    )
 
   List("dep", "ivy").foreach { dep =>
     check(

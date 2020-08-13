@@ -4,9 +4,10 @@ import tests.markdown.StringSyntax._
 
 class FailSuite extends BaseMarkdownSuite {
 
-  override def postProcessExpected: Map[String, String => String] = Map(
-    "2.13" -> { old => old.replace("(fo: F[O])fs2.Stream[F,O]", "(fo: F[O]): fs2.Stream[F,O]") }
-  )
+  override def postProcessExpected: Map[String, String => String] =
+    Map(
+      "2.13" -> { old => old.replace("(fo: F[O])fs2.Stream[F,O]", "(fo: F[O]): fs2.Stream[F,O]") }
+    )
 
   check(
     "mismatch",

@@ -15,7 +15,8 @@ object VariableRegex {
       settings: Settings
   ): Input.VirtualFile = {
     val text = Variable.replaceAllIn(
-      input.text, { m =>
+      input.text,
+      { m =>
         input.chars.lift(m.start - 1) match {
           case Some('@') =>
             Position.Range(input, m.start + 1, m.end).text

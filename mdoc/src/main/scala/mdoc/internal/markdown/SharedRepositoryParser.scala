@@ -13,42 +13,43 @@ import coursierapi.error.CoursierError
 
 object SharedRepositoryParser {
 
-  def repository(s: String): Try[Repository] = Try {
-    if (s == "central") {
-      Repository.central()
-    } else if (s.startsWith("sonatype:")) {
-      Repositories.sonatype(s.stripPrefix("sonatype:"))
-    } else if (s.startsWith("bintray:")) {
-      val s0 = s.stripPrefix("bintray:")
-      val id =
-        if (s.contains("/")) s0
-        else s0 + "/maven"
-      Repositories.bintray(id)
-    } else if (s.startsWith("bintray-ivy:")) {
-      unsupportedIvy("bintray-ivy")
-    } else if (s.startsWith("typesafe:ivy-")) {
-      unsupportedIvy("typesafe:ivy-")
-    } else if (s.startsWith("typesafe:")) {
-      Repositories.typesafe(s.stripPrefix("typesafe:"))
-    } else if (s.startsWith("sbt-maven:")) {
-      Repositories.sbtMaven(s.stripPrefix("sbt-maven:"))
-    } else if (s.startsWith("sbt-plugin:")) {
-      unsupportedIvy("sbt-plugin")
-    } else if (s.startsWith("ivy:")) {
-      val s0 = s.stripPrefix("ivy:")
-      val sepIdx = s0.indexOf('|')
-      if (sepIdx < 0) IvyRepository.of(s0)
-      else {
-        val mainPart = s0.substring(0, sepIdx)
-        val metadataPart = s0.substring(sepIdx + 1)
-        IvyRepository.of(mainPart, metadataPart)
+  def repository(s: String): Try[Repository] =
+    Try {
+      if (s == "central") {
+        Repository.central()
+      } else if (s.startsWith("sonatype:")) {
+        Repositories.sonatype(s.stripPrefix("sonatype:"))
+      } else if (s.startsWith("bintray:")) {
+        val s0 = s.stripPrefix("bintray:")
+        val id =
+          if (s.contains("/")) s0
+          else s0 + "/maven"
+        Repositories.bintray(id)
+      } else if (s.startsWith("bintray-ivy:")) {
+        unsupportedIvy("bintray-ivy")
+      } else if (s.startsWith("typesafe:ivy-")) {
+        unsupportedIvy("typesafe:ivy-")
+      } else if (s.startsWith("typesafe:")) {
+        Repositories.typesafe(s.stripPrefix("typesafe:"))
+      } else if (s.startsWith("sbt-maven:")) {
+        Repositories.sbtMaven(s.stripPrefix("sbt-maven:"))
+      } else if (s.startsWith("sbt-plugin:")) {
+        unsupportedIvy("sbt-plugin")
+      } else if (s.startsWith("ivy:")) {
+        val s0 = s.stripPrefix("ivy:")
+        val sepIdx = s0.indexOf('|')
+        if (sepIdx < 0) IvyRepository.of(s0)
+        else {
+          val mainPart = s0.substring(0, sepIdx)
+          val metadataPart = s0.substring(sepIdx + 1)
+          IvyRepository.of(mainPart, metadataPart)
+        }
+      } else if (s == "jitpack") {
+        Repositories.jitpack
+      } else {
+        MavenRepository.of(s)
       }
-    } else if (s == "jitpack") {
-      Repositories.jitpack
-    } else {
-      MavenRepository.of(s)
     }
-  }
 
   private def unsupportedIvy(what: String) =
     throw CoursierError.of(
