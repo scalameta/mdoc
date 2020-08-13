@@ -131,8 +131,15 @@ class WorksheetProvider(settings: Settings) {
               out
                 .append(if (out.isEmpty) "" else ", ")
                 .append(binder.name)
-                .append("=")
+                .append(": ")
+                .append(binder.tpeString)
+                .append(" = ")
             }
+            if (isSingle)
+              out
+                .append(": ")
+                .append(binder.tpeString)
+                .append(" = ")
             val chunk = BlackWhite
               .tokenize(binder.value, width = margin - out.length)
               .map(_.getChars)

@@ -42,7 +42,7 @@ class WorksheetSuite extends BaseSuite {
       |val x = 1.to(4).toVector
       |""".stripMargin,
     """|
-       |<val x = 1.to(4).toVector> // Vector(1, 2, 3, 4)
+       |<val x = 1.to(4).toVector> // : Vector[Int] = Vect...
        |x: Vector[Int] = Vector(1, 2, 3, 4)
        |""".stripMargin
   )
@@ -54,7 +54,7 @@ class WorksheetSuite extends BaseSuite {
       |val y = 1.0
       |""".stripMargin,
     """|lazy val x = 0.0
-       |<val y = 1.0> // 1.0
+       |<val y = 1.0> // : Double = 1.0
        |y: Double = 1.0
        |""".stripMargin
   )
@@ -65,7 +65,7 @@ class WorksheetSuite extends BaseSuite {
       |val List(x, y) = List(1, 2)
       |""".stripMargin,
     """|
-       |<val List(x, y) = List(1, 2)> // x=1, y=2
+       |<val List(x, y) = List(1, 2)> // x: Int = 1, y: Int =...
        |x: Int = 1
        |y: Int = 2
        |""".stripMargin
@@ -77,7 +77,7 @@ class WorksheetSuite extends BaseSuite {
       |Stream.from(10)
       |""".stripMargin,
     """|
-       |<Stream.from(10)> // Stream(10,11,12,13,1...
+       |<Stream.from(10)> // : Stream[Int] = Stre...
        |res0: Stream[Int] = Stream(
        |  10,
        |  11,
@@ -111,7 +111,7 @@ class WorksheetSuite extends BaseSuite {
        |<val x = {
        |  println("hello")
        |  42
-       |}> // 42
+       |}> // : Int = 42
        |x: Int = 42
        |// hello
        |""".stripMargin
@@ -125,11 +125,11 @@ class WorksheetSuite extends BaseSuite {
       |val m = n * 10
       |""".stripMargin,
     """|
-       |<val n = 10> // 10
+       |<val n = 10> // : Int = 10
        |n: Int = 10
        |<println(n)> // 10
        |// 10
-       |<val m = n * 10> // 100
+       |<val m = n * 10> // : Int = 100
        |m: Int = 100
        |""".stripMargin
   )
@@ -140,7 +140,7 @@ class WorksheetSuite extends BaseSuite {
       |val n = Future.successful(10)
       |""".stripMargin,
     """|import scala.concurrent.Future
-       |<val n = Future.successful(10)> // Future(Success(10))
+       |<val n = Future.successful(10)> // : Future[Int] = Futu...
        |n: Future[Int] = Future(Success(10))
        |""".stripMargin
   )
@@ -148,7 +148,7 @@ class WorksheetSuite extends BaseSuite {
   // From 2.13 we get `name =` part
   val definitionCompat =
     """|case class User(name: String)
-       |<val n = User("Susan")> // User(name = "Susan")
+       |<val n = User("Susan")> // : User = User(name =...
        |n: User = User(name = "Susan")
        |""".stripMargin
 
@@ -158,7 +158,7 @@ class WorksheetSuite extends BaseSuite {
       |val n = User("Susan")
       |""".stripMargin,
     """|case class User(name: String)
-       |<val n = User("Susan")> // User("Susan")
+       |<val n = User("Susan")> // : User = User("Susan...
        |n: User = User("Susan")
        |""".stripMargin,
     compat = Map(
@@ -224,7 +224,7 @@ class WorksheetSuite extends BaseSuite {
       |val y = "foobar".stripSuffix("bar")
       |""".stripMargin,
     """|
-       |<val x = "foobar".stripSuffix("bar")> // "foo"
+       |<val x = "foobar".stripSuffix("bar")> // : String = "foo"
        |x: String = "foo"
        |""".stripMargin
   )
@@ -260,17 +260,17 @@ class WorksheetSuite extends BaseSuite {
     """|case class Circle(x: Double, y: Double, radius: Double)
        |extension (c: Circle)
        |  def circumference: Double = c.radius * math.Pi * 2
-       |<val circle = Circle(0.0, 0.0, 2.0)> // Circle(x = 0.0,y = 0...
+       |<val circle = Circle(0.0, 0.0, 2.0)> // : Circle = Circle(x ...
        |circle: Circle = Circle(
        |  x = 0.0,
        |  y = 0.0,
        |  radius = 2.0
        |)
-       |<circle.circumference> // 12.566370614359172
+       |<circle.circumference> // : Double = 12.566370...
        |res0: Double = 12.566370614359172
        |extension [T](xs: List[T])
        |  def second = xs.tail.head
-       |<List(1,2,3).second> // 2
+       |<List(1,2,3).second> // : Int = 2
        |res1: Int = 2
        |""".stripMargin
   )
@@ -285,7 +285,7 @@ class WorksheetSuite extends BaseSuite {
     """|import $dep.`org.json4s:json4s-native_2.13:3.6.9`
        |import org.json4s._
        |import org.json4s.native.JsonMethods._
-       |<parse("{ \"numbers\" : [1, 2, 3, 4] }")> // JObject(obj = List((...
+       |<parse("{ \"numbers\" : [1, 2, 3, 4] }")> // : JValue = JObject(o...
        |res0: JValue = JObject(
        |  obj = List(
        |    (
