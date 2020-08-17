@@ -23,20 +23,21 @@ object Mod {
   }
   case object Nest extends Mod
 
-  def all: List[Mod] = List(
-    Passthrough,
-    Invisible,
-    CompileOnly,
-    Reset,
-    ResetClass,
-    ResetObject,
-    Fail,
-    Warn,
-    Crash,
-    Silent,
-    ToString,
-    Nest
-  )
+  def all: List[Mod] =
+    List(
+      Passthrough,
+      Invisible,
+      CompileOnly,
+      Reset,
+      ResetClass,
+      ResetObject,
+      Fail,
+      Warn,
+      Crash,
+      Silent,
+      ToString,
+      Nest
+    )
   def unapply(string: String): Option[Mod] = {
     all.find(_.toString.equalsIgnoreCase(string))
   }

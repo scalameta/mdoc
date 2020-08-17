@@ -109,12 +109,17 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       settings: Settings = baseSettings,
       compat: Map[String, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
-    checkCompiles(name, original, settings, obtained => {
-      assertNoDiff(
-        Compat(obtained, Map.empty, postProcessObtained),
-        Compat(expected, compat, postProcessExpected)
-      )
-    })
+    checkCompiles(
+      name,
+      original,
+      settings,
+      obtained => {
+        assertNoDiff(
+          Compat(obtained, Map.empty, postProcessObtained),
+          Compat(expected, compat, postProcessExpected)
+        )
+      }
+    )
   }
 
 }

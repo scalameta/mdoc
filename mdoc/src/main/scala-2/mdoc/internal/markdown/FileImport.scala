@@ -61,19 +61,21 @@ object FileImport {
       file: InputFile,
       reporter: Reporter
   ) {
-    def unapply(importer: Importer): Option[List[FileImport]] = importer match {
-      case importer @ Importer(qual, importees) if isFileQualifier(qual) =>
-        val parsed = FileImport.fromImportees(file.inputFile, qual, importees, reporter)
-        if (parsed.forall(_.isDefined)) Some(parsed.map(_.get))
-        else None
-      case _ =>
-        None
-    }
-    private def isFileQualifier(qual: Term): Boolean = qual match {
-      case Term.Name("$file") => true
-      case Term.Select(next, _) => isFileQualifier(next)
-      case _ => false
-    }
+    def unapply(importer: Importer): Option[List[FileImport]] =
+      importer match {
+        case importer @ Importer(qual, importees) if isFileQualifier(qual) =>
+          val parsed = FileImport.fromImportees(file.inputFile, qual, importees, reporter)
+          if (parsed.forall(_.isDefined)) Some(parsed.map(_.get))
+          else None
+        case _ =>
+          None
+      }
+    private def isFileQualifier(qual: Term): Boolean =
+      qual match {
+        case Term.Name("$file") => true
+        case Term.Select(next, _) => isFileQualifier(next)
+        case _ => false
+      }
   }
 
   private def fromImportees(
@@ -109,17 +111,18 @@ object FileImport {
       fileImport: Name.Indeterminate,
       reporter: Reporter
   ): Option[FileImport] = {
-    def loop(path: Path, parts: List[String]): Path = parts match {
-      case Nil => path
-      case "^" :: tail =>
-        loop(path.getParent, tail)
-      case "^^" :: tail =>
-        loop(path.getParent.getParent(), tail)
-      case "^^^" :: tail =>
-        loop(path.getParent.getParent.getParent(), tail)
-      case head :: tail =>
-        loop(path.resolve(head), tail)
-    }
+    def loop(path: Path, parts: List[String]): Path =
+      parts match {
+        case Nil => path
+        case "^" :: tail =>
+          loop(path.getParent, tail)
+        case "^^" :: tail =>
+          loop(path.getParent.getParent(), tail)
+        case "^^^" :: tail =>
+          loop(path.getParent.getParent.getParent(), tail)
+        case head :: tail =>
+          loop(path.resolve(head), tail)
+      }
     val parts = Term.Select(qual, Term.Name(fileImport.value)).syntax.split('.').toList
     val relativePath = parts.tail
     val packageName = parts.init.mkString(".")

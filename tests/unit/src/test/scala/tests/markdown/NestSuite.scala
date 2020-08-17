@@ -2,9 +2,10 @@ package tests.markdown
 
 class NestSuite extends BaseMarkdownSuite {
 
-  override def postProcessExpected: Map[String, String => String] = Map(
-    "2.13" -> { old => old.replace("of type => Int", "of type Int") }
-  )
+  override def postProcessExpected: Map[String, String => String] =
+    Map(
+      "2.13" -> { old => old.replace("of type => Int", "of type Int") }
+    )
 
   check(
     "redefine-val",

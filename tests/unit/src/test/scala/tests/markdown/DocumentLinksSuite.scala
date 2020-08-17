@@ -19,17 +19,25 @@ class DocumentLinksSuite extends FunSuite {
   }
 
   def references(name: String, original: String, expected: String): Unit = {
-    check(name, original, { links =>
-      val obtained = links.references.map(_.url).mkString("\n")
-      assertNoDiff(obtained, expected)
-    })
+    check(
+      name,
+      original,
+      { links =>
+        val obtained = links.references.map(_.url).mkString("\n")
+        assertNoDiff(obtained, expected)
+      }
+    )
   }
 
   def definitions(name: String, original: String, expected: String): Unit = {
-    check(name, original, { links =>
-      val obtained = links.definitions.mkString("\n")
-      assertNoDiff(obtained, expected)
-    })
+    check(
+      name,
+      original,
+      { links =>
+        val obtained = links.definitions.mkString("\n")
+        assertNoDiff(obtained, expected)
+      }
+    )
   }
 
   definitions(

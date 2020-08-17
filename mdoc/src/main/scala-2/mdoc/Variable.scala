@@ -45,7 +45,6 @@ import scala.meta.inputs.Position
   *                                    val y = 2
   *                                    ```
   *                                    }}}
-  *
   */
 final class Variable private[mdoc] (
     val name: String,

@@ -23,24 +23,25 @@ val isScala3 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=3.0.0"))
 }
 
-def multiScalaDirectories(projectName: String) = Def.setting {
-  val root = baseDirectory.in(ThisBuild).value / projectName
-  val base = root / "src" / "main"
-  val result = mutable.ListBuffer.empty[File]
-  val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
-  partialVersion.collect {
-    case (major, minor) =>
-      result += base / s"scala-$major.$minor"
-  }
-  if (isScala3.value) {
-    result += base / "scala-3"
-  }
+def multiScalaDirectories(projectName: String) =
+  Def.setting {
+    val root = baseDirectory.in(ThisBuild).value / projectName
+    val base = root / "src" / "main"
+    val result = mutable.ListBuffer.empty[File]
+    val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
+    partialVersion.collect {
+      case (major, minor) =>
+        result += base / s"scala-$major.$minor"
+    }
+    if (isScala3.value) {
+      result += base / "scala-3"
+    }
 
-  if (!isScala3.value) {
-    result += base / "scala-2"
+    if (!isScala3.value) {
+      result += base / "scala-2"
+    }
+    result.toList
   }
-  result.toList
-}
 
 def crossSetting[A](
     scalaVersion: String,
@@ -210,12 +211,13 @@ lazy val testsInput = project
     skip in publish := true
   )
 
-def scala212LibraryDependencies(deps: List[ModuleID]) = List(
-  libraryDependencies ++= {
-    if (isScala213.value || isScala3.value) Nil
-    else deps
-  }
-)
+def scala212LibraryDependencies(deps: List[ModuleID]) =
+  List(
+    libraryDependencies ++= {
+      if (isScala213.value || isScala3.value) Nil
+      else deps
+    }
+  )
 val tests = project
   .in(file("tests/tests"))
   .settings(

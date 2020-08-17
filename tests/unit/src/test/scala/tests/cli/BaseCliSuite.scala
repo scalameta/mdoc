@@ -25,16 +25,17 @@ abstract class BaseCliSuite extends BaseSuite {
   }
   val in = new TemporaryDirectory("in")
   val out = new TemporaryDirectory("out")
-  override def postProcessObtained: Map[String, String => String] = Map(
-    "all" -> { old =>
-      old
-        .replace(out().toString(), "<output>")
-        .replace(in().toString(), "<input>")
-        .linesIterator
-        .filterNot(line => line.startsWith("info: Compiled in"))
-        .mkString("\n")
-    }
-  )
+  override def postProcessObtained: Map[String, String => String] =
+    Map(
+      "all" -> { old =>
+        old
+          .replace(out().toString(), "<output>")
+          .replace(in().toString(), "<input>")
+          .linesIterator
+          .filterNot(line => line.startsWith("info: Compiled in"))
+          .mkString("\n")
+      }
+    )
   override def munitFixtures: Seq[Fixture[_]] = List(in, out)
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(

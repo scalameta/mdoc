@@ -70,26 +70,27 @@ final class MainOps(
     }
   }
 
-  def handleMarkdown(file: InputFile): Exit = synchronized {
-    val originalErrors = reporter.errorCount
-    if (settings.verbose) {
-      reporter.info(s"Compiling ${file.inputFile}")
-    }
-    val timer = new Timer
-    val source = FileIO.slurp(file.inputFile, settings.charset)
-    val input = Input.VirtualFile(file.inputFile.toString(), source)
-    val md = Markdown.toMarkdown(input, context, file, settings.site, reporter, settings)
-    val fileHasErrors = reporter.errorCount > originalErrors
-    if (!fileHasErrors) {
-      writePath(file, md)
+  def handleMarkdown(file: InputFile): Exit =
+    synchronized {
+      val originalErrors = reporter.errorCount
       if (settings.verbose) {
-        reporter.info(f"  done => ${file.outputFile} ($timer)")
+        reporter.info(s"Compiling ${file.inputFile}")
       }
-      livereload.foreach(_.reload(file.outputFile.toNIO))
+      val timer = new Timer
+      val source = FileIO.slurp(file.inputFile, settings.charset)
+      val input = Input.VirtualFile(file.inputFile.toString(), source)
+      val md = Markdown.toMarkdown(input, context, file, settings.site, reporter, settings)
+      val fileHasErrors = reporter.errorCount > originalErrors
+      if (!fileHasErrors) {
+        writePath(file, md)
+        if (settings.verbose) {
+          reporter.info(f"  done => ${file.outputFile} ($timer)")
+        }
+        livereload.foreach(_.reload(file.outputFile.toNIO))
+      }
+      if (reporter.hasErrors) Exit.error
+      else Exit.success
     }
-    if (reporter.hasErrors) Exit.error
-    else Exit.success
-  }
 
   def handleRegularFile(file: InputFile): Exit = {
     Files.createDirectories(file.outputFile.toNIO.getParent)

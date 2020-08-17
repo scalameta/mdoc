@@ -164,21 +164,22 @@ object MdocPlugin extends AutoPlugin {
       ref: Project,
       fullyQualifiedClassName: String,
       attributeName: String
-  ): Def.Initialize[Option[AnyRef]] = Def.settingDyn {
-    def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
-      val cls = Class.forName(fullyQualifiedClassName)
-      val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
-      SettingKey(attributeName)(stageManifest, anyWriter).in(ref).?
-    }
-    try {
-      val stageSetting = proxyForSetting()
-      Def.setting {
-        stageSetting.value
+  ): Def.Initialize[Option[AnyRef]] =
+    Def.settingDyn {
+      def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
+        val cls = Class.forName(fullyQualifiedClassName)
+        val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
+        SettingKey(attributeName)(stageManifest, anyWriter).in(ref).?
       }
-    } catch {
-      case _: ClassNotFoundException => Def.setting(None)
+      try {
+        val stageSetting = proxyForSetting()
+        Def.setting {
+          stageSetting.value
+        }
+      } catch {
+        case _: ClassNotFoundException => Def.setting(None)
+      }
     }
-  }
   private def mdocCompileOptions(ref: Project): Def.Initialize[Task[CompileOptions]] =
     Def.task {
       CompileOptions(
