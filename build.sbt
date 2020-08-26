@@ -107,7 +107,7 @@ lazy val sharedSettings = List(
 val V = new {
   val scalameta = "4.3.20"
   val munit = "0.7.10"
-  val coursier = "0.0.24"
+  val coursier = "0.0.25"
 }
 
 lazy val pprintVersion = Def.setting {
