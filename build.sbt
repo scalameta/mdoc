@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.11"
 def scala211 = "2.11.12"
 def scala213 = "2.13.2"
-def scala3 = "0.26.0-RC1"
+def scala3 = List("0.26.0", "0.27.0-RC1")
 
 def scalajs = "1.1.1"
 def scalajsBinaryVersion = "1"
@@ -65,7 +65,7 @@ def crossSetting[A](
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211, scala213, scala3),
+    crossScalaVersions := List(scala212, scala211, scala213) ::: scala3,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -243,6 +243,7 @@ val jsdocs = project
   .settings(
     sharedSettings,
     skip in publish := true,
+    crossScalaVersions --= scala3,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
@@ -274,7 +275,7 @@ lazy val unit = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    crossScalaVersions -= scala3,
+    crossScalaVersions --= scala3,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
@@ -339,7 +340,7 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
-    crossScalaVersions -= scala3,
+    crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(
