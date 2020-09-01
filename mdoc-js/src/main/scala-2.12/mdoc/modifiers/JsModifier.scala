@@ -16,6 +16,18 @@ import scala.meta.Term
 import scala.meta.inputs.Input
 import scala.meta.io.{AbsolutePath, Classpath}
 import scala.reflect.io.VirtualDirectory
+import org.scalajs.linker.interface.StandardConfig
+import org.scalajs.linker.StandardImpl
+import org.scalajs.linker.PathIRContainer
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import org.scalajs.linker.interface.IRFile
+import org.scalajs.linker.PathIRFile
+import org.scalajs.linker.standard.MemIRFileImpl
+import org.scalajs.linker.interface.LinkerOutput
+import org.scalajs.linker.MemOutputFile
+import java.util.concurrent.Executor
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -25,10 +37,15 @@ class JsModifier extends mdoc.PreModifier {
   var maybeCompiler: Option[MarkdownCompiler] = None
   var config = JsConfig()
   var linker: Linker = newLinker()
-  var virtualIrFiles: Seq[IRContainer] = Nil
+  var virtualIrFiles: Seq[IRFile] = Nil
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
+
+  implicit val synchronousExecutionContext = ExecutionContext.fromExecutor(new Executor {
+    def execute(task: Runnable) = task.run()
+  })
+
   val sjsLogger: Logger = new Logger {
     override def log(level: Level, message: => String): Unit = {
       if (level >= config.minLevel) {
@@ -37,8 +54,8 @@ class JsModifier extends mdoc.PreModifier {
         else reporter.info(message)
       }
     }
-    override def success(message: => String): Unit =
-      reporter.info(message)
+    // override def success(message: => String): Unit =
+    //   reporter.info(message)
     override def trace(t: => Throwable): Unit =
       reporter.error(t)
   }
@@ -55,17 +72,17 @@ class JsModifier extends mdoc.PreModifier {
   }
 
   def newLinker(): Linker = {
-    val semantics =
+    val semantics: Semantics =
       if (config.fullOpt) Semantics.Defaults.optimized
       else Semantics.Defaults
-    StandardLinker(
-      StandardLinker
-        .Config()
+
+      val conf = StandardConfig()
         .withSemantics(semantics)
         .withSourceMap(false)
-        .withClosureCompilerIfAvailable(config.fullOpt)
         .withModuleKind(config.moduleKind)
-    )
+        .withClosureCompilerIfAvailable(config.fullOpt)
+
+    StandardImpl.linker(conf)
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
@@ -86,10 +103,16 @@ class JsModifier extends mdoc.PreModifier {
           classpathHash = newClasspathHash
           maybeCompiler = Some(new MarkdownCompiler(classpath, scalacOptions, target))
           virtualIrFiles = {
+
             val irContainer =
-              IRFileCache.IRContainer.fromClasspath(Classpath(classpath).entries.map(_.toFile))
+              PathIRContainer.fromClasspath(Classpath(classpath).entries.map(_.toNIO))
+
             val cache = irCache.newCache
-            cache.cached(irContainer)
+
+            Await.result(
+              irContainer.map(_._1).flatMap(fs => cache.cached(fs)), 
+              Duration.Inf
+            )
           }
         }
     }
@@ -132,9 +155,11 @@ class JsModifier extends mdoc.PreModifier {
       x <- target.toList
       if x.name.endsWith(".sjsir")
     } yield {
-      val f = new MemVirtualSerializedScalaJSIRFile(x.path)
-      f.content = x.toByteArray
-      f: VirtualScalaJSIRFile
+      new MemIRFileImpl(
+        x.path,
+        None,
+        x.toByteArray
+      ): IRFile
     }
     if (sjsir.isEmpty) {
       if (!hasErrors) {
@@ -142,8 +167,9 @@ class JsModifier extends mdoc.PreModifier {
       }
       ""
     } else {
-      val output = WritableMemVirtualJSFile("output.js")
-      linker.link(virtualIrFiles ++ sjsir, Nil, output, sjsLogger)
+      val output = MemOutputFile.apply()
+      println(Thread.currentThread().getName())
+      linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
       ctx.settings.toInputFile(ctx.inputFile) match {
         case None =>
           ctx.reporter.error(
@@ -153,7 +179,7 @@ class JsModifier extends mdoc.PreModifier {
           ""
         case Some(inputFile) =>
           val outjsfile = resolveOutputJsFile(inputFile)
-          outjsfile.write(output.content)
+          outjsfile.write(new String(output.content))
           val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
           outmdoc.write(Resources.readPath("/mdoc.js"))
           val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
@@ -209,7 +235,8 @@ class JsModifier extends mdoc.PreModifier {
       }
     val run = gensym.fresh("run")
     inputs += input
-    val id = s"mdoc-js-$run"
+    val htmlId = s"mdoc-html-$run"
+    val jsId = s"mdoc_js_$run"
     val mountNodeParam = Term.Name(config.mountNode)
     val code: String =
       if (mods.isShared) {
@@ -222,7 +249,7 @@ class JsModifier extends mdoc.PreModifier {
           .toString
       } else {
         new CodeBuilder()
-          .println(s""" @_root_.scala.scalajs.js.annotation.JSExportTopLevel("$id") """)
+          .println(s"""@_root_.scala.scalajs.js.annotation.JSExportTopLevel("$jsId") """)
           .println(
             s"""def $run($mountNodeParam: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {"""
           )
@@ -230,10 +257,11 @@ class JsModifier extends mdoc.PreModifier {
           .println("}")
           .toString
       }
+
     runs += code
     new CodeBuilder()
       .printlnIf(!mods.isInvisible, s"```scala\n${input.text}\n```")
-      .printlnIf(mods.isEntrypoint, s"""<div id="$id" data-mdoc-js>$body</div>""")
+      .printlnIf(mods.isEntrypoint, s"""<div id="$htmlId" data-mdoc-js>$body</div>""")
       .toString
   }
 }
