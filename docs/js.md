@@ -32,37 +32,6 @@ setInterval({ () =>
 }, 100)
 ```
 
-<p></p>
-
-A good use-case for `mdoc:js` code fences is interactive documentation. For
-example, here below is a counter implemented with
-[monadic-html](https://github.com/OlivierBlanvillain/monadic-html).
-
-````md
-```scala mdoc:js
-import mhtml._
-val counter = Var(0)
-val component =
-  <div>
-    <button onclick={() => counter.update(_ - 1)}>-</button>
-    {counter}
-    <button onclick={() => counter.update(_ + 1)}>+</button>
-  </div>
-mount(node, component)
-```
-````
-
-```scala mdoc:js:invisible
-import mhtml._
-val counter = Var(0)
-val component =
-  <div>
-    <button onclick={() => counter.update(_ - 1)}>-</button>
-    {counter}
-    <button onclick={() => counter.update(_ + 1)}>+</button>
-  </div>
-mount(node, component)
-```
 
 ## Installation
 

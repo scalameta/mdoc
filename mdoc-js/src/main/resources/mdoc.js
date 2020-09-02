@@ -5,8 +5,8 @@
 
   function loadAll(scope) {
     findDivs().forEach(function(el) {
-      var id = el.getAttribute("id");
-      scope[id](el);
+      var id = el.getAttribute("id").replace("-html-", "_js_");
+      eval(id)(el);
     });
   }
 

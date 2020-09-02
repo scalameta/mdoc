@@ -25,7 +25,7 @@ class JsSuite extends BaseMarkdownSuite {
     """|```scala
        |println("hello world!")
        |```
-       |<div id="mdoc-js-run0" data-mdoc-js></div>
+       |<div id="mdoc-html-run0" data-mdoc-js></div>
        |<script type="text/javascript" src="basic.md.js" defer></script>
        |<script type="text/javascript" src="mdoc.js" defer></script>
     """.stripMargin
@@ -61,12 +61,12 @@ class JsSuite extends BaseMarkdownSuite {
     """|```scala
        |println("hello 1!")
        |```
-       |<div id="mdoc-js-run0" data-mdoc-js></div>
+       |<div id="mdoc-html-run0" data-mdoc-js></div>
        |
        |```scala
        |println("hello 2!")
        |```
-       |<div id="mdoc-js-run1" data-mdoc-js></div>
+       |<div id="mdoc-html-run1" data-mdoc-js></div>
        |<script type="text/javascript" src="multi.md.js" defer></script>
        |<script type="text/javascript" src="mdoc.js" defer></script>
        |""".stripMargin
@@ -140,7 +140,7 @@ class JsSuite extends BaseMarkdownSuite {
        |```scala
        |println(x)
        |```
-       |<div id="mdoc-js-run1" data-mdoc-js></div>
+       |<div id="mdoc-html-run1" data-mdoc-js></div>
        |<script type="text/javascript" src="shared.md.js" defer></script>
        |<script type="text/javascript" src="mdoc.js" defer></script>
     """.stripMargin
@@ -193,7 +193,7 @@ class JsSuite extends BaseMarkdownSuite {
         |  |  c
         | '''.stripMargin
         |```
-        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
         |${suffix("stripMargin")}
         |""".stripMargin.triplequoted
   )
@@ -206,7 +206,7 @@ class JsSuite extends BaseMarkdownSuite {
       |```
       |""".stripMargin,
     s"""|
-        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
         |${suffix("invisible")}
         |""".stripMargin
   )
@@ -272,7 +272,7 @@ class JsSuite extends BaseMarkdownSuite {
     """|```scala
        |println("Hello!")
        |```
-       |<div id="mdoc-js-run0" data-mdoc-js></div>
+       |<div id="mdoc-html-run0" data-mdoc-js></div>
        |<script type="text/javascript" src="mdoc-library.js" defer></script>
        |<script type="text/javascript" src="mdoc-loader.js" defer></script>
        |<script type="text/javascript" src="commonjs.md.js" defer></script>
@@ -303,7 +303,7 @@ class JsSuite extends BaseMarkdownSuite {
       |```
       |""".stripMargin,
     s"""|
-        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
         |$unpkgReact
         |<script type="text/javascript" src="html-header.md.js" defer></script>
         |<script type="text/javascript" src="mdoc.js" defer></script>

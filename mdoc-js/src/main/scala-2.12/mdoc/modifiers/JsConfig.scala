@@ -3,8 +3,8 @@ package mdoc.modifiers
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.internal.pos.PositionSyntax._
-import org.scalajs.core.tools.linker.backend.ModuleKind
-import org.scalajs.core.tools.logging.Level
+import org.scalajs.linker.interface.ModuleKind
+import org.scalajs.logging.Level
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
