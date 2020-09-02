@@ -23,6 +23,10 @@ val isScala3 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=3.0.0"))
 }
 
+val isScalaJs1 = Def.setting {
+  VersionNumber(scalaJSVersion).matchesSemVer(SemanticSelector(">=1.0.0"))
+}
+
 def multiScalaDirectories(projectName: String) =
   Def.setting {
     val root = baseDirectory.in(ThisBuild).value / projectName
@@ -239,7 +243,9 @@ val jsdocs = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+    },    
     crossScalaVersions -= scala3,
     libraryDependencies ++= {
       if (isScala213.value || isScalaJs1.value) Nil
@@ -345,8 +351,7 @@ lazy val js = project
     scala212LibraryDependencies(
       List(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-linker" % scalajs,
-        "org.scala-js" %% "scalajs-logging" % scalajs
+        "org.scala-js" %% "scalajs-linker" % scalajs
       )
     )
   )
