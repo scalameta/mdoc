@@ -18,7 +18,7 @@ println(example.Example.greeting)
 ```scala
 println("Hello Scala.js!")
 ```
-<div id="mdoc-js-run0" data-mdoc-js></div>
+<div id="mdoc-html-run0" data-mdoc-js></div>
 <script type="text/javascript" src="readme.md.js" defer></script>
 <script type="text/javascript" src="mdoc.js" defer></script>
 """.trim,
@@ -28,6 +28,6 @@ println("Hello Scala.js!")
 
 lazy val jsapp = project
   .settings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
   )
   .enablePlugins(ScalaJSPlugin)

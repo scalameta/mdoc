@@ -5,8 +5,8 @@ def scala211 = "2.11.12"
 def scala213 = "2.13.2"
 def scala3 = "0.26.0-RC1"
 
-def scalajs = "0.6.32"
-def scalajsBinaryVersion = "0.6"
+def scalajs = "1.1.1"
+def scalajsBinaryVersion = "1"
 def scalajsDom = "1.0.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
@@ -21,6 +21,10 @@ val isScala213 = Def.setting {
 
 val isScala3 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=3.0.0"))
+}
+
+val isScalaJs1 = Def.setting {
+  VersionNumber(scalaJSVersion).matchesSemVer(SemanticSelector(">=1.0.0"))
 }
 
 def multiScalaDirectories(projectName: String) =
@@ -239,15 +243,10 @@ val jsdocs = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
-    crossScalaVersions -= scala3,
-    libraryDependencies ++= {
-      if (isScala213.value) Nil
-      else
-        List(
-          "in.nvilla" %%% "monadic-html" % "0.4.0-RC1"
-        )
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
     },
+    crossScalaVersions -= scala3,
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
@@ -345,7 +344,7 @@ lazy val js = project
     scala212LibraryDependencies(
       List(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-tools" % scalajs
+        "org.scala-js" %% "scalajs-linker" % scalajs
       )
     )
   )
