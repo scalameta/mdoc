@@ -25,9 +25,10 @@ object DocusaurusPlugin extends AutoPlugin {
       taskKey[Unit]("Publish docusaurus site to GitHub pages")
   }
   import autoImport._
-  def website: Def.Initialize[File] = Def.setting {
-    baseDirectory.in(ThisBuild).value / "website"
-  }
+  def website: Def.Initialize[File] =
+    Def.setting {
+      baseDirectory.in(ThisBuild).value / "website"
+    }
 
   def listJarFiles(root: Path): List[(File, String)] = {
     val files = List.newBuilder[(File, String)]
@@ -45,11 +46,13 @@ object DocusaurusPlugin extends AutoPlugin {
   }
 
   def gitUser(): String =
-    sys.env.getOrElse("GIT_USER", {
-      import scala.sys.process._
-      Try("git config user.email".!!.trim)
-        .getOrElse("docusaurus@scalameta.org")
-    })
+    sys.env.getOrElse(
+      "GIT_USER", {
+        import scala.sys.process._
+        Try("git config user.email".!!.trim)
+          .getOrElse("docusaurus@scalameta.org")
+      }
+    )
   def installSsh: String =
     """|#!/usr/bin/env bash
        |
@@ -86,66 +89,67 @@ object DocusaurusPlugin extends AutoPlugin {
        |call yarn publish-gh-pages
     """.stripMargin
 
-  override def projectSettings: Seq[Def.Setting[_]] = List(
-    aggregate.in(docusaurusPublishGhpages) := false,
-    aggregate.in(docusaurusCreateSite) := false,
-    docusaurusProjectName := moduleName.value.stripSuffix("-docs"),
-    MdocPlugin.mdocInternalVariables ++= List(
-      "js-out-prefix" -> "assets"
-    ),
-    docusaurusPublishGhpages := {
-      m.mdoc.toTask(" ").value
+  override def projectSettings: Seq[Def.Setting[_]] =
+    List(
+      aggregate.in(docusaurusPublishGhpages) := false,
+      aggregate.in(docusaurusCreateSite) := false,
+      docusaurusProjectName := moduleName.value.stripSuffix("-docs"),
+      MdocPlugin.mdocInternalVariables ++= List(
+        "js-out-prefix" -> "assets"
+      ),
+      docusaurusPublishGhpages := {
+        m.mdoc.toTask(" ").value
 
-      val tmp =
-        if (scala.util.Properties.isWin) {
-          val tmp = Files.createTempFile("docusaurus", "install_ssh.bat")
-          Files.write(tmp, installSshWindows.getBytes())
-          tmp
-        } else {
-          val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")
-          Files.write(tmp, installSsh.getBytes())
-          tmp
-        }
+        val tmp =
+          if (scala.util.Properties.isWin) {
+            val tmp = Files.createTempFile("docusaurus", "install_ssh.bat")
+            Files.write(tmp, installSshWindows.getBytes())
+            tmp
+          } else {
+            val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")
+            Files.write(tmp, installSsh.getBytes())
+            tmp
+          }
 
-      tmp.toFile.setExecutable(true)
-      Process(
-        tmp.toString,
-        cwd = website.value,
-        "GIT_USER" -> gitUser(),
-        "USE_SSH" -> "true"
-      ).execute()
-    },
-    docusaurusCreateSite := {
-      m.mdoc.in(Compile).toTask(" ").value
-      Process(List("yarn", "install"), cwd = website.value).execute()
-      Process(List("yarn", "run", "build"), cwd = website.value).execute()
-      val redirectUrl = docusaurusProjectName.value + "/index.html"
-      val html = redirectHtml(redirectUrl)
-      val out = website.value / "build"
-      IO.write(out / "index.html", html)
-      out
-    },
-    cleanFiles := {
-      val buildFolder = website.value / "build"
-      val nodeModules = website.value / "node_modules"
-      val currentCleanFiles = cleanFiles.value
+        tmp.toFile.setExecutable(true)
+        Process(
+          tmp.toString,
+          cwd = website.value,
+          "GIT_USER" -> gitUser(),
+          "USE_SSH" -> "true"
+        ).execute()
+      },
+      docusaurusCreateSite := {
+        m.mdoc.in(Compile).toTask(" ").value
+        Process(List("yarn", "install"), cwd = website.value).execute()
+        Process(List("yarn", "run", "build"), cwd = website.value).execute()
+        val redirectUrl = docusaurusProjectName.value + "/index.html"
+        val html = redirectHtml(redirectUrl)
+        val out = website.value / "build"
+        IO.write(out / "index.html", html)
+        out
+      },
+      cleanFiles := {
+        val buildFolder = website.value / "build"
+        val nodeModules = website.value / "node_modules"
+        val currentCleanFiles = cleanFiles.value
 
-      val docusaurusFolders = Seq(buildFolder, nodeModules).filter(_.exists())
-      docusaurusFolders ++ currentCleanFiles
-    },
-    doc := {
-      val out = docusaurusCreateSite.value
-      Relativize.htmlSite(out.toPath)
-      out
-    },
-    packageDoc.in(Compile) := {
-      val directory = doc.value
-      val jar = target.value / "docusaurus.jar"
-      val files = listJarFiles(directory.toPath)
-      IO.jar(files, jar, new java.util.jar.Manifest())
-      jar
-    }
-  )
+        val docusaurusFolders = Seq(buildFolder, nodeModules).filter(_.exists())
+        docusaurusFolders ++ currentCleanFiles
+      },
+      doc := {
+        val out = docusaurusCreateSite.value
+        Relativize.htmlSite(out.toPath)
+        out
+      },
+      packageDoc.in(Compile) := {
+        val directory = doc.value
+        val jar = target.value / "docusaurus.jar"
+        val files = listJarFiles(directory.toPath)
+        IO.jar(files, jar, new java.util.jar.Manifest())
+        jar
+      }
+    )
 
   private implicit class XtensionListStringProcess(command: List[String]) {
     def execute(): Unit = {

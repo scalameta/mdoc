@@ -3,6 +3,7 @@ package mdoc.internal.cli
 import scala.meta.io.Classpath
 import coursierapi.Dependency
 import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.MarkdownBuilder
 import scala.collection.JavaConverters._
 import scala.meta.io.AbsolutePath
 import coursierapi.Repository
@@ -33,6 +34,6 @@ object Dependencies {
       case options =>
         s"${settings.scalacOptions} ${options.map(_.value).mkString(" ")}"
     }
-    MarkdownCompiler.fromClasspath(classpath.syntax, scalacOptions)
+    MarkdownBuilder.fromClasspath(classpath.syntax, scalacOptions)
   }
 }

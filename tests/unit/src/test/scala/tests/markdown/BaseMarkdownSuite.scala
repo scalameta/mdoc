@@ -10,6 +10,7 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.Markdown
 import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.MarkdownBuilder
 import scala.meta.inputs.Input
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
@@ -47,7 +48,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     new ConsoleReporter(new PrintStream(myStdout))
   }
   protected def scalacOptions: String = ""
-  private val compiler = MarkdownCompiler.fromClasspath("", scalacOptions)
+  private val compiler = MarkdownBuilder.fromClasspath("", scalacOptions)
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
     settings.validate(reporter)
     if (reporter.hasErrors) fail("reporter has errors")
@@ -105,14 +106,20 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       name: TestOptions,
       original: String,
       expected: String,
-      settings: Settings = baseSettings
+      settings: Settings = baseSettings,
+      compat: Map[String, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
-    checkCompiles(name, original, settings, obtained => {
-      assertNoDiff(
-        Compat(obtained, Map.empty, postProcessObtained),
-        Compat(expected, Map.empty, postProcessExpected)
-      )
-    })
+    checkCompiles(
+      name,
+      original,
+      settings,
+      obtained => {
+        assertNoDiff(
+          Compat(obtained, Map.empty, postProcessObtained),
+          Compat(expected, compat, postProcessExpected)
+        )
+      }
+    )
   }
 
 }

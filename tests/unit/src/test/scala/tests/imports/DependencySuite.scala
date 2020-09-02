@@ -4,17 +4,18 @@ import tests.markdown.BaseMarkdownSuite
 
 class DependencySuite extends BaseMarkdownSuite {
   val userHome = System.getProperty("user.home")
-  override def postProcessObtained: Map[String, String => String] = Map(
-    "all" -> { old =>
-      old.linesIterator
-        .map {
-          case line if line.contains(userHome) =>
-            "<redacted user.home>"
-          case line => line
-        }
-        .mkString("\n")
-    }
-  )
+  override def postProcessObtained: Map[String, String => String] =
+    Map(
+      "all" -> { old =>
+        old.linesIterator
+          .map {
+            case line if line.contains(userHome) =>
+              "<redacted user.home>"
+            case line => line
+          }
+          .mkString("\n")
+      }
+    )
 
   List("dep", "ivy").foreach { dep =>
     check(
@@ -29,7 +30,7 @@ class DependencySuite extends BaseMarkdownSuite {
           |import $$$dep.`org.dhallj::dhall-scala:0.3.0`, org.dhallj.syntax._
           |"\\\\(n: Natural) -> [n + 0, n + 1, 1 + 1]".parseExpr
           |// res0: Either[org.dhallj.core.DhallException.ParsingFailure, org.dhallj.core.Expr] = Right(
-          |//   λ(n : Natural) → [n + 0, n + 1, 1 + 1]
+          |//   value = λ(n : Natural) → [n + 0, n + 1, 1 + 1]
           |// )
           |```
           |""".stripMargin

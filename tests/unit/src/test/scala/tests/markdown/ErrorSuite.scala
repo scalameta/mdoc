@@ -2,16 +2,17 @@ package tests.markdown
 
 class ErrorSuite extends BaseMarkdownSuite {
 
-  override def postProcessObtained: Map[String, String => String] = Map(
-    "all" -> { old =>
-      old.linesIterator
-        .filterNot { line =>
-          line.startsWith("did you mean") ||
-          line.contains("(crash.md")
-        }
-        .mkString("\n")
-    }
-  )
+  override def postProcessObtained: Map[String, String => String] =
+    Map(
+      "all" -> { old =>
+        old.linesIterator
+          .filterNot { line =>
+            line.startsWith("did you mean") ||
+            line.contains("(crash.md")
+          }
+          .mkString("\n")
+      }
+    )
 
   checkError(
     "crash",

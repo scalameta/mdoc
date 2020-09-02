@@ -138,7 +138,16 @@ class DefaultSuite extends BaseMarkdownSuite {
        |User("John", 42)
        |// res0: User = User("John", 42)
        |```
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "2.13" ->
+        """|```scala
+           |case class User(name: String, age: Int)
+           |User("John", 42)
+           |// res0: User = User(name = "John", age = 42)
+           |```
+           |""".stripMargin
+    )
   )
 
   check(

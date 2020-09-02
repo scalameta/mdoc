@@ -4,6 +4,7 @@ import scala.collection.JavaConverters._
 import mdoc.Reporter
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.MarkdownBuilder
 import coursierapi.Dependency
 import scala.collection.mutable
 import scala.meta.io.Classpath
@@ -29,7 +30,7 @@ object Context {
     new Context(options, reporter, compiler)
   }
   def fromOptions(options: Settings, reporter: Reporter = ConsoleReporter.default): Context = {
-    val compiler = MarkdownCompiler.fromClasspath(options.classpath, options.scalacOptions)
+    val compiler = MarkdownBuilder.fromClasspath(options.classpath, options.scalacOptions)
     fromCompiler(options, reporter, compiler)
   }
 }

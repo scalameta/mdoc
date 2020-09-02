@@ -13,8 +13,8 @@ class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
   private val base = Settings.default(PathIO.workingDirectory)
 
-  def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(
-      implicit loc: munit.Location
+  def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(implicit
+      loc: munit.Location
   ): Unit = {
     test(name) {
       val obtained = Settings.fromCliArgs(args, base).get
@@ -22,8 +22,8 @@ class CliArgsSuite extends FunSuite {
     }
   }
 
-  def checkError(name: String, args: List[String], expected: String)(
-      implicit loc: munit.Location
+  def checkError(name: String, args: List[String], expected: String)(implicit
+      loc: munit.Location
   ): Unit = {
     test(name) {
       Settings.fromCliArgs(args, base).andThen(_.validate(reporter)).toEither match {

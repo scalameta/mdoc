@@ -13,6 +13,7 @@ import scala.meta.io.RelativePath
 import munit.TestOptions
 import mdoc.internal.BuildInfo
 import tests.BaseSuite
+import tests.markdown.Compat
 
 abstract class BaseCliSuite extends BaseSuite {
   class TemporaryDirectory(name: String) extends Fixture[AbsolutePath](name) {
@@ -24,16 +25,17 @@ abstract class BaseCliSuite extends BaseSuite {
   }
   val in = new TemporaryDirectory("in")
   val out = new TemporaryDirectory("out")
-  override def postProcessObtained: Map[String, String => String] = Map(
-    "all" -> { old =>
-      old
-        .replace(out().toString(), "<output>")
-        .replace(in().toString(), "<input>")
-        .linesIterator
-        .filterNot(line => line.startsWith("info: Compiled in"))
-        .mkString("\n")
-    }
-  )
+  override def postProcessObtained: Map[String, String => String] =
+    Map(
+      "all" -> { old =>
+        old
+          .replace(out().toString(), "<output>")
+          .replace(in().toString(), "<input>")
+          .linesIterator
+          .filterNot(line => line.startsWith("info: Compiled in"))
+          .mkString("\n")
+      }
+    )
   override def munitFixtures: Seq[Fixture[_]] = List(in, out)
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
@@ -46,7 +48,8 @@ abstract class BaseCliSuite extends BaseSuite {
       output: => String = out().toString,
       expectedExitCode: => Int = 0,
       onStdout: String => Unit = _ => (),
-      includeOutputPath: RelativePath => Boolean = _ => true
+      includeOutputPath: RelativePath => Boolean = _ => true,
+      compat: Map[String, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     test(name) {
       myStdout.reset()
@@ -66,7 +69,7 @@ abstract class BaseCliSuite extends BaseSuite {
       val stdout = fansi.Str(myStdout.toString()).plainText
       assertEquals(code, expectedExitCode, clues(stdout))
       val obtained = StringFS.asString(out(), includePath = includeOutputPath)
-      assertNoDiff(obtained, expected)
+      assertNoDiff(obtained, Compat(expected, compat))
       onStdout(stdout)
     }
   }

@@ -15,19 +15,22 @@ import scala.meta.internal.io.PathIO
 import scala.util.control.NonFatal
 import coursierapi.Dependency
 import scala.meta.internal.io.FileIO
+import scala.meta.internal.inputs._
 
 object PositionSyntax {
   implicit class XtensionInputMdoc(input: Input) {
-    def filename: String = input match {
-      case s: Input.Slice => s.input.filename
-      case _ => input.syntax
-    }
-    def relativeFilename(sourceroot: AbsolutePath): RelativePath = input match {
-      case s: Input.Slice =>
-        s.input.relativeFilename(sourceroot)
-      case _ =>
-        AbsolutePath(input.syntax).toRelative(sourceroot)
-    }
+    def filename: String =
+      input match {
+        case s: Input.Slice => s.input.filename
+        case _ => input.syntax
+      }
+    def relativeFilename(sourceroot: AbsolutePath): RelativePath =
+      input match {
+        case s: Input.Slice =>
+          s.input.relativeFilename(sourceroot)
+        case _ =>
+          AbsolutePath(input.syntax).toRelative(sourceroot)
+      }
     def toFilename(settings: Settings): String =
       if (settings.reportRelativePaths) Paths.get(input.filename).getFileName.toString
       else filename
@@ -77,18 +80,20 @@ object PositionSyntax {
     }
   }
   implicit class XtensionPositionMdoc(pos: Position) {
-    def addStart(offset: Int): Position = pos match {
-      case Position.Range(i, start, end) =>
-        Position.Range(i, start + offset, end)
-      case _ =>
-        pos
-    }
-    def toUnslicedPosition: Position = pos.input match {
-      case Input.Slice(underlying, a, _) =>
-        Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition
-      case _ =>
-        pos
-    }
+    def addStart(offset: Int): Position =
+      pos match {
+        case Position.Range(i, start, end) =>
+          Position.Range(i, start + offset, end)
+        case _ =>
+          pos
+      }
+    def toUnslicedPosition: Position =
+      pos.input match {
+        case Input.Slice(underlying, a, _) =>
+          Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition
+        case _ =>
+          pos
+      }
     def toMdoc: RangePosition =
       new RangePosition(
         pos.startLine,
@@ -151,29 +156,31 @@ object PositionSyntax {
     def rangeNumber: String =
       s"${pos.startLine + 1}:${pos.startColumn + 1}..${pos.endLine + 1}:${pos.endColumn + 1}"
 
-    def lineCaret: String = pos match {
-      case Position.None =>
-        ""
-      case _ =>
-        val caret =
-          if (pos.start == pos.end) "^"
-          else if (pos.startLine == pos.endLine) "^" * (pos.end - pos.start)
-          else "^"
-        (" " * pos.startColumn) + caret
-    }
+    def lineCaret: String =
+      pos match {
+        case Position.None =>
+          ""
+        case _ =>
+          val caret =
+            if (pos.start == pos.end) "^"
+            else if (pos.startLine == pos.endLine) "^" * (pos.end - pos.start)
+            else "^"
+          (" " * pos.startColumn) + caret
+      }
 
-    def lineContent: String = pos match {
-      case Position.None => ""
-      case range: Position.Range =>
-        val pos = Position.Range(
-          range.input,
-          range.startLine,
-          0,
-          range.startLine,
-          Int.MaxValue
-        )
-        pos.text
-    }
+    def lineContent: String =
+      pos match {
+        case Position.None => ""
+        case range: Position.Range =>
+          val pos = Position.Range(
+            range.input,
+            range.startLine,
+            0,
+            range.startLine,
+            Int.MaxValue
+          )
+          pos.text
+      }
   }
 
   implicit class XtensionThrowable(e: Throwable) {

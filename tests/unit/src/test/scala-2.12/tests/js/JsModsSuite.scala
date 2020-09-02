@@ -20,16 +20,22 @@ class JsModsSuite extends BaseMarkdownSuite {
     }
   }
   def checkError(str: String, expected: String): Unit = {
-    parsed(str, (err, res) => {
-      assertNoDiff(err, expected)
-      assert(res.isEmpty)
-    })
+    parsed(
+      str,
+      (err, res) => {
+        assertNoDiff(err, expected)
+        assert(res.isEmpty)
+      }
+    )
   }
   def checkOK(str: String): Unit = {
-    parsed(str, (err, res) => {
-      assertNoDiff(err, "")
-      assert(res.isDefined)
-    })
+    parsed(
+      str,
+      (err, res) => {
+        assertNoDiff(err, "")
+        assert(res.isDefined)
+      }
+    )
   }
   checkOK("")
   checkOK("shared")
