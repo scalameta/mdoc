@@ -28,14 +28,14 @@ class JsCliSuite extends BaseCliSuite {
         |```scala
         |println("hello world!")
         |```
-        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
         |${suffix("index1")}
         |
         |/index2.md
         |```scala
         |println("hello world!")
         |```
-        |<div id="mdoc-js-run0" data-mdoc-js></div>
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
         |${suffix("index2")}
         |""".stripMargin,
     input = "index1.md",
