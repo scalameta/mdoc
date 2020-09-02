@@ -75,11 +75,11 @@ class JsModifier extends mdoc.PreModifier {
       if (config.fullOpt) Semantics.Defaults.optimized
       else Semantics.Defaults
 
-      val conf = StandardConfig()
-        .withSemantics(semantics)
-        .withSourceMap(false)
-        .withModuleKind(config.moduleKind)
-        .withClosureCompilerIfAvailable(config.fullOpt)
+    val conf = StandardConfig()
+      .withSemantics(semantics)
+      .withSourceMap(false)
+      .withModuleKind(config.moduleKind)
+      .withClosureCompilerIfAvailable(config.fullOpt)
 
     StandardImpl.linker(conf)
   }
@@ -109,7 +109,7 @@ class JsModifier extends mdoc.PreModifier {
             val cache = irCache.newCache
 
             Await.result(
-              irContainer.map(_._1).flatMap(fs => cache.cached(fs)), 
+              irContainer.map(_._1).flatMap(fs => cache.cached(fs)),
               Duration.Inf
             )
           }

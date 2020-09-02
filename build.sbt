@@ -245,7 +245,7 @@ val jsdocs = project
     skip in publish := true,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
-    },    
+    },
     crossScalaVersions -= scala3,
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
