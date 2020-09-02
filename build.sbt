@@ -247,13 +247,6 @@ val jsdocs = project
       _.withModuleKind(ModuleKind.CommonJSModule)
     },    
     crossScalaVersions -= scala3,
-    libraryDependencies ++= {
-      if (isScala213.value || isScalaJs1.value) Nil
-      else
-        List(
-          "in.nvilla" %%% "monadic-html" % "0.4.0-RC1"
-        )
-    },
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),

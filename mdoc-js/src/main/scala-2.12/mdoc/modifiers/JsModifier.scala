@@ -54,8 +54,7 @@ class JsModifier extends mdoc.PreModifier {
         else reporter.info(message)
       }
     }
-    // override def success(message: => String): Unit =
-    //   reporter.info(message)
+
     override def trace(t: => Throwable): Unit =
       reporter.error(t)
   }
@@ -168,7 +167,6 @@ class JsModifier extends mdoc.PreModifier {
       ""
     } else {
       val output = MemOutputFile.apply()
-      println(Thread.currentThread().getName())
       linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
       ctx.settings.toInputFile(ctx.inputFile) match {
         case None =>
