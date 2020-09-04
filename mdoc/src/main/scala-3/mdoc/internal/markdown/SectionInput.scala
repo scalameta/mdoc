@@ -13,7 +13,7 @@ import scala.meta.Source
 import scala.meta.inputs.Input
 import scala.meta.Name
 import mdoc.internal.pos.TokenEditDistance
-
+import mdoc.internal.BuildInfo
 import dotty.tools.dotc.interactive.InteractiveDriver
 
 /* The class uses Scala 3 parser.
@@ -28,9 +28,9 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
           |}
           |""".stripMargin
   private val filename = "Section.scala"
-  
   driver.run(java.net.URI.create("file:///Section.scala"), SourceFile.virtual(filename, sourceCode))
   val source = driver.currentCtx.run.units.head.untpdTree
+  given ctx as Context = driver.currentCtx
   def stats : List[Tree] = {
       source match {
         case PackageDef(_, List(module @ _ : ModuleDef)) => 
@@ -42,14 +42,16 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
   def show(tree : Tree, currentIdent : Int) = {
      val str = tree.sourcePos.start 
      val end = tree.sourcePos.end
-     // https://github.com/lampepfl/dotty/issues/9495
-     val prefix = tree match {
-       case ext: ExtMethods if ext.tparams.nonEmpty =>
-        "extension ["
-       case _: ExtMethods =>
-        "extension ("
-       case _ => ""
-     } 
+     // workaround should be removed once support for 0.26.0 is dropped
+     val prefix = if (BuildInfo.scalaBinaryVersion == "0.26")
+        tree match {
+          case ext: ExtMethods if ext.tparams.nonEmpty =>
+            "extension ["
+          case _: ExtMethods =>
+            "extension ("
+          case _ =>  ""
+        } 
+     else ""
      val realIdent = " " * (currentIdent - wrapIdent.size)
      prefix + sourceCode.substring(str, end).replace("\n", "\n" + realIdent)
   }

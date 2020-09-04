@@ -6,6 +6,7 @@ import java.nio.file.Path
 
 import dotty.tools.dotc.interfaces.SourcePosition
 import dotty.tools.dotc.ast.untpd._
+import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.ast.Trees
 import dotty.tools.dotc.core.Flags
 
@@ -57,6 +58,7 @@ class Instrumenter(
   private def printAsScript(): Unit = {
     sections.zipWithIndex.foreach {
       case (section, i) =>
+        import section.ctx
         printlnWithIndent("")
         printlnWithIndent("$doc.startSection();")
           section.stats.foreach { stat =>
@@ -79,7 +81,7 @@ class Instrumenter(
       m: Modifier,
       sb: PrintStream,
       section: SectionInput
-  ): Unit = {
+  )(using ctx: Context): Unit = {
     val binders = stat match {
       case Instrumenter.Binders(names) =>
         names
@@ -140,13 +142,13 @@ object Instrumenter {
   }
 
   object Binders {
-    private def fromPat(trees: List[Tree]) = {
+    private def fromPat(trees: List[Tree])(using ctx: Context) = {
       trees.map {
         case id: Ident =>
           id.name.toString -> id.sourcePos
       }
     }
-    def unapply(tree: Tree): Option[List[(String, SourcePosition)]] =
+    def unapply(tree: Tree)(using ctx: Context): Option[List[(String, SourcePosition)]] =
       tree match {
         case df: Trees.ValDef[_] if df.mods.is(Flags.Lazy) => Some(Nil)
         case df: Trees.ValDef[_] =>

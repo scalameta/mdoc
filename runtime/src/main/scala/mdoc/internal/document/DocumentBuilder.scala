@@ -3,11 +3,11 @@ package mdoc.internal.document
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import mdoc.document._
-import pprint.TPrint
+import mdoc.internal.document.Compat.TPrint
 import scala.collection.mutable.ArrayBuffer
 import scala.language.experimental.macros
 import scala.util.control.NonFatal
-import sourcecode.Text
+import mdoc.internal.sourcecode.SourceStatement
 
 trait DocumentBuilder {
 
@@ -35,8 +35,14 @@ trait DocumentBuilder {
       pos
     }
 
-    def binder[A](e: Text[A], startLine: Int, startColumn: Int, endLine: Int, endColumn: Int)(
-        implicit tprint: TPrint[A]
+    def binder[A](
+        e: SourceStatement[A],
+        startLine: Int,
+        startColumn: Int,
+        endLine: Int,
+        endColumn: Int
+    )(implicit
+        tprint: TPrint[A]
     ): A = {
       val pos = position(startLine, startColumn, endLine, endColumn)
       myBinders.append(Binder.generate(e, pos))
@@ -62,9 +68,9 @@ trait DocumentBuilder {
 
     def crash(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int)(
         thunk: => Any
-    ): Unit = {
+    )(implicit tprint: TPrint[CrashResult]): Unit = {
       val pos = new RangePosition(startLine, startColumn, endLine, endColumn)
-      val result =
+      val result: CrashResult =
         try {
           thunk
           CrashResult.Success(pos)
@@ -72,7 +78,8 @@ trait DocumentBuilder {
           case MdocNonFatal(e) =>
             CrashResult.Crashed(e, pos)
         }
-      myBinders.append(Binder.generate(result, pos))
+      // We can't generate macros in the same unit and the name or result will be "result" anyway
+      myBinders.append(new Binder(result, "result", tprint, pos))
     }
 
     def build(input: InstrumentedInput): Document = {

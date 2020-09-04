@@ -18,11 +18,12 @@ class BaseSuite extends FunSuite {
   }
   object OnlyScala213 extends munit.Tag("OnlyScala213")
   object OnlyScala3 extends munit.Tag("OnlyScala3")
+  object SkipScala3 extends munit.Tag("SkipScala3")
   object SkipScala211 extends munit.Tag("SkipScala211")
   override def munitTestTransforms: List[TestTransform] =
     super.munitTestTransforms ++ List(
       new TestTransform(
-        OnlyScala213.value,
+        "ScalaVersions",
         { test =>
           val binaryVersion = tests.BuildInfo.scalaBinaryVersion
           if (test.tags(OnlyScala213) && binaryVersion != "2.13")
@@ -30,6 +31,12 @@ class BaseSuite extends FunSuite {
           else if (
             test
               .tags(OnlyScala3) && !(binaryVersion.startsWith("0.") || binaryVersion
+              .startsWith("3."))
+          )
+            test.tag(munit.Ignore)
+          else if (
+            test
+              .tags(SkipScala3) && (binaryVersion.startsWith("0.") || binaryVersion
               .startsWith("3."))
           )
             test.tag(munit.Ignore)

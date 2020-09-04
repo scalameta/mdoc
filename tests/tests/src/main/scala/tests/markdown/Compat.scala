@@ -20,8 +20,8 @@ object Compat {
       postProcess: Map[String, String => String] = Map.empty
   ): String = {
     val result = compat
-      .get(BuildInfo.scalaVersion)
-      .orElse(compat.get(BuildInfo.scalaBinaryVersion))
+      .collect { case (key, value) if BuildInfo.scalaVersion.startsWith(key) => value }
+      .headOption
       .orElse(compat.get("all"))
       .getOrElse(
         BuildInfo.scalaBinaryVersion match {

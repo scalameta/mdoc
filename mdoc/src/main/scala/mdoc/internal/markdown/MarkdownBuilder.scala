@@ -81,11 +81,11 @@ object MarkdownBuilder {
           val pathString = path.toString
           pathString.contains("scala-library") ||
           pathString.contains("scala-reflect") ||
-          pathString.contains("sourcecode") ||
           pathString.contains("fansi") ||
           pathString.contains("pprint") ||
           pathString.contains("mdoc-interfaces") ||
-          (pathString.contains("mdoc") && pathString.contains("runtime"))
+          (pathString.contains("mdoc") && pathString.contains("runtime")) ||
+          (pathString.contains("mdoc") && pathString.contains("printing"))
         })
         base ++ runtime
       }
@@ -99,7 +99,8 @@ object MarkdownBuilder {
         .iterator
         .map(url => AbsolutePath(Paths.get(url.toURI)))
         .filter(p => fn(p.toNIO))
-    Classpath(paths.toList)
+        .toList
+    Classpath(paths)
   }
 
 }

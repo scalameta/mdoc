@@ -110,7 +110,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.3.20"
-  val munit = "0.7.11"
+  val munit = "0.7.12"
   val coursier = "0.0.25"
 }
 
@@ -121,7 +121,7 @@ lazy val pprintVersion = Def.setting {
 
 lazy val fansiVersion = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "0.2.6"
-  else "0.2.7"
+  else "0.2.9"
 }
 
 lazy val interfaces = project
@@ -143,11 +143,13 @@ lazy val runtime = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % pprintVersion.value,
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("runtime").value,
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
+        "com.lihaoyi" %% "pprint" % pprintVersion.value,
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
       )
     )
   )
@@ -247,7 +249,6 @@ val jsdocs = project
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
-    crossScalaVersions -= scala3,
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),

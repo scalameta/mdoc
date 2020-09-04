@@ -14,8 +14,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |???
        |// scala.NotImplementedError: an implementation is missing
        |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |// 	at repl.MdocSession$App$$anonfun$2.apply(basic.md:14)
-       |// 	at repl.MdocSession$App$$anonfun$2.apply(basic.md:14)
+       |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
+       |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
        |```
     """.stripMargin
   )

@@ -1,10 +1,5 @@
 package mdoc.document
 
-import pprint.PPrinter
-import pprint.TPrint
-import pprint.TPrintColors
-import sourcecode.Text
-
 final case class InstrumentedInput(filename: String, text: String)
 object InstrumentedInput {
   val empty = InstrumentedInput("", "")
