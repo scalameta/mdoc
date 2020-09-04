@@ -84,13 +84,14 @@ pages. This task run several steps:
 
 ## Publish to GitHub pages from CI
 
-You can configure your Travis CI server to publish docs after merge into master.
-The [Docusaurus docs](https://docusaurus.io/docs/en/publishing#using-travis-cih)
-already have excellent instructions for how to set this up. If those
-instructions work for you, then that's great! No need to read this section here.
-However, you prefer to use "deploy keys" over "personal access tokens because
-deploy keys are limited to individual repositories instead of per-account. If
-this sounds interesting, read ahead.
+You can configure GitHub Actions or Travis CI server to publish docs after merge
+into master. The
+[Docusaurus docs](https://docusaurus.io/docs/en/publishing#using-travis-cih)
+already have instructions for how to set this up. If those instructions work for
+you, then that's great! No need to read this section here. However, you prefer
+to use "deploy keys" over "personal access tokens because deploy keys are
+limited to individual repositories instead of per-account. If this sounds
+interesting, read ahead.
 
 ### Deploy key
 
@@ -125,17 +126,20 @@ https://github.com/scalameta/mdoc/settings/keys. Press "Add deploy key".
 
 Your screen should look like this
 
-![Add GitHub deploy key](assets/deploy_key.png)
+![Add GitHub deploy key](https://i.imgur.com/hm3MpUK.png)
 
 ### Environment variables
 
-Next open the Travis CI settings panel for your project:
-https://travis-ci.org/scalameta/mdoc/settings.
+Next open the secrets settings for your CI provider. The URL for the mdoc repo
+looks like this:
+
+- GitHub Actions: https://github.com/scalameta/mdoc/settings/secrets
+- Travis CI: https://travis-ci.org/scalameta/mdoc/settings
 
 Add the following values:
 
-- `GITHUB_DEPLOY_KEY` or `GIT_DEPLOY_KEY`: the base64 encoded secret key. Note,
-  the secret key is the file without the `.pub` extension
+- `GIT_DEPLOY_KEY`: the base64 encoded secret key. Note, the secret key is the
+  file without the `.pub` extension.
   ```sh
   # macOS
   cat myproject | base64 | pbcopy
@@ -145,7 +149,23 @@ Add the following values:
   cat myproject | base64 | xclip
   ```
 
-### `.travis.yml`
+### GitHub Actions
+
+> Skip this part if you are not using GitHub Actions.
+
+Next, create a new file at `.github/workflows/mdoc.yml` to trigger
+`docs/docusaurusPublishGhpages` on successful merge into master and on tag push.
+
+```scala mdoc:file:.github/workflows/mdoc.yml
+
+```
+
+Commit your changes, push to master and you're all set! Merge a PR to your
+project and watch GitHub Actions release the docs 😎
+
+### Travis CI
+
+> Skip this part if you are not using Travis CI
 
 Next, update .travis.yml to trigger `docs/docusaurusPublishGhpages` on
 successful merge into master and on tag push. There are many ways to do this,
