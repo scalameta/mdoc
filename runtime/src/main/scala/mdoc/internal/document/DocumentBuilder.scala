@@ -78,7 +78,7 @@ trait DocumentBuilder {
           case MdocNonFatal(e) =>
             CrashResult.Crashed(e, pos)
         }
-      // We can't generate macros in the same unit and the name or result will be "result" anyway
+      // We can't generate macros in the same unit and the name of result will be "result" anyway
       myBinders.append(new Binder(result, "result", tprint, pos))
     }
 

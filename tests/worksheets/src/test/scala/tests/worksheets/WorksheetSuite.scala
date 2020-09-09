@@ -315,6 +315,21 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "dotty-interpolation".tag(OnlyScala3),
+    """|val name = "Ben"
+       |val quoted = s"$"$name$""
+       |quoted
+       |""".stripMargin,
+    """|<val name = "Ben"> // : String = Ben
+       |name: String = Ben
+       |<val quoted = s"$"$name$""> // : String = "Ben"
+       |quoted: String = "Ben"
+       |<quoted> // : String = "Ben"
+       |res0: String = "Ben"
+       |""".stripMargin
+  )
+
+  checkDecorations(
     "dotty-imports".tag(OnlyScala3),
     """|import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`
        |import scalatags.Text.all._
