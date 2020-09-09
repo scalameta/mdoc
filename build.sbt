@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.11"
 def scala211 = "2.11.12"
 def scala213 = "2.13.2"
-def scala3 = "0.26.0-RC1"
+def scala3 = List("0.26.0", "0.27.0-RC1")
 
 def scalajs = "1.1.1"
 def scalajsBinaryVersion = "1"
@@ -65,7 +65,7 @@ def crossSetting[A](
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211, scala213, scala3),
+    crossScalaVersions := List(scala212, scala211, scala213) ::: scala3,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -109,8 +109,8 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.3.20"
-  val munit = "0.7.11"
+  val scalameta = "4.3.22"
+  val munit = "0.7.12"
   val coursier = "0.0.25"
 }
 
@@ -121,7 +121,7 @@ lazy val pprintVersion = Def.setting {
 
 lazy val fansiVersion = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "0.2.6"
-  else "0.2.7"
+  else "0.2.9"
 }
 
 lazy val interfaces = project
@@ -143,11 +143,13 @@ lazy val runtime = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % pprintVersion.value,
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("runtime").value,
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
+        "com.lihaoyi" %% "pprint" % pprintVersion.value,
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
       )
     )
   )
@@ -243,10 +245,10 @@ val jsdocs = project
   .settings(
     sharedSettings,
     skip in publish := true,
+    crossScalaVersions --= scala3,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
-    crossScalaVersions -= scala3,
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
@@ -274,7 +276,7 @@ lazy val unit = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    crossScalaVersions -= scala3,
+    crossScalaVersions --= scala3,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
@@ -339,7 +341,7 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
-    crossScalaVersions -= scala3,
+    crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
     scala212LibraryDependencies(
       List(

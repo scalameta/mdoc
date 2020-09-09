@@ -28,7 +28,11 @@ class WorksheetSuite extends BaseSuite {
     .withClasspath(
       CompatClassloader
         .getURLs(this.getClass().getClassLoader())
-        .collect { case url if url.toString.contains("dotty-library") => Paths.get(url.toURI()) }
+        .collect {
+          case url
+              if url.toString.contains("dotty-library") || url.toString.contains("scala-library") =>
+            Paths.get(url.toURI())
+        }
         .asJava
     )
 
@@ -83,7 +87,12 @@ class WorksheetSuite extends BaseSuite {
        |  11,
        |  12,
        |...
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "0." -> """|<Stream.from(10)> // : Stream[Int] = Stre...
+                 |res0: Stream[Int] = Stream(10, <not computed>)
+                 |""".stripMargin
+    )
   )
 
   checkDecorations(
@@ -97,6 +106,27 @@ class WorksheetSuite extends BaseSuite {
        |// 2;
        |// 3
        |""".stripMargin
+  )
+
+  checkDecorations(
+    "list",
+    """
+      |val list = List(1,2,3)
+      |list.tail
+      |""".stripMargin,
+    """|<val list = List(1,2,3)> // : List[Int] = List(1...
+       |list: List[Int] = List(1, 2, 3)
+       |<list.tail> // : List[Int] = List(2,...
+       |res0: List[Int] = List(2, 3)
+       |""".stripMargin,
+    compat = Map(
+      "0.2" ->
+        """|<val list = List(1,2,3)> // : List[Int] = List(1...
+           |list: List[Int] = List(1, 2, 3)
+           |<list.tail> // : List[Int @unchecked...
+           |res0: List[Int @uncheckedVariance] = List(2, 3)
+           |""".stripMargin
+    )
   )
 
   checkDecorations(
@@ -145,13 +175,7 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
-  // From 2.13 we get `name =` part
-  val definitionCompat =
-    """|case class User(name: String)
-       |<val n = User("Susan")> // : User = User(name =...
-       |n: User = User(name = "Susan")
-       |""".stripMargin
-
+  // In pprint for 2.13  we get `name =` part
   checkDecorations(
     "definition",
     """case class User(name: String)
@@ -162,8 +186,14 @@ class WorksheetSuite extends BaseSuite {
        |n: User = User("Susan")
        |""".stripMargin,
     compat = Map(
-      "0.26" -> definitionCompat,
-      "2.13" -> definitionCompat
+      "0." -> """|case class User(name: String)
+                 |<val n = User("Susan")> // : User = User(Susan)
+                 |n: User = User(Susan)
+                 |""".stripMargin,
+      "2.13" -> """|case class User(name: String)
+                   |<val n = User("Susan")> // : User = User(name =...
+                   |n: User = User(name = "Susan")
+                   |""".stripMargin
     )
   )
 
@@ -179,7 +209,7 @@ class WorksheetSuite extends BaseSuite {
        |                    ^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      "0.26" ->
+      "0.2" ->
         """|type-error:2:21: error: Found:    ("not found" : String)
            |Required: Int
            |val filename: Int = "not found"
@@ -204,7 +234,7 @@ class WorksheetSuite extends BaseSuite {
        |^^^^^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      "0.26" ->
+      "0.2" ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
            |	at repl.MdocSession$App.crash(crash.scala:8)
            |	at repl.MdocSession$App.<init>(crash.scala:16)
@@ -226,12 +256,17 @@ class WorksheetSuite extends BaseSuite {
     """|
        |<val x = "foobar".stripSuffix("bar")> // : String = "foo"
        |x: String = "foo"
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "0." ->
+        """|<val x = "foobar".stripSuffix("bar")> // : String = foo
+           |x: String = foo
+           |""".stripMargin
+    )
   )
 
-  // test doesn't actually work currently
   checkDecorations(
-    "fastparse".ignore,
+    "fastparse".tag(SkipScala3).tag(SkipScala211),
     """
       |import $dep.`com.lihaoyi::fastparse:2.3.0`
       |import fastparse._, MultiLineWhitespace._
@@ -241,9 +276,17 @@ class WorksheetSuite extends BaseSuite {
     """|import $dep.`com.lihaoyi::fastparse:2.3.0`
        |import fastparse._, MultiLineWhitespace._
        |def p[_:P] = P("a")
-       |<parse("a", p(_))> // Success((), 1)
+       |<parse("a", p(_))> // : Parsed[Unit] = Suc...
        |res0: Parsed[Unit] = Success((), 1)
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "2.13" -> """|import $dep.`com.lihaoyi::fastparse:2.3.0`
+                   |import fastparse._, MultiLineWhitespace._
+                   |def p[_:P] = P("a")
+                   |<parse("a", p(_))> // : Parsed[Unit] = Suc...
+                   |res0: Parsed[Unit] = Success(value = (), index = 1)
+                   |""".stripMargin
+    )
   )
 
   checkDecorations(
@@ -260,12 +303,8 @@ class WorksheetSuite extends BaseSuite {
     """|case class Circle(x: Double, y: Double, radius: Double)
        |extension (c: Circle)
        |  def circumference: Double = c.radius * math.Pi * 2
-       |<val circle = Circle(0.0, 0.0, 2.0)> // : Circle = Circle(x ...
-       |circle: Circle = Circle(
-       |  x = 0.0,
-       |  y = 0.0,
-       |  radius = 2.0
-       |)
+       |<val circle = Circle(0.0, 0.0, 2.0)> // : Circle = Circle(0....
+       |circle: Circle = Circle(0.0,0.0,2.0)
        |<circle.circumference> // : Double = 12.566370...
        |res0: Double = 12.566370614359172
        |extension [T](xs: List[T])
@@ -276,21 +315,41 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
-    "dotty-imports".tag(OnlyScala3),
-    """|import $dep.`org.json4s:json4s-native_2.13:3.6.9`
-       |import org.json4s._
-       |import org.json4s.native.JsonMethods._
-       |parse("{ \"numbers\" : [1, 2, 3, 4] }")
+    "dotty-interpolation".tag(OnlyScala3),
+    """|val name = "Ben"
+       |val quoted = s"$"$name$""
+       |quoted
        |""".stripMargin,
-    """|import $dep.`org.json4s:json4s-native_2.13:3.6.9`
-       |import org.json4s._
-       |import org.json4s.native.JsonMethods._
-       |<parse("{ \"numbers\" : [1, 2, 3, 4] }")> // : JValue = JObject(o...
-       |res0: JValue = JObject(
-       |  obj = List(
-       |    (
-       |      "numbers",
-       |...
+    """|<val name = "Ben"> // : String = Ben
+       |name: String = Ben
+       |<val quoted = s"$"$name$""> // : String = "Ben"
+       |quoted: String = "Ben"
+       |<quoted> // : String = "Ben"
+       |res0: String = "Ben"
+       |""".stripMargin
+  )
+
+  checkDecorations(
+    "dotty-imports".tag(OnlyScala3),
+    """|import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`
+       |import scalatags.Text.all._
+       |val htmlFile = html(
+       |  body(
+       |    p("This is a big paragraph of text")
+       |  )
+       |)
+       |htmlFile.render
+       |""".stripMargin,
+    """|import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`
+       |import scalatags.Text.all._
+       |<val htmlFile = html(
+       |  body(
+       |    p("This is a big paragraph of text")
+       |  )
+       |)> // : TypedTag[String] = <html><b...
+       |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+       |<htmlFile.render> // : String = <html><bo...
+       |res0: String = <html><body><p>This is a big paragraph of text</p></body></html>
        |""".stripMargin
   )
 

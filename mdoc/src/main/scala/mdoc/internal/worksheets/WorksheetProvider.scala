@@ -7,11 +7,10 @@ import mdoc.internal.markdown.SectionInput
 import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.Instrumenter
 import mdoc.internal.markdown.MarkdownBuilder
+import mdoc.internal.document.Printing
 import mdoc.document.Statement
 import mdoc.document.RangePosition
 import mdoc.internal.cli.Settings
-import pprint.TPrintColors
-import pprint.PPrinter.BlackWhite
 import mdoc.internal.io.StoreReporter
 import mdoc.{interfaces => i}
 import java.{util => ju}
@@ -94,9 +93,7 @@ class WorksheetProvider(settings: Settings) {
           .append(": ")
           .append(binder.tpeString)
           .append(" = ")
-        BlackWhite
-          .tokenize(binder.value, width = settings.screenWidth, height = settings.screenHeight)
-          .foreach(text => out.appendAll(text.getChars))
+        Printing.print(binder.value, out, settings.screenWidth, settings.screenHeight)
       }
     }
     statement.out.linesIterator.foreach { line =>
@@ -140,16 +137,8 @@ class WorksheetProvider(settings: Settings) {
                 .append(": ")
                 .append(binder.tpeString)
                 .append(" = ")
-            val chunk = BlackWhite
-              .tokenize(binder.value, width = margin - out.length)
-              .map(_.getChars)
-              .filterNot(_.iterator.forall(_.isWhitespace))
-              .flatMap(_.iterator)
-              .filter {
-                case '\n' => false
-                case _ => true
-              }
-            out.appendAll(chunk)
+
+            Printing.printOneLine(binder.value, out, width = margin - out.length)
             out.length > margin
         }
       }
