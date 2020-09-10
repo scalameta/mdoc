@@ -28,6 +28,7 @@ import org.scalajs.linker.standard.MemIRFileImpl
 import org.scalajs.linker.interface.LinkerOutput
 import org.scalajs.linker.MemOutputFile
 import java.util.concurrent.Executor
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -41,10 +42,6 @@ class JsModifier extends mdoc.PreModifier {
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
-
-  implicit val synchronousExecutionContext = ExecutionContext.fromExecutor(new Executor {
-    def execute(task: Runnable) = task.run()
-  })
 
   val sjsLogger: Logger = new Logger {
     override def log(level: Level, message: => String): Unit = {
@@ -167,7 +164,10 @@ class JsModifier extends mdoc.PreModifier {
       ""
     } else {
       val output = MemOutputFile.apply()
-      linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
+
+      val linking = linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
+      Await.result(linking, Duration.Inf)
+
       ctx.settings.toInputFile(ctx.inputFile) match {
         case None =>
           ctx.reporter.error(
