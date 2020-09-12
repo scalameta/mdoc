@@ -343,12 +343,11 @@ lazy val js = project
     sharedSettings,
     crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
-    scala212LibraryDependencies(
-      List(
+    libraryDependencies ++=
+      Seq(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
         "org.scala-js" %% "scalajs-linker" % scalajs
       )
-    )
   )
   .dependsOn(mdoc)
 
