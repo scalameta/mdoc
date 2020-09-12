@@ -348,7 +348,7 @@ lazy val js = project
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
         "org.scala-js" %% "scalajs-linker" % scalajs
       )
-    )
+  )
   .dependsOn(mdoc)
 
 lazy val docs = project
