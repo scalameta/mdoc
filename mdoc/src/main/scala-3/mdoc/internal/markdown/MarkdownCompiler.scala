@@ -150,26 +150,21 @@ class MarkdownCompiler(
 
   private def toMetaPosition(
       edit: TokenEditDistance,
-      pos: java.util.Optional[SourcePosition]
+      position: SourcePosition
   ): Position = {
-    if (pos.isPresent) {
-      val position = pos.get
-      def toOffsetPosition(offset: Int): Position = {
-        edit.toOriginal(offset) match {
-          case Left(_) =>
-            Position.None
-          case Right(p) =>
-            p.toUnslicedPosition
-        }
+    def toOffsetPosition(offset: Int): Position = {
+      edit.toOriginal(offset) match {
+        case Left(_) =>
+          Position.None
+        case Right(p) =>
+          p.toUnslicedPosition
       }
-      (edit.toOriginal(pos.get.start), edit.toOriginal(pos.get.end - 1)) match {
-        case (Right(start), Right(end)) =>
-          Position.Range(start.input, start.start, end.end).toUnslicedPosition
-        case (_, _) =>
-          toOffsetPosition(pos.get.point)
-      }
-    } else {
-      Position.None
+    }
+    (edit.toOriginal(position.start), edit.toOriginal(position.end - 1)) match {
+      case (Right(start), Right(end)) =>
+        Position.Range(start.input, start.start, end.end).toUnslicedPosition
+      case (_, _) =>
+        toOffsetPosition(position.point - 1)
     }
   }
 
@@ -187,7 +182,7 @@ class MarkdownCompiler(
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
         val msg = nullableMessage(diagnostic.message)
-        val mpos = toMetaPosition(edit,java.util.Optional.of(pos))
+        val mpos = toMetaPosition(edit, pos)
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent
