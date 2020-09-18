@@ -49,12 +49,15 @@ object Mod {
       Nest
     )
 
-  def parametric: List[String => Option[Mod]] = List(
-    s => Try(s.replace("width=", "").toInt).toOption.map(Width),
-    s => Try(s.replace("height=", "").toInt).toOption.map(Height),
-  )
+  def parametric: List[String => Option[Mod]] =
+    List(
+      s => Try(s.replace("width=", "").toInt).toOption.map(Width),
+      s => Try(s.replace("height=", "").toInt).toOption.map(Height)
+    )
 
   def unapply(string: String): Option[Mod] = {
-    static.find(_.toString.equalsIgnoreCase(string)) orElse parametric.flatMap(check => check(string)).headOption
+    static.find(_.toString.equalsIgnoreCase(string)) orElse parametric
+      .flatMap(check => check(string))
+      .headOption
   }
 }

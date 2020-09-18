@@ -274,7 +274,7 @@ The `width=` allows you to override max width (deault is 80) of pretty-printed v
 
 
 ````scala mdoc:mdoc
-```scala mdoc:width=1
+```scala mdoc:width=2
 scala.util.Random.alphanumeric.take(500).mkString
 ```
 ```scala mdoc

@@ -32,13 +32,15 @@ sealed abstract class Modifier(val mods: Set[Mod]) {
   def isResetObject: Boolean = mods(ResetObject)
   def isNest: Boolean = mods(Nest)
 
-  def heightOverride: Option[Int] = mods.collectFirst{
-    case Width(value) => value
-  }
+  def heightOverride: Option[Int] =
+    mods.collectFirst {
+      case Width(value) => value
+    }
 
-  def widthOverride: Option[Int] = mods.collectFirst{
-    case Height(value) => value
-  }
+  def widthOverride: Option[Int] =
+    mods.collectFirst {
+      case Height(value) => value
+    }
 
   def isToString: Boolean = mods(ToString)
 }
