@@ -1,8 +1,8 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.11"
+def scala212 = "2.12.12"
 def scala211 = "2.11.12"
-def scala213 = "2.13.2"
+def scala213 = "2.13.3"
 def scala3 = List("0.26.0", "0.27.0-RC1")
 
 def scalajs = "1.1.1"
