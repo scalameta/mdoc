@@ -353,6 +353,17 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  checkDecorations(
+    "placeholder",
+    """|def x = 1 -> 2
+       |val (a, _) = x
+       |""".stripMargin,
+    """|def x = 1 -> 2
+       |<val (a, _) = x> // : Int = 1
+       |a: Int = 1
+       |""".stripMargin
+  )
+
   def checkDiagnostics(
       options: TestOptions,
       original: String,
