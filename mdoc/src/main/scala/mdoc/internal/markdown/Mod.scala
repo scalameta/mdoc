@@ -1,5 +1,7 @@
 package mdoc.internal.markdown
 
+import scala.util.Try
+
 sealed abstract class Mod extends Product with Serializable
 object Mod {
   case object Fail extends Mod
@@ -23,7 +25,15 @@ object Mod {
   }
   case object Nest extends Mod
 
-  def all: List[Mod] =
+  case class Width(value: Int) extends Mod {
+    override def toString: String = s"width=$value"
+  }
+
+  case class Height(value: Int) extends Mod {
+    override def toString: String = s"height=$value"
+  }
+
+  def static: List[Mod] =
     List(
       Passthrough,
       Invisible,
@@ -38,7 +48,13 @@ object Mod {
       ToString,
       Nest
     )
+
+  def parametric: List[String => Option[Mod]] = List(
+    s => Try(s.replace("width=", "").toInt).toOption.map(Width),
+    s => Try(s.replace("height=", "").toInt).toOption.map(Height),
+  )
+
   def unapply(string: String): Option[Mod] = {
-    all.find(_.toString.equalsIgnoreCase(string))
+    static.find(_.toString.equalsIgnoreCase(string)) orElse parametric.flatMap(check => check(string)).headOption
   }
 }

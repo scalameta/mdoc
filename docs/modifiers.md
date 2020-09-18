@@ -268,6 +268,36 @@ List("with quotes")
 ```
 ````
 
+## `width=`
+
+The `width=` allows you to override max width (deault is 80) of pretty-printed values.
+
+
+````scala mdoc:mdoc
+```scala mdoc:width=1
+scala.util.Random.alphanumeric.take(500).mkString
+```
+```scala mdoc
+scala.util.Random.alphanumeric.take(500).mkString
+```
+````
+
+
+## `height=`
+
+The `height=` allows you to override max height (default is 50) of pretty-printed values.
+
+````scala mdoc:mdoc
+```scala mdoc:height=2
+List.fill(15)("hello world!")
+```
+```scala mdoc
+List.fill(15)("hello world!")
+```
+````
+
+
+
 ## `compile-only`
 
 The `compile-only` modifier ensures the code example compiles without evaluating
