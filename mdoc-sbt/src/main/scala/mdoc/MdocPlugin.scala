@@ -100,13 +100,11 @@ object MdocPlugin extends AutoPlugin {
         val out =
           managedResourceDirectories.in(Compile).value.head / "mdoc.properties"
         val props = new java.util.Properties()
-        mdocVariables.value.foreach {
-          case (key, value) =>
-            props.put(key, value)
+        mdocVariables.value.foreach { case (key, value) =>
+          props.put(key, value)
         }
-        mdocInternalVariables.value.foreach {
-          case (key, value) =>
-            props.put(key, value)
+        mdocInternalVariables.value.foreach { case (key, value) =>
+          props.put(key, value)
         }
         mdocJSCompileOptions.value.foreach { options =>
           props.put(

@@ -33,9 +33,8 @@ def multiScalaDirectories(projectName: String) =
     val base = root / "src" / "main"
     val result = mutable.ListBuffer.empty[File]
     val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
-    partialVersion.collect {
-      case (major, minor) =>
-        result += base / s"scala-$major.$minor"
+    partialVersion.collect { case (major, minor) =>
+      result += base / s"scala-$major.$minor"
     }
     if (isScala3.value) {
       result += base / "scala-3"

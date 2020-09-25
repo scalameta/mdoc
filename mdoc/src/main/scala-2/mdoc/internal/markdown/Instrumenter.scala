@@ -38,45 +38,44 @@ class Instrumenter(
   val gensym = new Gensym()
   val nest = new Nesting(sb)
   private def printAsScript(): Unit = {
-    sections.zipWithIndex.foreach {
-      case (section, i) =>
-        if (section.mod.isReset) {
-          nest.unnest()
-          sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
-        } else if (section.mod.isNest) {
-          nest.nest()
-        }
-        sb.println("\n$doc.startSection();")
-        if (section.mod.isFailOrWarn) {
-          sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
-          val out = new FailInstrumenter(sections, i).instrument()
-          val literal = Instrumenter.stringLiteral(out)
-          val binder = gensym.fresh("res")
-          sb.append("val ")
-            .append(binder)
-            .append(" = _root_.mdoc.internal.document.FailSection(")
-            .append(literal)
-            .append(", ")
-            .append(position(section.source.pos))
-            .append(");")
-          printBinder(binder, section.source.pos)
+    sections.zipWithIndex.foreach { case (section, i) =>
+      if (section.mod.isReset) {
+        nest.unnest()
+        sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
+      } else if (section.mod.isNest) {
+        nest.nest()
+      }
+      sb.println("\n$doc.startSection();")
+      if (section.mod.isFailOrWarn) {
+        sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
+        val out = new FailInstrumenter(sections, i).instrument()
+        val literal = Instrumenter.stringLiteral(out)
+        val binder = gensym.fresh("res")
+        sb.append("val ")
+          .append(binder)
+          .append(" = _root_.mdoc.internal.document.FailSection(")
+          .append(literal)
+          .append(", ")
+          .append(position(section.source.pos))
+          .append(");")
+        printBinder(binder, section.source.pos)
+        sb.println("\n$doc.endStatement();")
+      } else if (section.mod.isCompileOnly) {
+        section.source.stats.foreach { stat =>
+          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
           sb.println("\n$doc.endStatement();")
-        } else if (section.mod.isCompileOnly) {
-          section.source.stats.foreach { stat =>
-            sb.println(s"$$doc.startStatement(${position(stat.pos)});")
-            sb.println("\n$doc.endStatement();")
-          }
-          sb.println(s"""object ${gensym.fresh("compile")} {""")
-          sb.println(section.source.pos.text)
-          sb.println("\n}")
-        } else {
-          section.source.stats.foreach { stat =>
-            sb.println(s"$$doc.startStatement(${position(stat.pos)});")
-            printStatement(stat, section.mod, sb)
-            sb.println("\n$doc.endStatement();")
-          }
         }
-        sb.println("$doc.endSection();")
+        sb.println(s"""object ${gensym.fresh("compile")} {""")
+        sb.println(section.source.pos.text)
+        sb.println("\n}")
+      } else {
+        section.source.stats.foreach { stat =>
+          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+          printStatement(stat, section.mod, sb)
+          sb.println("\n$doc.endStatement();")
+        }
+      }
+      sb.println("$doc.endSection();")
     }
     nest.unnest()
   }
@@ -117,9 +116,8 @@ class Instrumenter(
         case _ =>
           sb.print(stat.pos.text)
       }
-      binders.foreach {
-        case (name, pos) =>
-          printBinder(name.syntax, pos)
+      binders.foreach { case (name, pos) =>
+        printBinder(name.syntax, pos)
       }
     }
   }

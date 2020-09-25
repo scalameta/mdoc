@@ -152,10 +152,9 @@ final class MainOps(
     val timer = new Timer()
     val n = files.length
     compilingFiles(n)
-    val exit = files.foldLeft(Exit.success) {
-      case (accum, file) =>
-        val fileExit = handleFile(file)
-        accum.merge(fileExit)
+    val exit = files.foldLeft(Exit.success) { case (accum, file) =>
+      val fileExit = handleFile(file)
+      accum.merge(fileExit)
     }
     lint()
     if (files.isEmpty) {

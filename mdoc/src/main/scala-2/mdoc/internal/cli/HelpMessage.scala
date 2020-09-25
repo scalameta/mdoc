@@ -82,20 +82,19 @@ final class HelpMessage[T: generic.Surface: ConfEncoder](
       }
     }
 
-    settings.settings.zip(obj.values).foreach {
-      case (setting, (_, value)) =>
-        if (setting.annotations.exists(_.isInstanceOf[Inline])) {
-          for {
-            underlying <- setting.underlying.toList
-            (field, (_, fieldDefault)) <-
-              underlying.settings
-                .zip(value.asInstanceOf[Conf.Obj].values)
-          } {
-            printOption(field, fieldDefault)
-          }
-        } else {
-          printOption(setting, value)
+    settings.settings.zip(obj.values).foreach { case (setting, (_, value)) =>
+      if (setting.annotations.exists(_.isInstanceOf[Inline])) {
+        for {
+          underlying <- setting.underlying.toList
+          (field, (_, fieldDefault)) <-
+            underlying.settings
+              .zip(value.asInstanceOf[Conf.Obj].values)
+        } {
+          printOption(field, fieldDefault)
         }
+      } else {
+        printOption(setting, value)
+      }
     }
     sb.toString()
   }

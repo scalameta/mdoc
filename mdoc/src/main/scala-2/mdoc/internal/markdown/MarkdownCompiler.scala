@@ -85,15 +85,14 @@ class MarkdownCompiler(
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
     val edit = TokenEditDistance.fromTrees(original, input)
-    sreporter.infos.foreach {
-      case sreporter.Info(pos, msgOrNull, gseverity) =>
-        val msg = nullableMessage(msgOrNull)
-        val mpos = toMetaPosition(edit, pos)
-        if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
-          val severity = gseverity.toString.toLowerCase
-          val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
-          ps.println(formatted)
-        }
+    sreporter.infos.foreach { case sreporter.Info(pos, msgOrNull, gseverity) =>
+      val msg = nullableMessage(msgOrNull)
+      val mpos = toMetaPosition(edit, pos)
+      if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
+        val severity = gseverity.toString.toLowerCase
+        val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
+        ps.println(formatted)
+      }
     }
     out.toString()
   }
