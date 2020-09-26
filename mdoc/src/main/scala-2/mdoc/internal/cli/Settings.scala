@@ -155,15 +155,14 @@ case class Settings(
   lazy val outputByInput = in
     .zip(out)
     .iterator
-    .map {
-      case (input, output) =>
-        // NOTE(olafur): we automatically infer a filename for --out when --out
-        // is a directory and --in points to a regular file. For example, the
-        // command `mdoc --in readme.md` writes the output to the path
-        // `out/readme.md` even if the default value for --out is `out/`
-        // (without `readme.md`).
-        if (input.isFile && output.isDirectory) input -> output.resolve(input.filename)
-        else input -> output
+    .map { case (input, output) =>
+      // NOTE(olafur): we automatically infer a filename for --out when --out
+      // is a directory and --in points to a regular file. For example, the
+      // command `mdoc --in readme.md` writes the output to the path
+      // `out/readme.md` even if the default value for --out is `out/`
+      // (without `readme.md`).
+      if (input.isFile && output.isDirectory) input -> output.resolve(input.filename)
+      else input -> output
     }
     .toMap
 
@@ -223,8 +222,8 @@ case class Settings(
     } else if (in.length != out.length) {
       Configured.error(Feedback.inputDifferentLengthOutput(in, out))
     } else {
-      val errors: List[Option[ConfError]] = outputByInput.iterator.map {
-        case (input, output) => validateInputOutputPair(input, output)
+      val errors: List[Option[ConfError]] = outputByInput.iterator.map { case (input, output) =>
+        validateInputOutputPair(input, output)
       }.toList
       errors.flatten match {
         case Nil =>

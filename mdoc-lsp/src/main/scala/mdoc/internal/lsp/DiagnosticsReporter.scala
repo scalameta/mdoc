@@ -81,11 +81,10 @@ class DiagnosticsReporter(client: MdocLanguageClient) extends Reporter {
   }
   def publishDiagnostics(path: AbsolutePath): Unit = {
     diagnostics.putIfAbsent(path, new ConcurrentLinkedQueue[Diagnostic]())
-    diagnostics.asScala.foreach {
-      case (path, diags) =>
-        val uri = path.toURI.toString
-        val lst = new jutil.ArrayList(diags)
-        client.publishDiagnostics(new PublishDiagnosticsParams(uri, lst))
+    diagnostics.asScala.foreach { case (path, diags) =>
+      val uri = path.toURI.toString
+      val lst = new jutil.ArrayList(diags)
+      client.publishDiagnostics(new PublishDiagnosticsParams(uri, lst))
     }
   }
 }

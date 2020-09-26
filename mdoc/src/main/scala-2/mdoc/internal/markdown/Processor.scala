@@ -116,16 +116,15 @@ class Processor(implicit ctx: Context) {
       relpath: RelativePath,
       filename: String
   ): Unit = {
-    val sectionInputs = inputs.map {
-      case ScalaFenceInput(_, input, mod) =>
-        import scala.meta._
-        MdocDialect.scala(input).parse[Source] match {
-          case parsers.Parsed.Success(source) =>
-            SectionInput(input, source, mod)
-          case parsers.Parsed.Error(pos, msg, _) =>
-            ctx.reporter.error(pos.toUnslicedPosition, msg)
-            SectionInput(input, Source(Nil), mod)
-        }
+    val sectionInputs = inputs.map { case ScalaFenceInput(_, input, mod) =>
+      import scala.meta._
+      MdocDialect.scala(input).parse[Source] match {
+        case parsers.Parsed.Success(source) =>
+          SectionInput(input, source, mod)
+        case parsers.Parsed.Error(pos, msg, _) =>
+          ctx.reporter.error(pos.toUnslicedPosition, msg)
+          SectionInput(input, Source(Nil), mod)
+      }
     }
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
     if (ctx.reporter.hasErrors) {
@@ -185,81 +184,80 @@ class Processor(implicit ctx: Context) {
       instrumented,
       filename
     )
-    rendered.sections.zip(inputs).foreach {
-      case (section, ScalaFenceInput(block, _, mod)) =>
-        block.newInfo = Some("scala")
-        def defaultRender: String =
-          Renderer.renderEvaluatedSection(
-            rendered,
-            section,
+    rendered.sections.zip(inputs).foreach { case (section, ScalaFenceInput(block, _, mod)) =>
+      block.newInfo = Some("scala")
+      def defaultRender: String =
+        Renderer.renderEvaluatedSection(
+          rendered,
+          section,
+          ctx.reporter,
+          ctx.settings.variablePrinter,
+          markdownCompiler
+        )
+      mod match {
+        case Modifier.Post(modifier, info) =>
+          val variables = for {
+            (stat, i) <- section.section.statements.zipWithIndex
+            n = section.section.statements.length
+            (binder, j) <- stat.binders.zipWithIndex
+            m = stat.binders.length
+          } yield {
+            new mdoc.Variable(
+              binder.name,
+              binder.tpe.render(TPrintColors.BlackWhite),
+              binder.value,
+              binder.pos.toMeta(section),
+              j,
+              n,
+              i,
+              m,
+              section.mod
+            )
+          }
+          val postCtx = new PostModifierContext(
+            info,
+            section.input,
+            defaultRender,
+            variables,
             ctx.reporter,
-            ctx.settings.variablePrinter,
-            markdownCompiler
+            doc.file,
+            ctx.settings
           )
-        mod match {
-          case Modifier.Post(modifier, info) =>
-            val variables = for {
-              (stat, i) <- section.section.statements.zipWithIndex
-              n = section.section.statements.length
-              (binder, j) <- stat.binders.zipWithIndex
-              m = stat.binders.length
-            } yield {
-              new mdoc.Variable(
-                binder.name,
-                binder.tpe.render(TPrintColors.BlackWhite),
-                binder.value,
-                binder.pos.toMeta(section),
-                j,
-                n,
-                i,
-                m,
-                section.mod
-              )
+          val postRender = modifier.process(postCtx)
+          replaceNodeWithText(doc, block, postRender)
+        case m: Modifier.Builtin =>
+          if (m.isPassthrough) {
+            replaceNodeWithText(doc, block, section.out)
+          } else if (m.isInvisible) {
+            replaceNodeWithText(doc, block, "")
+          } else if (m.isCrash) {
+            val stacktrace =
+              Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)
+            replaceNodeWithText(doc, block, stacktrace)
+          } else if (m.isSilent) {
+            () // Do nothing
+          } else {
+            block.newBody = Some(defaultRender)
+          }
+        case c: Modifier.Str =>
+          throw new IllegalArgumentException(c.toString)
+        case c: Modifier.Pre =>
+          val preCtx = new PreModifierContext(
+            c.info,
+            section.input,
+            ctx.reporter,
+            doc.file,
+            ctx.settings
+          )
+          val out =
+            try c.mod.process(preCtx)
+            catch {
+              case NonFatal(e) =>
+                ctx.reporter.error(e)
+                e.getMessage
             }
-            val postCtx = new PostModifierContext(
-              info,
-              section.input,
-              defaultRender,
-              variables,
-              ctx.reporter,
-              doc.file,
-              ctx.settings
-            )
-            val postRender = modifier.process(postCtx)
-            replaceNodeWithText(doc, block, postRender)
-          case m: Modifier.Builtin =>
-            if (m.isPassthrough) {
-              replaceNodeWithText(doc, block, section.out)
-            } else if (m.isInvisible) {
-              replaceNodeWithText(doc, block, "")
-            } else if (m.isCrash) {
-              val stacktrace =
-                Renderer.renderCrashSection(section, ctx.reporter, rendered.edit)
-              replaceNodeWithText(doc, block, stacktrace)
-            } else if (m.isSilent) {
-              () // Do nothing
-            } else {
-              block.newBody = Some(defaultRender)
-            }
-          case c: Modifier.Str =>
-            throw new IllegalArgumentException(c.toString)
-          case c: Modifier.Pre =>
-            val preCtx = new PreModifierContext(
-              c.info,
-              section.input,
-              ctx.reporter,
-              doc.file,
-              ctx.settings
-            )
-            val out =
-              try c.mod.process(preCtx)
-              catch {
-                case NonFatal(e) =>
-                  ctx.reporter.error(e)
-                  e.getMessage
-              }
-            replaceNodeWithText(doc, block, out)
-        }
+          replaceNodeWithText(doc, block, out)
+      }
     }
   }
 

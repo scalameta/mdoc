@@ -173,8 +173,8 @@ object Markdown {
   )(f: PartialFunction[A, B]): List[B] = {
     val lifted = f.lift
     val buffer = List.newBuilder[B]
-    traverse[A](node) {
-      case h => lifted(h).foreach(buffer += _)
+    traverse[A](node) { case h =>
+      lifted(h).foreach(buffer += _)
     }
     buffer.result()
   }
