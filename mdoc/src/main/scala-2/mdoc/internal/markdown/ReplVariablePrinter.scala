@@ -40,7 +40,8 @@ class ReplVariablePrinter(
         lines.foreach { lineStr =>
           val line = lineStr.plainText
           widthOverride match {
-            case None => Renderer.appendMultiline(sb, line)
+            case None =>
+              Renderer.appendMultiline(sb, line)
             case Some(maxWidth) =>
               Renderer.appendMultilineMaxWidth(sb, line, maxWidth)
           }

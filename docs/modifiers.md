@@ -288,7 +288,7 @@ The `width=` allows you to override max width (deault is 80) of pretty-printed v
 The `height=` allows you to override max height (default is 50) of pretty-printed values.
 
 ````scala mdoc:mdoc
-```scala mdoc:height=2
+```scala mdoc:height=5
 List.fill(15)("hello world!")
 ```
 ```scala mdoc
