@@ -79,6 +79,7 @@ object Renderer {
   def appendMultiline(sb: PrintStream, string: String): Unit = {
     appendMultiline(sb, string, string.length)
   }
+
   def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
     var i = 0
     while (i < N) {
@@ -88,6 +89,23 @@ object Renderer {
         case ch =>
           sb.append(ch)
       }
+      i += 1
+    }
+  }
+
+  def appendMultilineMaxWidth(sb: PrintStream, string: String, maxLineLength: Int): Unit = {
+    var i = 0
+    var lineLength = 0
+
+    while (i < string.length()) {
+      string.charAt(i) match {
+        case '\n' =>
+          sb.append("\n// "); lineLength = 0
+        case ch if lineLength == maxLineLength =>
+          sb.append(ch); sb.append("\n// "); lineLength = 0
+        case ch => sb.append(ch); lineLength += 1
+      }
+
       i += 1
     }
   }
