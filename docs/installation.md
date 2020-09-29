@@ -141,7 +141,7 @@ Use the `--classpath` argument to change the classpath used for compilation:
 ```diff
  coursier launch \
    org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
-+  --classpath $(coursier fetch -p org.typelevel:cats-core_2.12:1.5.0)
++  --classpath $(coursier fetch -p org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0)
 ```
 
 ### Customize input directory
