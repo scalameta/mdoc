@@ -93,9 +93,9 @@ object Renderer {
     }
   }
 
-  def appendMultilineMaxWidth(sb: PrintStream, string: String, maxLineLength: Int): Unit = {
+  def appendMultilineMaxWidth(sb: PrintStream, string: String, maxWidth: Int): Unit = {
     var i = 0
-    var lineLength = 0
+    var currentWidth = 0
 
     while (i < string.length()) {
       string.charAt(i) match {
