@@ -136,12 +136,12 @@ info: Compiled in 1.2s (0 errors)
 
 ### Add library dependencies to classpath
 
-Add libraries to the launched classpath to include them for compilation.
+Use the `--classpath` argument to change the classpath used for compilation:
 
 ```diff
  coursier launch \
-   org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ \
-+  org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0
+   org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
++  --classpath $(coursier fetch -p org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0)
 ```
 
 ### Customize input directory
