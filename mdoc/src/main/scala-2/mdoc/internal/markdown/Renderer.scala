@@ -137,58 +137,57 @@ object Renderer {
           appendFreshMultiline(sb, statement.out)
         }
         val N = statement.binders.length
-        statement.binders.zipWithIndex.foreach {
-          case (binder, i) =>
-            section.mod match {
-              case Modifier.Fail() | Modifier.Warn() =>
-                sb.append('\n')
-                binder.value match {
-                  case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
-                    val compiled = compiler.fail(
-                      doc.sections.map(_.source),
-                      Input.String(instrumented),
-                      section.source.pos
+        statement.binders.zipWithIndex.foreach { case (binder, i) =>
+          section.mod match {
+            case Modifier.Fail() | Modifier.Warn() =>
+              sb.append('\n')
+              binder.value match {
+                case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
+                  val compiled = compiler.fail(
+                    doc.sections.map(_.source),
+                    Input.String(instrumented),
+                    section.source.pos
+                  )
+                  val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
+                  val pos = tpos.toMeta(section)
+                  if (section.mod.isWarn && compiler.hasErrors) {
+                    reporter.error(
+                      pos,
+                      s"Expected compile warnings but program failed to compile"
                     )
-                    val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
-                    val pos = tpos.toMeta(section)
-                    if (section.mod.isWarn && compiler.hasErrors) {
-                      reporter.error(
-                        pos,
-                        s"Expected compile warnings but program failed to compile"
-                      )
-                    } else if (section.mod.isWarn && !compiler.hasWarnings) {
-                      reporter.error(
-                        pos,
-                        s"Expected compile warnings but program compiled successfully without warnings"
-                      )
-                    } else if (section.mod.isFail && !compiler.hasErrors) {
-                      reporter.error(
-                        pos,
-                        s"Expected compile errors but program compiled successfully without errors"
-                      )
-                    }
-                    appendFreshMultiline(sb, compiled)
-                  case _ =>
-                    val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
-                    throw new IllegalArgumentException(
-                      s"Expected FailSection. Obtained $obtained"
+                  } else if (section.mod.isWarn && !compiler.hasWarnings) {
+                    reporter.error(
+                      pos,
+                      s"Expected compile warnings but program compiled successfully without warnings"
                     )
-                }
-              case _ =>
-                val pos = binder.pos.toMeta(section)
-                val variable = new mdoc.Variable(
-                  binder.name,
-                  binder.tpe.render,
-                  binder.value,
-                  pos,
-                  i,
-                  N,
-                  statementIndex,
-                  totalStats,
-                  section.mod
-                )
-                sb.append(printer(variable))
-            }
+                  } else if (section.mod.isFail && !compiler.hasErrors) {
+                    reporter.error(
+                      pos,
+                      s"Expected compile errors but program compiled successfully without errors"
+                    )
+                  }
+                  appendFreshMultiline(sb, compiled)
+                case _ =>
+                  val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
+                  throw new IllegalArgumentException(
+                    s"Expected FailSection. Obtained $obtained"
+                  )
+              }
+            case _ =>
+              val pos = binder.pos.toMeta(section)
+              val variable = new mdoc.Variable(
+                binder.name,
+                binder.tpe.render,
+                binder.value,
+                pos,
+                i,
+                N,
+                statementIndex,
+                totalStats,
+                section.mod
+              )
+              sb.append(printer(variable))
+          }
         }
     }
     baos.toString.trim

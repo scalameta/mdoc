@@ -18,8 +18,8 @@ object EvaluatedDocument {
     EvaluatedDocument(
       instrumented,
       edit,
-      document.sections.zip(trees).map {
-        case (a, b) => EvaluatedSection(a, b.input, b.source, b.mod)
+      document.sections.zip(trees).map { case (a, b) =>
+        EvaluatedSection(a, b.input, b.source, b.mod)
       }
     )
   }

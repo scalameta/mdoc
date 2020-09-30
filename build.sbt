@@ -1,8 +1,8 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.11"
+def scala212 = "2.12.12"
 def scala211 = "2.11.12"
-def scala213 = "2.13.2"
+def scala213 = "2.13.3"
 def scala3 = List("0.26.0", "0.27.0-RC1")
 
 def scalajs = "1.1.1"
@@ -33,9 +33,8 @@ def multiScalaDirectories(projectName: String) =
     val base = root / "src" / "main"
     val result = mutable.ListBuffer.empty[File]
     val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
-    partialVersion.collect {
-      case (major, minor) =>
-        result += base / s"scala-$major.$minor"
+    partialVersion.collect { case (major, minor) =>
+      result += base / s"scala-$major.$minor"
     }
     if (isScala3.value) {
       result += base / "scala-3"
@@ -202,8 +201,8 @@ lazy val mdoc = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
       "io.methvin" % "directory-watcher" % "0.10.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.1.3.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.0.Final",
+      "io.undertow" % "undertow-core" % "2.1.4.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.2.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
   )

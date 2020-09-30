@@ -143,8 +143,8 @@ object Instrumenter {
 
   object Binders {
     private def fromPat(trees: List[Tree])(using ctx: Context) = {
-      trees.map {
-        case id: Ident =>
+      trees.collect {
+        case id: Ident if id.name.toString != "_" => // ignore placeholders
           id.name.toString -> id.sourcePos
       }
     }

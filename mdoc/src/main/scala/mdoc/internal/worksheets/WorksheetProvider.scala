@@ -35,7 +35,6 @@ class WorksheetProvider(settings: Settings) {
     val compiler = ctx.compiler(instrumented)
     val rendered =
       MarkdownBuilder.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
-
     val decorations = for {
       section <- rendered.sections.iterator
       statement <- section.section.statements
