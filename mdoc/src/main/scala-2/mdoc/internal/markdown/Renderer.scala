@@ -93,23 +93,6 @@ object Renderer {
     }
   }
 
-  def appendMultilineMaxWidth(sb: PrintStream, string: String, maxWidth: Int): Unit = {
-    var i = 0
-    var currentWidth = 0
-
-    while (i < string.length()) {
-      string.charAt(i) match {
-        case '\n' =>
-          sb.append("\n// "); lineLength = 0
-        case ch if lineLength == maxLineLength =>
-          sb.append(ch); sb.append("\n// "); lineLength = 0
-        case ch => sb.append(ch); lineLength += 1
-      }
-
-      i += 1
-    }
-  }
-
   def appendFreshMultiline(sb: PrintStream, string: String): Unit = {
     val N = string.length - (if (string.endsWith("\n")) 1 else 0)
     sb.append("// ")

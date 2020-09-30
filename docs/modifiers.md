@@ -274,11 +274,11 @@ The `width=` allows you to override max width (deault is 80) of pretty-printed v
 
 
 ````scala mdoc:mdoc
-```scala mdoc:width=30
-(0 to 100).mkString(",")
+```scala mdoc:width=20
+List.fill(2)(List(1,2,3,4,5))
 ```
 ```scala mdoc
-(0 to 100).mkString(",")
+List.fill(2)(List(1,2,3,4,5))
 ```
 ````
 
