@@ -57,7 +57,7 @@ object DocusaurusPlugin extends AutoPlugin {
     """|#!/usr/bin/env bash
        |
        |set -eu
-       |DEPLOY_KEY=${GIT_DEPLOY_KEY:-$GITHUB_DEPLOY_KEY}
+       |DEPLOY_KEY=${GIT_DEPLOY_KEY:-${GITHUB_DEPLOY_KEY:-}}
        |set-up-ssh() {
        |  echo "Setting up ssh..."
        |  mkdir -p $HOME/.ssh
@@ -75,7 +75,7 @@ object DocusaurusPlugin extends AutoPlugin {
        |if [[ -n "${DEPLOY_KEY:-}" ]]; then
        |  set-up-ssh
        |else
-       |  echo "Can't setup SSH. To fix this problem, set the GIT_DEPLOY_KEY environment variable."
+       |  echo "No deploy key found. Attempting to auth with ssh key saved in ssh-agent. To use a deploy key instead, set the GIT_DEPLOY_KEY environment variable."
        |fi
        |
        |yarn install
