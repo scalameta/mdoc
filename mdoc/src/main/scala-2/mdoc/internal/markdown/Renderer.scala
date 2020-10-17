@@ -79,6 +79,7 @@ object Renderer {
   def appendMultiline(sb: PrintStream, string: String): Unit = {
     appendMultiline(sb, string, string.length)
   }
+
   def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
     var i = 0
     while (i < N) {

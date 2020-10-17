@@ -27,10 +27,13 @@ class ReplVariablePrinter(
       if (binder.isToString) {
         Renderer.appendMultiline(sb, binder.runtimeValue.toString)
       } else {
+        val heightOverride = binder.mods.heightOverride
+        val widthOverride = binder.mods.widthOverride
+
         val lines = pprint.PPrinter.BlackWhite.tokenize(
           binder.runtimeValue,
-          width = width,
-          height = height,
+          width = widthOverride.getOrElse(width),
+          height = heightOverride.getOrElse(height),
           indent = 2,
           initialOffset = baos.size()
         )
