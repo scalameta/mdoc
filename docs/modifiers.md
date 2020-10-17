@@ -268,10 +268,10 @@ List("with quotes")
 ```
 ````
 
-## `width=`
+## `width`
 
-The `width=` allows you to override max width (deault is 80) of pretty-printed values.
-
+The `width=NUMBER` allows you to override max width (deault is 80) of
+pretty-printed values.
 
 ````scala mdoc:mdoc
 ```scala mdoc:width=20
@@ -282,10 +282,10 @@ List.fill(2)(List(1,2,3,4,5))
 ```
 ````
 
-
 ## `height=`
 
-The `height=` allows you to override max height (default is 50) of pretty-printed values.
+The `height=NUMBER` allows you to override max height (default is 50) of
+pretty-printed values.
 
 ````scala mdoc:mdoc
 ```scala mdoc:height=5
@@ -295,8 +295,6 @@ List.fill(15)("hello world!")
 List.fill(15)("hello world!")
 ```
 ````
-
-
 
 ## `compile-only`
 
