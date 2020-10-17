@@ -28,6 +28,7 @@ class SbtModifier extends StringModifier {
         .replaceAllLiterally("sbt.internal.util.", "")
         .replaceAllLiterally("sbt.", "")
         .replaceAllLiterally("scala.", "")
+        .replaceAllLiterally("java.io.", "")
       <tr>
         <td><code>{s.key.toString}</code></td>
         <td><code>{tpe}</code></td>
