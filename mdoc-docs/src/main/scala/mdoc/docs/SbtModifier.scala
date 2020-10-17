@@ -25,6 +25,7 @@ class SbtModifier extends StringModifier {
         .replaceAllLiterally("java.lang.String", "String")
         .replaceAllLiterally("scala.collection.immutable.", "")
         .replaceAllLiterally("scala.collection.", "")
+        .replaceAllLiterally("sbt.internal.util.", "")
       <tr>
         <td><code>{s.key.toString}</code></td>
         <td><code>{tpe}</code></td>
