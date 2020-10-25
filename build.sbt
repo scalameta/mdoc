@@ -110,7 +110,7 @@ lazy val sharedSettings = List(
 val V = new {
   val scalameta = "4.3.22"
   val munit = "0.7.14"
-  val coursier = "0.0.25"
+  val coursier = "1.0.1"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -199,9 +199,9 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      "io.methvin" % "directory-watcher" % "0.10.0",
+      "io.methvin" % "directory-watcher" % "0.10.1",
       // live reload
-      "io.undertow" % "undertow-core" % "2.1.4.Final",
+      "io.undertow" % "undertow-core" % "2.2.2.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.2.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
