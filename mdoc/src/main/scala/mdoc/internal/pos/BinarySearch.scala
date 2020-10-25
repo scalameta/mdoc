@@ -8,8 +8,7 @@ object BinarySearch {
   case object Equal extends ComparisonResult
   case object Smaller extends ComparisonResult
 
-  /**
-    * Binary search using a custom compare function.
+  /** Binary search using a custom compare function.
     *
     * scala.util.Searching does not support the ability to search an IndexedSeq
     * by a custom mapping function, you must search by an element of the same

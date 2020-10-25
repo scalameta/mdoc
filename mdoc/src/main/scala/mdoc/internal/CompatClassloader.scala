@@ -7,8 +7,7 @@ import scala.collection.JavaConverters._
 
 object CompatClassloader {
 
-  /**
-    * Utility to get SystemClassLoader/ClassLoader urls in java8 and java9+
+  /** Utility to get SystemClassLoader/ClassLoader urls in java8 and java9+
     *   Based upon: https://gist.github.com/hengyunabc/644f8e84908b7b405c532a51d8e34ba9
     */
   def getURLs(classLoader: ClassLoader): Seq[URL] = {

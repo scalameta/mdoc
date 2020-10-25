@@ -2,8 +2,7 @@ package mdoc.internal.livereload
 
 import java.nio.file.Path
 
-/**
-  * Interface of a LiveReload server http://livereload.com/api/protocol/
+/** Interface of a LiveReload server http://livereload.com/api/protocol/
   */
 trait LiveReload {
 

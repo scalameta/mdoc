@@ -1,5 +1,4 @@
-/**
-  * This file is derived from the following Coursier sources, see NOTICE for license details.
+/** This file is derived from the following Coursier sources, see NOTICE for license details.
   * https://github.com/coursier/coursier/blob/dfb04cab48a4beefa2be59fc71e3eff0493a5886/modules/coursier/shared/src/main/scala/coursier/Repositories.scala
   * https://github.com/coursier/coursier/blob/dfb04cab48a4beefa2be59fc71e3eff0493a5886/modules/coursier/shared/src/main/scala/coursier/internal/SharedRepositoryParser.scala
   */
