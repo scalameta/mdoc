@@ -4,8 +4,7 @@ import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.ReplVariablePrinter
 import scala.meta.inputs.Position
 
-/**
-  * A captured variable in a code fence.
+/** A captured variable in a code fence.
   *
   * Example, the code fence below has two statements:
   *

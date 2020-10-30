@@ -79,8 +79,7 @@ object TokenEditDistance {
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 
-  /**
-    * Build utility to map offsets between two slightly different strings.
+  /** Build utility to map offsets between two slightly different strings.
     *
     * @param original The original snapshot of a string, for example the latest
     *                 semanticdb snapshot.

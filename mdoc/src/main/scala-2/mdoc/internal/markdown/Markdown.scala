@@ -31,8 +31,7 @@ object Markdown {
   val RelativePathKey = new DataKey[Option[RelativePath]]("mdocFile", None)
   val SiteVariables = new DataKey[Option[Map[String, String]]]("siteVariables", None)
 
-  /**
-    * Defines the default markdown settings.
+  /** Defines the default markdown settings.
     *
     * Do not use directly. The default flexmark settings have special keys set
     * up by mdoc to keep track of certain document-specific information like path.

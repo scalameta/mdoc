@@ -7,8 +7,7 @@ import metaconfig.Input
 import java.nio.file.Files
 import mdoc.internal.pos.PositionSyntax._
 
-/**
-  * @param relpath the input filename relativized by its input directory.
+/** @param relpath the input filename relativized by its input directory.
   * @param inputFile the input file to read from.
   * @param outputFile the output file to write to.
   * @param inputDirectory directory enclosing the input file.

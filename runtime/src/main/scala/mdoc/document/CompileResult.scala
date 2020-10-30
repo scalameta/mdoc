@@ -8,15 +8,13 @@ object CompileResult {
 
   sealed trait CompileError extends CompileResult
 
-  /**
-    * Compiler reported an error message during typechecking.
+  /** Compiler reported an error message during typechecking.
     * @param message the typechecking error message (without position formatting)
     * @param pos the range position inside the code fence
     */
   final case class TypeError(message: String, pos: RangePosition) extends CompileError
 
-  /**
-    * Compiler reported an error message during parsing.
+  /** Compiler reported an error message during parsing.
     * @param message the syntax error message (without position formatting)
     * @param pos the range position inside the code fence
     */

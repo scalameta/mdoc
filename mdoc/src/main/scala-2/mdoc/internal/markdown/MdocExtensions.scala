@@ -15,8 +15,7 @@ import mdoc.internal.cli.Context
 
 object MdocExtensions {
 
-  /**
-    * Defines mdoc's markdown extensions.
+  /** Defines mdoc's markdown extensions.
     *
     *  Inspired by CommonMark formatter options so that pandoc understands it.
     *  https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/samples/FormatConverterCommonMark.java#L27-L37

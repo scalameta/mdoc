@@ -8,8 +8,7 @@ import scribe.Logger
 import scribe.format._
 import scribe.writer.Writer
 
-/**
-  * Scribe logging handler that forwards logging messages to the LSP editor client.
+/** Scribe logging handler that forwards logging messages to the LSP editor client.
   */
 object LspLogger extends Writer {
   def update(client: MdocLanguageClient): Unit = {

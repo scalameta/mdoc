@@ -54,8 +54,7 @@ final case class UndertowLiveReload private (
 
 object UndertowLiveReload {
 
-  /**
-    * Instantiate an undertow file server that speaks the LiveReload protocol.
+  /** Instantiate an undertow file server that speaks the LiveReload protocol.
     *
     * See LiveReload protocol for more details: http://livereload.com/api/protocol/
     *

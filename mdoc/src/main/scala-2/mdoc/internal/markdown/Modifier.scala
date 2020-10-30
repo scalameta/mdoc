@@ -3,8 +3,7 @@ package mdoc.internal.markdown
 import mdoc.StringModifier
 import mdoc.internal.markdown.Mod._
 
-/**
-  * A mdoc code fence modifier.
+/** A mdoc code fence modifier.
   *
   * Modifiers are parsed from code blocks like here
   *
