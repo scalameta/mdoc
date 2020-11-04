@@ -30,8 +30,7 @@ jobs:
           - "'++2.11.12 test'"
           - "'++2.12.11 test' scripted"
           - "'++2.13.2 test'"
-          - "'++0.26.0 test'"
-          - "'++0.27.0-RC1 test'"
+          - "'++3.0.0-M1 test'"
     steps:
       - uses: actions/checkout@v1
       - uses: olafurpg/setup-scala@v7
