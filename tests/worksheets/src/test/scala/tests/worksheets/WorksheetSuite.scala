@@ -30,7 +30,8 @@ class WorksheetSuite extends BaseSuite {
         .getURLs(this.getClass().getClassLoader())
         .collect {
           case url
-              if url.toString.contains("dotty-library") || url.toString.contains("scala-library") =>
+              if url.toString.contains("scala3-library") || url.toString
+                .contains("scala-library") =>
             Paths.get(url.toURI())
         }
         .asJava
@@ -89,9 +90,9 @@ class WorksheetSuite extends BaseSuite {
        |...
        |""".stripMargin,
     compat = Map(
-      "0." -> """|<Stream.from(10)> // : Stream[Int] = Stre...
-                 |res0: Stream[Int] = Stream(10, <not computed>)
-                 |""".stripMargin
+      "3.0" -> """|<Stream.from(10)> // : Stream[Int] = Stre...
+                  |res0: Stream[Int] = Stream(10, <not computed>)
+                  |""".stripMargin
     )
   )
 
@@ -120,11 +121,11 @@ class WorksheetSuite extends BaseSuite {
        |res0: List[Int] = List(2, 3)
        |""".stripMargin,
     compat = Map(
-      "0.2" ->
+      "3.0" ->
         """|<val list = List(1,2,3)> // : List[Int] = List(1...
            |list: List[Int] = List(1, 2, 3)
-           |<list.tail> // : List[Int @unchecked...
-           |res0: List[Int @uncheckedVariance] = List(2, 3)
+           |<list.tail> // : List[Int] = List(2,...
+           |res0: List[Int] = List(2, 3)
            |""".stripMargin
     )
   )
@@ -186,10 +187,10 @@ class WorksheetSuite extends BaseSuite {
        |n: User = User("Susan")
        |""".stripMargin,
     compat = Map(
-      "0." -> """|case class User(name: String)
-                 |<val n = User("Susan")> // : User = User(Susan)
-                 |n: User = User(Susan)
-                 |""".stripMargin,
+      "3.0" -> """|case class User(name: String)
+                  |<val n = User("Susan")> // : User = User(Susan)
+                  |n: User = User(Susan)
+                  |""".stripMargin,
       "2.13" -> """|case class User(name: String)
                    |<val n = User("Susan")> // : User = User(name =...
                    |n: User = User(name = "Susan")
@@ -209,7 +210,7 @@ class WorksheetSuite extends BaseSuite {
        |                    ^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      "0.2" ->
+      "3.0" ->
         """|type-error:2:21: error: Found:    ("not found" : String)
            |Required: Int
            |val filename: Int = "not found"
@@ -234,7 +235,7 @@ class WorksheetSuite extends BaseSuite {
        |^^^^^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      "0.2" ->
+      "3.0" ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
            |	at repl.MdocSession$App.crash(crash.scala:8)
            |	at repl.MdocSession$App.<init>(crash.scala:16)
@@ -258,7 +259,7 @@ class WorksheetSuite extends BaseSuite {
        |x: String = "foo"
        |""".stripMargin,
     compat = Map(
-      "0." ->
+      "3.0" ->
         """|<val x = "foobar".stripSuffix("bar")> // : String = foo
            |x: String = foo
            |""".stripMargin

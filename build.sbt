@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.3"
-def scala3 = List("0.26.0", "0.27.0-RC1")
+def scala3 = List("3.0.0-M1")
 
 def scalajs = "1.1.1"
 def scalajsBinaryVersion = "1"
@@ -20,7 +20,8 @@ val isScala213 = Def.setting {
 }
 
 val isScala3 = Def.setting {
-  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=3.0.0"))
+  // doesn't work well with >= 3.0.0 for `3.0.0-M1`
+  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=2.99.0"))
 }
 
 val isScalaJs1 = Def.setting {
@@ -109,7 +110,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.3.24"
-  val munit = "0.7.14"
+  val munit = "0.7.16"
   val coursier = "1.0.1"
 }
 
@@ -180,7 +181,7 @@ lazy val mdoc = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if3 = List(
-        "ch.epfl.lamp" %% "dotty-compiler" % scalaVersion.value,
+        "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
         ("org.scalameta" %% "scalameta" % V.scalameta)
           .excludeAll(excludePprint)
           .withDottyCompat(scalaVersion.value),

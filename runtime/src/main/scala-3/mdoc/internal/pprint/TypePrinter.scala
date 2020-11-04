@@ -15,10 +15,10 @@ object TPrint {
 object TypePrinter{
 
   def typeString[T](using ctx: QuoteContext, tpe: Type[T]): Expr[TPrint[T]] = {
-    import ctx.tasty._
+    import ctx.reflect._
 
-    val typePrinter = new SourceTypePrinter(ctx.tasty)(SyntaxHighlight.plain)
+    val typePrinter = new SourceTypePrinter(ctx.reflect)(SyntaxHighlight.plain)
     
-    '{  new TPrint[T]{ def render: String = ${ Expr(typePrinter.showTypeOrBounds(tpe.unseal.tpe)) } }  }
+    '{  new TPrint[T]{ def render: String = ${ Expr(typePrinter.showType(tpe.unseal.tpe)) } }  }
   }
 }

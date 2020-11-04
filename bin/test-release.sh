@@ -9,6 +9,7 @@ coursier fetch \
   org.scalameta:mdoc_2.11:$version \
   org.scalameta:mdoc_2.12:$version \
   org.scalameta:mdoc_2.13:$version \
+  org.scalameta:mdoc_3.0.0-M1:$version \
   org.scalameta:mdoc-js_2.11:$version \
   org.scalameta:mdoc-js_2.12:$version \
   org.scalameta:mdoc-js_2.13:$version $suffix
