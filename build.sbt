@@ -5,9 +5,9 @@ def scala211 = "2.11.12"
 def scala213 = "2.13.3"
 def scala3 = List("3.0.0-M1")
 
-def scalajs = "1.1.1"
+def scalajs = "1.3.0"
 def scalajsBinaryVersion = "1"
-def scalajsDom = "1.0.0"
+def scalajsDom = "1.1.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
