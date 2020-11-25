@@ -109,9 +109,10 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.3.24"
-  val munit = "0.7.16"
-  val coursier = "1.0.1"
+  val scalameta = "4.4.0"
+  val munit = "0.7.18"
+  val coursier = "1.0.2"
+  val scalacheck = "1.15.1"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -286,7 +287,7 @@ lazy val unit = project
     ),
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % "2.1.0",
-      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
       "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
@@ -309,7 +310,7 @@ lazy val plugin = project
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
-      "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+      "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
       "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
