@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.3"
-def scala3 = List("3.0.0-M1")
+def scala3 = List("3.0.0-M2")
 
 def scalajs = "1.3.0"
 def scalajsBinaryVersion = "1"
@@ -110,7 +110,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.0"
-  val munit = "0.7.18"
+  val munit = "0.7.19"
   val coursier = "1.0.2"
   val scalacheck = "1.15.1"
 }
@@ -151,6 +151,9 @@ lazy val runtime = project
         "com.lihaoyi" %% "pprint" % pprintVersion.value,
         "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
+      ),
+      if3 = List(
+        "org.scala-lang" %% "scala3-compiler" % scalaVersion.value
       )
     )
   )

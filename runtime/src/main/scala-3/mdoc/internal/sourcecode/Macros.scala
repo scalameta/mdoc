@@ -2,7 +2,6 @@ package mdoc.internal.sourcecode
 
 import scala.language.implicitConversions
 import scala.quoted._
-import scala.tasty.Reflection
 
 trait StatementMacro {
   inline implicit def generate[T](v: => T): SourceStatement[T] = ${ Macros.text('v) }
@@ -11,9 +10,9 @@ trait StatementMacro {
 
 object Macros{
 
-  def text[T: Type](v: Expr[T])(using ctx: QuoteContext): Expr[SourceStatement[T]] = {
-    import ctx.tasty._
-    val txt = v.unseal.pos.sourceCode
+  def text[T: Type](v: Expr[T])(using ctx: Quotes): Expr[SourceStatement[T]] = {
+    import ctx.reflect.{_, given}
+    val txt =  Term.of(v).pos.sourceCode
     '{SourceStatement[T]($v, ${Expr(txt)})}
   }
 }
