@@ -16,13 +16,15 @@ case class Context(
     settings: Settings,
     reporter: Reporter,
     compiler: MarkdownCompiler,
-    compilers: mutable.Map[Set[Dependency], MarkdownCompiler] = mutable.Map.empty
+    compilers: mutable.Map[(Set[Dependency], List[String]), MarkdownCompiler] = mutable.Map.empty
 ) {
-  def compiler(instrumented: Instrumented) =
+  def compiler(instrumented: Instrumented) = {
+    val scalacOptions = instrumented.scalacOptionImports.map(_.value)
     compilers.getOrElseUpdate(
-      instrumented.dependencies,
+      (instrumented.dependencies, scalacOptions),
       Dependencies.newCompiler(settings, instrumented)
     )
+  }
 }
 
 object Context {
