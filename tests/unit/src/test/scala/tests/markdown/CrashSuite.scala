@@ -17,7 +17,19 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
        |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
        |```
+    """.stripMargin,
+    compat = Map(
+      "2.13" ->
+        """|```scala
+           |val x = 1
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
+           |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
+           |```
     """.stripMargin
+    )
   )
 
   checkError(
@@ -81,7 +93,18 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
        |```
+    """.stripMargin,
+    compat = Map(
+      "2.13" ->
+        """|```scala
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
+           |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
+           |```
     """.stripMargin
+    )
   )
 
   check(
