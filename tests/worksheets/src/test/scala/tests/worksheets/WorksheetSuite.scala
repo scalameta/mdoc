@@ -382,6 +382,24 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  checkExportableEvaluations(
+    "simple",
+    "val x = 3",
+    ju.Optional.of("val x = 3 // : Int = 3")
+  )
+
+  checkExportableEvaluations(
+    "continuation",
+    """val x = println("badabing\nbadaboom")""",
+    ju.Optional.of("""val x = println("badabing\nbadaboom") // badabing…""")
+  )
+
+  checkExportableEvaluations(
+    "no-export",
+    "val x: Int = a",
+    ju.Optional.empty()
+  )
+
   def checkDiagnostics(
       options: TestOptions,
       original: String,
@@ -448,6 +466,20 @@ class WorksheetSuite extends BaseSuite {
       }
       val obtained = out.toString()
       assertNoDiff(obtained, Compat(expected, compat))
+    }
+  }
+
+  def checkExportableEvaluations(
+      options: TestOptions,
+      original: String,
+      expected: ju.Optional[String],
+      compat: Map[String, String] = Map.empty
+  ): Unit = {
+    test(options) {
+      val filename = options.name + ".scala"
+      val worksheet = mdoc.evaluateWorksheet(filename, original)
+      val output = worksheet.exportableEvaluation
+      assertEquals(output, expected)
     }
   }
 }

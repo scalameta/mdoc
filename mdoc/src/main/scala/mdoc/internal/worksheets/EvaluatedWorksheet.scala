@@ -11,5 +11,6 @@ case class EvaluatedWorksheet(
     val scalac: ju.List[String],
     val classpath: ju.List[Path],
     val dependencies: ju.List[coursierapi.Dependency],
-    val repositories: ju.List[coursierapi.Repository]
+    val repositories: ju.List[coursierapi.Repository],
+    val exportableEvaluation: ju.Optional[String]
 ) extends mdoc.interfaces.EvaluatedWorksheet

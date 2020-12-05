@@ -35,24 +35,53 @@ class WorksheetProvider(settings: Settings) {
     val compiler = ctx.compiler(instrumented)
     val rendered =
       MarkdownBuilder.buildDocument(compiler, reporter, sectionInputs, instrumented, input.path)
-    val decorations = for {
+    val diagnostics = reporter.diagnostics.map(d => d: i.Diagnostic).toSeq
+
+    val evaluatedStatements = (for {
       section <- rendered.sections.iterator
       statement <- section.section.statements
-    } yield renderDecoration(statement)
+    } yield renderDecoration(statement)).toList
+
+    val exportableEvaluation =
+      if (diagnostics.exists(_.severity() == i.DiagnosticSeverity.Error)) {
+        ju.Optional.empty[String]
+      } else {
+        ju.Optional.of(zipStatements(input, evaluatedStatements))
+      }
 
     EvaluatedWorksheet(
-      reporter.diagnostics.map(d => d: i.Diagnostic).toSeq.asJava,
-      decorations
+      diagnostics.asJava,
+      evaluatedStatements
         .filterNot(_.summary.isEmpty)
         .map(d => d: i.EvaluatedWorksheetStatement)
-        .toList
         .asJava,
       instrumented.fileImports.map(_.toInterface).asJava,
       instrumented.scalacOptionImports.map(_.value).asJava,
       compiler.classpathEntries.asJava,
       instrumented.dependencies.toSeq.asJava,
-      instrumented.repositories.toSeq.asJava
+      instrumented.repositories.toSeq.asJava,
+      exportableEvaluation
     )
+  }
+
+  private def zipStatements(
+      input: Input.VirtualFile,
+      statements: Seq[EvaluatedWorksheetStatement]
+  ): String = {
+
+    val lines = input.value.split("\n").toBuffer
+
+    statements.foreach { statement =>
+      if (statement.summary.nonEmpty) {
+        val line = statement.position.endLine
+        val oldValue = lines(line)
+        val possibleContinuation = if (statement.isSummaryComplete) "" else "…"
+        val newValue = oldValue + s" // ${statement.summary}${possibleContinuation}"
+        lines.update(line, newValue)
+      }
+    }
+
+    lines.mkString("\n")
   }
 
   private def renderDecoration(statement: Statement): EvaluatedWorksheetStatement = {
