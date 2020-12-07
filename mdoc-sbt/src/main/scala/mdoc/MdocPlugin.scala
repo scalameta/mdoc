@@ -76,6 +76,7 @@ object MdocPlugin extends AutoPlugin {
       mdocJSLibraries := Nil,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
+      watchTriggers += mdocIn.value.toGlob / "*.md",
       mdoc := Def.inputTaskDyn {
         validateSettings.value
         val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
