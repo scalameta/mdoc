@@ -113,6 +113,7 @@ class MarkdownCompilerSuite extends FunSuite {
       |  2
       |}
       |// 42
+      |// err
       |// 52
       |// x: Int = 2
       |```
