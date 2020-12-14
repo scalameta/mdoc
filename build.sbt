@@ -86,6 +86,7 @@ inThisBuild(
       )
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
+    Test / parallelExecution := false,
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
     publishArtifact.in(packageDoc) := "true" == System.getenv("CI"),
