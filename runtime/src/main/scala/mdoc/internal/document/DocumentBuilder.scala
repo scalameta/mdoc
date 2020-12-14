@@ -85,8 +85,20 @@ trait DocumentBuilder {
     def build(input: InstrumentedInput): Document = {
       try {
         Console.withOut(myPs) {
-          Console.withErr(myPs) {
-            app()
+          val oldOut = System.out
+          try {
+            System.setOut(myPs)
+            Console.withErr(myPs) {
+              val oldErr = System.err
+              try {
+                System.setErr(myPs)
+                app()
+              } finally {
+                System.setErr(oldErr)
+              }
+            }
+          } finally {
+            System.setOut(oldOut)
           }
         }
       } catch {
