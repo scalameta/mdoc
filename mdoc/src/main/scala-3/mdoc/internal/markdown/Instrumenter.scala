@@ -62,8 +62,8 @@ class Instrumenter(
         printlnWithIndent("")
         printlnWithIndent("$doc.startSection();")
           section.stats.foreach { stat =>
-            printlnWithIndent(s"$$doc.startStatement(${position(stat.sourcePos)});")
-            printStatement(stat, section.mod, sb, section)
+            printlnWithIndent(s"$$doc.startStatement(${position(stat.sourcePos(using ctx))});")
+            printStatement(stat, section.mod, sb, section)(using ctx)
             printlnWithIndent("")
             printlnWithIndent("$doc.endStatement();")
           }

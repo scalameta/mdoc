@@ -30,7 +30,7 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
   private val filename = "Section.scala"
   driver.run(java.net.URI.create("file:///Section.scala"), SourceFile.virtual(filename, sourceCode))
   val source = driver.currentCtx.run.units.head.untpdTree
-  given ctx as Context = driver.currentCtx
+  val ctx = driver.currentCtx
   def stats : List[Tree] = {
       source match {
         case PackageDef(_, List(module @ _ : ModuleDef)) => 
@@ -40,8 +40,8 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
   }
 
   def show(tree : Tree, currentIdent : Int) = {
-     val str = tree.sourcePos.start 
-     val end = tree.sourcePos.end
+     val str = tree.sourcePos(using ctx).start 
+     val end = tree.sourcePos(using ctx).end
      // workaround should be removed once support for 0.26.0 is dropped
      val prefix = if (BuildInfo.scalaBinaryVersion == "0.26")
         tree match {

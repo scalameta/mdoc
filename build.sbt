@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.4"
-def scala3 = List("3.0.0-M2")
+def scala3 = List("3.0.0-M3", "3.0.0-M2")
 
 def scalajs = "1.3.0"
 def scalajsBinaryVersion = "1"
@@ -12,8 +12,7 @@ def scalajsDom = "1.1.0"
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
 def isScala211(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 11)
-def isScala3(v: Option[(Long, Long)]): Boolean =
-  v.exists(_._1 == 0) || v.exists(_._1 == 3)
+def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
 val isScala213 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
@@ -110,7 +109,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.0"
-  val munit = "0.7.19"
+  val munit = "0.7.20"
   val coursier = "1.0.2"
   val scalacheck = "1.15.1"
 }
