@@ -330,17 +330,18 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  val givenSyntax = if (tests.BuildInfo.scalaVersion == "3.0.0-M2") "as C:" else ": C with"
   checkDiagnostics(
     "dotty-ambiguous-implicit".tag(OnlyScala3),
-    """|abstract class C:
-       |  val x: Int
-       |given c1 as C:
-       |  val x = 1
-       |given c2 as C:
-       |  val x = 2
-       |def fn(using c: C) = ()
-       |val xx = fn
-       |""".stripMargin,
+    s"""|abstract class C:
+        |  val x: Int
+        |given c1 $givenSyntax
+        |  val x = 1
+        |given c2 $givenSyntax
+        |  val x = 2
+        |def fn(using c: C) = ()
+        |val xx = fn
+        |""".stripMargin,
     """|dotty-ambiguous-implicit:8:10: error: ambiguous implicit arguments: both object c1 in class App and object c2 in class App match type App.this.C of parameter c of method fn in class App
        |val xx = fn
        |         ^^
