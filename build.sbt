@@ -111,7 +111,7 @@ val V = new {
   val scalameta = "4.4.0"
   val munit = "0.7.20"
   val coursier = "1.0.2"
-  val scalacheck = "1.15.1"
+  val scalacheck = "1.15.2"
 }
 
 lazy val pprintVersion = Def.setting {
