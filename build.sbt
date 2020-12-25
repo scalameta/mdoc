@@ -111,7 +111,7 @@ val V = new {
   val scalameta = "4.4.0"
   val munit = "0.7.20"
   val coursier = "1.0.2"
-  val scalacheck = "1.15.1"
+  val scalacheck = "1.15.2"
 }
 
 lazy val pprintVersion = Def.setting {
@@ -205,8 +205,8 @@ lazy val mdoc = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
       "io.methvin" % "directory-watcher" % "0.10.1",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.3.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.2.Final",
+      "io.undertow" % "undertow-core" % "2.2.2.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
   )
