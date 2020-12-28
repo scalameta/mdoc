@@ -135,8 +135,20 @@ object PositionSyntax {
           .append("\n")
           .append(pos.lineContent)
           .append("\n")
-          .append(pos.lineCaret)
+          .append(lineCaret(pos))
           .toString
+    }
+
+  private def lineCaret(pos: Position): String =
+    pos match {
+      case Position.None =>
+        ""
+      case _ =>
+        val caret =
+          if (pos.start == pos.end) "^"
+          else if (pos.startLine == pos.endLine) "^" * (pos.end - pos.start)
+          else "^"
+        (" " * pos.startColumn) + caret
     }
 
   implicit class XtensionPositionsScalafix(private val pos: Position) extends AnyVal {
@@ -156,31 +168,6 @@ object PositionSyntax {
     def rangeNumber: String =
       s"${pos.startLine + 1}:${pos.startColumn + 1}..${pos.endLine + 1}:${pos.endColumn + 1}"
 
-    def lineCaret: String =
-      pos match {
-        case Position.None =>
-          ""
-        case _ =>
-          val caret =
-            if (pos.start == pos.end) "^"
-            else if (pos.startLine == pos.endLine) "^" * (pos.end - pos.start)
-            else "^"
-          (" " * pos.startColumn) + caret
-      }
-
-    def lineContent: String =
-      pos match {
-        case Position.None => ""
-        case range: Position.Range =>
-          val pos = Position.Range(
-            range.input,
-            range.startLine,
-            0,
-            range.startLine,
-            Int.MaxValue
-          )
-          pos.text
-      }
   }
 
   implicit class XtensionThrowable(e: Throwable) {
