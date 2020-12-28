@@ -33,10 +33,7 @@ object MdocDialect {
   def parse(path: AbsolutePath): Parsed[Source] = {
     scala(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
   }
-  val scala = Scala213.copy(
-    allowToplevelTerms = true,
-    toplevelSeparator = ""
-  )
+  val scala = Scala213.withAllowToplevelTerms(true)
 }
 
 class Processor(implicit ctx: Context) {

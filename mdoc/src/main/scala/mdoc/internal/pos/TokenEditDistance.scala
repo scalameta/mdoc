@@ -75,7 +75,7 @@ object TokenEditDistance {
 
   implicit val dialect: scala.meta.Dialect =
     if (BuildInfo.scalaBinaryVersion.startsWith("2.")) scala.meta.dialects.Scala213
-    else scala.meta.dialects.Dotty
+    else scala.meta.dialects.Scala3
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 
