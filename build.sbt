@@ -132,6 +132,14 @@ lazy val interfaces = project
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier
     ),
+    // @note needed to deal with issues with dottyDoc
+    sources in (Compile, doc) := {
+      if (isScala3.value) {
+        Seq.empty
+      } else {
+        (sources in (Compile, doc)).value
+      }
+    },
     crossVersion := CrossVersion.disabled,
     javacOptions in (Compile / doc) ++= List(
       "-tag",
