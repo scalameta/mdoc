@@ -12,7 +12,7 @@ object CompatClassloader {
     */
   def getURLs(classLoader: ClassLoader): Seq[URL] = {
     if (classLoader.isInstanceOf[URLClassLoader]) {
-      classLoader.asInstanceOf[URLClassLoader].getURLs()
+      classLoader.asInstanceOf[URLClassLoader].getURLs().toIndexedSeq
       // java9+
     } else if (
       classLoader

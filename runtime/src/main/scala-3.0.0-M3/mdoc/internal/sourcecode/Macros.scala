@@ -12,7 +12,8 @@ object Macros{
 
   def text[T: Type](v: Expr[T])(using ctx: Quotes): Expr[SourceStatement[T]] = {
     import ctx.reflect.{_, given}
-    val txt =  Term.of(v).pos.sourceCode.getOrElse("")
+    import quotes.reflect._
+    val txt =  v.asTerm.pos.sourceCode.getOrElse("")
     '{SourceStatement[T]($v, ${Expr(txt)})}
   }
 }

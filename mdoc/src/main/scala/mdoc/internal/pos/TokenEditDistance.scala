@@ -159,7 +159,7 @@ object TokenEditDistance {
       original.foreach { tokens => tokens.foreach { token => buf += token } }
       buf.result()
     }
-    TokenEditDistance(originalTokens, instrumentedTokens)
+    TokenEditDistance(originalTokens.toIndexedSeq, instrumentedTokens)
   }
 
   def fromTrees(original: Seq[Tree], instrumented: Input): TokenEditDistance = {
