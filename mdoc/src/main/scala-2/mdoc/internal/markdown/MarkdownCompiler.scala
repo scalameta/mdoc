@@ -77,14 +77,13 @@ class MarkdownCompiler(
     global.close()
   }
 
-  def fail(original: Seq[Tree], input: Input, sectionPos: Position): String = {
+  def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
     sreporter.reset()
     val g = global
     val run = new g.Run
     run.compileSources(List(toSource(input)))
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
-    val edit = TokenEditDistance.fromTrees(original, input)
     sreporter.infos.foreach { case sreporter.Info(pos, msgOrNull, gseverity) =>
       val msg = nullableMessage(msgOrNull)
       val mpos = toMetaPosition(edit, pos)

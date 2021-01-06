@@ -1,8 +1,8 @@
 package mdoc.internal.worksheets
 
 import scala.meta._
+import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.cli.Context
-import scala.collection.JavaConverters._
 import mdoc.internal.markdown.SectionInput
 import mdoc.internal.markdown.Modifier
 import mdoc.internal.markdown.Instrumenter

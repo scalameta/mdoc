@@ -4,7 +4,6 @@ import scala.meta.inputs.Position
 import scala.meta.inputs.Input
 import mdoc.Reporter
 import scala.collection.mutable
-import scala.tools.nsc.doc.DocParser
 import scala.meta.io.RelativePath
 import mdoc.internal.cli.InputFile
 

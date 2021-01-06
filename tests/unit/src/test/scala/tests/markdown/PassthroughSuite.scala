@@ -39,7 +39,7 @@ println('''|* Bullet 1
      |* Bullet 3
         '''.stripMargin)
 ```
-    """.replaceAllLiterally("'''", "\"\"\""),
+    """.replace("'''", "\"\"\""),
     """
 * Bullet 1
 * Bullet 2

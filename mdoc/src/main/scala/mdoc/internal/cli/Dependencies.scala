@@ -4,7 +4,6 @@ import scala.meta.io.Classpath
 import coursierapi.Dependency
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.MarkdownBuilder
-import scala.collection.JavaConverters._
 import scala.meta.io.AbsolutePath
 import coursierapi.Repository
 import mdoc.internal.markdown.Instrumented
@@ -12,6 +11,7 @@ import coursierapi.ResolutionParams
 import coursierapi.Cache
 import coursierapi.Logger
 import scala.collection.immutable.Nil
+import mdoc.internal.pos.PositionSyntax._
 
 object Dependencies {
   def newCompiler(

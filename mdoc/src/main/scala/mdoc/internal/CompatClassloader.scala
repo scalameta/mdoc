@@ -3,7 +3,7 @@ package mdoc.internal
 import java.net.URLClassLoader
 import java.net.URL
 import sun.misc.Unsafe
-import scala.collection.JavaConverters._
+import mdoc.internal.pos.PositionSyntax._
 
 object CompatClassloader {
 

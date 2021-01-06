@@ -28,16 +28,16 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
           |}
           |""".stripMargin
   private val filename = "Section.scala"
+  private val edit =     TokenEditDistance.fromInputs(List(input), Input.String(sourceCode))
   driver.run(java.net.URI.create("file:///Section.scala"), SourceFile.virtual(filename, sourceCode))
-  val source = driver.currentCtx.run.units.head.untpdTree
-  val ctx = driver.currentCtx
-  def stats : List[Tree] = {
-      source match {
-        case PackageDef(_, List(module @ _ : ModuleDef)) => 
-          module.impl.body(using driver.currentCtx)
-        case _ => Nil
-      }
+  val tree = driver.currentCtx.run.units.head.untpdTree
+  val stats = tree match {
+    case PackageDef(_, List(module @ _ : ModuleDef)) => 
+      module.impl.body(using driver.currentCtx)
+    case _ => Nil
   }
+  val source = ParsedSource(tree, tree.sourcePos(using ctx), edit, stats.map(s => ParsedSource(s, s.sourcePos(using ctx), edit, Nil)))
+  val ctx = driver.currentCtx
 
   def show(tree : Tree, currentIdent : Int) = {
      val str = tree.sourcePos(using ctx).start 
@@ -55,7 +55,7 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
      val realIdent = " " * (currentIdent - wrapIdent.size)
      prefix + sourceCode.substring(str, end).replace("\n", "\n" + realIdent)
   }
-  def text = source.show(using driver.currentCtx)
+  def text = source.tree.show(using driver.currentCtx)
 }
 
 object SectionInput { 

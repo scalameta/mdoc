@@ -95,7 +95,8 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
     MdocDialect.scala(input).parse[Source] match {
       case e: scala.meta.parsers.Parsed.Error =>
         reporter.error(e.pos, e.message)
-      case Success(source) =>
+      case s: Success[_] =>
+        val source = s.tree
         source.stats.foreach {
           case i: Import =>
             i.importers.foreach {

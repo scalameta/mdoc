@@ -28,8 +28,9 @@ import scala.meta.io.RelativePath
 import mdoc.StringModifier
 import mdoc.Variable
 import mdoc.Reporter
-import mdoc.internal.markdown.{GitHubIdGenerator, MarkdownCompiler, ReplVariablePrinter}
-import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.markdown.{GitHubIdGenerator, ReplVariablePrinter}
+import mdoc.internal.cli.CliEnrichments._
+// import mdoc.internal.pos.PositionSyntax._
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -152,7 +153,7 @@ case class Settings(
 
   val isMarkdownFileExtension = markdownExtensions.toSet
 
-  lazy val outputByInput = in
+  val outputByInput = in
     .zip(out)
     .iterator
     .map { case (input, output) =>
@@ -212,56 +213,6 @@ case class Settings(
   def onLoad(reporter: Reporter): Unit = {
     val ctx = new OnLoadContext(reporter, this)
     preModifiers.foreach(_.onLoad(ctx))
-  }
-
-  def validate(logger: Reporter): Configured[Context] = {
-    if (in.isEmpty) {
-      Configured.error(Feedback.mustBeNonEmpty("in"))
-    } else if (out.isEmpty) {
-      Configured.error(Feedback.mustBeNonEmpty("out"))
-    } else if (in.length != out.length) {
-      Configured.error(Feedback.inputDifferentLengthOutput(in, out))
-    } else {
-      val errors: List[Option[ConfError]] = outputByInput.iterator.map { case (input, output) =>
-        validateInputOutputPair(input, output)
-      }.toList
-      errors.flatten match {
-        case Nil =>
-          val context = Context.fromOptions(this, logger)
-          onLoad(logger)
-          if (logger.hasErrors) {
-            Configured.error("Failed to load modifiers")
-          } else {
-            Configured.ok(context)
-          }
-        case errors =>
-          errors.foldLeft(ConfError.empty)(_ combine _).notOk
-      }
-    }
-  }
-
-  private def validateInputOutputPair(
-      input: AbsolutePath,
-      output: AbsolutePath
-  ): Option[ConfError] = {
-    if (!Files.exists(input.toNIO)) {
-      Some(ConfError.fileDoesNotExist(input.toNIO))
-    } else if (input == output) {
-      Some(ConfError.message(Feedback.inputEqualOutput(input)))
-    } else if (output.toNIO.startsWith(input.toNIO) && !assumedRegularFile(output)) {
-      Some(ConfError.message(Feedback.outSubdirectoryOfIn(input.toNIO, output.toNIO)))
-    } else if (input.isFile && output.isDirectory) {
-      Some(ConfError.message(Feedback.outputCannotBeDirectory(input, output)))
-    } else if (input.isDirectory && output.isFile) {
-      Some(ConfError.message(Feedback.outputCannotBeRegularFile(input, output)))
-    } else {
-      None
-    }
-  }
-
-  private def assumedRegularFile(absPath: AbsolutePath): Boolean = {
-    val extension = PathIO.extension(absPath.toNIO)
-    markdownExtensions.toSet.contains(extension)
   }
 
   def addSite(extraVariables: Map[String, String]): Settings = {

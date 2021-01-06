@@ -25,7 +25,7 @@ class ReplVariablePrinter(
         .append(binder.staticType)
         .append(" = ")
       if (binder.isToString) {
-        Renderer.appendMultiline(sb, binder.runtimeValue.toString)
+        appendMultiline(sb, binder.runtimeValue.toString)
       } else {
         val heightOverride = binder.mods.heightOverride
         val widthOverride = binder.mods.widthOverride
@@ -39,10 +39,27 @@ class ReplVariablePrinter(
         )
         lines.foreach { lineStr =>
           val line = lineStr.plainText
-          Renderer.appendMultiline(sb, line)
+          appendMultiline(sb, line)
         }
       }
       baos.toString()
+    }
+  }
+
+  def appendMultiline(sb: PrintStream, string: String): Unit = {
+    appendMultiline(sb, string, string.length)
+  }
+
+  def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
+    var i = 0
+    while (i < N) {
+      string.charAt(i) match {
+        case '\n' =>
+          sb.append("\n// ")
+        case ch =>
+          sb.append(ch)
+      }
+      i += 1
     }
   }
 }

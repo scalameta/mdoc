@@ -15,7 +15,6 @@ import scala.meta.inputs.Position
 import mdoc.internal.pos.TokenEditDistance
 import scala.meta.Import
 import mdoc.interfaces.ImportedScriptFile
-import scala.collection.JavaConverters._
 
 final case class FileImport(
     path: AbsolutePath,

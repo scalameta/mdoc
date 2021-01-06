@@ -1,5 +1,6 @@
 package mdoc.internal.markdown
 
+import scala.meta.internal.inputs._
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterBlock
 import com.vladsch.flexmark.formatter.Formatter
 import com.vladsch.flexmark.html.HtmlRenderer
@@ -19,7 +20,7 @@ import mdoc.Reporter
 import mdoc.internal.cli.Context
 import mdoc.internal.cli.InputFile
 import mdoc.internal.cli.Settings
-import scala.collection.JavaConverters._
+import mdoc.internal.pos.PositionSyntax._
 import scala.language.dynamics
 import scala.meta.inputs.Input
 import scala.meta.io.AbsolutePath
@@ -65,7 +66,7 @@ object Markdown {
       settings: Settings
   ): Document = {
     markdownSettings.set(InputKey, Some(input))
-    markdownSettings.get(RelativePathKey) match {
+    RelativePathKey.get(markdownSettings) match {
       case None =>
         markdownSettings.set(
           RelativePathKey,
@@ -73,7 +74,7 @@ object Markdown {
         )
       case _ =>
     }
-    val variables = markdownSettings.get(SiteVariables).getOrElse(Map.empty)
+    val variables = SiteVariables.get(markdownSettings).getOrElse(Map.empty)
     val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter, settings)
     markdownSettings.set(InputKey, Some(textWithVariables))
     val parser = Parser.builder(markdownSettings).build

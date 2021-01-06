@@ -1,7 +1,6 @@
 package tests.cli
 
 import java.nio.file.Files
-import mdoc.internal.BuildInfo
 import scala.meta.io.AbsolutePath
 import java.nio.file.Paths
 

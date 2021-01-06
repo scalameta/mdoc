@@ -56,7 +56,7 @@ class MarkdownCompiler(
     val options = scalacOptions.split("\\s+").toList
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
-    new InteractiveDriver(settings)
+    new InteractiveDriver(settings.distinct)
   }
   private var driver = newDriver
 
@@ -148,25 +148,10 @@ class MarkdownCompiler(
     }
   }
 
-  private def toMetaPosition(
-      edit: TokenEditDistance,
-      position: SourcePosition
-  ): Position = {
-    def toOffsetPosition(offset: Int): Position = {
-      edit.toOriginal(offset) match {
-        case Left(_) =>
-          Position.None
-        case Right(p) =>
-          p.toUnslicedPosition
-      }
-    }
-    (edit.toOriginal(position.start), edit.toOriginal(position.end - 1)) match {
-      case (Right(start), Right(end)) =>
-        Position.Range(start.input, start.start, end.end).toUnslicedPosition
-      case (_, _) =>
-        toOffsetPosition(position.point - 1)
-    }
+  def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
+    ???
   }
+
 
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
@@ -182,7 +167,7 @@ class MarkdownCompiler(
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
         val msg = nullableMessage(diagnostic.message)
-        val mpos = toMetaPosition(edit, pos)
+        val mpos = ParsedSource.toMetaPosition(edit, pos)
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent

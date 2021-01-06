@@ -50,7 +50,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
   protected def scalacOptions: String = ""
   private val compiler = MarkdownBuilder.fromClasspath("", scalacOptions)
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
-    settings.validate(reporter)
+    Context.fromSettings(settings, reporter)
     if (reporter.hasErrors) fail("reporter has errors")
     Context.fromCompiler(settings, reporter, compiler)
   }

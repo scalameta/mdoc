@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService
 import org.slf4j.Logger
 import org.slf4j.helpers.NOPLogger
 import scala.meta.io.AbsolutePath
-import scala.collection.JavaConverters._
+import mdoc.internal.pos.PositionSyntax._
 
 final class MdocFileListener(
     executor: ExecutorService,

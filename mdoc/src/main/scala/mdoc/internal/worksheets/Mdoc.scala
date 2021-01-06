@@ -4,7 +4,7 @@ import java.{util => ju}
 import java.io.File
 import java.io.PrintStream
 import java.nio.file.Path
-import scala.collection.JavaConverters._
+import mdoc.internal.pos.PositionSyntax._
 import mdoc.{interfaces => i}
 import mdoc.internal.cli.Context
 import mdoc.internal.cli.Settings

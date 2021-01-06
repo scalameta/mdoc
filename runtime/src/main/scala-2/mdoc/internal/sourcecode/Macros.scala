@@ -15,8 +15,8 @@ object Macros {
     val fileContent = new String(v.tree.pos.source.content)
     val start = v.tree.collect { case treeVal =>
       treeVal.pos match {
-        case NoPosition ⇒ Int.MaxValue
-        case p ⇒ p.startOrPoint
+        case NoPosition => Int.MaxValue
+        case p => if (p.isRange) p.start else p.point
       }
     }.min
     val g = c.asInstanceOf[reflect.macros.runtime.Context].global

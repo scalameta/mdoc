@@ -3,7 +3,9 @@ import scala.collection.mutable
 def scala212 = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.4"
+def scala2Versions = List(scala213, scala212, scala211)
 def scala3 = List("3.0.0-M3", "3.0.0-M2")
+def allScalaVersions = scala2Versions ::: scala3
 
 def scalajs = "1.3.0"
 def scalajsBinaryVersion = "1"
@@ -63,8 +65,8 @@ def crossSetting[A](
 
 inThisBuild(
   List(
-    scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211, scala213) ::: scala3,
+    scalaVersion := scala213,
+    crossScalaVersions := allScalaVersions,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -168,6 +170,20 @@ lazy val runtime = project
 
 val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 
+lazy val cli = project
+  .settings(
+    moduleName := "mdoc-cli",
+    crossScalaVersions := scala2Versions,
+    libraryDependencies ++= List(
+      "io.get-coursier" % "interface" % V.coursier,
+      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
+      ("org.scalameta" %% "scalameta" % V.scalameta).withDottyCompat(scalaVersion.value),
+      ("com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10").withDottyCompat(
+        scalaVersion.value
+      )
+    )
+  )
+
 lazy val mdoc = project
   .settings(
     sharedSettings,
@@ -209,8 +225,6 @@ lazy val mdoc = project
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "io.get-coursier" % "interface" % V.coursier,
-      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
       "io.methvin" % "directory-watcher" % "0.10.1",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.3.Final",
@@ -218,7 +232,7 @@ lazy val mdoc = project
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
   )
-  .dependsOn(runtime)
+  .dependsOn(runtime, cli)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project
@@ -287,8 +301,12 @@ lazy val unit = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    crossScalaVersions --= scala3,
-    addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
+    // crossScalaVersions --= scala3,
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("tests/unit").value,
+    libraryDependencies ++= {
+      if (isScala3.value) List()
+      else List(compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"))
+    },
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
       List(
@@ -296,10 +314,8 @@ lazy val unit = project
       )
     ),
     libraryDependencies ++= List(
-      "co.fs2" %% "fs2-core" % "2.1.0",
-      "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
-      "org.scalameta" %% "munit" % V.munit % Test,
-      "org.scalameta" %% "testkit" % V.scalameta % Test
+      "co.fs2" %% "fs2-core" % "2.5.0",
+      "org.scalameta" %% "munit" % V.munit % Test
     ),
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -316,6 +332,7 @@ lazy val plugin = project
     sharedSettings,
     sbtPlugin := true,
     sbtVersion in pluginCrossBuild := "1.0.0",
+    scalaVersion := scala212,
     crossScalaVersions := List(scala212),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
@@ -352,13 +369,16 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
-    crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
-    libraryDependencies ++=
-      Seq(
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("js").value,
+    libraryDependencies ++= crossSetting(
+      scalaVersion.value,
+      if2 = List(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
         "org.scala-js" %% "scalajs-linker" % scalajs
-      )
+      ),
+      if3 = List()
+    )
   )
   .dependsOn(mdoc)
 
@@ -367,6 +387,7 @@ lazy val docs = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-docs",
+    scalaVersion := scala212,
     crossScalaVersions := List(scala212),
     skip in publish :=
       !scalaVersion.value.startsWith("2.12") ||
@@ -377,6 +398,8 @@ lazy val docs = project
       "org.scala-sbt" % "sbt" % sbtVersion.value,
       "com.cibo" %% "evilplot" % "0.6.3"
     ),
+    TaskKey[Option[File]]("bloopGenerate").in(Compile) := None,
+    TaskKey[Option[File]]("bloopGenerate").in(Test) := None,
     watchSources += baseDirectory.in(ThisBuild).value / "docs",
     cancelable in Global := true,
     MdocPlugin.autoImport.mdoc := run.in(Compile).evaluated,

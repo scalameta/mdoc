@@ -249,7 +249,7 @@ class DefaultSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "leading-comment",
+    "leading-comment".only,
     """
       |```scala mdoc
       |

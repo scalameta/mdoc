@@ -83,7 +83,7 @@ class Instrumenter(
   private def printBinder(name: String, pos: Position): Unit = {
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
-  private def printStatement(stat: Stat, m: Modifier, sb: PrintStream): Unit = {
+  private def printStatement(stat: Tree, m: Modifier, sb: PrintStream): Unit = {
     if (m.isCrash) {
       sb.append("$doc.crash(")
         .append(position(stat.pos))

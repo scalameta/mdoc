@@ -10,7 +10,7 @@ import scala.meta.inputs.Input
 import scala.meta.io.AbsolutePath
 import scala.collection.JavaConverters._
 import scala.meta.io.RelativePath
-import mdoc.internal.pos.PositionSyntax._
+// import mdoc.internal.pos.PositionSyntax._
 import scala.meta.inputs.Position
 
 trait PreModifier {

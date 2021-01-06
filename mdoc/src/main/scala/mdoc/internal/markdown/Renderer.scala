@@ -16,6 +16,7 @@ import scala.meta._
 import scala.meta.inputs.Position
 import mdoc.internal.cli.InputFile
 import mdoc.internal.cli.Settings
+import mdoc.internal.cli.Context
 
 object Renderer {
 
@@ -26,10 +27,12 @@ object Renderer {
       settings: Settings,
       reporter: Reporter,
       filename: String,
-      printer: Variable => String
+      printer: Variable => String,
+      context: Context
   ): String = {
+    println("HELLO: " + sections)
     val inputs =
-      sections.map(s => SectionInput(s, MdocDialect.scala(s).parse[Source].get, Modifier.Default()))
+      sections.map(s => SectionInput(s, Modifier.Default(), context))
     val instrumented = Instrumenter.instrument(file, inputs, settings, reporter)
     val doc =
       MarkdownBuilder.buildDocument(
@@ -76,27 +79,20 @@ object Renderer {
     out.toString()
   }
 
+  @deprecated("this method will be removed", "2020-06-01")
   def appendMultiline(sb: PrintStream, string: String): Unit = {
-    appendMultiline(sb, string, string.length)
+    sb.appendMultiline(string)
   }
 
+  @deprecated("this method will be removed", "2020-06-01")
   def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
-    var i = 0
-    while (i < N) {
-      string.charAt(i) match {
-        case '\n' =>
-          sb.append("\n// ")
-        case ch =>
-          sb.append(ch)
-      }
-      i += 1
-    }
+    sb.appendMultiline(string, N)
   }
 
   def appendFreshMultiline(sb: PrintStream, string: String): Unit = {
     val N = string.length - (if (string.endsWith("\n")) 1 else 0)
     sb.append("// ")
-    appendMultiline(sb, string, N)
+    sb.appendMultiline(string, N)
   }
 
   def renderEvaluatedSection(
@@ -106,6 +102,8 @@ object Renderer {
       printer: Variable => String,
       compiler: MarkdownCompiler
   ): String = {
+    println("IN: " + doc.instrumented)
+    println("OUT: " + doc.sections.map(_.section.statements.map(_.binders.map(_.value))))
     val baos = new ByteArrayOutputStream()
     val sb = new PrintStream(baos)
     val stats = section.source.stats.lift
@@ -143,11 +141,10 @@ object Renderer {
               sb.append('\n')
               binder.value match {
                 case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
-                  val compiled = compiler.fail(
-                    doc.sections.map(_.source),
-                    Input.String(instrumented),
-                    section.source.pos
-                  )
+                  val input = Input.String(instrumented)
+                  val edit =
+                    TokenEditDistance.fromInputs(doc.sections.map(_.source.pos.input), input)
+                  val compiled = compiler.fail(edit, input, section.source.pos)
                   val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                   val pos = tpos.toMeta(section)
                   if (section.mod.isWarn && compiler.hasErrors) {

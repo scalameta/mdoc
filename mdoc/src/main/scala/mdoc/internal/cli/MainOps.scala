@@ -257,7 +257,7 @@ object MainOps {
         reporter.println(Settings.version(BuildInfo.version))
         0
       case els =>
-        els.andThen(_.validate(reporter)) match {
+        els.andThen(s => Context.fromSettings(s, reporter)) match {
           case Configured.NotOk(error) =>
             error.all.foreach(message => reporter.error(message))
             1

@@ -3,7 +3,7 @@ package mdoc
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath
 import mdoc.internal.cli.Settings
-import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.cli.CliEnrichments._
 import scala.meta.io.AbsolutePath
 import mdoc.internal.cli.InputFile
 

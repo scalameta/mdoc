@@ -2,7 +2,7 @@ package tests.markdown
 
 object StringSyntax {
   implicit class XtensionStringSyntax(str: String) {
-    def triplequoted: String = str.replaceAllLiterally("'''", "\"\"\"")
+    def triplequoted: String = str.replace("'''", "\"\"\"")
     def trimLineEnds: String = {
       str.linesIterator.map(_.trimEnd).mkString("\n")
     }

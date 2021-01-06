@@ -6,6 +6,7 @@ import com.vladsch.flexmark.parser.block.DocumentPostProcessor
 import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
 import com.vladsch.flexmark.util.sequence.BasedSequence
 import com.vladsch.flexmark.util.sequence.CharSubSequence
+import scala.meta._
 import java.util
 import mdoc.PostModifierContext
 import mdoc.PostProcessContext
@@ -14,7 +15,6 @@ import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 import scala.meta.dialects.Scala213
 import scala.util.control.NonFatal
-import scala.collection.JavaConverters._
 import mdoc.internal.cli.Context
 import mdoc.internal.document.MdocExceptions
 import mdoc.internal.markdown.Modifier._
@@ -31,7 +31,7 @@ import scala.meta.Source
 object MdocDialect {
 
   def parse(path: AbsolutePath): Parsed[Source] = {
-    scala(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
+    scala.apply(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
   }
   val scala = Scala213.withAllowToplevelTerms(true)
 }
@@ -114,14 +114,14 @@ class Processor(implicit ctx: Context) {
       filename: String
   ): Unit = {
     val sectionInputs = inputs.map { case ScalaFenceInput(_, input, mod) =>
-      import scala.meta._
-      MdocDialect.scala(input).parse[Source] match {
-        case parsers.Parsed.Success(source) =>
-          SectionInput(input, source, mod)
-        case parsers.Parsed.Error(pos, msg, _) =>
-          ctx.reporter.error(pos.toUnslicedPosition, msg)
-          SectionInput(input, Source(Nil), mod)
-      }
+      // TODO: report error
+      SectionInput(input, mod, ctx)
+    // MdocDialect.scala(input).parse[Source] match {
+    //   case parsers.Parsed.Success(source) =>
+    //   case parsers.Parsed.Error(pos, msg, _) =>
+    //     ctx.reporter.error(pos.toUnslicedPosition, msg)
+    //     SectionInput(input, Source(Nil), mod)
+    // }
     }
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
     if (ctx.reporter.hasErrors) {
@@ -191,6 +191,7 @@ class Processor(implicit ctx: Context) {
           ctx.settings.variablePrinter,
           markdownCompiler
         )
+      implicit val pprintColor = TPrintColors.BlackWhite
       mod match {
         case Modifier.Post(modifier, info) =>
           val variables = for {
@@ -201,7 +202,7 @@ class Processor(implicit ctx: Context) {
           } yield {
             new mdoc.Variable(
               binder.name,
-              binder.tpe.render(TPrintColors.BlackWhite),
+              binder.tpe.render,
               binder.value,
               binder.pos.toMeta(section),
               j,

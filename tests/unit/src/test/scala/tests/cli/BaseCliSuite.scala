@@ -6,12 +6,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 import munit.FunSuite
 import scala.meta.io.AbsolutePath
-import scala.meta.testkit.StringFS
 import mdoc.Main
 import scala.meta.internal.io.PathIO
 import scala.meta.io.RelativePath
 import munit.TestOptions
-import mdoc.internal.BuildInfo
 import tests.BaseSuite
 import tests.markdown.Compat
 
