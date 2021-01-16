@@ -1,6 +1,6 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.12"
+def scala212 = "2.12.13"
 def scala211 = "2.11.12"
 def scala213 = "2.13.4"
 def scala3 = List("3.0.0-M3", "3.0.0-M2")
