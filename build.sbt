@@ -1,6 +1,8 @@
+import sbt.librarymanagement.CrossVersion
 import scala.collection.mutable
 
 def scala212 = "2.12.13"
+def scala212Legacy = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.4"
 def scala3 = List("3.0.0-M3", "3.0.0-M2")
@@ -36,6 +38,8 @@ def multiScalaDirectories(projectName: String) =
     partialVersion.collect { case (major, minor) =>
       result += base / s"scala-$major.$minor"
     }
+
+    result += base / s"scala-${scalaVersion.value}"
     if (isScala3.value) {
       result += base / "scala-3"
     }
@@ -64,7 +68,7 @@ def crossSetting[A](
 inThisBuild(
   List(
     scalaVersion := scala212,
-    crossScalaVersions := List(scala212, scala211, scala213) ::: scala3,
+    crossScalaVersions := List(scala212, scala212Legacy, scala211, scala213) ::: scala3,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -114,6 +118,13 @@ val V = new {
   val scalacheck = "1.15.2"
 }
 
+val crossVersionLegacy = Def.setting {
+  CrossVersion.binaryWith(
+    prefix = "",
+    suffix = if (scalaVersion.value == scala212Legacy) ".12" else ""
+  )
+}
+
 lazy val pprintVersion = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "0.5.4"
   else "0.6.0"
@@ -152,6 +163,7 @@ lazy val runtime = project
     sharedSettings,
     moduleName := "mdoc-runtime",
     unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("runtime").value,
+    crossVersion := crossVersionLegacy.value,
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
@@ -172,6 +184,7 @@ lazy val mdoc = project
   .settings(
     sharedSettings,
     unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("mdoc").value,
+    crossVersion := crossVersionLegacy.value,
     moduleName := "mdoc",
     mainClass in assembly := Some("mdoc.Main"),
     assemblyJarName in assembly := "mdoc.jar",
@@ -329,6 +342,7 @@ lazy val plugin = project
         managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
       val props = new java.util.Properties()
       props.put("version", version.value)
+      props.put("scala212Legacy", scala212Legacy)
       IO.write(props, "sbt-mdoc properties", out)
       List(out)
     },
@@ -352,6 +366,7 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
+    crossVersion := crossVersionLegacy.value,
     crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
     libraryDependencies ++=
