@@ -67,7 +67,7 @@ object MdocPlugin extends AutoPlugin {
   }
 
   def compatibleScalaVersion = Def.setting {
-    scalaVersion.value.split('.').take(3).map(_.toInt) match {
+    scalaVersion.value.takeWhile(_ != '-').split('.').take(3).map(_.toInt) match {
       case Array(2, 12, minor) if minor <= 12 => BuildInfo.scala212Legacy
       case _ => scalaBinaryVersion.value
     }
