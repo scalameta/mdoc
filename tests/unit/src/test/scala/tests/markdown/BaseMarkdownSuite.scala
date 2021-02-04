@@ -89,7 +89,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     test(name) {
       val reporter = newReporter()
       val context = newContext(settings, reporter)
-      original.foreach { case (filename, contents) =>
+      original.toList.sortBy(_._1).foreach { case (filename, contents) =>
         println(s"creating $filename")
         val input = Input.VirtualFile(filename, contents)
         val file = InputFile.fromRelativeFilename(input.path, settings)
