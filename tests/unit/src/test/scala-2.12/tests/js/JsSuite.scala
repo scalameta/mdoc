@@ -15,6 +15,55 @@ class JsSuite extends BaseMarkdownSuite {
     )
   )
 
+  checkMulti(
+    "problem", {
+      val a_md =
+        """
+          |---
+          |title: A
+          |---
+          |
+          |```scala mdoc:js
+          |import scala.util.Success
+          |Success("foo")
+          |```
+          |
+          |```scala mdoc:js
+          |import scala.util.Success
+          |Success("bar")
+          |```
+          |
+          |
+         """.stripMargin.trim
+
+      val b_md =
+        """
+          |---
+          |title: B
+          |---
+          |
+          |```scala mdoc:js
+          |println("b")
+          |```
+      """.stripMargin.trim
+      val c_md =
+        """
+          |---
+          |title: C
+          |---
+          |
+          |```scala mdoc:js
+          |println("c1")
+          |```
+          |
+          |```scala mdoc:js
+          |println("c2")
+          |```
+      """.stripMargin.trim
+      Map("a.md" -> a_md, "b.md" -> b_md, "c.md" -> c_md)
+    }
+  )
+
   check(
     "basic",
     """

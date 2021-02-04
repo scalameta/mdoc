@@ -80,6 +80,31 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     }
   }
 
+  def checkMulti(
+      name: TestOptions,
+      original: Map[String, String],
+      settings: Settings = baseSettings,
+      onOutput: String => Unit = _ => ()
+  ): Unit = {
+    test(name) {
+      val reporter = newReporter()
+      val context = newContext(settings, reporter)
+      original.foreach { case (filename, contents) =>
+        println(s"creating $filename")
+        val input = Input.VirtualFile(filename, contents)
+        val file = InputFile.fromRelativeFilename(input.path, settings)
+        val obtained =
+          Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
+        onOutput(obtained)
+      }
+      val colorOut = myStdout.toString()
+      print(colorOut)
+      val stdout = fansi.Str(colorOut).plainText
+      assert(!reporter.hasErrors, stdout)
+      assert(!reporter.hasWarnings, stdout)
+    }
+  }
+
   def checkCompiles(
       name: TestOptions,
       original: String,
