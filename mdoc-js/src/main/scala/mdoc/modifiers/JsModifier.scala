@@ -165,7 +165,9 @@ class JsModifier extends mdoc.PreModifier {
     } else {
       val output = MemOutputFile.apply()
 
-      val linking = linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
+      val currentLinker = if (config.reuseLinker) linker else newLinker()
+      val linking =
+        currentLinker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
       Await.result(linking, Duration.Inf)
 
       ctx.settings.toInputFile(ctx.inputFile) match {
