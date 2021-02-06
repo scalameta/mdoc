@@ -29,6 +29,7 @@ import org.scalajs.linker.interface.LinkerOutput
 import org.scalajs.linker.MemOutputFile
 import java.util.concurrent.Executor
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.linker.interface.ClearableLinker
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -37,7 +38,7 @@ class JsModifier extends mdoc.PreModifier {
   val target = new VirtualDirectory("(memory)", None)
   var maybeCompiler: Option[MarkdownCompiler] = None
   var config = JsConfig()
-  var linker: Linker = newLinker()
+  var linker: ClearableLinker = newLinker()
   var virtualIrFiles: Seq[IRFile] = Nil
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
@@ -67,7 +68,7 @@ class JsModifier extends mdoc.PreModifier {
     result
   }
 
-  def newLinker(): Linker = {
+  def newLinker(): ClearableLinker = {
     val semantics: Semantics =
       if (config.fullOpt) Semantics.Defaults.optimized
       else Semantics.Defaults
@@ -76,9 +77,10 @@ class JsModifier extends mdoc.PreModifier {
       .withSemantics(semantics)
       .withSourceMap(false)
       .withModuleKind(config.moduleKind)
+      .withBatchMode(config.batchMode)
       .withClosureCompilerIfAvailable(config.fullOpt)
 
-    StandardImpl.linker(conf)
+    StandardImpl.clearableLinker(conf)
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
@@ -165,7 +167,8 @@ class JsModifier extends mdoc.PreModifier {
     } else {
       val output = MemOutputFile.apply()
 
-      val linking = linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
+      val linking =
+        linker.link(virtualIrFiles ++ sjsir, Nil, LinkerOutput.apply(output), sjsLogger)
       Await.result(linking, Duration.Inf)
 
       ctx.settings.toInputFile(ctx.inputFile) match {
