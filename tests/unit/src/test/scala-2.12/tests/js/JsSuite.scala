@@ -61,7 +61,8 @@ class JsSuite extends BaseMarkdownSuite {
           |```
       """.stripMargin.trim
       Map("a.md" -> a_md, "b.md" -> b_md, "c.md" -> c_md)
-    }
+    },
+    settings = baseSettings.copy(site = baseSettings.site.updated("js-opt", "full"))
   )
 
   check(
