@@ -20,7 +20,7 @@ case class JsConfig(
     fullOpt: Boolean = true,
     htmlPrefix: String = "",
     relativeLinkPrefix: String = "",
-    reuseLinker: Boolean = true
+    batchMode: Boolean = false
 ) {
   def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
   def libraryScripts(
@@ -92,7 +92,7 @@ object JsConfig {
           }
       },
       relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix),
-      reuseLinker = ctx.site.getOrElse("js-reuse-linker", "true").toBoolean
+      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean
     )
   }
 }

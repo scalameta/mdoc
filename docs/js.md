@@ -395,3 +395,18 @@ files:
   the markdown output as a `<script src="...">`.
 - `*-loader.js`: same as `*-library.js` but it comes after `*-library.js`.
 - `*.js.map`: optional source maps.
+
+### Batch mode linking
+
+By default, mdoc will re-use the Scala.js linker, exercising its ability to work
+incrementally. This can speed up linking and optimization dramatically.
+
+If incremental linking is causing issues in your project, use can use `js-batch-mode`
+site variable to enable batch mode (which will discard intermediate linker state 
+after processing each file):
+
+```scala
+mdocVariables := Map(
+  "js-batch-mode" -> "true"
+)
+```
