@@ -42,18 +42,8 @@ case class SectionInput(input : Input, mod : Modifier, context : MContext){
   def show(tree : Tree, currentIdent : Int) = {
      val str = tree.sourcePos(using ctx).start 
      val end = tree.sourcePos(using ctx).end
-     // workaround should be removed once support for 0.26.0 is dropped
-     val prefix = if (BuildInfo.scalaBinaryVersion == "0.26")
-        tree match {
-          case ext: ExtMethods if ext.tparams.nonEmpty =>
-            "extension ["
-          case _: ExtMethods =>
-            "extension ("
-          case _ =>  ""
-        } 
-     else ""
      val realIdent = " " * (currentIdent - wrapIdent.size)
-     prefix + sourceCode.substring(str, end).replace("\n", "\n" + realIdent)
+     sourceCode.substring(str, end).replace("\n", "\n" + realIdent)
   }
   def text = source.show(using driver.currentCtx)
 }

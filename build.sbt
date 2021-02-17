@@ -5,7 +5,7 @@ def scala212 = "2.12.13"
 def scala212Legacy = "2.12.12"
 def scala211 = "2.11.12"
 def scala213 = "2.13.4"
-def scala3 = List("3.0.0-M3", "3.0.0-M2")
+def scala3 = List("3.0.0-RC1", "3.0.0-M3", "3.0.0-M2")
 
 def scalajs = "1.3.0"
 def scalajsBinaryVersion = "1"
@@ -113,7 +113,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.7"
-  val munit = "0.7.21"
+  val munit = "0.7.22"
   val coursier = "1.0.2"
   val scalacheck = "1.15.2"
 }
