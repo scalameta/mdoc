@@ -167,7 +167,7 @@ class MarkdownCompiler(
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
         val msg = nullableMessage(diagnostic.message)
-        val mpos = ParsedSource.toMetaPosition(edit, pos)
+        val mpos = Position.None //ParsedSource.toMetaPosition(edit, pos)
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent

@@ -31,7 +31,8 @@ import scala.meta.Source
 object MdocDialect {
 
   def parse(path: AbsolutePath): Parsed[Source] = {
-    scala.apply(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
+    // scala.apply(Input.VirtualFile(path.toString(), path.readText)).parse[Source]
+    (Input.VirtualFile(path.toString, path.readText), scala).parse[Source]
   }
   val scala = Scala213.withAllowToplevelTerms(true)
 }
@@ -124,6 +125,7 @@ class Processor(implicit ctx: Context) {
     // }
     }
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
+    // println(s"Instrumented: $instrumented")
     if (ctx.reporter.hasErrors) {
       return
     }

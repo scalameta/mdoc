@@ -29,6 +29,7 @@ import scala.tools.nsc.io.VirtualDirectory
 import scala.annotation.implicitNotFound
 import mdoc.internal.CompatClassloader
 import mdoc.internal.worksheets.Compat._
+import scala.meta.internal.inputs._
 
 class MarkdownCompiler(
     classpath: String,
@@ -218,13 +219,15 @@ class MarkdownCompiler(
       severity: sreporter.Severity,
       mpos: Position,
       message: String
-  ): Unit =
-    severity match {
-      case sreporter.ERROR => vreporter.error(mpos, message)
-      case sreporter.INFO => vreporter.info(mpos, message)
-      case sreporter.WARNING => vreporter.warning(mpos, message)
-      case _ =>
-    }
+  ): Unit = {
+    import sreporter._
+    if(severity == sreporter.ERROR)
+      vreporter.error(mpos, message)
+    else if(severity == sreporter.WARNING)
+      vreporter.warning(mpos, message)
+    else if (severity == sreporter.INFO)
+      vreporter.info(mpos, message)
+  }
   private def formatMessage(pos: GPosition, message: String): String =
     new CodeBuilder()
       .println(s"${pos.source.file.path}:${pos.line + 1} (mdoc generated code) $message")

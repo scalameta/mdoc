@@ -15,6 +15,7 @@ import scala.meta.Source
 import scala.meta.Import
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.inputs.Position
+import scala.meta._
 
 class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
 
@@ -92,12 +93,12 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
     )
     val fileDependencies = mutable.ListBuffer.empty[FileImport]
     val renames = mutable.ListBuffer.empty[Rename]
-    MdocDialect.scala(input).parse[Source] match {
+    (input, MdocDialect.scala).parse[Source] match {
       case e: scala.meta.parsers.Parsed.Error =>
         reporter.error(e.pos, e.message)
-      case s: Success[_] =>
-        val source = s.tree
-        source.stats.foreach {
+      case scala.meta.parsers.Parsed.Success(s) =>
+        println(s)
+        s.stats.foreach {
           case i: Import =>
             i.importers.foreach {
               case importer @ FilePrintable(deps) =>
