@@ -89,7 +89,7 @@ class DependencySuite extends BaseMarkdownSuite {
        |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.13/2.3.4/mmunit_2.13-2.3.4.pom
        |import $dep.`org.scalameta::mmunit:2.3.4`, $dep.`org.scalameta:foobar:1.2.1`
        |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.13.4:2.3.4
+       |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.13.5:2.3.4
        |<redacted user.home>
        |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_2.13.4/2.3.4/not-exists_2.13.4-2.3.4.pom
        |import $dep.`org.scalameta:::not-exists:2.3.4`
