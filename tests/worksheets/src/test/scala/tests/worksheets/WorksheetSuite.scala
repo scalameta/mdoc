@@ -373,6 +373,22 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "akka".tag(SkipScala3).tag(SkipScala211),
+    """|import $dep.`com.typesafe.akka::akka-actor:2.6.13`
+       |import akka.actor.ActorSystem
+       |
+       |implicit val system = ActorSystem("worksheet")
+       |
+       |""".stripMargin,
+    """|import $dep.`com.typesafe.akka::akka-actor:2.6.13`
+       |import akka.actor.ActorSystem
+       |
+       |<implicit val system = ActorSystem("worksheet")> // : ActorSystem = akka...
+       |system: ActorSystem = akka://worksheet
+       |""".stripMargin
+  )
+
+  checkDecorations(
     "placeholder",
     """|def x = 1 -> 2
        |val (a, _) = x
