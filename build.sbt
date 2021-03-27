@@ -302,8 +302,7 @@ lazy val worksheets = project
     sharedSettings,
     skip in publish := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % munitVersion.value % Test,
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
+      "org.scalameta" %% "munit" % munitVersion.value % Test
     )
   )
   .dependsOn(mdoc, tests)
@@ -383,6 +382,7 @@ lazy val plugin = project
         publishLocal in interfaces,
         publishLocal in runtime,
         publishLocal in mdoc,
+        publishLocal in cli,
         publishLocal in js
       )
       .value,
