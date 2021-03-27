@@ -12,6 +12,7 @@ import mdoc.internal.document.MdocNonFatal
 import mdoc.internal.CompatClassloader
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.atomic.AtomicReference
 
 object MarkdownBuilder {
 
@@ -40,31 +41,35 @@ object MarkdownBuilder {
         val ctor = cls.getDeclaredConstructor()
         ctor.setAccessible(true)
         val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
-        try {
-          doc.build(instrumentedInput)
-        } catch {
-          case e: DocumentException =>
-            val index = e.sections.length - 1
-            val input = sectionInputs(index).input
-            val pos =
-              if (e.pos.isEmpty) {
-                Position.Range(input, 0, 0)
-              } else {
-                val slice = Position.Range(
-                  input,
-                  e.pos.startLine,
-                  e.pos.startColumn,
-                  e.pos.endLine,
-                  e.pos.endColumn
-                )
-                slice.toUnslicedPosition
-              }
-            reporter.error(pos, e.getCause)
-            Document(instrumentedInput, e.sections)
-          case MdocNonFatal(e) =>
-            reporter.error(e)
-            Document.empty(instrumentedInput)
+        var evaluatedDoc = Document.empty(instrumentedInput)
+        runInClassLoader(cls.getClassLoader()) { () =>
+          try {
+            evaluatedDoc = doc.build(instrumentedInput)
+          } catch {
+            case e: DocumentException =>
+              val index = e.sections.length - 1
+              val input = sectionInputs(index).input
+              val pos =
+                if (e.pos.isEmpty) {
+                  Position.Range(input, 0, 0)
+                } else {
+                  val slice = Position.Range(
+                    input,
+                    e.pos.startLine,
+                    e.pos.startColumn,
+                    e.pos.endLine,
+                    e.pos.endColumn
+                  )
+                  slice.toUnslicedPosition
+                }
+              reporter.error(pos, e.getCause)
+              evaluatedDoc = Document(instrumentedInput, e.sections)
+            case MdocNonFatal(e) =>
+              reporter.error(e)
+              evaluatedDoc = Document.empty(instrumentedInput)
+          }
         }
+        evaluatedDoc
       case None =>
         // An empty document will render as the original markdown
         Document.empty(instrumentedInput)
@@ -90,6 +95,17 @@ object MarkdownBuilder {
         base ++ runtime
       }
     new MarkdownCompiler(fullClasspath.syntax, scalacOptions)
+  }
+
+  private def runInClassLoader(classloader: ClassLoader)(f: () => Unit) = {
+    val thread = new Thread {
+      override def run: Unit = {
+        f()
+      }
+    }
+    thread.setContextClassLoader(classloader)
+    thread.start()
+    thread.join()
   }
 
   private def defaultClasspath(fn: Path => Boolean): Classpath = {
