@@ -30,7 +30,6 @@ object Renderer {
       printer: Variable => String,
       context: Context
   ): String = {
-    println("HELLO: " + sections)
     val inputs =
       sections.map(s => SectionInput(s, Modifier.Default(), context))
     val instrumented = Instrumenter.instrument(file, inputs, settings, reporter)
@@ -128,7 +127,6 @@ object Renderer {
         // println(input)
         // println(section.source)
         val leadingTrivia = Position.Range(input, leadingStart, pos.start)
-        println(leadingTrivia)
         if (!section.mod.isFailOrWarn) {
           sb.append(leadingTrivia.text)
         }

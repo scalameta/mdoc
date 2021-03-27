@@ -97,7 +97,6 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
       case e: scala.meta.parsers.Parsed.Error =>
         reporter.error(e.pos, e.message)
       case scala.meta.parsers.Parsed.Success(s) =>
-        println(s)
         s.stats.foreach {
           case i: Import =>
             i.importers.foreach {
