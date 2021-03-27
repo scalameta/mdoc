@@ -34,7 +34,6 @@ class WorksheetSuite extends BaseSuite {
             Paths.get(url.toURI())
         }
         .asJava
-        
     )
 
   override def afterAll(): Unit = {

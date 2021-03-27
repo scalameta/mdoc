@@ -128,13 +128,13 @@ lazy val fansiVersion = Def.setting {
 }
 
 lazy val fs2Version = Def.setting {
-  if(scalaVersion.value.startsWith("2.11")) "2.1.0"
-  else if(scalaVersion.value == "3.0.0-M2") "2.5.0"
+  if (scalaVersion.value.startsWith("2.11")) "2.1.0"
+  else if (scalaVersion.value == "3.0.0-M2") "2.5.0"
   else "2.5.3"
 }
 
 lazy val munitVersion = Def.setting {
-  if(scalaVersion.value == "3.0.0-M2")
+  if (scalaVersion.value == "3.0.0-M2")
     "0.7.21"
   else V.munit
 }
@@ -225,7 +225,7 @@ lazy val mdoc = project
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
         ("org.scalameta" %% "scalameta" % V.scalameta)
           .excludeAll(excludePprint)
-          .withDottyCompat(scalaVersion.value),
+          .withDottyCompat(scalaVersion.value)
       ),
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
@@ -266,7 +266,7 @@ val tests = project
     sharedSettings,
     skip in publish := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % munitVersion.value 
+      "org.scalameta" %% "munit" % munitVersion.value
     ),
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -331,7 +331,7 @@ lazy val unit = project
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
-    ),
+    )
   )
   .dependsOn(mdoc, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)

@@ -11,7 +11,7 @@ import metaconfig.Configured
 import metaconfig.Conf
 import scala.meta.internal.io.PathIO
 
-trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders => 
+trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders =>
 
   implicit val surface: Surface[Settings] =
     generic.deriveSurface[Settings]
@@ -30,7 +30,7 @@ trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders =>
       }
     generic.deriveDecoder[Settings](base)
   }
-  
+
   def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
@@ -42,5 +42,5 @@ trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders =>
   }
 
   def write(set: Settings) = ConfEncoder[Settings].write(set)
-  
+
 }

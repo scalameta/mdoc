@@ -221,9 +221,9 @@ class MarkdownCompiler(
       message: String
   ): Unit = {
     import sreporter._
-    if(severity == sreporter.ERROR)
+    if (severity == sreporter.ERROR)
       vreporter.error(mpos, message)
-    else if(severity == sreporter.WARNING)
+    else if (severity == sreporter.WARNING)
       vreporter.warning(mpos, message)
     else if (severity == sreporter.INFO)
       vreporter.info(mpos, message)

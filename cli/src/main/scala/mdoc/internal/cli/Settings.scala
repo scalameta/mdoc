@@ -258,8 +258,8 @@ object Settings extends MetaconfigScalametaImplicits with Decoders with Settings
     val props = MdocProperties.default(cwd)
     base.withProperties(props)
   }
-  
-  def help(displayVersion: String, width: Int): String = 
+
+  def help(displayVersion: String, width: Int): String =
     new HelpMessage[Settings](
       baseDefault(PathIO.workingDirectory),
       version(displayVersion),

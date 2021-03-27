@@ -22,7 +22,7 @@ object SectionInput {
   }
   def apply(input: Input, mod: Modifier, context: MContext): SectionInput = {
     val source: Source = (input, MdocDialect.scala).parse[Source] match {
-      case parsers.Parsed.Success(source) => 
+      case parsers.Parsed.Success(source) =>
         source
       case parsers.Parsed.Error(pos, msg, _) =>
         context.reporter.error(pos.toUnslicedPosition, msg)
