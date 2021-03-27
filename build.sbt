@@ -136,6 +136,11 @@ lazy val fansiVersion = Def.setting {
   else "0.2.9"
 }
 
+lazy val fs2Version = Def.setting {
+  if(scalaVersion.value.startsWith("2.11")) "2.1.0"
+  else "2.5.3"
+}
+
 lazy val interfaces = project
   .in(file("mdoc-interfaces"))
   .settings(
@@ -183,6 +188,7 @@ val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 
 lazy val cli = project
   .settings(
+    sharedSettings,
     moduleName := "mdoc-cli",
     crossScalaVersions := allScalaVersions,
     libraryDependencies ++= List(
@@ -326,7 +332,7 @@ lazy val unit = project
       )
     ),
     libraryDependencies ++= List(
-      "co.fs2" %% "fs2-core" % "2.5.0",
+      "co.fs2" %% "fs2-core" % fs2Version.value,
       "org.scalameta" %% "munit" % V.munit % Test
     ),
     buildInfoPackage := "tests.cli",

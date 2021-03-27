@@ -227,18 +227,6 @@ case class Settings(
 }
 
 object Settings extends MetaconfigScalametaImplicits with Decoders with SettingsGeneric {
-  def baseDefault(cwd: AbsolutePath): Settings = {
-    new Settings(
-      in = List(cwd.resolve("docs")),
-      out = List(cwd.resolve("out")),
-      cwd = cwd
-    )
-  }
-  def default(cwd: AbsolutePath): Settings = {
-    val base = baseDefault(cwd)
-    val props = MdocProperties.default(cwd)
-    base.withProperties(props)
-  }
   def version(displayVersion: String) =
     s"mdoc v$displayVersion"
   def usage: String =
@@ -258,4 +246,24 @@ object Settings extends MetaconfigScalametaImplicits with Decoders with Settings
          |""".stripMargin
     )
 
+  def baseDefault(cwd: AbsolutePath): Settings = {
+    new Settings(
+      in = List(cwd.resolve("docs")),
+      out = List(cwd.resolve("out")),
+      cwd = cwd
+    )
+  }
+  def default(cwd: AbsolutePath): Settings = {
+    val base = baseDefault(cwd)
+    val props = MdocProperties.default(cwd)
+    base.withProperties(props)
+  }
+  
+  def help(displayVersion: String, width: Int): String = 
+    new HelpMessage[Settings](
+      baseDefault(PathIO.workingDirectory),
+      version(displayVersion),
+      usage,
+      description
+    ).helpMessage(width)
 }

@@ -8,6 +8,8 @@ import scala.meta.io.AbsolutePath
 import java.nio.file.InvalidPathException
 import metaconfig.ConfError
 import metaconfig.Configured
+import metaconfig.Conf
+import scala.meta.internal.io.PathIO
 
 trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders => 
 
@@ -39,13 +41,6 @@ trait SettingsGeneric { self: MetaconfigScalametaImplicits with Decoders =>
       .map(_.addSite(base.site))
   }
 
-  def write(set: Settings) = ConfEncoder[Settings].write(this)
+  def write(set: Settings) = ConfEncoder[Settings].write(set)
   
-  def help(displayVersion: String, width: Int): String =
-    new HelpMessage[Settings](
-      baseDefault(PathIO.workingDirectory),
-      version(displayVersion),
-      usage,
-      description
-    ).helpMessage(width)
 }
