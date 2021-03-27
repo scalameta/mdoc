@@ -19,7 +19,8 @@ case class JsConfig(
     outPrefix: Option[String] = None,
     fullOpt: Boolean = true,
     htmlPrefix: String = "",
-    relativeLinkPrefix: String = ""
+    relativeLinkPrefix: String = "",
+    batchMode: Boolean = false
 ) {
   def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
   def libraryScripts(
@@ -90,7 +91,8 @@ object JsConfig {
               !ctx.settings.watch
           }
       },
-      relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix)
+      relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix),
+      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean
     )
   }
 }

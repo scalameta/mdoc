@@ -14,3 +14,5 @@ trait MetaconfigScalametaImplicits {
   implicit def iterablePrint[C[x] <: Iterable[x], T](implicit ev: pprint.TPrint[T]): TPrint[C[T]] =
     TPrint.make { implicit cfg => s"[${ev.render} ...]" }
 }
+
+object MetaconfigScalametaImplicits extends MetaconfigScalametaImplicits

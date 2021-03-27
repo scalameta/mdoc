@@ -66,6 +66,13 @@ object MdocPlugin extends AutoPlugin {
     }
   }
 
+  def compatibleScalaVersion = Def.setting {
+    scalaVersion.value.takeWhile(_ != '-').split('.').take(3).map(_.toInt) match {
+      case Array(2, 12, minor) if minor <= 12 => BuildInfo.scala212Legacy
+      case _ => scalaBinaryVersion.value
+    }
+  }
+
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
       mdocIn := baseDirectory.in(ThisBuild).value / "docs",
@@ -91,7 +98,9 @@ object MdocPlugin extends AutoPlugin {
         val isJS = mdocJS.value.isDefined
         if (mdocAutoDependency.value) {
           val suffix = if (isJS) "-js" else ""
-          List("org.scalameta" %% s"mdoc$suffix" % BuildInfo.version)
+          List(
+            "org.scalameta" % s"mdoc${suffix}_${compatibleScalaVersion.value}" % BuildInfo.version
+          )
         } else {
           List()
         }
