@@ -10,7 +10,8 @@ import java.lang.StringBuilder
 import java.{util => ju}
 import java.nio.file.Paths
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.language.implicitConversions
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 
@@ -18,6 +19,8 @@ import tests.BaseSuite
 import tests.markdown.Compat
 
 class WorksheetSuite extends BaseSuite {
+
+
 
   var mdoc = ju.ServiceLoader
     .load(classOf[Mdoc], this.getClass().getClassLoader())
@@ -35,6 +38,7 @@ class WorksheetSuite extends BaseSuite {
             Paths.get(url.toURI())
         }
         .asJava
+        
     )
 
   override def afterAll(): Unit = {

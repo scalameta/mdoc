@@ -7,6 +7,7 @@ import mdoc.MainSettings
 import mdoc.StringModifier
 import mdoc.internal.BuildInfo
 import mdoc.modifiers.ScastieModifier
+import mdoc.internal.cli.Context
 
 object Docs {
   def stableVersion: String =
@@ -51,7 +52,8 @@ object Docs {
         )
       )
       .withArgs(args)
-    val context = settings.settings.validate(settings.reporter).get
+    val context = Context.fromSettings(settings.settings, settings.reporter).get
+
     val exitCode = Main.process(
       settings
         .withStringModifiers(

@@ -129,7 +129,14 @@ lazy val fansiVersion = Def.setting {
 
 lazy val fs2Version = Def.setting {
   if(scalaVersion.value.startsWith("2.11")) "2.1.0"
+  else if(scalaVersion.value == "3.0.0-M2") "2.5.0"
   else "2.5.3"
+}
+
+lazy val munitVersion = Def.setting {
+  if(scalaVersion.value == "3.0.0-M2")
+    "0.7.21"
+  else V.munit
 }
 
 lazy val interfaces = project
@@ -219,9 +226,6 @@ lazy val mdoc = project
         ("org.scalameta" %% "scalameta" % V.scalameta)
           .excludeAll(excludePprint)
           .withDottyCompat(scalaVersion.value),
-        /* ("com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10") */
-        /*   .excludeAll(excludePprint) */
-        /*   .withDottyCompat(scalaVersion.value) */
       ),
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
@@ -262,7 +266,7 @@ val tests = project
     sharedSettings,
     skip in publish := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit
+      "org.scalameta" %% "munit" % munitVersion.value 
     ),
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -298,7 +302,8 @@ lazy val worksheets = project
     sharedSettings,
     skip in publish := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit % Test
+      "org.scalameta" %% "munit" % munitVersion.value % Test,
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
     )
   )
   .dependsOn(mdoc, tests)
@@ -308,7 +313,6 @@ lazy val unit = project
   .settings(
     sharedSettings,
     skip in publish := true,
-    // crossScalaVersions --= scala3,
     unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("tests/unit").value,
     libraryDependencies ++= {
       if (isScala3.value) List()
@@ -322,15 +326,33 @@ lazy val unit = project
     ),
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % fs2Version.value,
-      "org.scalameta" %% "munit" % V.munit % Test
+      "org.scalameta" %% "munit" % munitVersion.value % Test
     ),
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
     ),
+  )
+  .dependsOn(mdoc, testsInput, tests)
+  .enablePlugins(BuildInfoPlugin, MdocPlugin)
+
+lazy val unitJS = project
+  .in(file("tests/unit-js"))
+  .settings(
+    sharedSettings,
+    skip in publish := true,
+    crossScalaVersions --= scala3,
+    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("tests/unit-js").value,
+    libraryDependencies ++= List(
+      "org.scalameta" %% "munit" % munitVersion.value % Test
+    ),
+    buildInfoPackage := "tests.js",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
+    ),
     mdocJS := Some(jsdocs)
   )
-  .dependsOn(mdoc, js, testsInput, tests)
+  .dependsOn(mdoc, js, testsInput, tests, unit % "test->test")
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 lazy val plugin = project

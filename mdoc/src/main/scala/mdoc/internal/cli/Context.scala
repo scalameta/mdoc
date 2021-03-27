@@ -33,7 +33,6 @@ case class Context(
 
 object Context {
   def fromSettings(settings: Settings, reporter: Reporter): Configured[Context] = {
-    // import settings._
     if (settings.in.isEmpty) {
       Configured.error(Feedback.mustBeNonEmpty("in"))
     } else if (settings.out.isEmpty) {
