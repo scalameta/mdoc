@@ -13,6 +13,7 @@ coursier fetch \
   org.scalameta:mdoc_3.0.0-M2:$version \
   org.scalameta:mdoc_3.0.0-M3:$version \
   org.scalameta:mdoc_3.0.0-RC1:$version \
+  org.scalameta:mdoc_3.0.0-RC2:$version \
   org.scalameta:mdoc-js_2.11:$version \
   org.scalameta:mdoc-js_2.12.12:$version \
   org.scalameta:mdoc-js_2.12:$version \
