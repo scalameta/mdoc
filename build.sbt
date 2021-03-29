@@ -2,7 +2,7 @@ import scala.collection.mutable
 
 def scala212 = "2.12.13"
 def scala211 = "2.11.12"
-def scala213 = "2.13.4"
+def scala213 = "2.13.5"
 def scala3 = List("3.0.0-RC1", "3.0.0-M3", "3.0.0-M2")
 
 def scalajs = "1.5.0"
