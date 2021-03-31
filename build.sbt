@@ -130,12 +130,15 @@ lazy val fansiVersion = Def.setting {
 lazy val fs2Version = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "2.1.0"
   else if (scalaVersion.value == "3.0.0-M2") "2.5.0"
-  else "2.5.3"
+  else if (scalaVersion.value == "3.0.0-M3") "2.5.3"
+  else "2.5.4"
 }
 
 lazy val munitVersion = Def.setting {
   if (scalaVersion.value == "3.0.0-M2")
     "0.7.21"
+  else if (scalaVersion.value == "3.0.0-M3")
+    "0.7.22"
   else V.munit
 }
 
@@ -187,6 +190,7 @@ lazy val cli = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-cli",
+    scalaVersion := scala213,
     crossScalaVersions := scala2Versions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
