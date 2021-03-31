@@ -187,7 +187,7 @@ lazy val cli = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-cli",
-    crossScalaVersions := allScalaVersions,
+    crossScalaVersions := scala2Versions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
