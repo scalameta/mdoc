@@ -36,11 +36,11 @@ object Compat {
             default
               .replace("<init>", "<clinit>")
               .replace("Predef.scala:288", "Predef.scala:347")
-          case other if other.startsWith("3.0") => 
+          case other if other.startsWith("3.0") =>
             default
               .replace("<init>", "<clinit>")
               .replace("Predef.scala:288", "Predef.scala:345")
-          case _ => 
+          case _ =>
             default
         }
       )

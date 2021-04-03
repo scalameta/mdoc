@@ -61,7 +61,16 @@ class FailSuite extends BaseMarkdownSuite {
       |error: fail-error.md:3:1: not found: value foobar
       |foobar
       |^^^^^^
-      |""".stripMargin
+      |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error: fail-error.md:3:1
+          |Not found: foobar
+          |foobar
+          |^^^^^^
+        """.stripMargin
+    )
   )
 
   checkError(
@@ -93,7 +102,16 @@ class FailSuite extends BaseMarkdownSuite {
       |error: mixed-error.md:3:9: not found: value foobar
       |val x = foobar
       |        ^^^^^^
-      |""".stripMargin
+      |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error: mixed-error.md:3:9
+          |Not found: foobar
+          |val x = foobar
+          |        ^^^^^^
+        """.stripMargin
+    )
   )
 
   check(

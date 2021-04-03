@@ -129,7 +129,7 @@ class ErrorSuite extends BaseMarkdownSuite {
        |    ^
     """.stripMargin
   )
-  
+
   checkError(
     "already-defined-scala3".tag(OnlyScala3),
     """
@@ -162,7 +162,7 @@ class ErrorSuite extends BaseMarkdownSuite {
        |          ^^^^^^^^^^^^^^^^^^
     """.stripMargin
   )
-  
+
   checkError(
     "yrangepos-scala3".tag(OnlyScala3),
     """

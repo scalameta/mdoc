@@ -266,16 +266,15 @@ class NestSuite extends BaseMarkdownSuite {
        |class Foo(val x: Int) extends AnyVal
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |""".stripMargin,
-       compat = Map(
-         "3.0" -> 
-      """|error: anyval-nok.md:6:1: 
-         |Value classes may not be a local class
-         |class Foo(val x: Int) extends AnyVal
-         |      ^
-         |""".stripMargin,
-         )
+    compat = Map(
+      "3.0" ->
+        """|error: anyval-nok.md:6:1: 
+           |Value classes may not be a local class
+           |class Foo(val x: Int) extends AnyVal
+           |      ^
+           |""".stripMargin
+    )
   )
-
 
   checkError(
     "stacktrace",
