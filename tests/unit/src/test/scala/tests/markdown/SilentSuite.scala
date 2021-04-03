@@ -25,7 +25,7 @@ class SilentSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "error",
+    "error".tag(SkipScala3),
     """
       |```scala mdoc:silent
       |val x: String = 4
@@ -39,4 +39,18 @@ class SilentSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  checkError(
+    "error-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc:silent
+      |val x: String = 4
+      |```
+    """.stripMargin,
+    """|error: error-scala3.md:3:17:
+       |Found:    (4 : Int)
+       |Required: String
+       |val x: String = 4
+       |                ^
+       |""".stripMargin
+  )
 }

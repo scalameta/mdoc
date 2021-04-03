@@ -175,6 +175,7 @@ class MarkdownCompiler(
 
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
+
   private def report(
       vreporter: Reporter,
       input: Input,

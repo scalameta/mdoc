@@ -19,6 +19,7 @@ object Compat {
       compat: Map[String, String],
       postProcess: Map[String, String => String] = Map.empty
   ): String = {
+    println(compat)
     val result = compat
       .collect { case (key, value) if BuildInfo.scalaVersion.startsWith(key) => value }
       .headOption
@@ -35,7 +36,12 @@ object Compat {
             default
               .replace("<init>", "<clinit>")
               .replace("Predef.scala:288", "Predef.scala:347")
-          case _ => default
+          case other if other.startsWith("3.0") => 
+            default
+              .replace("<init>", "<clinit>")
+              .replace("Predef.scala:288", "Predef.scala:345")
+          case _ => 
+            default
         }
       )
     this.postProcess(result, postProcess)

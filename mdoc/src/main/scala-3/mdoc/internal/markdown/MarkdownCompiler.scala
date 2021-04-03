@@ -107,6 +107,7 @@ class MarkdownCompiler(
     val compiler = new Compiler
     val run = compiler.newRun(using context)
     val inputs = List(input)
+    println(s"compiling $input")
     scala.util.Try(run.compileSources(inputs.map(toSource)))
     report(vreporter, input, fileImports, run.runContext, edit)
   }
@@ -153,8 +154,29 @@ class MarkdownCompiler(
   }
 
 
+  def toMetaPosition(edit: TokenEditDistance, pos: SourcePosition): Position = {
+    def toOffsetPosition(offset: Int): Position = {
+      edit.toOriginal(offset) match {
+        case Left(_) => Position.None
+        case Right(p) => p.toUnslicedPosition
+      }
+    }
+
+    val start = pos.start
+    val end = pos.end
+
+    (edit.toOriginal(start), edit.toOriginal(end - 1)) match {
+      case (Right(start), Right(end)) =>
+          Position.Range(start.input, start.start, end.end).toUnslicedPosition
+      case (_, _) =>
+          toOffsetPosition(pos.point)
+    }
+    
+  }
+
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
+
   private def report(
       vreporter: Reporter,
       input: Input,
@@ -167,7 +189,8 @@ class MarkdownCompiler(
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
         val msg = nullableMessage(diagnostic.message)
-        val mpos = Position.None //ParsedSource.toMetaPosition(edit, pos)
+        
+        val mpos = toMetaPosition(edit, pos) 
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent
@@ -179,7 +202,8 @@ class MarkdownCompiler(
           } else {
             msg
           }
-        reportMessage(vreporter, diagnostic, mpos, actualMessage)
+
+        reportMessage(vreporter, diagnostic, mpos, "\n" + actualMessage)
       case _ =>
     }
   }
@@ -197,7 +221,7 @@ class MarkdownCompiler(
   }
   private def formatMessage(pos: SourcePosition, message: String): String =
     new CodeBuilder()
-      .println(s"${pos.source().path()}:${pos.line + 1} (mdoc generated code) $message")
+      .println(s"${pos.source().path()}:${pos.line + 1} (mdoc generated code) \n $message")
       .println(pos.lineContent)
       .println(pos.point().toString)
       .toString

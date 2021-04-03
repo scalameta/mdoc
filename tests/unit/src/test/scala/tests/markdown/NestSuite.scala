@@ -231,7 +231,7 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "implicit-nok",
+    "implicit-nok".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -265,8 +265,17 @@ class NestSuite extends BaseMarkdownSuite {
     """|error: anyval-nok.md:6:1: value class may not be a local class
        |class Foo(val x: Int) extends AnyVal
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |""".stripMargin
+       |""".stripMargin,
+       compat = Map(
+         "3.0" -> 
+      """|error: anyval-nok.md:6:1: 
+         |Value classes may not be a local class
+         |class Foo(val x: Int) extends AnyVal
+         |      ^
+         |""".stripMargin,
+         )
   )
+
 
   checkError(
     "stacktrace",

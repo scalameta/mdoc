@@ -88,8 +88,9 @@ class ErrorSuite extends BaseMarkdownSuite {
       |       ^
     """.stripMargin
   )
+
   checkError(
-    "not-member",
+    "not-member".tag(SkipScala3),
     """
       |```scala mdoc
       |List(1).len
@@ -102,7 +103,21 @@ class ErrorSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "already-defined",
+    "not-member-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |List(1).len
+      |```
+    """.stripMargin,
+    """|error: not-member-scala3.md:3:1:
+       |value len is not a member of List[Int] - did you mean List[Int].min?
+       |List(1).len
+       |^^^^^^^^^^^
+    """.stripMargin
+  )
+
+  checkError(
+    "already-defined".tag(SkipScala3),
     """
       |```scala mdoc
       |val x = 1
@@ -114,9 +129,27 @@ class ErrorSuite extends BaseMarkdownSuite {
        |    ^
     """.stripMargin
   )
+  
+  checkError(
+    "already-defined-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |val x = 1
+      |val x = 2
+      |```
+    """.stripMargin,
+    """|error: already-defined-scala3.md:4:5:
+       |Double definition:
+       |val x: Int in class App at line 8 and
+       |val x: Int in class App at line 11
+       |
+       |val x = 2
+       |    ^
+    """.stripMargin
+  )
 
   checkError(
-    "yrangepos",
+    "yrangepos".tag(SkipScala3),
     """
       |```scala mdoc
       |List[Int]("".length.toString)
@@ -125,6 +158,21 @@ class ErrorSuite extends BaseMarkdownSuite {
     """|error: yrangepos.md:3:11: type mismatch;
        | found   : String
        | required: Int
+       |List[Int]("".length.toString)
+       |          ^^^^^^^^^^^^^^^^^^
+    """.stripMargin
+  )
+  
+  checkError(
+    "yrangepos-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |List[Int]("".length.toString)
+      |```
+    """.stripMargin,
+    """|error: yrangepos-scala3.md:3:11:
+       |Found:    String
+       |Required: Int
        |List[Int]("".length.toString)
        |          ^^^^^^^^^^^^^^^^^^
     """.stripMargin
