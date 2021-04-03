@@ -107,7 +107,6 @@ class MarkdownCompiler(
     val compiler = new Compiler
     val run = compiler.newRun(using context)
     val inputs = List(input)
-    println(s"compiling $input")
     scala.util.Try(run.compileSources(inputs.map(toSource)))
     report(vreporter, input, fileImports, run.runContext, edit)
   }

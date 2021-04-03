@@ -19,7 +19,6 @@ object Compat {
       compat: Map[String, String],
       postProcess: Map[String, String => String] = Map.empty
   ): String = {
-    println(compat)
     val result = compat
       .collect { case (key, value) if BuildInfo.scalaVersion.startsWith(key) => value }
       .headOption
