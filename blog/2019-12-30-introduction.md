@@ -316,7 +316,7 @@ to line 449 and column 41 which is exactly where `year` identifier is
 referenced. In some terminals, you can cmd+click on the error to open your
 editor at that position.
 
-We compare the performance with tut by checking out the master branch and run
+We compare the performance with tut by checking out the main branch and run
 `docs/tutOnly dsl.md` four times.
 
 ```scala

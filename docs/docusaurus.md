@@ -85,7 +85,7 @@ pages. This task run several steps:
 ## Publish to GitHub pages from CI
 
 You can configure GitHub Actions or Travis CI server to publish docs after merge
-into master. The
+into main. The
 [Docusaurus docs](https://docusaurus.io/docs/en/publishing#using-travis-cih)
 already have instructions for how to set this up. If those instructions work for
 you, then that's great! No need to read this section here. However, you prefer
@@ -154,13 +154,13 @@ Add the following values:
 > Skip this part if you are not using GitHub Actions.
 
 Next, create a new file at `.github/workflows/mdoc.yml` to trigger
-`docs/docusaurusPublishGhpages` on successful merge into master and on tag push.
+`docs/docusaurusPublishGhpages` on successful merge into main and on tag push.
 
 ```scala mdoc:file:.github/workflows/mdoc.yml
 
 ```
 
-Commit your changes, push to master and you're all set! Merge a PR to your
+Commit your changes, push to main and you're all set! Merge a PR to your
 project and watch GitHub Actions release the docs 😎
 
 ### Travis CI
@@ -168,7 +168,7 @@ project and watch GitHub Actions release the docs 😎
 > Skip this part if you are not using Travis CI
 
 Next, update .travis.yml to trigger `docs/docusaurusPublishGhpages` on
-successful merge into master and on tag push. There are many ways to do this,
+successful merge into main and on tag push. There are many ways to do this,
 but I recommend using Travis
 ["build stages"](https://docs.travis-ci.com/user/build-stages/). It's not
 necessary to use build stages but they make it easy to avoid publishing the
@@ -179,7 +179,7 @@ stages
 stages:
   - name: test
   - name: release
-    if: (branch = master AND type = push) OR (tag IS present)
+    if: (branch = main AND type = push) OR (tag IS present)
 ```
 
 Next, define your build matrix with `docs/docusaurusPublishGhpages` at the end
@@ -196,7 +196,7 @@ jobs:
 ```
 
 For a complete example of the Travis configuration, see the
-[.travis.yml](https://github.com/scalameta/mdoc/blob/master/.travis.yml) in this
+[.travis.yml](https://github.com/scalameta/mdoc/blob/main/.travis.yml) in this
 project.
 
 You're all set! Merge a PR to your project and watch the Travis job release the
