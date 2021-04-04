@@ -18,6 +18,8 @@ import mdoc.internal.document.MdocNonFatal
 import mdoc.internal.pos.TokenEditDistance
 import mdoc.internal.CompatClassloader
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.pos.PositionSyntax
+import mdoc.internal.pos.PositionSyntax._
 
 import scala.collection.JavaConverters._
 import scala.collection.Seq
@@ -149,7 +151,26 @@ class MarkdownCompiler(
   }
 
   def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
-    ???
+    val compiler = new Compiler
+    val context = driver.currentCtx.fresh
+    val run = compiler.newRun(using context)
+
+    val inputs = List(input).map(toSource)
+
+    run.compileSources(inputs)
+    val runContext = run.runContext
+    val out = new ByteArrayOutputStream()
+    val ps = new PrintStream(out)
+    
+    runContext.reporter.allErrors.foreach { diagnostic =>
+      val msg = nullableMessage(diagnostic.message)
+      val mpos = toMetaPosition(edit, diagnostic.position.get)
+      val formatted = 
+        PositionSyntax.formatMessage(mpos, "error", "\n" + msg, includePath = false)
+      ps.println(formatted)
+    }
+    
+    out.toString()
   }
 
 

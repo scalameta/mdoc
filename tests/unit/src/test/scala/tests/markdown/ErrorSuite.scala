@@ -75,6 +75,7 @@ class ErrorSuite extends BaseMarkdownSuite {
        |^^^^^^^
        |""".stripMargin
   )
+
   checkError(
     "parse-error",
     """

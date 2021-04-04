@@ -93,6 +93,17 @@ class MarkdownCompilerSuite extends FunSuite {
           |val y = x.length
           |// y: Int = 10
           |```
+          |""".stripMargin,
+      "3.0" ->
+        """
+          |```scala
+          |val x = 1.to(10)
+          |// x: Inclusive = Range(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          |```
+          |```scala
+          |val y = x.length
+          |// y: Int = 10
+          |```
           |""".stripMargin
     )
   )
