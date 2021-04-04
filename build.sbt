@@ -29,7 +29,7 @@ val isScalaJs1 = Def.setting {
 
 def multiScalaDirectories(projectName: String) =
   Def.setting {
-    val root = baseDirectory.in(ThisBuild).value / projectName
+    val root = (ThisBuild / baseDirectory).value / projectName
     val base = root / "src" / "main"
     val result = mutable.ListBuffer.empty[File]
     val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
@@ -89,15 +89,15 @@ inThisBuild(
     testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
     // faster publishLocal:
-    publishArtifact.in(packageDoc) := "true" == System.getenv("CI"),
-    publishArtifact.in(packageSrc) := "true" == System.getenv("CI"),
+    packageDoc / publishArtifact := "true" == System.getenv("CI"),
+    packageSrc / publishArtifact := "true" == System.getenv("CI"),
     turbo := true,
     useSuperShell := false // overlaps with MUnit test failure reports.
   )
 )
 
 name := "mdocRoot"
-skip in publish := true
+publish / skip := true
 crossScalaVersions := Nil
 lazy val sharedSettings = List(
   scalacOptions ++= crossSetting(
@@ -135,15 +135,15 @@ lazy val interfaces = project
       "io.get-coursier" % "interface" % V.coursier
     ),
     // @note needed to deal with issues with dottyDoc
-    sources in (Compile, doc) := {
+    Compile / doc / sources := {
       if (isScala3.value) {
         Seq.empty
       } else {
-        (sources in (Compile, doc)).value
+        (Compile / doc / sources).value
       }
     },
     crossVersion := CrossVersion.disabled,
-    javacOptions in (Compile / doc) ++= List(
+    Compile / doc / javacOptions ++= List(
       "-tag",
       "implNote:a:Implementation Note:"
     )
@@ -153,7 +153,7 @@ lazy val runtime = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
-    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("runtime").value,
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("runtime").value,
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
@@ -173,18 +173,18 @@ val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 lazy val mdoc = project
   .settings(
     sharedSettings,
-    unmanagedSourceDirectories.in(Compile) ++= multiScalaDirectories("mdoc").value,
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("mdoc").value,
     moduleName := "mdoc",
-    mainClass in assembly := Some("mdoc.Main"),
-    assemblyJarName in assembly := "mdoc.jar",
-    test in assembly := {},
-    assemblyMergeStrategy.in(assembly) ~= { old =>
+    assembly / mainClass := Some("mdoc.Main"),
+    assembly / assemblyJarName := "mdoc.jar",
+    assembly / test := {},
+    assembly / assemblyMergeStrategy ~= { old =>
       {
         case PathList("META-INF", "CHANGES") => MergeStrategy.discard
         case x => old(x)
       }
     },
-    fork in run := true,
+    run / fork := true,
     buildInfoPackage := "mdoc.internal",
     buildInfoKeys := Seq[BuildInfoKey](
       version,
@@ -227,7 +227,7 @@ lazy val testsInput = project
   .in(file("tests/input"))
   .settings(
     sharedSettings,
-    skip in publish := true
+    publish / skip := true
   )
 
 def scala212LibraryDependencies(deps: List[ModuleID]) =
@@ -241,7 +241,7 @@ val tests = project
   .in(file("tests/tests"))
   .settings(
     sharedSettings,
-    skip in publish := true,
+    publish / skip := true,
     libraryDependencies ++= List(
       "org.scalameta" %% "munit" % V.munit
     ),
@@ -257,7 +257,7 @@ val jsdocs = project
   .in(file("tests/jsdocs"))
   .settings(
     sharedSettings,
-    skip in publish := true,
+    publish / skip := true,
     crossScalaVersions --= scala3,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
@@ -266,7 +266,7 @@ val jsdocs = project
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
     scalaJSUseMainModuleInitializer := true,
-    npmDependencies in Compile ++= List(
+    Compile / npmDependencies ++= List(
       "ms" -> "2.1.1"
     ),
     webpackBundlingMode := BundlingMode.LibraryOnly()
@@ -277,7 +277,7 @@ lazy val worksheets = project
   .in(file("tests/worksheets"))
   .settings(
     sharedSettings,
-    skip in publish := true,
+    publish / skip := true,
     libraryDependencies ++= List(
       "org.scalameta" %% "munit" % V.munit % Test
     )
@@ -288,7 +288,7 @@ lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     sharedSettings,
-    skip in publish := true,
+    publish / skip := true,
     crossScalaVersions --= scala3,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
@@ -305,7 +305,7 @@ lazy val unit = project
     ),
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
-      "testsInputClassDirectory" -> classDirectory.in(testsInput, Compile).value
+      "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
     ),
     mdocJS := Some(jsdocs)
   )
@@ -317,7 +317,7 @@ lazy val plugin = project
   .settings(
     sharedSettings,
     sbtPlugin := true,
-    sbtVersion in pluginCrossBuild := "1.0.0",
+    pluginCrossBuild / sbtVersion := "1.0.0",
     crossScalaVersions := List(scala212),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
@@ -326,9 +326,9 @@ lazy val plugin = project
       "org.scalameta" %% "munit" % V.munit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
-    resourceGenerators.in(Compile) += Def.task {
+    Compile / resourceGenerators += Def.task {
       val out =
-        managedResourceDirectories.in(Compile).value.head / "sbt-mdoc.properties"
+        (Compile / managedResourceDirectories).value.head / "sbt-mdoc.properties"
       val props = new java.util.Properties()
       props.put("version", version.value)
       IO.write(props, "sbt-mdoc properties", out)
@@ -336,10 +336,10 @@ lazy val plugin = project
     },
     publishLocal := publishLocal
       .dependsOn(
-        publishLocal in interfaces,
-        publishLocal in runtime,
-        publishLocal in mdoc,
-        publishLocal in js
+        interfaces / publishLocal,
+        runtime / publishLocal,
+        mdoc / publishLocal,
+        js / publishLocal
       )
       .value,
     scriptedBufferLog := false,
@@ -370,20 +370,20 @@ lazy val docs = project
     sharedSettings,
     moduleName := "mdoc-docs",
     crossScalaVersions := List(scala212),
-    skip in publish :=
+    publish / skip :=
       !scalaVersion.value.startsWith("2.12") ||
-        version.in(ThisBuild).value.endsWith("-SNAPSHOT"),
+        (ThisBuild / version).value.endsWith("-SNAPSHOT"),
     mdocAutoDependency := false,
     resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
       "com.cibo" %% "evilplot" % "0.6.3"
     ),
-    watchSources += baseDirectory.in(ThisBuild).value / "docs",
-    cancelable in Global := true,
-    MdocPlugin.autoImport.mdoc := run.in(Compile).evaluated,
+    watchSources += (ThisBuild / baseDirectory).value / "docs",
+    Global / cancelable := true,
+    MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jsdocs),
-    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value,
+    mdocJSLibraries := (jsdocs / Compile / fullOptJS / webpack).value,
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")
