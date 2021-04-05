@@ -213,7 +213,7 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      "io.methvin" % "directory-watcher" % "0.12.0",
+      "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.5.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
