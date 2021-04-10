@@ -205,7 +205,47 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "multi-reset",
+    "multi-reset".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|error: multi-reset.md:15:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |error: multi-reset.md:27:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |""".stripMargin
+  )
+
+  checkError(
+    "multi-reset".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1

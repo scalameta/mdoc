@@ -182,6 +182,27 @@ class ScalacOptionsSuite extends BaseCliSuite {
            |// val x: Int = "123"
            |//              ^^^^^
            |```
+           |""".stripMargin,
+      "3.0" ->
+        """|/index.md
+           |```scala
+           |final case class Test(value: Int)
+           |
+           |val test = Test(123)
+           |// test: Test = Test(123)
+           |
+           |test.value
+           |// res0: Int = 123
+           |```
+           |
+           |```scala
+           |val x: Int = "123"
+           |// error:
+           |// Found:    ("123" : String)
+           |// Required: Int
+           |// val x: Int = "123"
+           |//              ^^^^^
+           |```
            |""".stripMargin
     )
   )
