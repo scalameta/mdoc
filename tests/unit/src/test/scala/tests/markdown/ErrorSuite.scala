@@ -141,7 +141,7 @@ class ErrorSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """|error: already-defined-scala3.md:4:5:
        |Double definition:
-       |val x: Int in class App at line 8 and
+       |val x: Int in class App at line 7 and
        |val x: Int in class App at line 11
        |
        |val x = 2

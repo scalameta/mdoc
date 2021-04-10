@@ -355,7 +355,18 @@ class NestSuite extends BaseMarkdownSuite {
        |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
        |	at repl.MdocSession$App.<init>(stacktrace.md:35)
        |	at repl.MdocSession$.app(stacktrace.md:3)
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|error: stacktrace.md:14:1: null
+           |boom(x > 4)
+           |^^^^^^^^^^^
+           |java.lang.IllegalArgumentException
+           |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
+           |	at repl.MdocSession$App.<init>(stacktrace.md:36)
+           |	at repl.MdocSession$.app(stacktrace.md:3)
+           |""".stripMargin
+    )
   )
 
   check(
