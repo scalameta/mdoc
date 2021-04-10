@@ -156,7 +156,7 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "implicit-ok",
+    "implicit-ok".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -175,6 +175,36 @@ class NestSuite extends BaseMarkdownSuite {
        |```
        |```scala
        |implicit val x = 1
+       |// x: Int = 1
+       |```
+       |```scala
+       |implicitly[Int]
+       |// res0: Int = 1
+       |```
+       |
+       |""".stripMargin
+  )
+
+  check(
+    "implicit-ok-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |implicit val x: Int = 1
+       |// x: Int = 1
+       |```
+       |```scala
+       |implicit val x: Int = 1
        |// x: Int = 1
        |```
        |```scala
