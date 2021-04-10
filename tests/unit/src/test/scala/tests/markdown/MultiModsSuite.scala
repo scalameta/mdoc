@@ -25,7 +25,24 @@ class MultiModsSuite extends BaseMarkdownSuite {
        |// println(x)
        |//         ^
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|
+           |```scala
+           |val x = 1
+           |// x: Int = 1
+           |```
+           |
+           |```scala
+           |println(x)
+           |// error:
+           |// Not found: x
+           |// println(x)
+           |//         ^
+           |```
+           |""".stripMargin
+    )
   )
 
   check(
