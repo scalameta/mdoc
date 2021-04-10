@@ -210,7 +210,8 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin,
     compat = Map(
       "3.0" ->
-        """|type-error:2:21: error: Found:    ("not found" : String)
+        """|type-error:2:21: error:
+           |Found:    ("not found" : String)
            |Required: Int
            |val filename: Int = "not found"
            |                    ^^^^^^^^^^^
@@ -237,7 +238,7 @@ class WorksheetSuite extends BaseSuite {
       "3.0" ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
            |	at repl.MdocSession$App.crash(crash.scala:8)
-           |	at repl.MdocSession$App.<init>(crash.scala:16)
+           |	at repl.MdocSession$App.<init>(crash.scala:14)
            |	at repl.MdocSession$.app(crash.scala:3)
            |
            |crash(filename)

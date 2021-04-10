@@ -55,7 +55,7 @@ class MarkdownCompiler(
 
   private def newContext: FreshContext = {
     val defaultFlags =
-      List("-no-indent", "-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
+      List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
     val options = scalacOptions.split("\\s+").toList
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil

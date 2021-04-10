@@ -13,7 +13,7 @@ import mdoc.PostProcessContext
 import mdoc.PreModifierContext
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import scala.meta.dialects.Scala213
+import scala.meta.dialects.{Scala213, Scala3}
 import scala.util.control.NonFatal
 import mdoc.internal.cli.Context
 import mdoc.internal.document.MdocExceptions
@@ -27,13 +27,18 @@ import coursierapi.error.MultipleResolutionError
 import scala.meta.io.AbsolutePath
 import scala.meta.parsers.Parsed
 import scala.meta.Source
+import mdoc.internal.BuildInfo
 
 object MdocDialect {
 
   def parse(path: AbsolutePath): Parsed[Source] = {
     (Input.VirtualFile(path.toString, path.readText), scala).parse[Source]
   }
-  val scala = Scala213.withAllowToplevelTerms(true)
+
+  val scala =
+    if (BuildInfo.scalaBinaryVersion.startsWith("3.0"))
+      Scala3.withAllowToplevelTerms(true).withAllowToplevelStatements(true)
+    else Scala213.withAllowToplevelTerms(true)
 }
 
 class Processor(implicit ctx: Context) {
