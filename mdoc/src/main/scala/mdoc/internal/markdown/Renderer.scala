@@ -101,13 +101,10 @@ object Renderer {
       printer: Variable => String,
       compiler: MarkdownCompiler
   ): String = {
-    // println("IN: " + doc.instrumented)
-    // println("OUT: " + doc.sections.map(_.section.statements.map(_.binders.map(_.value))))
     val baos = new ByteArrayOutputStream()
     val sb = new PrintStream(baos)
     val stats = section.source.stats.lift
     val input = section.source.pos.input
-    // println(section.source.pos)
     val totalStats = section.source.stats.length
     if (section.mod.isFailOrWarn) {
       sb.print(section.input.text)
@@ -121,11 +118,6 @@ object Renderer {
           case Some(previousStatement) =>
             previousStatement.pos.end
         }
-        // println(leadingStart)
-        // println(pos.start)
-        // println(section.section.statements)
-        // println(input)
-        // println(section.source)
         val leadingTrivia = Position.Range(input, leadingStart, pos.start)
         if (!section.mod.isFailOrWarn) {
           sb.append(leadingTrivia.text)

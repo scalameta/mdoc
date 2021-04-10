@@ -343,7 +343,7 @@ lazy val unitJS = project
   .in(file("tests/unit-js"))
   .settings(
     sharedSettings,
-    publish / skip:= true,
+    publish / skip := true,
     crossScalaVersions --= scala3,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies ++= List(

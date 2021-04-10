@@ -86,6 +86,20 @@ class NestSuite extends BaseMarkdownSuite {
            |susan
            |// res0: App.this.type.User = User(name = "Susan")
            |```
+           |""".stripMargin,
+      "3.0" ->
+        """|```scala
+           |case class User(name: String)
+           |val susan = User("Susan")
+           |// susan: User = User(name = "Susan")
+           |```
+           |```scala
+           |case class User(name: String, age: Int)
+           |val hakon = User("Hakon", 42)
+           |// hakon: User = User(name = "Hakon", age = 42)
+           |susan
+           |// res0: User = User(name = "Susan")
+           |```
            |""".stripMargin
     )
   )
@@ -326,7 +340,14 @@ class NestSuite extends BaseMarkdownSuite {
        |// case class Foo(i: Int) { val x = y }
        |//                                  ^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error:
+          |Not found: y 
     """.stripMargin
+    )
   )
 
 }

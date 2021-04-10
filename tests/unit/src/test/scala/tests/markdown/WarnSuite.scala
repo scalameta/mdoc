@@ -16,7 +16,18 @@ class WarnSuite extends BaseMarkdownSuite {
        |// List(1) match { case Nil => }
        |// ^^^^^^^
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |
+          | warn:
+          | match may not be exhaustive.
+          | 
+          | It would fail on pattern case: List(_, _*)
+          | 
+        """.stripMargin
+    )
   )
 
   checkError(

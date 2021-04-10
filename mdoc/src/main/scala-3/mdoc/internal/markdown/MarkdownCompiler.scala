@@ -32,12 +32,13 @@ import scala.meta.internal.inputs.XtensionInputSyntaxStructure
 import dotty.tools.dotc.interactive.InteractiveDriver
 import dotty.tools.dotc.interactive.Interactive
 import dotty.tools.dotc.interactive.InteractiveCompiler
-import dotty.tools.dotc.core.Contexts.Context
+import dotty.tools.dotc.core.Contexts.{Context, FreshContext}
 import dotty.tools.dotc.config.Settings.Setting._
 import dotty.tools.dotc.interfaces.SourcePosition
 import dotty.tools.dotc.ast.Trees.Tree
 import dotty.tools.dotc.interfaces.{SourceFile => ISourceFile}
-import dotty.tools.dotc.reporting.Diagnostic
+import dotty.tools.dotc.interfaces.{Diagnostic => IDiagnostic}
+import dotty.tools.dotc.reporting._
 import dotty.tools.dotc.parsing.Parsers.Parser
 import dotty.tools.dotc.Compiler
 import dotty.tools.io.{AbstractFile, VirtualDirectory}
@@ -52,26 +53,28 @@ class MarkdownCompiler(
     target: AbstractFile = new VirtualDirectory("(memory)")
 ) {
 
-  private def newDriver: InteractiveDriver = {
+  private def newContext: FreshContext = {
     val defaultFlags =
-      List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
+      List("-no-indent", "-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
     val options = scalacOptions.split("\\s+").toList
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
-    new InteractiveDriver(settings.distinct)
+    val driver = new InteractiveDriver(settings.distinct)
+    driver.currentCtx.fresh.setReporter(new CollectionReporter)
   }
-  private var driver = newDriver
+
+  private var context = newContext
 
   def shutdown(): Unit = {}
 
   def classpathEntries: Seq[Path] =
-    driver.currentCtx.settings.classpath
-      .value(using driver.currentCtx)
+    context.settings.classpath
+      .value(using context)
       .split(File.pathSeparator)
       .map(url => Paths.get(url))
 
   private def reset(): Unit = {
-    driver = newDriver
+    context = newContext
   }
   private val appClasspath: Array[URL] = classpath
     .split(File.pathSeparator)
@@ -95,8 +98,8 @@ class MarkdownCompiler(
     Input.String(new String(sourceFile.content()))
   }
 
-  def hasErrors: Boolean = driver.currentCtx.reporter.hasErrors
-  def hasWarnings: Boolean = driver.currentCtx.reporter.hasWarnings
+  def hasErrors: Boolean = context.reporter.hasErrors
+  def hasWarnings: Boolean = context.reporter.hasWarnings
 
   def compileSources(
       input: Input,
@@ -113,6 +116,14 @@ class MarkdownCompiler(
     report(vreporter, input, fileImports, run.runContext, edit)
   }
 
+  class CollectionReporter extends dotty.tools.dotc.reporting.Reporter {
+    val allDiags = List.newBuilder[Diagnostic]
+
+    override def doReport(dia: Diagnostic)(using Context) = allDiags += dia
+
+    override def pendingMessages(using Context) = allDiags.result()
+  }
+
   def compile(
       input: Input,
       vreporter: Reporter,
@@ -122,12 +133,14 @@ class MarkdownCompiler(
       retry: Int = 0
   ): Option[Class[_]] = {
     reset()
-    val context = driver.currentCtx.fresh.setSetting(
-      driver.currentCtx.settings.outputDir,
+
+    val freshContext = context.fresh.setSetting(
+      context.settings.outputDir,
       target
     )
-    compileSources(input, vreporter, edit, fileImports, context)
-    if (!context.reporter.hasErrors) {
+
+    compileSources(input, vreporter, edit, fileImports, freshContext)
+    if (!freshContext.reporter.hasErrors) {
       val loader = new AbstractFileClassLoader(target, appClassLoader)
       try {
         Some(loader.loadClass(className))
@@ -152,8 +165,9 @@ class MarkdownCompiler(
 
   def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
     val compiler = new Compiler
-    val context = driver.currentCtx.fresh
-    val run = compiler.newRun(using context)
+    val freshContext = context.fresh
+
+    val run = compiler.newRun(using freshContext)
 
     val inputs = List(input).map(toSource)
 
@@ -162,12 +176,19 @@ class MarkdownCompiler(
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
     
-    runContext.reporter.allErrors.foreach { diagnostic =>
+    runContext.reporter.pendingMessages(using context).foreach { diagnostic =>
       val msg = nullableMessage(diagnostic.message)
       val mpos = toMetaPosition(edit, diagnostic.position.get)
-      val formatted = 
-        PositionSyntax.formatMessage(mpos, "error", "\n" + msg, includePath = false)
-      ps.println(formatted)
+      if(sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
+        val severity = diagnostic.level match {
+          case IDiagnostic.ERROR => "error"
+          case IDiagnostic.WARNING => "warn"
+          case IDiagnostic.INFO => "info"
+        }
+        val formatted = 
+          PositionSyntax.formatMessage(mpos, severity, "\n" + msg, includePath = false)
+        ps.println(formatted)
+      }
     }
     
     out.toString()
@@ -204,7 +225,9 @@ class MarkdownCompiler(
       context: Context,
       edit: TokenEditDistance
   ): Unit = {
-    val infos = context.reporter.allErrors.toSeq.sortBy(_.pos.source.path)
+
+    val infos = context.reporter.pendingMessages(using context).toSeq.sortBy(_.pos.source.path)
+
     infos.foreach {
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
@@ -222,7 +245,6 @@ class MarkdownCompiler(
           } else {
             msg
           }
-
         reportMessage(vreporter, diagnostic, mpos, "\n" + actualMessage)
       case _ =>
     }
@@ -233,11 +255,13 @@ class MarkdownCompiler(
       diagnostic: Diagnostic,
       mpos: Position,
       message: String
-  ): Unit = diagnostic match {
+  ): Unit = {
+    diagnostic match {
     case _: Diagnostic.Error => vreporter.error(mpos, message)
     case _: Diagnostic.Info => vreporter.info(mpos, message)
     case _: Diagnostic.Warning => vreporter.warning(mpos, message)
     case _ =>
+  }
   }
   private def formatMessage(pos: SourcePosition, message: String): String =
     new CodeBuilder()

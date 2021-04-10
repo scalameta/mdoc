@@ -26,7 +26,16 @@ class NamespaceHygieneSuite extends BaseMarkdownSuite {
        |import scala.util.{Random=>MdocSession}
        |val x = MdocSession.nextInt(1)
        |        ^^^^^^^^^^^
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error: cannot import something called MdocSession.md:3:9:
+          |Reference to MdocSession is ambiguous,
+          |it is both defined in package repl
+          |and imported by name subsequently by import util.{...}
+        """.stripMargin
+    )
   )
 
 }
