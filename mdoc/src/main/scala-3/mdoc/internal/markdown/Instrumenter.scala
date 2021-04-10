@@ -78,9 +78,7 @@ class Instrumenter(
   }
   val magic = new MagicImports(settings, reporter, file)
   private val out = new ByteArrayOutputStream()
-  // private val sb = new PrintStream(out)
   val gensym = new Gensym()
-  // val nest = new Nesting(sb)
   val sb = new CodePrinter(new PrintStream(out))
 
   private def printAsScript(): Unit = {
@@ -97,13 +95,14 @@ class Instrumenter(
         val out = new FailInstrumenter(sections, i).instrument()
         val literal = Instrumenter.stringLiteral(out)
         val binder = gensym.fresh("res")
-        sb.append("val ")
+        sb.line{_.append("val ")
           .append(binder)
           .append(" = _root_.mdoc.internal.document.FailSection(")
           .append(literal)
           .append(", ")
           .append(position(section.source.pos))
           .append(");")
+        }
         printBinder(binder, section.source.pos)
         sb.println("$doc.endStatement();")
       } else if (section.mod.isCompileOnly) {

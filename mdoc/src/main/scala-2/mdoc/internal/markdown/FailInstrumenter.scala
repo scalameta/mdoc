@@ -17,6 +17,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
     sb.println("package repl")
     sb.println("object MdocSession {")
     sb.println("  object App {")
+
     sections.zipWithIndex.foreach { case (section, j) =>
       if (j > i) ()
       else {

@@ -186,7 +186,7 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "reset",
+    "reset".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -205,7 +205,38 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "multi-reset".tag(OnlyScala3),
+    "reset-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|error: reset.md:9:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |
+          |error:
+          |reset-scala3.md:26 (mdoc generated code)
+          | no implicit argument of type Int was found for parameter e of method implicitly in object
+         Predef
+          |    implicitly[Int]
+          |
+         """.stripMargin
+    )
+  )
+
+  checkError(
+    "multi-reset-scala3".tag(OnlyScala3),
     """
       |```scala mdoc
       |implicit val x: Int = 1
@@ -235,13 +266,22 @@ class NestSuite extends BaseMarkdownSuite {
       |implicitly[Int]
       |```
     """.stripMargin,
-    """|error: multi-reset.md:15:1: could not find implicit value for parameter e: Int
-       |implicitly[Int]
-       |^^^^^^^^^^^^^^^
-       |error: multi-reset.md:27:1: could not find implicit value for parameter e: Int
-       |implicitly[Int]
-       |^^^^^^^^^^^^^^^
-       |""".stripMargin
+    // TODO: what are those numbers??
+    """
+      |error:
+      |multi-reset-scala3.md:40 (mdoc generated code)
+      | no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |    implicitly[Int]
+      |
+      |1170
+      |
+      |error:
+      |multi-reset-scala3.md:73 (mdoc generated code)
+      | no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |    implicitly[Int]
+      |
+      |2097
+    """.trim.stripMargin
   )
 
   checkError(
