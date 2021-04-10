@@ -2,9 +2,8 @@ package mdoc.internal.cli
 
 import com.vladsch.flexmark.parser.Parser
 import io.methvin.watcher.DirectoryChangeEvent
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.util.concurrent.Executors
+import io.methvin.watcher.hashing.FileHash
+import io.methvin.watcher.hashing.FileHasher
 import mdoc.Reporter
 import mdoc.internal.BuildInfo
 import mdoc.internal.io.IO
@@ -16,16 +15,18 @@ import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.markdown.Markdown
 import mdoc.internal.pos.DiffUtils
 import metaconfig.Configured
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+import java.util.concurrent.Executors
+import scala.collection.concurrent.TrieMap
+import scala.collection.mutable
 import scala.meta.Input
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
-import io.methvin.watcher.hashing.FileHasher
-import scala.collection.concurrent.TrieMap
-import java.nio.file.Path
-import io.methvin.watcher.hashing.HashCode
-import scala.collection.mutable
 
 final class MainOps(
     context: Context
@@ -185,7 +186,7 @@ final class MainOps(
     }
   }
 
-  val hashes = mutable.Map.empty[Path, HashCode]
+  val hashes = mutable.Map.empty[Path, FileHash]
   def handleWatchEvent(event: DirectoryChangeEvent): Unit = {
     val path = AbsolutePath(event.path())
     settings.toInputFile(path) match {

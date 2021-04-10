@@ -25,7 +25,7 @@ class FileModifier extends StringModifier {
         case _ => "text"
       }
       s"""
-File: [${file.toNIO.getFileName}](https://github.com/scalameta/mdoc/blob/master/$info)
+File: [${file.toNIO.getFileName}](https://github.com/scalameta/mdoc/blob/main/$info)
 `````$language
 $text
 `````
