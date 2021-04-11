@@ -25,17 +25,15 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
   def definition(header: String)(cb: CodePrinter => Unit): CodePrinter = {
     val newCB = new CodePrinter(ps, baseIndent + 1, baseNest)
 
-    println(header + " {")
+    this.println(header + " {")
     cb(newCB)
-    println("}")
+    this.println("}")
 
     this
   }
 
   def appendLines(body: String) = {
-
     body.linesIterator.toArray.foreach(this.println)
-
     this
   }
 
@@ -43,18 +41,17 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
     val sb = new StringBuilder
     f(sb)
 
-    println(sb.result())
+    this.println(sb.result())
     this
   }
 
   def nest(): Unit = {
-    println("_root_.scala.Predef.locally {")
+    this.println("_root_.scala.Predef.locally {")
     nestCount += 1
-
   }
 
   def unnest(): Unit = {
-    println("};" * nestCount)
+    this.println("};" * nestCount)
     nestCount = baseNest
   }
 }
@@ -130,11 +127,8 @@ class Instrumenter(
   }
   private def printStatement(stat: Tree, m: Modifier, sb: CodePrinter): Unit = {
     if (m.isCrash) {
-      sb.line {_.append("$doc.crash(")
-        .append(position(stat.pos))
-        .append(") {\n")
-        .append(stat.pos.text)
-        .append("\n}")
+      sb.definition("$doc.crash(" ++ position(stat.pos) ++ ")") {
+        _.appendLines(stat.pos.text)
       }
     } else {
       val binders = stat match {

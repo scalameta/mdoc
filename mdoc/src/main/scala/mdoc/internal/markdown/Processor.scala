@@ -121,14 +121,9 @@ class Processor(implicit ctx: Context) {
     val sectionInputs = inputs.map { case ScalaFenceInput(_, input, mod) =>
       // TODO: report error
       SectionInput(input, mod, ctx)
-    // MdocDialect.scala(input).parse[Source] match {
-    //   case parsers.Parsed.Success(source) =>
-    //   case parsers.Parsed.Error(pos, msg, _) =>
-    //     ctx.reporter.error(pos.toUnslicedPosition, msg)
-    //     SectionInput(input, Source(Nil), mod)
-    // }
     }
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
+
     if (ctx.reporter.hasErrors) {
       return
     }

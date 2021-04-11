@@ -4,6 +4,7 @@ import tests.BuildInfo
 
 object Compat {
   def isScala212: Boolean = BuildInfo.scalaVersion.startsWith("2.12")
+  def isScala3: Boolean = BuildInfo.scalaVersion.startsWith("3.0")
   def postProcess(default: String, compat: Map[String, String => String]): String = {
     val processor = compat
       .get(BuildInfo.scalaVersion)

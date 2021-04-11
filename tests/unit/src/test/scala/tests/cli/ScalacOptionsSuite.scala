@@ -30,27 +30,53 @@ class ScalacOptionsSuite extends BaseCliSuite {
       }
     )
 
-  checkCli(
-    "kind-projector",
-    """
-      |/index.md
-      |```scala mdoc
-      |def baz[T[_]] = ()
-      |baz[Either[Int, ?]]
-      |```
-      |""".stripMargin,
-    """|/index.md
-       |```scala
-       |def baz[T[_]] = ()
-       |baz[Either[Int, ?]]
-       |```
+  if (!Compat.isScala3)
+    checkCli(
+      "kind-projector",
+      """
+        |/index.md
+        |```scala mdoc
+        |def baz[T[_]] = ()
+        |baz[Either[Int, ?]]
+        |```
+        |""".stripMargin,
+      """|/index.md
+         |```scala
+         |def baz[T[_]] = ()
+         |baz[Either[Int, ?]]
+         |```
     """.stripMargin
-  )
+    )
+
+  if (Compat.isScala3)
+    checkCli(
+      "kind-projector",
+      """
+        |/index.md
+        |```scala mdoc
+        |def baz[T[_]] = ()
+        |baz[Either[Int, *]]
+        |```
+        |""".stripMargin,
+      """|/index.md
+         |```scala
+         |def baz[T[_]] = ()
+         |baz[Either[Int, *]]
+         |```
+    """.stripMargin,
+      extraArgs = Array(
+        "--scalac-options",
+        "-Ykind-projector"
+      )
+    )
 
   // NOTE(olafur): with -Xfatal-warning, the following program reports the following
   // warning if its wrapped in classes.
   // > warning: The outer reference in this type test cannot be checked at run time.
   // We wrap the code in objects instead of classes to avoid this warning.
+  //
+  // Note(anton): this used to say "final case object", but in Scala3 this produces a warning
+  // that final objects are redundant
   val finalInput: String =
     """
       |/in.md
@@ -58,7 +84,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
       |sealed abstract class Maybe[+A] extends Product with Serializable
       |
       |final case class Just[A](value: A) extends Maybe[A]
-      |final case object Nothing extends Maybe[Nothing]
+      |case object Nothing extends Maybe[Nothing]
       |```
     """.stripMargin
   checkCli(
@@ -71,33 +97,35 @@ class ScalacOptionsSuite extends BaseCliSuite {
     expected = finalInput.replaceFirst("scala mdoc:reset-object", "scala")
   )
 
-  checkCli(
-    "-Ywarn-value-discard",
-    """
-      |/index.md
-      |```scala mdoc
-      |println("1")
-      |```
-      |```scala mdoc:reset
-      |println("2")
-      |```
-      |""".stripMargin,
-    """|/index.md
-       |```scala
-       |println("1")
-       |// 1
-       |```
-       |```scala
-       |println("2")
-       |// 2
-       |```
+  // Removed in Scala3
+  if (!Compat.isScala3)
+    checkCli(
+      "-Ywarn-value-discard",
+      """
+        |/index.md
+        |```scala mdoc
+        |println("1")
+        |```
+        |```scala mdoc:reset
+        |println("2")
+        |```
+        |""".stripMargin,
+      """|/index.md
+         |```scala
+         |println("1")
+         |// 1
+         |```
+         |```scala
+         |println("2")
+         |// 2
+         |```
     """.stripMargin,
-    extraArgs = Array(
-      "--scalac-options",
-      "-Ywarn-value-discard"
-    ),
-    onStdout = { out => assert(!out.contains("discarded non-Unit value")) }
-  )
+      extraArgs = Array(
+        "--scalac-options",
+        "-Ywarn-value-discard"
+      ),
+      onStdout = { out => assert(!out.contains("discarded non-Unit value")) }
+    )
 
   checkCli(
     "no-imports",
