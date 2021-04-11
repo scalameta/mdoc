@@ -345,7 +345,7 @@ class WorksheetSuite extends BaseSuite {
     """|dotty-ambiguous-implicit:8:12: error:
        |ambiguous implicit arguments: both object c1 in class App and object c2 in class App match type App.this.C of parameter c of method fn in class App
        |val xx = fn
-       |         ^^
+       |           ^
        |""".stripMargin
   )
 
