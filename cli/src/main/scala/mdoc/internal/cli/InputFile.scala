@@ -5,7 +5,6 @@ import scala.meta.io.RelativePath
 import scala.meta.internal.io.PathIO
 import metaconfig.Input
 import java.nio.file.Files
-// import mdoc.internal.pos.PositionSyntax._
 
 /** @param relpath the input filename relativized by its input directory.
   * @param inputFile the input file to read from.

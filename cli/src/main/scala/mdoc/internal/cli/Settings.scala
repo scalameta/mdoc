@@ -30,6 +30,7 @@ import mdoc.Variable
 import mdoc.Reporter
 import mdoc.internal.markdown.{GitHubIdGenerator, ReplVariablePrinter}
 import mdoc.internal.cli.CliEnrichments._
+import pprint.TPrint
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -226,7 +227,7 @@ case class Settings(
   }
 }
 
-object Settings extends MetaconfigScalametaImplicits with Decoders with SettingsGeneric {
+object Settings { // extends MetaconfigScalametaImplicits with Decoders with SettingsGeneric {
   def version(displayVersion: String) =
     s"mdoc v$displayVersion"
   def usage: String =
@@ -266,4 +267,91 @@ object Settings extends MetaconfigScalametaImplicits with Decoders with Settings
       usage,
       description
     ).helpMessage(width)
+
+  implicit def surface: Surface[Settings] =
+    generic.deriveSurface[Settings]
+  implicit def encoder: ConfEncoder[Settings] =
+    generic.deriveEncoder[Settings]
+
+  def decoder(base: Settings): ConfDecoder[Settings] = {
+    implicit val cwd = base.cwd
+    implicit val PathDecoder: ConfDecoder[AbsolutePath] =
+      ConfDecoder.stringConfDecoder.flatMap { str =>
+        try {
+          Configured.ok(AbsolutePath(str))
+        } catch {
+          case e: InvalidPathException =>
+            ConfError.message(e.getMessage).notOk
+        }
+      }
+    generic.deriveDecoder[Settings](base)
+  }
+
+  def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
+    Conf
+      .parseCliArgs[Settings](args)
+      .andThen(conf => {
+        val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
+        conf.as[Settings](decoder(base.copy(cwd = cwd)))
+      })
+      .map(_.addSite(base.site))
+  }
+
+  def write(set: Settings) = ConfEncoder[Settings].write(set)
+
+  implicit val absolutePathPrint: TPrint[AbsolutePath] =
+    TPrint.make[AbsolutePath](_ => "<path>")
+  implicit val pathMatcherPrint: TPrint[PathMatcher] =
+    TPrint.make[PathMatcher](_ => "<glob>")
+  implicit def optionPrint[T](implicit ev: pprint.TPrint[T]): TPrint[Option[T]] =
+    TPrint.make { implicit cfg => ev.render }
+  implicit def iterablePrint[C[x] <: Iterable[x], T](implicit ev: pprint.TPrint[T]): TPrint[C[T]] =
+    TPrint.make { implicit cfg => s"[${ev.render} ...]" }
+
+  implicit val pathMatcherDecoder: ConfDecoder[PathMatcher] =
+    ConfDecoder.stringConfDecoder.map(glob => FileSystems.getDefault.getPathMatcher("glob:" + glob))
+  implicit val LoggerEncoder: ConfEncoder[coursierapi.Logger] =
+    ConfEncoder.StringEncoder.contramap(_.toString())
+  implicit val LoggerDecoder: ConfDecoder[coursierapi.Logger] =
+    ConfDecoder.stringConfDecoder.flatMap {
+      case "nop" => Configured.ok(coursierapi.Logger.nop())
+      case "progress-bars" => Configured.ok(coursierapi.Logger.progressBars())
+      case unknown =>
+        Configured.error(
+          s"unknown coursier logger '$unknown'. Expected one of 'nop' or 'progress-bars'"
+        )
+    }
+  implicit val CharsetDecoder: ConfDecoder[Charset] =
+    ConfDecoder.stringConfDecoder.flatMap { str =>
+      try {
+        Configured.ok(Charset.forName(str))
+      } catch {
+        case _: UnsupportedCharsetException =>
+          ConfError.message(s"Charset '$str' is unsupported").notOk
+        case _: IllegalCharsetNameException =>
+          ConfError.message(s"Charset name '$str' is illegal").notOk
+      }
+    }
+  implicit val inputStreamDecoder: ConfDecoder[InputStream] =
+    ConfDecoder.stringConfDecoder.map(_ => System.in)
+  implicit val headerIdGeneratorDecoder: ConfDecoder[String => String] =
+    ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
+  implicit val variablePrinterDecoder: ConfDecoder[Variable => String] =
+    ConfDecoder.stringConfDecoder.flatMap(_ => ConfError.message("unsupported").notOk)
+
+  implicit val pathEncoder: ConfEncoder[AbsolutePath] =
+    ConfEncoder.StringEncoder.contramap { path =>
+      if (path == PathIO.workingDirectory) "<current working directory>"
+      else path.toRelative(PathIO.workingDirectory).toString()
+    }
+  implicit val pathMatcherEncoder: ConfEncoder[PathMatcher] =
+    ConfEncoder.StringEncoder.contramap(_.toString())
+  implicit val charsetEncoder: ConfEncoder[Charset] =
+    ConfEncoder.StringEncoder.contramap(_.name())
+  implicit val inputStreamEncoder: ConfEncoder[InputStream] =
+    ConfEncoder.StringEncoder.contramap(_ => "<input stream>")
+  implicit val headerIdGeneratorEncoder: ConfEncoder[String => String] =
+    ConfEncoder.StringEncoder.contramap(_ => "<String => String>")
+  implicit val variablePrinterEncoder: ConfEncoder[Variable => String] =
+    ConfEncoder.StringEncoder.contramap(_ => "<Variable => String>")
 }
