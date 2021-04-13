@@ -37,7 +37,8 @@ object MdocDialect {
 
   val scala =
     if (BuildInfo.scalaBinaryVersion.startsWith("3.0"))
-      Scala3.withAllowToplevelTerms(true)    else Scala213.withAllowToplevelTerms(true)
+      Scala3.withAllowToplevelTerms(true)
+    else Scala213.withAllowToplevelTerms(true)
 }
 
 class Processor(implicit ctx: Context) {
