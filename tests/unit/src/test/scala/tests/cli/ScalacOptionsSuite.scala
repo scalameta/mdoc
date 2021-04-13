@@ -30,45 +30,29 @@ class ScalacOptionsSuite extends BaseCliSuite {
       }
     )
 
-  if (!Compat.isScala3)
-    checkCli(
-      "kind-projector",
-      """
-        |/index.md
-        |```scala mdoc
-        |def baz[T[_]] = ()
-        |baz[Either[Int, ?]]
-        |```
-        |""".stripMargin,
-      """|/index.md
-         |```scala
-         |def baz[T[_]] = ()
-         |baz[Either[Int, ?]]
-         |```
-    """.stripMargin
-    )
-
-  if (Compat.isScala3)
-    checkCli(
-      "kind-projector",
-      """
-        |/index.md
-        |```scala mdoc
-        |def baz[T[_]] = ()
-        |baz[Either[Int, *]]
-        |```
-        |""".stripMargin,
-      """|/index.md
-         |```scala
-         |def baz[T[_]] = ()
-         |baz[Either[Int, *]]
-         |```
+  checkCli(
+    "kind-projector",
+    """
+      |/index.md
+      |```scala mdoc
+      |def baz[T[_]] = ()
+      |baz[Either[Int, *]]
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |def baz[T[_]] = ()
+       |baz[Either[Int, *]]
+       |```
     """.stripMargin,
-      extraArgs = Array(
-        "--scalac-options",
-        "-Ykind-projector"
-      )
-    )
+    extraArgs =
+      if (Compat.isScala3)
+        Array(
+          "--scalac-options",
+          "-Ykind-projector"
+        )
+      else Array()
+  )
 
   // NOTE(olafur): with -Xfatal-warning, the following program reports the following
   // warning if its wrapped in classes.
@@ -98,9 +82,8 @@ class ScalacOptionsSuite extends BaseCliSuite {
   )
 
   // Removed in Scala3
-  if (!Compat.isScala3)
     checkCli(
-      "-Ywarn-value-discard",
+      "-Ywarn-value-discard".tag(SkipScala3),
       """
         |/index.md
         |```scala mdoc

@@ -355,7 +355,7 @@ lazy val unitJS = project
     ),
     mdocJS := Some(jsdocs)
   )
-  .dependsOn(mdoc, js, testsInput, tests, unit % "test->test")
+  .dependsOn(mdoc, js, testsInput, tests, unit)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 lazy val plugin = project
