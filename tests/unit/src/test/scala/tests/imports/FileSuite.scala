@@ -8,7 +8,7 @@ class FileSuite extends BaseCliSuite {
 
   val includeOutputPath: RelativePath => Boolean = { path => path.toNIO.endsWith("readme.md") }
   checkCli(
-    "basic",
+    "basic".tag(SkipScala3),
     """
       |/hello.sc
       |val message = "Hello world!"
@@ -30,7 +30,7 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "outer",
+    "outer".tag(SkipScala3),
     """
       |/inner/hello.sc
       |val message = "hello world"
@@ -55,7 +55,7 @@ class FileSuite extends BaseCliSuite {
     val caret = "^" * i
     val inner = 1.to(i).map(_ => "inner").mkString("/")
     checkCli(
-      inner,
+      inner.tag(SkipScala3),
       s"""
          |/hello.sc
          |val message = "hello world"
@@ -77,7 +77,7 @@ class FileSuite extends BaseCliSuite {
   }
 
   checkCli(
-    "nested",
+    "nested".tag(SkipScala3),
     """
       |/hello1.sc
       |val first = "hello"
@@ -139,7 +139,7 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "compile-error",
+    "compile-error".tag(SkipScala3),
     """
       |/hello1.sc
       |val message: String = 42
@@ -181,7 +181,7 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "conflicting-package",
+    "conflicting-package".tag(SkipScala3),
     """
       |/hello0.sc
       |val zero = 0
@@ -213,7 +213,7 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "importees",
+    "importees".tag(SkipScala3),
     """
       |/hello0.sc
       |val zero = 0
@@ -297,7 +297,7 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "rename-edit-distance",
+    "rename-edit-distance".tag(SkipScala3),
     """
       |/hello0.sc
       |val zero = 0

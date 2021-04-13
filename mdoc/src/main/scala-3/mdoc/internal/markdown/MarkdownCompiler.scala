@@ -210,7 +210,7 @@ class MarkdownCompiler(
       case (Right(start), Right(end)) =>
           Position.Range(start.input, start.start, end.end).toUnslicedPosition
       case (_, _) =>
-          toOffsetPosition(pos.point)
+          toOffsetPosition(pos.point - 1)
     }
     
   }

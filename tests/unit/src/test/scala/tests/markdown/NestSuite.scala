@@ -296,21 +296,15 @@ class NestSuite extends BaseMarkdownSuite {
       |implicitly[Int]
       |```
     """.stripMargin,
-    // TODO: what are those numbers??
     """
-      |error:
-      |multi-reset-scala3.md:40 (mdoc generated code)
-      | no implicit argument of type Int was found for parameter e of method implicitly in object Predef
-      |    implicitly[Int]
-      |
-      |1170
-      |
-      |error:
-      |multi-reset-scala3.md:73 (mdoc generated code)
-      | no implicit argument of type Int was found for parameter e of method implicitly in object Predef
-      |    implicitly[Int]
-      |
-      |2097
+      |error: multi-reset-scala3.md:15:15:
+      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |implicitly[Int]
+      |              ^
+      |error: multi-reset-scala3.md:27:15:
+      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |implicitly[Int]
+      |              ^
     """.trim.stripMargin
   )
 
