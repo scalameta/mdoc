@@ -79,11 +79,6 @@ object Renderer {
   }
 
   @deprecated("this method will be removed", "2020-06-01")
-  def appendMultiline(sb: PrintStream, string: String): Unit = {
-    sb.appendMultiline(string)
-  }
-
-  @deprecated("this method will be removed", "2020-06-01")
   def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
     sb.appendMultiline(string, N)
   }

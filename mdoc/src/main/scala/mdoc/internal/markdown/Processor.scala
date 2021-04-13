@@ -37,8 +37,7 @@ object MdocDialect {
 
   val scala =
     if (BuildInfo.scalaBinaryVersion.startsWith("3.0"))
-      Scala3.withAllowToplevelTerms(true).withAllowToplevelStatements(true)
-    else Scala213.withAllowToplevelTerms(true)
+      Scala3.withAllowToplevelTerms(true)    else Scala213.withAllowToplevelTerms(true)
 }
 
 class Processor(implicit ctx: Context) {
@@ -119,8 +118,15 @@ class Processor(implicit ctx: Context) {
       filename: String
   ): Unit = {
     val sectionInputs = inputs.map { case ScalaFenceInput(_, input, mod) =>
-      // TODO: report error
-      SectionInput(input, mod, ctx)
+      import scala.meta._
+
+      (input, MdocDialect.scala).parse[Source] match {
+        case parsers.Parsed.Success(source) =>
+          SectionInput(input, ParsedSource(source), mod)
+        case parsers.Parsed.Error(pos, msg, _) =>
+          ctx.reporter.error(pos.toUnslicedPosition, msg)
+          SectionInput(input, ParsedSource.empty, mod)
+      }
     }
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
 

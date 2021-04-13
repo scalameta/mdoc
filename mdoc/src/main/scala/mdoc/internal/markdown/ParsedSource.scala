@@ -12,5 +12,5 @@ case class ParsedSource(source: Tree, stats: List[Tree]) {
 
 object ParsedSource {
   def apply(source: Source): ParsedSource = ParsedSource(source, source.stats)
-  def empty = Source(Nil)
+  def empty = ParsedSource(Source(Nil), Nil)
 }
