@@ -73,9 +73,7 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
 
 object TokenEditDistance {
 
-  implicit val dialect: scala.meta.Dialect =
-    if (BuildInfo.scalaBinaryVersion.startsWith("2.")) scala.meta.dialects.Scala213
-    else scala.meta.dialects.Scala3
+  implicit val dialect: scala.meta.Dialect = mdoc.internal.markdown.MdocDialect.scala
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 

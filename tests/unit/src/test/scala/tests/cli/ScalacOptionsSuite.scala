@@ -109,9 +109,10 @@ class ScalacOptionsSuite extends BaseCliSuite {
     ),
     onStdout = { out => assert(!out.contains("discarded non-Unit value")) }
   )
-
+  
+  // TODO: fix for Scala 3
   checkCli(
-    "no-imports",
+    "no-imports".tag(SkipScala3),
     """
       |/index.md
       |```scala mdoc
