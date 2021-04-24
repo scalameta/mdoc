@@ -215,7 +215,7 @@ lazy val mdoc = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
       "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.5.Final",
+      "io.undertow" % "undertow-core" % "2.2.7.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
