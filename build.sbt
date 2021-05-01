@@ -3,9 +3,10 @@ import scala.collection.mutable
 def scala212 = "2.12.13"
 def scala211 = "2.11.12"
 def scala213 = "2.13.5"
-def scala3 = List("3.0.0-RC2", "3.0.0-RC1", "3.0.0-M3", "3.0.0-M2")
+def scala3 = List("3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1", "3.0.0-M3", "3.0.0-M2")
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions ::: scala3
+
 def scalajs = "1.5.0"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "1.1.0"
@@ -111,8 +112,8 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.4.11"
-  val munit = "0.7.23"
+  val scalameta = "4.4.14"
+  val munit = "0.7.25"
   val coursier = "1.0.3"
   val scalacheck = "1.15.2"
 }
@@ -131,7 +132,8 @@ lazy val fs2Version = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "2.1.0"
   else if (scalaVersion.value == "3.0.0-M2") "2.5.0"
   else if (scalaVersion.value == "3.0.0-M3") "2.5.3"
-  else "2.5.4"
+  else if (scalaVersion.value == "3.0.0-RC1") "2.5.4"
+  else "2.5.5"
 }
 
 lazy val munitVersion = Def.setting {
@@ -242,7 +244,7 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.5.Final",
+      "io.undertow" % "undertow-core" % "2.2.7.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
       "org.slf4j" % "slf4j-api" % "1.7.30"
     )
@@ -432,8 +434,6 @@ lazy val docs = project
       "org.scala-sbt" % "sbt" % sbtVersion.value,
       "com.cibo" %% "evilplot" % "0.6.3"
     ),
-    Compile / TaskKey[Option[File]]("bloopGenerate") := None,
-    Test / TaskKey[Option[File]]("bloopGenerate") := None,
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,

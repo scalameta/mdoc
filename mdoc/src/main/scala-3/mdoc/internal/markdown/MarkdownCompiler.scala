@@ -166,9 +166,8 @@ class MarkdownCompiler(
   def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
     val compiler = new Compiler
     val freshContext = context.fresh
-
+    
     val run = compiler.newRun(using freshContext)
-
     val inputs = List(input).map(toSource)
 
     run.compileSources(inputs)
