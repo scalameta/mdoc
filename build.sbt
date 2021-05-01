@@ -197,10 +197,8 @@ lazy val cli = project
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      ("org.scalameta" %% "scalameta" % V.scalameta).withDottyCompat(scalaVersion.value),
-      ("com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10").withDottyCompat(
-        scalaVersion.value
-      )
+      "org.scalameta" %% "scalameta" % V.scalameta,
+      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10"
     )
   )
 
