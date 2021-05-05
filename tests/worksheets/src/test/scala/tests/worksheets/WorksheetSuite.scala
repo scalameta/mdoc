@@ -51,6 +51,27 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  checkDiagnostics(
+    "value-class",
+    """|object Foo {
+       |  case class Bar(b: Int) extends AnyVal
+       |}""".stripMargin,
+    "",
+    modifier = Some("reset-object")
+  )
+
+  checkDecorations(
+    "multi-mods",
+    """|object Foo {
+       |  case class Bar(b: Int) extends AnyVal
+       |}
+       |
+       |Foo.Bar(1)
+       |""".stripMargin,
+    "",
+    modifier = Some("reset-object:compile-only")
+  )
+
   checkDecorations(
     "lazy",
     """
@@ -404,11 +425,12 @@ class WorksheetSuite extends BaseSuite {
       options: TestOptions,
       original: String,
       expected: String,
-      compat: Map[String, String] = Map.empty
+      compat: Map[String, String] = Map.empty,
+      modifier: Option[String] = None
   ): Unit = {
     test(options) {
       val filename = options.name + ".scala"
-      val worksheet = mdoc.evaluateWorksheet(filename, original)
+      val worksheet = evaluateWorksheet(filename, original, modifier)
       val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
       var i = 0
@@ -435,11 +457,12 @@ class WorksheetSuite extends BaseSuite {
       options: TestOptions,
       original: String,
       expected: String,
-      compat: Map[String, String] = Map.empty
+      compat: Map[String, String] = Map.empty,
+      modifier: Option[String] = None
   ): Unit = {
     test(options) {
       val filename = options.name + ".scala"
-      val worksheet = mdoc.evaluateWorksheet(filename, original)
+      val worksheet = evaluateWorksheet(filename, original, modifier)
       val statements = worksheet.statements().asScala.sortBy(_.position().startLine())
       val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
@@ -466,6 +489,15 @@ class WorksheetSuite extends BaseSuite {
       }
       val obtained = out.toString()
       assertNoDiff(obtained, Compat(expected, compat))
+    }
+  }
+
+  private def evaluateWorksheet(filename: String, original: String, modifier: Option[String]) = {
+    modifier match {
+      case Some(mod) =>
+        mdoc.evaluateWorksheet(filename, original, mod)
+      case None =>
+        mdoc.evaluateWorksheet(filename, original)
     }
   }
 }

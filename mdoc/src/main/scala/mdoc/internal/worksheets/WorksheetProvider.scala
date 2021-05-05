@@ -26,9 +26,10 @@ class WorksheetProvider(settings: Settings) {
 
   def evaluateWorksheet(
       input: Input.VirtualFile,
-      ctx: Context
+      ctx: Context,
+      modifier: Option[Modifier]
   ): EvaluatedWorksheet = {
-    val sectionInput = SectionInput(input, ctx)
+    val sectionInput = SectionInput(input, modifier.getOrElse(Modifier.Default()), ctx)
     val sectionInputs = List(sectionInput)
     val file = InputFile.fromRelativeFilename(input.path, settings)
     val instrumented = Instrumenter.instrument(file, sectionInputs, settings, reporter)

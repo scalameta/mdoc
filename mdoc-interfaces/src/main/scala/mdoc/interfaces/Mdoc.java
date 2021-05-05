@@ -7,6 +7,7 @@ import java.io.PrintStream;
 public abstract class Mdoc {
 
   public abstract EvaluatedWorksheet evaluateWorksheet(String filename, String text);
+  public abstract EvaluatedWorksheet evaluateWorksheet(String filename, String text, String modifier);
   public abstract Mdoc withWorkingDirectory(Path workingDirectory);
   public abstract Mdoc withClasspath(List<Path> classpath);
   public abstract Mdoc withScalacOptions(List<String> options);
