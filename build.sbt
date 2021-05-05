@@ -14,8 +14,8 @@ def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala211(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 11)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
-val isScala213 = Def.setting {
-  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector(">=2.13"))
+val isScala212 = Def.setting {
+  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
 }
 
 val isScala3 = Def.setting {
@@ -233,8 +233,8 @@ lazy val testsInput = project
 def scala212LibraryDependencies(deps: List[ModuleID]) =
   List(
     libraryDependencies ++= {
-      if (isScala213.value || isScala3.value) Nil
-      else deps
+      if (isScala212.value) deps
+      else Nil
     }
   )
 val tests = project
@@ -291,10 +291,9 @@ lazy val unit = project
     publish / skip := true,
     crossScalaVersions --= scala3,
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
-    resolvers += Resolver.bintrayRepo("cibotech", "public"),
     scala212LibraryDependencies(
       List(
-        "com.cibo" %% "evilplot" % "0.6.3"
+        "io.github.cibotech" %% "evilplot" % "0.8.1"
       )
     ),
     libraryDependencies ++= List(
@@ -374,10 +373,9 @@ lazy val docs = project
       !scalaVersion.value.startsWith("2.12") ||
         (ThisBuild / version).value.endsWith("-SNAPSHOT"),
     mdocAutoDependency := false,
-    resolvers += Resolver.bintrayRepo("cibotech", "public"),
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "com.cibo" %% "evilplot" % "0.6.3"
+      "io.github.cibotech" %% "evilplot" % "0.8.1"
     ),
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
