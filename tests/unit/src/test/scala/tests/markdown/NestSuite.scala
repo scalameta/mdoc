@@ -348,6 +348,9 @@ class NestSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  // This test is skipped for Scala 3 because of changes
+  // in implicit resolution
+  // See http://dotty.epfl.ch/docs/reference/changed-features/implicit-resolution.html
   checkError(
     "implicit-nok".tag(SkipScala3),
     """
