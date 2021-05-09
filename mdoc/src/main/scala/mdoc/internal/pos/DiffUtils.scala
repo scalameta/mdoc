@@ -1,7 +1,7 @@
 package mdoc.internal.pos
 
 import difflib.{DiffUtils => DU}
-import scala.collection.JavaConverters._
+import PositionSyntax._
 
 object DiffUtils {
   def unifiedDiff(

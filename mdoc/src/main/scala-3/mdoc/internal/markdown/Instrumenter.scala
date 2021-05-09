@@ -2,33 +2,23 @@ package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import java.nio.file.Path
-
-import dotty.tools.dotc.interfaces.SourcePosition
-import dotty.tools.dotc.ast.untpd._
-import dotty.tools.dotc.core.Contexts.Context
-import dotty.tools.dotc.ast.Trees
-import dotty.tools.dotc.core.Flags
-
+import scala.meta._
+import scala.meta.inputs.Position
+import Instrumenter.position
+import mdoc.internal.markdown.Instrumenter.Binders
+import scala.meta.Mod.Lazy
 import scala.collection.mutable
 import mdoc.Reporter
 import mdoc.internal.cli.InputFile
+import java.nio.file.Path
 import mdoc.internal.cli.Settings
-import scala.meta.Mod.Lazy
-import scala.meta.Name
 
-import Instrumenter.position
-
-/* This Class can be removed once Scalameta parser is ready for Scala 3 code
- * we should only make sure that the other Instrumenter generates code with proper indentation 
- * */
 class Instrumenter(
     file: InputFile,
     sections: List[SectionInput],
     settings: Settings,
     reporter: Reporter
 ) {
-  private val innerClassIdent = " " * 4
   def instrument(): Instrumented = {
     printAsScript()
     Instrumented.fromSource(
@@ -36,71 +26,97 @@ class Instrumenter(
       magic.scalacOptions.toList,
       magic.dependencies.toList,
       magic.repositories.toList,
-      Nil,
+      magic.files.values.toList,
       reporter
     )
   }
-
   val magic = new MagicImports(settings, reporter, file)
   private val out = new ByteArrayOutputStream()
-  private val sb = new PrintStream(out)
   val gensym = new Gensym()
-  val nest = new Nesting(sb)
-
-  private def printlnWithIndent(out: String) = {
-    sb.println(innerClassIdent + out)
-  }
-
-  private def printWithIndent(out: String) = {
-    sb.print(innerClassIdent + out)
-  }
+  val sb = new CodePrinter(new PrintStream(out))
 
   private def printAsScript(): Unit = {
-    sections.zipWithIndex.foreach {
-      case (section, i) =>
-        import section.ctx
-        printlnWithIndent("")
-        printlnWithIndent("$doc.startSection();")
-          section.stats.foreach { stat =>
-            printlnWithIndent(s"$$doc.startStatement(${position(stat.sourcePos(using ctx))});")
-            printStatement(stat, section.mod, sb, section)(using ctx)
-            printlnWithIndent("")
-            printlnWithIndent("$doc.endStatement();")
-          }
-        printlnWithIndent("$doc.endSection();")
+    sections.zipWithIndex.foreach { case (section, i) =>
+      if (section.mod.isReset) {
+        sb.unnest()
+        sb.println(Instrumenter.reset(section.mod, gensym.fresh("App")))
+      } else if (section.mod.isNest) {
+        sb.nest()
+      }
+      sb.println("$doc.startSection();")
+      if (section.mod.isFailOrWarn) {
+        sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
+        val out = new FailInstrumenter(sections, i).instrument()
+        val literal = Instrumenter.stringLiteral(out)
+        val binder = gensym.fresh("res")
+        sb.line{_.append("val ")
+          .append(binder)
+          .append(" = _root_.mdoc.internal.document.FailSection(")
+          .append(literal)
+          .append(", ")
+          .append(position(section.source.pos))
+          .append(");")
+        }
+        printBinder(binder, section.source.pos)
+        sb.println("$doc.endStatement();")
+      } else if (section.mod.isCompileOnly) {
+        section.source.stats.foreach { stat =>
+          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+          sb.println("$doc.endStatement();")
+        }
+        sb.definition(s"""object ${gensym.fresh("compile")}""") {
+          _.println(section.source.pos.text)
+        }
+      } else {
+        section.source.stats.foreach { stat =>
+          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+          printStatement(stat, section.mod, sb)
+          sb.println("$doc.endStatement();")
+        }
+      }
+      sb.println("$doc.endSection();")
     }
-    nest.unnest()
+    sb.unnest()
   }
 
-  private def printBinder(name: String, pos: SourcePosition): Unit = {
-    printlnWithIndent("")
-    printlnWithIndent(s"""$$doc.binder($name, ${position(pos)})""")
+  private def printBinder(name: String, pos: Position): Unit = {
+    sb.println(s"$$doc.binder($name, ${position(pos)});")
   }
-  private def printStatement(
-      stat: Tree,
-      m: Modifier,
-      sb: PrintStream,
-      section: SectionInput
-  )(using ctx: Context): Unit = {
-    val binders = stat match {
-      case Instrumenter.Binders(names) =>
-        names
-      case _ =>
-        val fresh = gensym.fresh("res")
-        printWithIndent(s"val $fresh = ")
-        List(fresh -> stat.sourcePos)
-    }
-    stat match {
-      case magic.NonPrintable() =>
-      case _ =>
-        printWithIndent(section.show(stat, innerClassIdent.size))
-    }
-    binders.foreach {
-      case (name, pos) =>
-        printBinder(
-          name,
-          pos
-        )
+  private def printStatement(stat: Tree, m: Modifier, sb: CodePrinter): Unit = {
+    if (m.isCrash) {
+      sb.definition("$doc.crash(" ++ position(stat.pos) ++ ")") {
+        _.appendLines(stat.pos.text)
+      }
+    } else {
+      val binders = stat match {
+        case Binders(names) =>
+          names.map(name => name -> name.pos)
+        case _ =>
+          val fresh = gensym.fresh("res")
+          sb.line{_.append(s"val $fresh = ")}
+          List(Name(fresh) -> stat.pos)
+      }
+      stat match {
+        case i: Import =>
+          def printImporter(importer: Importer): Unit = {
+              sb.line {_.append("import ")
+              .append(importer.syntax)
+              .append(";")
+            }
+          }
+          i.importers.foreach {
+            case importer @ magic.Printable(_) =>
+              printImporter(importer)
+            case magic.NonPrintable() =>
+            case importer =>
+              printImporter(importer)
+          }
+        case _ =>
+          sb.appendLines(stat.pos.text)
+      }
+      binders.foreach { case (name, pos) =>
+        printBinder(name.syntax, pos)
+      }
     }
   }
 }
@@ -112,6 +128,15 @@ object Instrumenter {
     "$dep",
     "$ivy"
   )
+  def reset(mod: Modifier, identifier: String): String = {
+    val ctor =
+      if (mod.isResetClass) s"new $identifier()"
+      else identifier
+    val keyword =
+      if (mod.isResetClass) "class"
+      else "object"
+    s"$ctor\n}\n$keyword $identifier {\n"
+  }
   def instrument(
       file: InputFile,
       sections: List[SectionInput],
@@ -122,50 +147,41 @@ object Instrumenter {
     instrumented.copy(source = wrapBody(instrumented.source))
   }
 
-  def position(pos: SourcePosition): String = {
-    val start = SectionInput.startLine
-    val ident = SectionInput.startIdent
-    s"${pos.startLine - start}, ${pos.startColumn - ident}, ${pos.endLine - start}, ${pos.endColumn - ident}"
+  def position(pos: Position): String = {
+    s"${pos.startLine}, ${pos.startColumn}, ${pos.endLine}, ${pos.endColumn}"
+  }
+
+  def stringLiteral(string: String): String = {
+    import scala.meta.internal.prettyprinters._
+    enquote(string, DoubleQuotes)
   }
 
   def wrapBody(body: String): String = {
-    val wrapped = new StringBuilder()
-      .append("package repl\n")
-      .append("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder {\n")
-      .append("  def app(): _root_.scala.Unit = {val _ = new App()}\n")
-      .append("  class App {\n")
-      .append(body)
-      .append("  }\n")
-      .append("}\n")
-      .toString()
-    wrapped
-  }
+    val wrapped = new ByteArrayOutputStream()
 
-  object Binders {
-    private def fromPat(trees: List[Tree])(using ctx: Context) = {
-      trees.collect {
-        case id: Ident if id.name.toString != "_" => // ignore placeholders
-          id.name.toString -> id.sourcePos
-      }
+    val ps = new PrintStream(wrapped)
+    val cb = new CodePrinter(ps)
+    cb.println("package repl")
+    cb.definition("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder") {
+      _.println("def app(): _root_.scala.Unit = {val _ = new App()}")
+       .definition("class App") {
+        _.appendLines(body)
+       }
+
     }
-    def unapply(tree: Tree)(using ctx: Context): Option[List[(String, SourcePosition)]] =
+
+    wrapped.toString()
+  }
+  object Binders {
+    def binders(pat: Pat): List[Name] =
+      pat.collect { case m: Member => m.name }
+    def unapply(tree: Tree): Option[List[Name]] =
       tree match {
-        case df: Trees.ValDef[_] if df.mods.is(Flags.Lazy) => Some(Nil)
-        case df: Trees.ValDef[_] =>
-          Some(List(df.name.toString -> df.sourcePos))
-        case pat: PatDef =>
-          val pattern = pat.pats.flatMap {
-            case tpl: Tuple =>
-              fromPat(tpl.trees)
-            case appl: Apply =>
-              fromPat(appl.args)
-            case _ => Nil
-          }
-          Some(pattern)
-        case _: Trees.DefDef[_] => Some(Nil)
+        case Defn.Val(mods, _, _, _) if mods.exists(_.isInstanceOf[Lazy]) => Some(Nil)
+        case Defn.Val(_, pats, _, _) => Some(pats.flatMap(binders))
+        case Defn.Var(_, pats, _, _) => Some(pats.flatMap(binders))
+        case _: Defn => Some(Nil)
         case _: Import => Some(Nil)
-        case _: Trees.DefTree[_] => Some(Nil)
-        case _: ExtMethods => Some(Nil)
         case _ => None
       }
   }

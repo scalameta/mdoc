@@ -4,6 +4,7 @@ import tests.BuildInfo
 
 object Compat {
   def isScala212: Boolean = BuildInfo.scalaVersion.startsWith("2.12")
+  def isScala3: Boolean = BuildInfo.scalaVersion.startsWith("3.0")
   def postProcess(default: String, compat: Map[String, String => String]): String = {
     val processor = compat
       .get(BuildInfo.scalaVersion)
@@ -27,15 +28,20 @@ object Compat {
         BuildInfo.scalaBinaryVersion match {
           case "2.11" =>
             default
-              .replaceAllLiterally("Predef.scala:288", "Predef.scala:230")
+              .replace("Predef.scala:288", "Predef.scala:230")
           case "2.12" =>
             default
-              .replaceAllLiterally("package.scala:219", "package.scala:220")
+              .replace("package.scala:219", "package.scala:220")
           case "2.13" =>
             default
-              .replaceAllLiterally("<init>", "<clinit>")
-              .replaceAllLiterally("Predef.scala:288", "Predef.scala:347")
-          case _ => default
+              .replace("<init>", "<clinit>")
+              .replace("Predef.scala:288", "Predef.scala:347")
+          case other if other.startsWith("3.0") =>
+            default
+              .replace("<init>", "<clinit>")
+              .replace("Predef.scala:288", "Predef.scala:345")
+          case _ =>
+            default
         }
       )
     this.postProcess(result, postProcess)

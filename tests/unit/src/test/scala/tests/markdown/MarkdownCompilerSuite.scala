@@ -10,6 +10,7 @@ import mdoc.internal.markdown.ReplVariablePrinter
 import mdoc.internal.cli.InputFile
 import mdoc.internal.cli.Settings
 import scala.meta.internal.io.PathIO
+import mdoc.internal.cli.Context
 
 class MarkdownCompilerSuite extends FunSuite {
 
@@ -32,6 +33,7 @@ class MarkdownCompilerSuite extends FunSuite {
     test(name) {
       val inputs = original.map(s => Input.String(s))
       val file = InputFile.fromRelativeFilename(name + ".md", settings)
+      val context = Context(settings, reporter, compiler)
       val obtained = Renderer.render(
         file,
         inputs,
@@ -39,7 +41,8 @@ class MarkdownCompilerSuite extends FunSuite {
         settings,
         reporter,
         name + ".md",
-        ReplVariablePrinter
+        ReplVariablePrinter,
+        context
       )
       assertNoDiff(
         obtained,
@@ -85,6 +88,17 @@ class MarkdownCompilerSuite extends FunSuite {
           |```scala
           |val x = 1.to(10)
           |// x: Range.Inclusive = Range.Inclusive(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          |```
+          |```scala
+          |val y = x.length
+          |// y: Int = 10
+          |```
+          |""".stripMargin,
+      "3.0" ->
+        """
+          |```scala
+          |val x = 1.to(10)
+          |// x: Inclusive = Range(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
           |```
           |```scala
           |val y = x.length

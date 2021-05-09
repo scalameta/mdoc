@@ -24,7 +24,19 @@ class FailSuite extends BaseMarkdownSuite {
        |// val x: Int = "String"
        |//              ^^^^^^^^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |val x: Int = "String"
+           |// error: 
+           |// Found:    String("String")
+           |// Required: Int
+           |// val x: Int = "String"
+           |//              ^^^^^^^^
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -47,7 +59,22 @@ class FailSuite extends BaseMarkdownSuite {
       |// val y: Int = '''Triplequote
       |//              ^
       |```
-      |""".stripMargin.triplequoted
+      |""".stripMargin.triplequoted,
+    compat = Map(
+      "3.0" ->
+        """
+          |```scala
+          |val y: Int = '''Triplequote
+          |newlines
+          |'''
+          |// error:
+          |// Found:    String("Triplequote\nnewlines\n")
+          |// Required: Int
+          |// val y: Int = '''Triplequote
+          |//              ^
+          |```
+          |""".stripMargin.triplequoted
+    )
   )
 
   checkError(
@@ -61,7 +88,16 @@ class FailSuite extends BaseMarkdownSuite {
       |error: fail-error.md:3:1: not found: value foobar
       |foobar
       |^^^^^^
-      |""".stripMargin
+      |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error: fail-error.md:3:1
+          |Not found: foobar
+          |foobar
+          |^^^^^^
+        """.stripMargin
+    )
   )
 
   checkError(
@@ -93,7 +129,16 @@ class FailSuite extends BaseMarkdownSuite {
       |error: mixed-error.md:3:9: not found: value foobar
       |val x = foobar
       |        ^^^^^^
-      |""".stripMargin
+      |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error: mixed-error.md:3:9
+          |Not found: foobar
+          |val x = foobar
+          |        ^^^^^^
+        """.stripMargin
+    )
   )
 
   check(
@@ -118,7 +163,23 @@ class FailSuite extends BaseMarkdownSuite {
        |// val x: Int = "String"
        |//              ^^^^^^^^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |println(42)
+           |// 42
+           |```
+           |```scala
+           |val x: Int = "String"
+           |// error: 
+           |// Found:    String("String")
+           |// Required: Int
+           |// val x: Int = "String"
+           |//              ^^^^^^^^
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -144,7 +205,23 @@ class FailSuite extends BaseMarkdownSuite {
        |// fs2.Stream.eval(println("Do not ever do this"))
        |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |fs2.Stream.eval(println("Do not ever do this"))
+           |// error:
+           |// Found:    Unit
+           |// Required: F[O]
+           |// ∙
+           |// where:    F is a type variable with constraint <: [_$95] =>> Any
+           |//           O is a type variable with constraint ∙
+           |// ∙
+           |// Note that implicit conversions cannot be applied because they are ambiguous;
+           |// both method ArrowAssoc in object Predef and method StringFormat in object Predef convert from Unit to F[O]
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -165,7 +242,23 @@ class FailSuite extends BaseMarkdownSuite {
        |// println(b)
        |//         ^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |println(notfound)
+           |println(b)
+           |// error:
+           |// Not found: b
+           |// println(b)
+           |//         ^
+           |// error: 
+           |// Not found: notfound
+           |// println(notfound)
+           |//         ^^^^^^^^
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -206,7 +299,36 @@ class FailSuite extends BaseMarkdownSuite {
        |// println(d)
        |//         ^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |val x = 1
+           |println(notfound)
+           |println(b)
+           |// error:
+           |// Not found: notfound
+           |// println(notfound)
+           |//         ^^^^^^^^
+           |// error: 
+           |// Not found: b
+           |// println(b)
+           |//         ^
+           |```
+           |
+           |```scala
+           |val x = 1
+           |println(c)
+           |println(d)
+           |// error: not found: value c
+           |// println(c)
+           |//         ^
+           |// error: not found: value d
+           |// println(d)
+           |//         ^
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -233,6 +355,23 @@ class FailSuite extends BaseMarkdownSuite {
        |// "abc": Int
        |// ^^^^^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|
+           |```scala
+           |final case class FloatValue(val value: Float) extends AnyVal
+           |```
+           |
+           |```scala
+           |"abc": Int
+           |// error:
+           |// Found:    String("abc")
+           |// Required: Int
+           |// "abc": Int
+           |// ^^^^^
+           |```
     """.stripMargin
+    )
   )
 }

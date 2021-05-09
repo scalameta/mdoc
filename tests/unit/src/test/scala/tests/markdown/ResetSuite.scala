@@ -36,7 +36,30 @@ class ResetSuite extends BaseMarkdownSuite {
        |// println(x)
        |//         ^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |implicit val x: Int = 42
+           |// x: Int = 42
+           |```
+           |
+           |```scala
+           |implicit val y: Int = 42
+           |// y: Int = 42
+           |println(implicitly[Int])
+           |// 42
+           |```
+           |
+           |```scala
+           |println(x)
+           |// error:
+           |// Not found: x
+           |// println(x)
+           |//         ^
+           |```
     """.stripMargin
+    )
   )
 
   check(

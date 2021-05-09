@@ -86,6 +86,20 @@ class NestSuite extends BaseMarkdownSuite {
            |susan
            |// res0: App.this.type.User = User(name = "Susan")
            |```
+           |""".stripMargin,
+      "3.0" ->
+        """|```scala
+           |case class User(name: String)
+           |val susan = User("Susan")
+           |// susan: User = User(name = "Susan")
+           |```
+           |```scala
+           |case class User(name: String, age: Int)
+           |val hakon = User("Hakon", 42)
+           |// hakon: User = User(name = "Hakon", age = 42)
+           |susan
+           |// res0: User = User(name = "Susan")
+           |```
            |""".stripMargin
     )
   )
@@ -142,7 +156,7 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "implicit-ok",
+    "implicit-ok".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -171,8 +185,38 @@ class NestSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  check(
+    "implicit-ok-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|
+       |```scala
+       |implicit val x: Int = 1
+       |// x: Int = 1
+       |```
+       |```scala
+       |implicit val x: Int = 1
+       |// x: Int = 1
+       |```
+       |```scala
+       |implicitly[Int]
+       |// res0: Int = 1
+       |```
+       |
+       |""".stripMargin
+  )
+
   checkError(
-    "reset",
+    "reset".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -191,7 +235,81 @@ class NestSuite extends BaseMarkdownSuite {
   )
 
   checkError(
-    "multi-reset",
+    "reset-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """|error: reset.md:9:1: could not find implicit value for parameter e: Int
+       |implicitly[Int]
+       |^^^^^^^^^^^^^^^
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |
+          |error:
+          |reset-scala3.md:26 (mdoc generated code)
+          | no implicit argument of type Int was found for parameter e of method implicitly in object
+         Predef
+          |    implicitly[Int]
+          |
+         """.stripMargin
+    )
+  )
+
+  checkError(
+    "multi-reset-scala3".tag(OnlyScala3),
+    """
+      |```scala mdoc
+      |implicit val x: Int = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:nest
+      |implicit val x = 1
+      |```
+      |```scala mdoc:reset
+      |implicitly[Int]
+      |```
+    """.stripMargin,
+    """
+      |error: multi-reset-scala3.md:15:15:
+      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |implicitly[Int]
+      |              ^
+      |error: multi-reset-scala3.md:27:15:
+      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |implicitly[Int]
+      |              ^
+    """.trim.stripMargin
+  )
+
+  checkError(
+    "multi-reset".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -230,8 +348,11 @@ class NestSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  // This test is skipped for Scala 3 because of changes
+  // in implicit resolution
+  // See http://dotty.epfl.ch/docs/reference/changed-features/implicit-resolution.html
   checkError(
-    "implicit-nok",
+    "implicit-nok".tag(SkipScala3),
     """
       |```scala mdoc
       |implicit val x = 1
@@ -265,7 +386,15 @@ class NestSuite extends BaseMarkdownSuite {
     """|error: anyval-nok.md:6:1: value class may not be a local class
        |class Foo(val x: Int) extends AnyVal
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|error: anyval-nok.md:6:1: 
+           |Value classes may not be a local class
+           |class Foo(val x: Int) extends AnyVal
+           |      ^
+           |""".stripMargin
+    )
   )
 
   checkError(
@@ -293,7 +422,18 @@ class NestSuite extends BaseMarkdownSuite {
        |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
        |	at repl.MdocSession$App.<init>(stacktrace.md:35)
        |	at repl.MdocSession$.app(stacktrace.md:3)
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|error: stacktrace.md:14:1: null
+           |boom(x > 4)
+           |^^^^^^^^^^^
+           |java.lang.IllegalArgumentException
+           |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
+           |	at repl.MdocSession$App.<init>(stacktrace.md:36)
+           |	at repl.MdocSession$.app(stacktrace.md:3)
+           |""".stripMargin
+    )
   )
 
   check(
@@ -318,7 +458,14 @@ class NestSuite extends BaseMarkdownSuite {
        |// case class Foo(i: Int) { val x = y }
        |//                                  ^
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """
+          |error:
+          |Not found: y 
     """.stripMargin
+    )
   )
 
 }

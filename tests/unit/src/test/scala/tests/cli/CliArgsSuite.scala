@@ -8,6 +8,7 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import scala.meta.io.AbsolutePath
 import cats.instances.set
+import mdoc.internal.cli.Context
 
 class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
@@ -26,7 +27,10 @@ class CliArgsSuite extends FunSuite {
       loc: munit.Location
   ): Unit = {
     test(name) {
-      Settings.fromCliArgs(args, base).andThen(_.validate(reporter)).toEither match {
+      Settings
+        .fromCliArgs(args, base)
+        .andThen(s => Context.fromSettings(s, reporter))
+        .toEither match {
         case Left(obtained) =>
           assertNoDiff(obtained.toString(), expected)
         case Right(ok) =>

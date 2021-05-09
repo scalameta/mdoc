@@ -10,7 +10,6 @@ import java.lang.StringBuilder
 import java.{util => ju}
 import java.nio.file.Paths
 
-import scala.collection.JavaConverters._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 
@@ -211,7 +210,8 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin,
     compat = Map(
       "3.0" ->
-        """|type-error:2:21: error: Found:    ("not found" : String)
+        """|type-error:2:21: error:
+           |Found:    ("not found" : String)
            |Required: Int
            |val filename: Int = "not found"
            |                    ^^^^^^^^^^^
@@ -237,8 +237,8 @@ class WorksheetSuite extends BaseSuite {
     compat = Map(
       "3.0" ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
-           |	at repl.MdocSession$App.crash(crash.scala:8)
-           |	at repl.MdocSession$App.<init>(crash.scala:16)
+           |	at repl.MdocSession$App.crash(crash.scala:7)
+           |	at repl.MdocSession$App.<init>(crash.scala:15)
            |	at repl.MdocSession$.app(crash.scala:3)
            |
            |crash(filename)
@@ -342,9 +342,10 @@ class WorksheetSuite extends BaseSuite {
         |def fn(using c: C) = ()
         |val xx = fn
         |""".stripMargin,
-    """|dotty-ambiguous-implicit:8:10: error: ambiguous implicit arguments: both object c1 in class App and object c2 in class App match type App.this.C of parameter c of method fn in class App
+    """|dotty-ambiguous-implicit:8:12: error:
+       |ambiguous implicit arguments: both object c1 in class App and object c2 in class App match type App.this.C of parameter c of method fn in class App
        |val xx = fn
-       |         ^^
+       |           ^
        |""".stripMargin
   )
 

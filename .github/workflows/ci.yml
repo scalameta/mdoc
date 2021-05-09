@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v10
-      - run: sbt docs/mdoc
+      - run: sbt '++2.12.13 docs/mdoc'
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
     runs-on: ubuntu-latest

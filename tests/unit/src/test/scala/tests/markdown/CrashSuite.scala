@@ -28,6 +28,15 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
            |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
            |```
+    """.stripMargin,
+      "3.0" ->
+        """|```scala
+           |val x = 1
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |// 	at repl.MdocSession$App.$init$$anonfun$3(basic.md:14)
+           |```
     """.stripMargin
     )
   )
@@ -76,7 +85,19 @@ class CrashSuite extends BaseMarkdownSuite {
        |// scala.MatchError: 1 (of class java.lang.Integer)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(comments.md:9)
        |```
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |1 match {
+           |  case 2 => // boom!
+           |}
+           |// scala.MatchError: 1 (of class java.lang.Integer)
+           |// 	at repl.MdocSession$App.$init$$anonfun$1(comments.md:9)
+           |//  at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+           |```
     """.stripMargin
+    )
   )
 
   check(
@@ -103,6 +124,14 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
            |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
            |```
+    """.stripMargin,
+      "3.0" ->
+        """|```scala
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |// 	at repl.MdocSession$App.$init$$anonfun$1(relative.md:9)
+           |```
     """.stripMargin
     )
   )
@@ -120,7 +149,16 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal.md:9)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal.md:9)
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |throw new StackOverflowError()
+           |// java.lang.StackOverflowError
+           |// 	at repl.MdocSession$App.$init$$$anonfun$1(fatal.md:9)
+           |```
+           |""".stripMargin
+    )
   )
 
   check(
@@ -136,7 +174,16 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal2.md:9)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal2.md:9)
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |throw new NoClassDefFoundError()
+           |// java.lang.NoClassDefFoundError
+           |// 	at repl.MdocSession$App.$init$$$anonfun$1(fatal2.md:9)
+           |```
+           |""".stripMargin
+    )
   )
 
   check(
@@ -152,7 +199,16 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal3.md:9)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal3.md:9)
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |throw new NoSuchMethodError()
+           |// java.lang.NoSuchMethodError
+           |// 	at repl.MdocSession$App.$init$$$anonfun$1(fatal3.md:9)
+           |```
+           |""".stripMargin
+    )
   )
 
   check(
@@ -168,7 +224,16 @@ class CrashSuite extends BaseMarkdownSuite {
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal4.md:9)
        |// 	at repl.MdocSession$App$$anonfun$1.apply(fatal4.md:9)
        |```
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      "3.0" ->
+        """|```scala
+           |throw new IncompatibleClassChangeError()
+           |// java.lang.IncompatibleClassChangeError
+           |// 	at repl.MdocSession$App.$init$$$anonfun$1(fatal4.md:9)
+           |```
+           |""".stripMargin
+    )
   )
 
 }

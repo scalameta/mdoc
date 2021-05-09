@@ -29,6 +29,7 @@ import scala.tools.nsc.io.VirtualDirectory
 import scala.annotation.implicitNotFound
 import mdoc.internal.CompatClassloader
 import mdoc.internal.worksheets.Compat._
+import scala.meta.internal.inputs._
 
 class MarkdownCompiler(
     classpath: String,
@@ -77,14 +78,13 @@ class MarkdownCompiler(
     global.close()
   }
 
-  def fail(original: Seq[Tree], input: Input, sectionPos: Position): String = {
+  def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
     sreporter.reset()
     val g = global
     val run = new g.Run
     run.compileSources(List(toSource(input)))
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
-    val edit = TokenEditDistance.fromTrees(original, input)
     sreporter.infos.foreach { case sreporter.Info(pos, msgOrNull, gseverity) =>
       val msg = nullableMessage(msgOrNull)
       val mpos = toMetaPosition(edit, pos)
@@ -175,6 +175,7 @@ class MarkdownCompiler(
 
   private def nullableMessage(msgOrNull: String): String =
     if (msgOrNull == null) "" else msgOrNull
+
   private def report(
       vreporter: Reporter,
       input: Input,
@@ -219,13 +220,15 @@ class MarkdownCompiler(
       severity: sreporter.Severity,
       mpos: Position,
       message: String
-  ): Unit =
-    severity match {
-      case sreporter.ERROR => vreporter.error(mpos, message)
-      case sreporter.INFO => vreporter.info(mpos, message)
-      case sreporter.WARNING => vreporter.warning(mpos, message)
-      case _ =>
-    }
+  ): Unit = {
+    import sreporter._
+    if (severity == sreporter.ERROR)
+      vreporter.error(mpos, message)
+    else if (severity == sreporter.WARNING)
+      vreporter.warning(mpos, message)
+    else if (severity == sreporter.INFO)
+      vreporter.info(mpos, message)
+  }
   private def formatMessage(pos: GPosition, message: String): String =
     new CodeBuilder()
       .println(s"${pos.source.file.path}:${pos.line + 1} (mdoc generated code) $message")

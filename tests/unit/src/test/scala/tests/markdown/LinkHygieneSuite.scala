@@ -3,7 +3,6 @@ package tests.markdown
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import munit.FunSuite
-import scala.meta.testkit.StringFS
 import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.DocumentLinks
@@ -21,7 +20,7 @@ class LinkHygieneSuite extends FunSuite {
     test(name) {
       myOut.reset()
       reporter.reset()
-      val root = StringFS.fromString(original)
+      val root = tests.cli.StringFS.fromString(original)
       val settings = Settings
         .default(root)
         .copy(reportRelativePaths = true, in = List(root), out = List(root))

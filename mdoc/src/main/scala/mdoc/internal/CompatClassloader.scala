@@ -3,7 +3,7 @@ package mdoc.internal
 import java.net.URLClassLoader
 import java.net.URL
 import sun.misc.Unsafe
-import scala.collection.JavaConverters._
+import mdoc.internal.pos.PositionSyntax._
 
 object CompatClassloader {
 
@@ -12,7 +12,7 @@ object CompatClassloader {
     */
   def getURLs(classLoader: ClassLoader): Seq[URL] = {
     if (classLoader.isInstanceOf[URLClassLoader]) {
-      classLoader.asInstanceOf[URLClassLoader].getURLs()
+      classLoader.asInstanceOf[URLClassLoader].getURLs().toIndexedSeq
       // java9+
     } else if (
       classLoader

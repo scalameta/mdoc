@@ -73,9 +73,7 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
 
 object TokenEditDistance {
 
-  implicit val dialect: scala.meta.Dialect =
-    if (BuildInfo.scalaBinaryVersion.startsWith("2.")) scala.meta.dialects.Scala213
-    else scala.meta.dialects.Scala3
+  implicit val dialect: scala.meta.Dialect = mdoc.internal.markdown.MdocDialect.scala
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)
 
@@ -120,7 +118,6 @@ object TokenEditDistance {
       }
     }
     val deltas = {
-      import scala.collection.JavaConverters._
       difflib.DiffUtils
         .diff(original.asJava, revised.asJava, TokenEqualizer)
         .getDeltas
@@ -159,7 +156,7 @@ object TokenEditDistance {
       original.foreach { tokens => tokens.foreach { token => buf += token } }
       buf.result()
     }
-    TokenEditDistance(originalTokens, instrumentedTokens)
+    TokenEditDistance(originalTokens.toIndexedSeq, instrumentedTokens)
   }
 
   def fromTrees(original: Seq[Tree], instrumented: Input): TokenEditDistance = {

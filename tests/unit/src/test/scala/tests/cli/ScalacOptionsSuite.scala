@@ -36,21 +36,31 @@ class ScalacOptionsSuite extends BaseCliSuite {
       |/index.md
       |```scala mdoc
       |def baz[T[_]] = ()
-      |baz[Either[Int, ?]]
+      |baz[Either[Int, *]]
       |```
       |""".stripMargin,
     """|/index.md
        |```scala
        |def baz[T[_]] = ()
-       |baz[Either[Int, ?]]
+       |baz[Either[Int, *]]
        |```
-    """.stripMargin
+    """.stripMargin,
+    extraArgs =
+      if (Compat.isScala3)
+        Array(
+          "--scalac-options",
+          "-Ykind-projector"
+        )
+      else Array()
   )
 
   // NOTE(olafur): with -Xfatal-warning, the following program reports the following
   // warning if its wrapped in classes.
   // > warning: The outer reference in this type test cannot be checked at run time.
   // We wrap the code in objects instead of classes to avoid this warning.
+  //
+  // Note(anton): this used to say "final case object", but in Scala3 this produces a warning
+  // that final objects are redundant
   val finalInput: String =
     """
       |/in.md
@@ -58,7 +68,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
       |sealed abstract class Maybe[+A] extends Product with Serializable
       |
       |final case class Just[A](value: A) extends Maybe[A]
-      |final case object Nothing extends Maybe[Nothing]
+      |case object Nothing extends Maybe[Nothing]
       |```
     """.stripMargin
   checkCli(
@@ -71,8 +81,9 @@ class ScalacOptionsSuite extends BaseCliSuite {
     expected = finalInput.replaceFirst("scala mdoc:reset-object", "scala")
   )
 
+  // Removed in Scala3
   checkCli(
-    "-Ywarn-value-discard",
+    "-Ywarn-value-discard".tag(SkipScala3),
     """
       |/index.md
       |```scala mdoc
@@ -100,7 +111,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "no-imports",
+    "no-imports".tag(SkipScala3),
     """
       |/index.md
       |```scala mdoc
@@ -179,6 +190,27 @@ class ScalacOptionsSuite extends BaseCliSuite {
            |// error: type mismatch;
            |//  found   : String("123")
            |//  required: Int
+           |// val x: Int = "123"
+           |//              ^^^^^
+           |```
+           |""".stripMargin,
+      "3.0" ->
+        """|/index.md
+           |```scala
+           |final case class Test(value: Int)
+           |
+           |val test = Test(123)
+           |// test: Test = Test(123)
+           |
+           |test.value
+           |// res0: Int = 123
+           |```
+           |
+           |```scala
+           |val x: Int = "123"
+           |// error:
+           |// Found:    ("123" : String)
+           |// Required: Int
            |// val x: Int = "123"
            |//              ^^^^^
            |```
