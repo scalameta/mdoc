@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.13"
 def scala211 = "2.11.12"
 def scala213 = "2.13.5"
-def scala3 = List("3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1", "3.0.0-M3", "3.0.0-M2")
+def scala3 = List("3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1")
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions ::: scala3
 
@@ -130,18 +130,8 @@ lazy val fansiVersion = Def.setting {
 
 lazy val fs2Version = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "2.1.0"
-  else if (scalaVersion.value == "3.0.0-M2") "2.5.0"
-  else if (scalaVersion.value == "3.0.0-M3") "2.5.3"
   else if (scalaVersion.value == "3.0.0-RC1") "2.5.4"
   else "2.5.5"
-}
-
-lazy val munitVersion = Def.setting {
-  if (scalaVersion.value == "3.0.0-M2")
-    "0.7.21"
-  else if (scalaVersion.value == "3.0.0-M3")
-    "0.7.22"
-  else V.munit
 }
 
 lazy val interfaces = project
@@ -270,7 +260,7 @@ val tests = project
     sharedSettings,
     publish / skip := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % munitVersion.value
+      "org.scalameta" %% "munit" % V.munit
     ),
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -306,7 +296,7 @@ lazy val worksheets = project
     sharedSettings,
     publish / skip := true,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % munitVersion.value % Test
+      "org.scalameta" %% "munit" % V.munit % Test
     )
   )
   .dependsOn(mdoc, tests)
@@ -328,7 +318,7 @@ lazy val unit = project
     ),
     libraryDependencies ++= List(
       "co.fs2" %% "fs2-core" % fs2Version.value,
-      "org.scalameta" %% "munit" % munitVersion.value % Test
+      "org.scalameta" %% "munit" % V.munit % Test
     ),
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -346,7 +336,7 @@ lazy val unitJS = project
     crossScalaVersions --= scala3,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % munitVersion.value % Test
+      "org.scalameta" %% "munit" % V.munit % Test
     ),
     buildInfoPackage := "tests.js",
     buildInfoKeys := Seq[BuildInfoKey](
