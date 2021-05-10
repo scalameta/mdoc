@@ -229,7 +229,7 @@ lazy val mdoc = project
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
         ("org.scalameta" %% "scalameta" % V.scalameta)
           .excludeAll(excludePprint)
-          .withDottyCompat(scalaVersion.value)
+          .cross(CrossVersion.for3Use2_13)
       ),
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
