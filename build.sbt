@@ -67,7 +67,7 @@ def crossSetting[A](
 
 inThisBuild(
   List(
-    scalaVersion := scala212,
+    scalaVersion := scala213,
     crossScalaVersions := scala2Versions ::: scala3,
     organization := "org.scalameta",
     licenses := Seq(
