@@ -1,20 +1,22 @@
 package mdoc.internal.worksheets
 
-import java.{util => ju}
+import coursierapi.Logger
+import mdoc.MainSettings
+import mdoc.internal.cli.Context
+import mdoc.internal.cli.Settings
+import mdoc.internal.io.ConsoleReporter
+import mdoc.internal.markdown.MarkdownCompiler
+import mdoc.internal.markdown.Modifier
+import mdoc.internal.pos.PositionSyntax._
+import mdoc.internal.worksheets.Compat._
+import mdoc.{interfaces => i}
+
 import java.io.File
 import java.io.PrintStream
 import java.nio.file.Path
-import mdoc.internal.pos.PositionSyntax._
-import mdoc.{interfaces => i}
-import mdoc.internal.cli.Context
-import mdoc.internal.cli.Settings
-import scala.meta.internal.io.PathIO
-import mdoc.internal.io.ConsoleReporter
-import mdoc.internal.markdown.MarkdownCompiler
+import java.{util => ju}
 import scala.meta.inputs.Input
-import mdoc.internal.worksheets.Compat._
-import mdoc.MainSettings
-import coursierapi.Logger
+import scala.meta.internal.io.PathIO
 
 class Mdoc(settings: MainSettings) extends i.Mdoc {
 
@@ -46,10 +48,19 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
     }
   }
 
-  def evaluateWorksheet(filename: String, text: String): EvaluatedWorksheet =
+  def evaluateWorksheet(filename: String, text: String): i.EvaluatedWorksheet = {
     new WorksheetProvider(settings.settings).evaluateWorksheet(
       Input.VirtualFile(filename, text),
-      context()
+      context(),
+      modifier = None
+    )
+  }
+
+  def evaluateWorksheet(filename: String, text: String, modifier: String): i.EvaluatedWorksheet =
+    new WorksheetProvider(settings.settings).evaluateWorksheet(
+      Input.VirtualFile(filename, text),
+      context(),
+      Modifier(modifier)
     )
 
   private def context(): Context = {
