@@ -36,7 +36,7 @@ object MdocDialect {
   }
 
   val scala =
-    if (BuildInfo.scalaBinaryVersion.startsWith("3.0"))
+    if (BuildInfo.scalaBinaryVersion.startsWith("3"))
       Scala3.withAllowToplevelTerms(true)
     else Scala213.withAllowToplevelTerms(true)
 }

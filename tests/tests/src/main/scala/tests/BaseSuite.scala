@@ -28,17 +28,9 @@ class BaseSuite extends FunSuite {
           val binaryVersion = tests.BuildInfo.scalaBinaryVersion
           if (test.tags(OnlyScala213) && binaryVersion != "2.13")
             test.tag(munit.Ignore)
-          else if (
-            test
-              .tags(OnlyScala3) && !(binaryVersion.startsWith("0.") || binaryVersion
-              .startsWith("3."))
-          )
+          else if (test.tags(OnlyScala3) && binaryVersion != "3")
             test.tag(munit.Ignore)
-          else if (
-            test
-              .tags(SkipScala3) && (binaryVersion.startsWith("0.") || binaryVersion
-              .startsWith("3."))
-          )
+          else if (test.tags(SkipScala3) && binaryVersion == "3")
             test.tag(munit.Ignore)
           else if (test.tags(SkipScala211) && binaryVersion == "2.11")
             test.tag(munit.Ignore)

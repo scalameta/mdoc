@@ -41,6 +41,13 @@ class ErrorSuite extends BaseMarkdownSuite {
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
            |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |""".stripMargin,
+      "3.0" ->
+        """|error: crash.md:10:1: an implementation is missing
+           |x + y + z
+           |^^^^^^^^^
+           |scala.NotImplementedError: an implementation is missing
+           |        at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
            |""".stripMargin
     )
   )
