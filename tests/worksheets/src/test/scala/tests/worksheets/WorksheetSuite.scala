@@ -351,14 +351,13 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
-  val givenSyntax = if (tests.BuildInfo.scalaVersion == "3.0.0-M2") "as C:" else ": C with"
   checkDiagnostics(
     "dotty-ambiguous-implicit".tag(OnlyScala3),
     s"""|abstract class C:
         |  val x: Int
-        |given c1 $givenSyntax
+        |given c1: C with
         |  val x = 1
-        |given c2 $givenSyntax
+        |given c2: C with
         |  val x = 2
         |def fn(using c: C) = ()
         |val xx = fn

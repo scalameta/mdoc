@@ -3,7 +3,7 @@ import scala.collection.mutable
 def scala212 = "2.12.13"
 def scala211 = "2.11.12"
 def scala213 = "2.13.5"
-def scala3 = List("3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1")
+def scala3 = List("3.0.0", "3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1")
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions ::: scala3
 
@@ -113,7 +113,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.14"
-  val munit = "0.7.25"
+  val munit = "0.7.26"
   val coursier = "1.0.3"
   val scalacheck = "1.15.2"
 }
@@ -317,8 +317,17 @@ lazy val unit = project
       )
     ),
     libraryDependencies ++= List(
-      "co.fs2" %% "fs2-core" % fs2Version.value,
       "org.scalameta" %% "munit" % V.munit % Test
+    ),
+    libraryDependencies ++= crossSetting(
+      scalaVersion.value,
+      if3 = List(
+        ("co.fs2" %% "fs2-core" % fs2Version.value)
+          .cross(CrossVersion.for3Use2_13)
+      ),
+      if2 = List(
+        "co.fs2" %% "fs2-core" % fs2Version.value
+      )
     ),
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
