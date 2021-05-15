@@ -46,11 +46,11 @@ class JsSuite extends BaseMarkdownSuite {
       |             ^^
     """.stripMargin,
     compat = Map(
-      "3.0" -> 
-      """
-      |error: error.md:3:14
-      |Found:    ("" : String)
-      |Required: Int
+      "3.0" ->
+        """
+          |error: error.md:3:14
+          |Found:    ("" : String)
+          |Required: Int
       """.stripMargin
     )
   )
@@ -104,16 +104,16 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin,
     compat = Map(
       "3.0" ->
-      """
-      |error: edit.md:3:14:                
-      |Found:    ("" : String)             
-      |Required: Int                       
-      | val x: Int = ""                     
-      |              ^^                     
-      |error: edit.md:7:17:                
-      |Found:    (42 : Int)                
-      |Required: String                    
-      | val y: String = 42                  
+        """
+          |error: edit.md:3:14:                
+          |Found:    ("" : String)             
+          |Required: Int                       
+          | val x: Int = ""                     
+          |              ^^                     
+          |error: edit.md:7:17:                
+          |Found:    (42 : Int)                
+          |Required: String                    
+          | val y: String = 42                  
       """.stripMargin
     )
   )
@@ -134,10 +134,10 @@ class JsSuite extends BaseMarkdownSuite {
        |        ^
     """.stripMargin,
     compat = Map(
-      "3.0" -> 
-      """
-      |error: isolated.md:7:9
-      |Not found: x
+      "3.0" ->
+        """
+          |error: isolated.md:7:9
+          |Not found: x
       """.stripMargin
     )
   )
@@ -202,13 +202,13 @@ class JsSuite extends BaseMarkdownSuite {
        |                ^^
     """.stripMargin,
     compat = Map(
-      "3.0" -> 
-      """
-      |-error: compile-only-error.md:3:17:
-      |Found:    (42 : Int)
-      |Required: String              
+      "3.0" ->
+        """
+          |-error: compile-only-error.md:3:17:
+          |Found:    (42 : Int)
+          |Required: String              
       """.stripMargin
-      )
+    )
   )
 
   // It's easy to mess up stripMargin multiline strings when generating code with strings.
@@ -286,11 +286,11 @@ class JsSuite extends BaseMarkdownSuite {
       )
     },
     compat = Map(
-      "3.0" -> 
-      """
-      |error:
-      |no-dom.md:3 (mdoc generated code)
-      | value scalajs is not a member of org
+      "3.0" ->
+        """
+          |error:
+          |no-dom.md:3 (mdoc generated code)
+          | value scalajs is not a member of org
       """.stripMargin
     )
   )
