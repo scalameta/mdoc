@@ -117,8 +117,9 @@ class MarkdownCompiler(
       freshContext: Option[Context] = None
   ): Unit = {
     clearTarget()
+    val context = freshContext.getOrElse(newContext)
     val compiler = new Compiler
-    val run = compiler.newRun(using freshContext.getOrElse(context))
+    val run = compiler.newRun(using context)
     val inputs = List(input)
     val res = scala.util.Try(run.compileSources(inputs.map(toSource)))
     report(vreporter, input, fileImports, run.runContext, edit)

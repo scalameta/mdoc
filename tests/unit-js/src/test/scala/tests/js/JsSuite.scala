@@ -101,7 +101,21 @@ class JsSuite extends BaseMarkdownSuite {
        | required: String
        |val y: String = 42
        |                ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "3.0" ->
+      """
+      |error: edit.md:3:14:                
+      |Found:    ("" : String)             
+      |Required: Int                       
+      | val x: Int = ""                     
+      |              ^^                     
+      |error: edit.md:7:17:                
+      |Found:    (42 : Int)                
+      |Required: String                    
+      | val y: String = 42                  
+      """.stripMargin
+    )
   )
 
   checkError(
@@ -118,7 +132,14 @@ class JsSuite extends BaseMarkdownSuite {
     """|error: isolated.md:7:9: not found: value x
        |println(x)
        |        ^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "3.0" -> 
+      """
+      |error: isolated.md:7:9
+      |Not found: x
+      """.stripMargin
+    )
   )
 
   checkCompiles(

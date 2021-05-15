@@ -147,18 +147,8 @@ class JsModifier extends mdoc.PreModifier {
     val edit = TokenEditDistance.fromInputs(inputs, input)
     val oldErrors = ctx.reporter.errorCount
 
-    // val newCode = """
-    // |object mdocjs {                        
-    // |  @_root_.scala.scalajs.js.annotation.JSExportTopLevel("mdoc_js_run0")  
-    // |  def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {      
-    // |   println("hello world!")                                               
-    // |  }                                                                                                                                          
-    // |}                                                                     
-    // """.stripMargin
-    // val newInput = Input.VirtualFile(ctx.relativePath.toString(), newCode)
     compiler.compileSources(input, ctx.reporter, edit, fileImports = Nil)
     val hasErrors = ctx.reporter.errorCount > oldErrors
-    println(target.isDirectory)
     val sjsir = for {
       x <- target.toList
       if x.name.endsWith(".sjsir")
