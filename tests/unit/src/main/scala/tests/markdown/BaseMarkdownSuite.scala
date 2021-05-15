@@ -73,15 +73,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
         postProcessObtained
       )
-      val compatExpected =
-        Compat(expected, compat, postProcessObtained)
-      val compatObtained =
-        Compat(obtainedErrors, compat, postProcessObtained)
 
-      // println(s"obtained: '$obtainedErrors'")
-      // println(s"expected: '$expected'")
-      // println(s"Compat obtained: '$compatObtained'")
-      // println(s"Compat expected: '$compatExpected'")
       assertNoDiff(
         Compat(obtainedErrors, Map.empty, postProcessObtained),
         Compat(expected, compat, postProcessExpected)
