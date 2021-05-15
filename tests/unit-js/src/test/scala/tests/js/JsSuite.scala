@@ -203,7 +203,7 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """|error: compile-only-error.md:3:17: type mismatch;
        | found   : Int(42)
-       | re!quired: String
+       | required: String
        |val x: String = 42
        |                ^^
     """.stripMargin,
