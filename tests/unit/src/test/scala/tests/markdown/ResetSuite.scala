@@ -38,7 +38,7 @@ class ResetSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |implicit val x: Int = 42
            |// x: Int = 42

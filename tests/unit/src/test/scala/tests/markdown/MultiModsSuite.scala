@@ -27,7 +27,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|
            |```scala
            |val x = 1

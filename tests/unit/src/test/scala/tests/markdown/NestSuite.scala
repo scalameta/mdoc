@@ -1,11 +1,10 @@
 package tests.markdown
 
-
 class NestSuite extends BaseMarkdownSuite {
 
   override def postProcessExpected: Map[Compat.ScalaVersion, String => String] =
     Map(
-      Compat.Scala213 ->  { old => old.replace("of type => Int", "of type Int") }
+      Compat.Scala213 -> { old => old.replace("of type => Int", "of type Int") }
     )
 
   check(
@@ -74,7 +73,7 @@ class NestSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|```scala
            |case class User(name: String)
            |val susan = User("Susan")
@@ -88,7 +87,7 @@ class NestSuite extends BaseMarkdownSuite {
            |// res0: App.this.type.User = User(name = "Susan")
            |```
            |""".stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |case class User(name: String)
            |val susan = User("Susan")
@@ -248,11 +247,11 @@ class NestSuite extends BaseMarkdownSuite {
       |implicitly[Int]
       |```
     """.stripMargin,
-        """
-          |error: reset-scala3.md:9:15:
-          |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
-          |implicitly[Int]
-          |              ^
+    """
+      |error: reset-scala3.md:9:15:
+      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |implicitly[Int]
+      |              ^
          """.stripMargin
   )
 
@@ -379,7 +378,7 @@ class NestSuite extends BaseMarkdownSuite {
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|error: anyval-nok.md:6:7:
            |Value classes may not be a local class
            |class Foo(val x: Int) extends AnyVal
@@ -415,7 +414,7 @@ class NestSuite extends BaseMarkdownSuite {
        |	at repl.MdocSession$.app(stacktrace.md:3)
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|error: stacktrace.md:14:1: null
            |boom(x > 4)
            |^^^^^^^^^^^
@@ -451,7 +450,7 @@ class NestSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """
           |error:
           |Not found: y 

@@ -38,7 +38,7 @@ class AsyncSuite extends BaseMarkdownSuite {
        |	at repl.MdocSession$.app(timeout.md:3)
        |""".stripMargin,
     compat = Map(
-      Compat.Scala211 -> 
+      Compat.Scala211 ->
         """|error: timeout.md:4:1: Futures timed out after [10 milliseconds]
            |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
            |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -51,7 +51,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at repl.MdocSession$App.<init>(timeout.md:11)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|error: timeout.md:4:1: Future timed out after [10 milliseconds]
            |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
            |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64,7 +64,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at repl.MdocSession$App.<init>(timeout.md:11)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|error: timeout.md:4:1: Future timed out after [10 milliseconds]
            |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
            |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

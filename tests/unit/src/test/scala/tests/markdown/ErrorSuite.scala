@@ -35,14 +35,14 @@ class ErrorSuite extends BaseMarkdownSuite {
        |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
        |""".stripMargin,
     compat = Map(
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|error: crash.md:10:1: an implementation is missing
            |x + y + z
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
            |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
            |""".stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|error: crash.md:10:1: an implementation is missing
            |x + y + z
            |^^^^^^^^^

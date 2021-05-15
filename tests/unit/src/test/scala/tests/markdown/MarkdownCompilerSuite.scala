@@ -72,7 +72,7 @@ class MarkdownCompilerSuite extends FunSuite {
       |```
         """.stripMargin,
     compat = Map(
-      Compat.Scala211 -> 
+      Compat.Scala211 ->
         """
           |```scala
           |val x = 1.to(10)
@@ -83,7 +83,7 @@ class MarkdownCompilerSuite extends FunSuite {
           |// y: Int = 10
           |```
           |""".stripMargin,
-      Compat.Scala212 -> 
+      Compat.Scala212 ->
         """
           |```scala
           |val x = 1.to(10)
@@ -94,7 +94,7 @@ class MarkdownCompilerSuite extends FunSuite {
           |// y: Int = 10
           |```
           |""".stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """
           |```scala
           |val x = 1.to(10)

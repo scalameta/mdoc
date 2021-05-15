@@ -28,7 +28,7 @@ class NamespaceHygieneSuite extends BaseMarkdownSuite {
        |        ^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """
           |error: cannot import something called MdocSession.md:3:9:
           |Reference to MdocSession is ambiguous,

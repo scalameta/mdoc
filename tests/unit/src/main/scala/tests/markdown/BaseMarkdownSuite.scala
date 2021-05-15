@@ -73,9 +73,9 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
         postProcessObtained
       )
-      val compatExpected = 
+      val compatExpected =
         Compat(expected, compat, postProcessObtained)
-      val compatObtained = 
+      val compatObtained =
         Compat(obtainedErrors, compat, postProcessObtained)
 
       // println(s"obtained: '$obtainedErrors'")

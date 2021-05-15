@@ -19,7 +19,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|```scala
            |val x = 1
            |???
@@ -29,7 +29,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
            |```
     """.stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |val x = 1
            |???
@@ -87,7 +87,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |1 match {
            |  case 2 => // boom!
@@ -116,7 +116,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|```scala
            |???
            |// scala.NotImplementedError: an implementation is missing
@@ -125,7 +125,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$App$$anonfun$1.apply(relative.md:9)
            |```
     """.stripMargin,
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |???
            |// scala.NotImplementedError: an implementation is missing
@@ -151,7 +151,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |throw new StackOverflowError()
            |// java.lang.StackOverflowError
@@ -176,7 +176,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |throw new NoClassDefFoundError()
            |// java.lang.NoClassDefFoundError
@@ -201,7 +201,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |throw new NoSuchMethodError()
            |// java.lang.NoSuchMethodError
@@ -226,7 +226,7 @@ class CrashSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> 
+      Compat.Scala3 ->
         """|```scala
            |throw new IncompatibleClassChangeError()
            |// java.lang.IncompatibleClassChangeError

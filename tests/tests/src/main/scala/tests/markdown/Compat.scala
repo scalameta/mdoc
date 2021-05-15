@@ -30,7 +30,7 @@ object Compat {
   private def binary: ScalaVersion = {
     BuildInfo.scalaBinaryVersion match {
       case "2.11" => Scala211
-      case "2.12" => Scala212 
+      case "2.12" => Scala212
       case "2.13" => Scala213
       case "3" => Scala3
       case s if s.startsWith("3.0") => Scala3

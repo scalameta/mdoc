@@ -41,7 +41,7 @@ class SemanticsSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      Compat.Scala213 -> 
+      Compat.Scala213 ->
         """|```scala
            |case class User(name: String)
            |object User {
