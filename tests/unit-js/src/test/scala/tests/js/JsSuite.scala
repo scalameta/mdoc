@@ -44,7 +44,15 @@ class JsSuite extends BaseMarkdownSuite {
       | required: Int
       |val x: Int = ""
       |             ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "3.0" -> 
+      """
+      |error: error.md:3:14
+      |Found:    ("" : String)
+      |Required: Int
+      """.stripMargin
+    )
   )
 
   check(
@@ -171,7 +179,15 @@ class JsSuite extends BaseMarkdownSuite {
        | required: String
        |val x: String = 42
        |                ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      "3.0" -> 
+      """
+      |-error: compile-only-error.md:3:17:
+      |Found:    (42 : Int)
+      |Required: String              
+      """.stripMargin
+      )
   )
 
   // It's easy to mess up stripMargin multiline strings when generating code with strings.
@@ -246,7 +262,15 @@ class JsSuite extends BaseMarkdownSuite {
       baseSettings.copy(
         site = baseSettings.site.updated("js-classpath", Classpath(noScalajsDom).syntax)
       )
-    }
+    },
+    compat = Map(
+      "3.0" -> 
+      """
+      |error:
+      |no-dom.md:3 (mdoc generated code)
+      | value scalajs is not a member of org
+      """.stripMargin
+    )
   )
 
   checkError(
