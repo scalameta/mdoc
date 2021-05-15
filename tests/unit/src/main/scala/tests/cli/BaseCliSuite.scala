@@ -23,9 +23,9 @@ abstract class BaseCliSuite extends BaseSuite {
   }
   val in = new TemporaryDirectory("in")
   val out = new TemporaryDirectory("out")
-  override def postProcessObtained: Map[String, String => String] =
+  override def postProcessObtained: Map[Compat.ScalaVersion, String => String] =
     Map(
-      "all" -> { old =>
+      Compat.All -> { old =>
         old
           .replace(out().toString(), "<output>")
           .replace(in().toString(), "<input>")
@@ -47,7 +47,7 @@ abstract class BaseCliSuite extends BaseSuite {
       expectedExitCode: => Int = 0,
       onStdout: String => Unit = _ => (),
       includeOutputPath: RelativePath => Boolean = _ => true,
-      compat: Map[String, String] = Map.empty
+      compat: Map[Compat.ScalaVersion, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     test(name) {
       myStdout.reset()

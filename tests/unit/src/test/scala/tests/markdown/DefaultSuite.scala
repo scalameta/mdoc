@@ -140,7 +140,7 @@ class DefaultSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "2.13" ->
+      Compat.Scala213 -> 
         """|```scala
            |case class User(name: String, age: Int)
            |User("John", 42)

@@ -60,7 +60,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       original: String,
       expected: String,
       settings: Settings = baseSettings,
-      compat: Map[String, String] = Map.empty
+      compat: Map[Compat.ScalaVersion, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     test(name) {
       val reporter = newReporter()
@@ -73,8 +73,17 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
         postProcessObtained
       )
+      val compatExpected = 
+        Compat(expected, compat, postProcessObtained)
+      val compatObtained = 
+        Compat(obtainedErrors, compat, postProcessObtained)
+
+      // println(s"obtained: '$obtainedErrors'")
+      // println(s"expected: '$expected'")
+      // println(s"Compat obtained: '$compatObtained'")
+      // println(s"Compat expected: '$compatExpected'")
       assertNoDiff(
-        Compat(obtainedErrors, compat, postProcessObtained),
+        Compat(obtainedErrors, Map.empty, postProcessObtained),
         Compat(expected, compat, postProcessExpected)
       )
     }
@@ -107,7 +116,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       original: String,
       expected: String,
       settings: Settings = baseSettings,
-      compat: Map[String, String] = Map.empty
+      compat: Map[Compat.ScalaVersion, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     checkCompiles(
       name,

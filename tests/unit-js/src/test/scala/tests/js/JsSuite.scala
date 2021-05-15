@@ -5,6 +5,7 @@ import scala.meta.io.Classpath
 import tests.markdown.StringSyntax._
 import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
+import tests.markdown.Compat
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
@@ -46,11 +47,13 @@ class JsSuite extends BaseMarkdownSuite {
       |             ^^
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |error: error.md:3:14
+          |error: error.md:3:14:
           |Found:    ("" : String)
           |Required: Int
+          |val x: Int = ""
+          |             ^^
       """.stripMargin
     )
   )
@@ -103,17 +106,18 @@ class JsSuite extends BaseMarkdownSuite {
        |                ^^
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |error: edit.md:3:14:                
-          |Found:    ("" : String)             
-          |Required: Int                       
-          | val x: Int = ""                     
-          |              ^^                     
-          |error: edit.md:7:17:                
-          |Found:    (42 : Int)                
-          |Required: String                    
-          | val y: String = 42                  
+          |error: edit.md:3:14:
+          |Found:    ("" : String)
+          |Required: Int
+          |val x: Int = ""
+          |             ^^
+          |error: edit.md:7:17:
+          |Found:    (42 : Int)
+          |Required: String
+          |val y: String = 42
+          |                ^^
       """.stripMargin
     )
   )
@@ -134,10 +138,12 @@ class JsSuite extends BaseMarkdownSuite {
        |        ^
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |error: isolated.md:7:9
+          |error: isolated.md:7:9:
           |Not found: x
+          |println(x)
+          |        ^
       """.stripMargin
     )
   )
@@ -197,16 +203,18 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """|error: compile-only-error.md:3:17: type mismatch;
        | found   : Int(42)
-       | required: String
+       | re!quired: String
        |val x: String = 42
        |                ^^
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |-error: compile-only-error.md:3:17:
+          |error: compile-only-error.md:3:17:
           |Found:    (42 : Int)
-          |Required: String              
+          |Required: String
+          |val x: String = 42
+          |                ^^
       """.stripMargin
     )
   )
@@ -286,11 +294,23 @@ class JsSuite extends BaseMarkdownSuite {
       )
     },
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
           |error:
           |no-dom.md:3 (mdoc generated code)
           | value scalajs is not a member of org
+          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+          |
+          |112
+          |
+          |error:
+          |no-dom.md:3 (mdoc generated code)
+          | (<error value scalajs is not a member of org>#dom.raw :
+          |  <error value scalajs is not a member of org>
+          |) is not a valid type prefix, since it is not an immutable path
+          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+          |
+          |124
       """.stripMargin
     )
   )

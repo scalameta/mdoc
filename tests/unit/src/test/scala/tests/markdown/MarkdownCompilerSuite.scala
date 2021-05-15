@@ -28,7 +28,7 @@ class MarkdownCompilerSuite extends FunSuite {
       name: String,
       original: List[String],
       expected: String,
-      compat: Map[String, String] = Map.empty
+      compat: Map[Compat.ScalaVersion, String] = Map.empty
   ): Unit = {
     test(name) {
       val inputs = original.map(s => Input.String(s))
@@ -72,7 +72,7 @@ class MarkdownCompilerSuite extends FunSuite {
       |```
         """.stripMargin,
     compat = Map(
-      "2.11" ->
+      Compat.Scala211 -> 
         """
           |```scala
           |val x = 1.to(10)
@@ -83,7 +83,7 @@ class MarkdownCompilerSuite extends FunSuite {
           |// y: Int = 10
           |```
           |""".stripMargin,
-      "2.12" ->
+      Compat.Scala212 -> 
         """
           |```scala
           |val x = 1.to(10)
@@ -94,7 +94,7 @@ class MarkdownCompilerSuite extends FunSuite {
           |// y: Int = 10
           |```
           |""".stripMargin,
-      "3.0" ->
+      Compat.Scala3 -> 
         """
           |```scala
           |val x = 1.to(10)

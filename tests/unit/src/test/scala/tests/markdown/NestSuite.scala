@@ -1,10 +1,11 @@
 package tests.markdown
 
+
 class NestSuite extends BaseMarkdownSuite {
 
-  override def postProcessExpected: Map[String, String => String] =
+  override def postProcessExpected: Map[Compat.ScalaVersion, String => String] =
     Map(
-      "2.13" -> { old => old.replace("of type => Int", "of type Int") }
+      Compat.Scala213 ->  { old => old.replace("of type => Int", "of type Int") }
     )
 
   check(
@@ -73,7 +74,7 @@ class NestSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      "2.13" ->
+      Compat.Scala213 -> 
         """|```scala
            |case class User(name: String)
            |val susan = User("Susan")
@@ -87,7 +88,7 @@ class NestSuite extends BaseMarkdownSuite {
            |// res0: App.this.type.User = User(name = "Susan")
            |```
            |""".stripMargin,
-      "3.0" ->
+      Compat.Scala3 -> 
         """|```scala
            |case class User(name: String)
            |val susan = User("Susan")
@@ -247,22 +248,12 @@ class NestSuite extends BaseMarkdownSuite {
       |implicitly[Int]
       |```
     """.stripMargin,
-    """|error: reset.md:9:1: could not find implicit value for parameter e: Int
-       |implicitly[Int]
-       |^^^^^^^^^^^^^^^
-       |""".stripMargin,
-    compat = Map(
-      "3.0" ->
         """
-          |
-          |error:
-          |reset-scala3.md:26 (mdoc generated code)
-          | no implicit argument of type Int was found for parameter e of method implicitly in object
-         Predef
-          |    implicitly[Int]
-          |
+          |error: reset-scala3.md:9:15:
+          |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+          |implicitly[Int]
+          |              ^
          """.stripMargin
-    )
   )
 
   checkError(
@@ -388,8 +379,8 @@ class NestSuite extends BaseMarkdownSuite {
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |""".stripMargin,
     compat = Map(
-      "3.0" ->
-        """|error: anyval-nok.md:6:1: 
+      Compat.Scala3 -> 
+        """|error: anyval-nok.md:6:7:
            |Value classes may not be a local class
            |class Foo(val x: Int) extends AnyVal
            |      ^
@@ -424,7 +415,7 @@ class NestSuite extends BaseMarkdownSuite {
        |	at repl.MdocSession$.app(stacktrace.md:3)
        |""".stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 -> 
         """|error: stacktrace.md:14:1: null
            |boom(x > 4)
            |^^^^^^^^^^^
@@ -460,7 +451,7 @@ class NestSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 -> 
         """
           |error:
           |Not found: y 
