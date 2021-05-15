@@ -261,7 +261,8 @@ class JsSuite extends BaseMarkdownSuite {
     "onclick",
     """
       |```scala mdoc:js
-      |node.onclick = {_ => println(42)}
+      |import org.scalajs.dom.raw.MouseEvent
+      |node.onclick = {(_: MouseEvent) => println(42)}
       |```
     """.stripMargin
   )
