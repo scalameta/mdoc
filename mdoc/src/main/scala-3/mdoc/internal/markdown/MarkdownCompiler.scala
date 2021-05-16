@@ -128,7 +128,8 @@ class MarkdownCompiler(
   class CollectionReporter extends dotty.tools.dotc.reporting.Reporter {
     val allDiags = List.newBuilder[Diagnostic]
 
-    override def doReport(dia: Diagnostic)(using Context) = allDiags += dia
+    override def doReport(dia: Diagnostic)(using Context) = 
+      allDiags += dia
 
     override def pendingMessages(using Context) = allDiags.result()
   }
@@ -274,7 +275,6 @@ class MarkdownCompiler(
     new CodeBuilder()
       .println(s"${pos.source().path()}:${pos.line + 1} (mdoc generated code) \n $message")
       .println(pos.lineContent)
-      .println(pos.point().toString)
       .toString
 
 }
