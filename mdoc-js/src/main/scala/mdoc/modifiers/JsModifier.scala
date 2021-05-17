@@ -15,7 +15,6 @@ import scala.collection.mutable.ListBuffer
 import scala.meta.Term
 import scala.meta.inputs.Input
 import scala.meta.io.{AbsolutePath, Classpath}
-import scala.reflect.io.VirtualDirectory
 import org.scalajs.linker.interface.StandardConfig
 import org.scalajs.linker.StandardImpl
 import org.scalajs.linker.PathIRContainer
@@ -35,7 +34,7 @@ class JsModifier extends mdoc.PreModifier {
   override val name = "js"
   override def toString: String = s"JsModifier($config)"
   val irCache = new StandardIRFileCache
-  val target = new VirtualDirectory("(memory)", None)
+  val target = CompilerCompat.abstractFile("(memory)")
   var maybeCompiler: Option[MarkdownCompiler] = None
   var config = JsConfig()
   var linker: ClearableLinker = newLinker()
@@ -147,6 +146,7 @@ class JsModifier extends mdoc.PreModifier {
     val input = Input.VirtualFile(ctx.relativePath.toString(), wrapped)
     val edit = TokenEditDistance.fromInputs(inputs, input)
     val oldErrors = ctx.reporter.errorCount
+
     compiler.compileSources(input, ctx.reporter, edit, fileImports = Nil)
     val hasErrors = ctx.reporter.errorCount > oldErrors
     val sjsir = for {

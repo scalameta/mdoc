@@ -1,12 +1,15 @@
 package tests.markdown
 
 import tests.markdown.StringSyntax._
+import tests.markdown.Compat
 
 class FailSuite extends BaseMarkdownSuite {
 
-  override def postProcessExpected: Map[String, String => String] =
+  override def postProcessExpected: Map[Compat.ScalaVersion, String => String] =
     Map(
-      "2.13" -> { old => old.replace("(fo: F[O])fs2.Stream[F,O]", "(fo: F[O]): fs2.Stream[F,O]") }
+      Compat.Scala213 -> { old =>
+        old.replace("(fo: F[O])fs2.Stream[F,O]", "(fo: F[O]): fs2.Stream[F,O]")
+      }
     )
 
   check(
@@ -26,7 +29,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|```scala
            |val x: Int = "String"
            |// error: 
@@ -61,7 +64,7 @@ class FailSuite extends BaseMarkdownSuite {
       |```
       |""".stripMargin.triplequoted,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
           |```scala
           |val y: Int = '''Triplequote
@@ -90,9 +93,9 @@ class FailSuite extends BaseMarkdownSuite {
       |^^^^^^
       |""".stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |error: fail-error.md:3:1
+          |error: fail-error.md:3:1:
           |Not found: foobar
           |foobar
           |^^^^^^
@@ -131,9 +134,9 @@ class FailSuite extends BaseMarkdownSuite {
       |        ^^^^^^
       |""".stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
-          |error: mixed-error.md:3:9
+          |error: mixed-error.md:3:9:
           |Not found: foobar
           |val x = foobar
           |        ^^^^^^
@@ -165,7 +168,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|```scala
            |println(42)
            |// 42
@@ -207,7 +210,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|```scala
            |fs2.Stream.eval(println("Do not ever do this"))
            |// error:
@@ -244,7 +247,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|```scala
            |println(notfound)
            |println(b)
@@ -301,7 +304,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|```scala
            |val x = 1
            |println(notfound)
@@ -357,7 +360,7 @@ class FailSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """|
            |```scala
            |final case class FloatValue(val value: Float) extends AnyVal

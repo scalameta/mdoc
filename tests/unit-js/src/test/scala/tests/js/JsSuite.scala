@@ -5,6 +5,7 @@ import scala.meta.io.Classpath
 import tests.markdown.StringSyntax._
 import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
+import tests.markdown.Compat
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
@@ -44,7 +45,17 @@ class JsSuite extends BaseMarkdownSuite {
       | required: Int
       |val x: Int = ""
       |             ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |error: error.md:3:14:
+          |Found:    ("" : String)
+          |Required: Int
+          |val x: Int = ""
+          |             ^^
+      """.stripMargin
+    )
   )
 
   check(
@@ -93,7 +104,22 @@ class JsSuite extends BaseMarkdownSuite {
        | required: String
        |val y: String = 42
        |                ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |error: edit.md:3:14:
+          |Found:    ("" : String)
+          |Required: Int
+          |val x: Int = ""
+          |             ^^
+          |error: edit.md:7:17:
+          |Found:    (42 : Int)
+          |Required: String
+          |val y: String = 42
+          |                ^^
+      """.stripMargin
+    )
   )
 
   checkError(
@@ -110,7 +136,16 @@ class JsSuite extends BaseMarkdownSuite {
     """|error: isolated.md:7:9: not found: value x
        |println(x)
        |        ^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |error: isolated.md:7:9:
+          |Not found: x
+          |println(x)
+          |        ^
+      """.stripMargin
+    )
   )
 
   checkCompiles(
@@ -171,7 +206,17 @@ class JsSuite extends BaseMarkdownSuite {
        | required: String
        |val x: String = 42
        |                ^^
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |error: compile-only-error.md:3:17:
+          |Found:    (42 : Int)
+          |Required: String
+          |val x: String = 42
+          |                ^^
+      """.stripMargin
+    )
   )
 
   // It's easy to mess up stripMargin multiline strings when generating code with strings.
@@ -247,7 +292,24 @@ class JsSuite extends BaseMarkdownSuite {
       baseSettings.copy(
         site = baseSettings.site.updated("js-classpath", Classpath(noScalajsDom).syntax)
       )
-    }
+    },
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |error:
+          |no-dom.md:3 (mdoc generated code)
+          | value scalajs is not a member of org
+          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+          |
+          |
+          |error:
+          |no-dom.md:3 (mdoc generated code)
+          | (<error value scalajs is not a member of org>#dom.raw :
+          |  <error value scalajs is not a member of org>
+          |) is not a valid type prefix, since it is not an immutable path
+          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+      """.stripMargin
+    )
   )
 
   checkError(

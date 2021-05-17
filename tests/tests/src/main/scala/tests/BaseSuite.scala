@@ -5,8 +5,8 @@ import munit.Location
 import tests.markdown.Compat
 
 class BaseSuite extends FunSuite {
-  def postProcessObtained: Map[String, String => String] = Map.empty
-  def postProcessExpected: Map[String, String => String] = Map.empty
+  def postProcessObtained: Map[Compat.ScalaVersion, String => String] = Map.empty
+  def postProcessExpected: Map[Compat.ScalaVersion, String => String] = Map.empty
   override def assertNoDiff(obtained: String, expected: String, clue: => Any)(implicit
       loc: Location
   ): Unit = {

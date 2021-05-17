@@ -2,9 +2,9 @@ package tests.markdown
 
 class ErrorSuite extends BaseMarkdownSuite {
 
-  override def postProcessObtained: Map[String, String => String] =
+  override def postProcessObtained: Map[Compat.ScalaVersion, String => String] =
     Map(
-      "all" -> { old =>
+      Compat.All -> { old =>
         old.linesIterator
           .filterNot { line =>
             line.startsWith("did you mean") ||
@@ -35,20 +35,24 @@ class ErrorSuite extends BaseMarkdownSuite {
        |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
        |""".stripMargin,
     compat = Map(
-      "2.13" ->
+      Compat.Scala213 ->
         """|error: crash.md:10:1: an implementation is missing
            |x + y + z
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
-           |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
+           |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
            |""".stripMargin,
-      "3.0" ->
+      Compat.Scala3 -> {
+        // Anton: for some reason, the compiler(?) returns tab in this particular place
+        val tab = "\t"
+
         """|error: crash.md:10:1: an implementation is missing
            |x + y + z
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
-           |        at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
-           |""".stripMargin
+           |<TAB>at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
+           """.stripMargin.replace("<TAB>", tab)
+      }
     )
   )
 

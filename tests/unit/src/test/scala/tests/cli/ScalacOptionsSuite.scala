@@ -173,7 +173,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
       "-Ywarn-value-discard"
     ),
     compat = Map(
-      "2.13" ->
+      Compat.Scala213 ->
         """|/index.md
            |```scala
            |final case class Test(value: Int)
@@ -194,7 +194,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
            |//              ^^^^^
            |```
            |""".stripMargin,
-      "3.0" ->
+      Compat.Scala3 ->
         """|/index.md
            |```scala
            |final case class Test(value: Int)

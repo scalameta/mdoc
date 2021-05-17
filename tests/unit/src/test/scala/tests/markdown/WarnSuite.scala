@@ -18,7 +18,7 @@ class WarnSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin,
     compat = Map(
-      "3.0" ->
+      Compat.Scala3 ->
         """
           |
           | warn:

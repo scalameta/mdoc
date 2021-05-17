@@ -53,6 +53,7 @@ class MarkdownCompiler(
     target: AbstractFile = new VirtualDirectory("(memory)")
 ) {
 
+
   private def newContext: FreshContext = {
     val defaultFlags =
       List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
@@ -60,7 +61,14 @@ class MarkdownCompiler(
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
     val driver = new InteractiveDriver(settings.distinct)
-    driver.currentCtx.fresh.setReporter(new CollectionReporter)
+
+    val ctx = driver.currentCtx.fresh
+
+    ctx
+      .setReporter(new CollectionReporter)
+      .setSetting(
+        ctx.settings.outputDir, target
+      )
   }
 
   private var context = newContext
@@ -106,20 +114,22 @@ class MarkdownCompiler(
       vreporter: Reporter,
       edit: TokenEditDistance,
       fileImports: List[FileImport],
-      context: Context
+      freshContext: Option[Context] = None
   ): Unit = {
     clearTarget()
+    val context = freshContext.getOrElse(newContext)
     val compiler = new Compiler
     val run = compiler.newRun(using context)
     val inputs = List(input)
-    scala.util.Try(run.compileSources(inputs.map(toSource)))
+    val res = scala.util.Try(run.compileSources(inputs.map(toSource)))
     report(vreporter, input, fileImports, run.runContext, edit)
   }
 
   class CollectionReporter extends dotty.tools.dotc.reporting.Reporter {
     val allDiags = List.newBuilder[Diagnostic]
 
-    override def doReport(dia: Diagnostic)(using Context) = allDiags += dia
+    override def doReport(dia: Diagnostic)(using Context) = 
+      allDiags += dia
 
     override def pendingMessages(using Context) = allDiags.result()
   }
@@ -139,7 +149,7 @@ class MarkdownCompiler(
       target
     )
 
-    compileSources(input, vreporter, edit, fileImports, freshContext)
+    compileSources(input, vreporter, edit, fileImports, Some(freshContext))
     if (!freshContext.reporter.hasErrors) {
       val loader = new AbstractFileClassLoader(target, appClassLoader)
       try {
@@ -226,7 +236,6 @@ class MarkdownCompiler(
   ): Unit = {
 
     val infos = context.reporter.pendingMessages(using context).toSeq.sortBy(_.pos.source.path)
-
     infos.foreach {
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
@@ -266,7 +275,6 @@ class MarkdownCompiler(
     new CodeBuilder()
       .println(s"${pos.source().path()}:${pos.line + 1} (mdoc generated code) \n $message")
       .println(pos.lineContent)
-      .println(pos.point().toString)
       .toString
 
 }

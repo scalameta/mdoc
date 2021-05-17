@@ -275,12 +275,11 @@ val jsdocs = project
   .settings(
     sharedSettings,
     publish / skip := true,
-    crossScalaVersions --= scala3,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % scalajsDom
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom cross CrossVersion.for3Use2_13
     ),
     scalaJSUseMainModuleInitializer := true,
     Compile / npmDependencies ++= List(
@@ -342,7 +341,6 @@ lazy val unitJS = project
   .settings(
     sharedSettings,
     publish / skip := true,
-    crossScalaVersions --= scala3,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies ++= List(
       "org.scalameta" %% "munit" % V.munit % Test
@@ -400,7 +398,6 @@ lazy val js = project
   .in(file("mdoc-js"))
   .settings(
     sharedSettings,
-    crossScalaVersions --= scala3,
     moduleName := "mdoc-js",
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
     libraryDependencies ++= crossSetting(
@@ -409,7 +406,9 @@ lazy val js = project
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
         "org.scala-js" %% "scalajs-linker" % scalajs
       ),
-      if3 = List()
+      if3 = List(
+        "org.scala-js" %% "scalajs-linker" % scalajs cross CrossVersion.for3Use2_13
+      )
     )
   )
   .dependsOn(mdoc)

@@ -1,12 +1,13 @@
 package tests.imports
 
 import tests.markdown.BaseMarkdownSuite
+import tests.markdown.Compat
 
 class DependencySuite extends BaseMarkdownSuite {
   val userHome = System.getProperty("user.home")
-  override def postProcessObtained: Map[String, String => String] =
+  override def postProcessObtained: Map[Compat.ScalaVersion, String => String] =
     Map(
-      "all" -> { old =>
+      Compat.All -> { old =>
         old.linesIterator
           .map {
             case line if line.contains(userHome) =>
