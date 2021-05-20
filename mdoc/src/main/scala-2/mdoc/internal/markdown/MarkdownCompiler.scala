@@ -42,6 +42,7 @@ class MarkdownCompiler(
   settings.unchecked.value = true // enable detailed unchecked warnings
   settings.outputDirs.setSingleOutput(target)
   settings.classpath.value = classpath
+  settings.exposeEmptyPackage.value = true
   // enable -Ydelambdafy:inline to avoid future timeouts, see:
   //   https://github.com/scala/bug/issues/9824
   //   https://github.com/scalameta/mdoc/issues/124
