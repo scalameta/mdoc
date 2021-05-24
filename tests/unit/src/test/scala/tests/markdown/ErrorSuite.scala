@@ -13,7 +13,7 @@ class ErrorSuite extends BaseMarkdownSuite {
           .mkString("\n")
       }
     )
-
+  private val tab = "\t"
   checkError(
     "crash",
     """
@@ -40,19 +40,16 @@ class ErrorSuite extends BaseMarkdownSuite {
            |x + y + z
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
-           |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
-           |""".stripMargin,
-      Compat.Scala3 -> {
+           |<TAB>at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
+           |""".stripMargin.replace("<TAB>", tab),
+      Compat.Scala3 ->
         // Anton: for some reason, the compiler(?) returns tab in this particular place
-        val tab = "\t"
-
         """|error: crash.md:10:1: an implementation is missing
            |x + y + z
            |^^^^^^^^^
            |scala.NotImplementedError: an implementation is missing
            |<TAB>at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
            """.stripMargin.replace("<TAB>", tab)
-      }
     )
   )
 
