@@ -2,12 +2,12 @@ import scala.collection.mutable
 
 def scala212 = "2.12.13"
 def scala211 = "2.11.12"
-def scala213 = "2.13.5"
+def scala213 = "2.13.6"
 def scala3 = List("3.0.0", "3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1")
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions ::: scala3
 
-def scalajs = "1.5.0"
+def scalajs = "1.5.1"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "1.1.0"
 

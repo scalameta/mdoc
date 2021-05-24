@@ -31,7 +31,7 @@ jobs:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12 test'"
           - "'++2.12.13 test' scripted"
-          - "'++2.13.5 test'"
+          - "'++2.13.6 test'"
           - "'++3.0.0 test'"
     steps:
       - uses: actions/checkout@v2
