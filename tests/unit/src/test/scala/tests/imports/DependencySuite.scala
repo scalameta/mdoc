@@ -80,7 +80,7 @@ class DependencySuite extends BaseMarkdownSuite {
       |println(42)
       |```
       | """.stripMargin,
-    """|error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.13.5:2.3.4
+    """|error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_2.13.6:2.3.4
        |<redacted user.home>
        |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_2.13.5/2.3.4/not-exists_2.13.5-2.3.4.pom
        |import $dep.`org.scalameta:::not-exists:2.3.4`
