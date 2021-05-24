@@ -114,7 +114,7 @@ lazy val sharedSettings = List(
 val V = new {
   val scalameta = "4.4.14"
   val munit = "0.7.26"
-  val coursier = "1.0.3"
+  val coursier = "1.0.4"
   val scalacheck = "1.15.2"
 }
 
