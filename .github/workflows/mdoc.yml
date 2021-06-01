@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v11
       - uses: olafurpg/setup-gpg@v3
       - run: sbt '++2.12.13 docs/docusaurusPublishGhpages'
         env:

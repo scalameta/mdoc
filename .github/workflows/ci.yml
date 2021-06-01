@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v11
       - run: ./bin/scalafmt --test
   docs:
     name: Website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v11
       - run: sbt '++2.12.13 docs/mdoc'
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
@@ -35,7 +35,7 @@ jobs:
           - "'++3.0.0 test'"
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v11
         with:
           java-version: ${{ matrix.java }}
       - run: sbt ${{ matrix.command }}
