@@ -26,12 +26,17 @@ abstract class BaseCliSuite extends BaseSuite {
   override def postProcessObtained: Map[Compat.ScalaVersion, String => String] =
     Map(
       Compat.All -> { old =>
-        old
-          .replace(out().toString(), "<output>")
-          .replace(in().toString(), "<input>")
-          .linesIterator
-          .filterNot(line => line.startsWith("info: Compiled in"))
-          .mkString("\n")
+        {
+          val outDir = out().toString().replace("\\", "/")
+          val inDir = in().toString().replace("\\", "/")
+          old
+            .replace("\\", "/")
+            .replace(outDir, "<output>")
+            .replace(inDir, "<input>")
+            .linesIterator
+            .filterNot(line => line.startsWith("info: Compiled in"))
+            .mkString("\n")
+        }
       }
     )
   override def munitFixtures: Seq[Fixture[_]] = List(in, out)

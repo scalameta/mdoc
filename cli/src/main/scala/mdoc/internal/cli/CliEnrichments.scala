@@ -14,12 +14,16 @@ import coursierapi.Dependency
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.inputs._
 import java.io.PrintStream
+import scala.util.Try
 
 trait CliEnrichments {
   implicit class XtensionInputMdoc(input: Input) {
     def filename: String =
       input match {
         case s: Input.Slice => s.input.filename
+        case f: Input.File => f.path.filename
+        case v: Input.VirtualFile =>
+          Try(AbsolutePath(Paths.get(v.path)).filename).getOrElse(v.path)
         case _ => input.syntax
       }
     def relativeFilename(sourceroot: AbsolutePath): RelativePath =

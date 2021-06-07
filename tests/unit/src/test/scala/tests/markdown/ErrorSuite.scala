@@ -10,6 +10,8 @@ class ErrorSuite extends BaseMarkdownSuite {
             line.startsWith("did you mean") ||
             line.contains("(crash.md")
           }
+          // Predef lines change between versions and platforms
+          .map(line => line.replaceAll("Predef\\.scala:\\d\\d\\d", "Predef.scala:???"))
           .mkString("\n")
       }
     )
@@ -32,25 +34,8 @@ class ErrorSuite extends BaseMarkdownSuite {
        |x + y + z
        |^^^^^^^^^
        |scala.NotImplementedError: an implementation is missing
-       |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |""".stripMargin,
-    compat = Map(
-      Compat.Scala213 ->
-        """|error: crash.md:10:1: an implementation is missing
-           |x + y + z
-           |^^^^^^^^^
-           |scala.NotImplementedError: an implementation is missing
-           |<TAB>at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
-           |""".stripMargin.replace("<TAB>", tab),
-      Compat.Scala3 ->
-        // Anton: for some reason, the compiler(?) returns tab in this particular place
-        """|error: crash.md:10:1: an implementation is missing
-           |x + y + z
-           |^^^^^^^^^
-           |scala.NotImplementedError: an implementation is missing
-           |<TAB>at scala.Predef$.$qmark$qmark$qmark(Predef.scala:345)
-           """.stripMargin.replace("<TAB>", tab)
-    )
+       |	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:???)
+       |""".stripMargin
   )
 
   checkError(

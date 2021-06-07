@@ -1,19 +1,22 @@
 package tests
 
-import java.nio.file.Paths
-import munit.TestOptions
 import munit.FunSuite
+import munit.TestOptions
 import sbtdocusaurus.internal.Relativize
+
+import java.nio.file.Files
+import java.nio.file.Paths
 import scala.meta.internal.io.PathIO
+import scala.meta.io.AbsolutePath
 import scala.meta.testkit.StringFS
 
 class RelativizeSuite extends FunSuite {
 
   def check(name: TestOptions, original: String, expected: String): Unit = {
     test(name) {
-      val root = StringFS.fromString(original)
+      val root = AbsolutePath(Files.createTempDirectory("mdoc"))
+      StringFS.fromString(original, root)
       Relativize.htmlSite(root.toNIO)
-      root.toRelative(PathIO.workingDirectory).toURI(true)
       val isTrivial = Set(
         "<html>",
         "<body>",

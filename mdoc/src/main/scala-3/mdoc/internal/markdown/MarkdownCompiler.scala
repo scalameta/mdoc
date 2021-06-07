@@ -98,8 +98,7 @@ class MarkdownCompiler(
   }
 
   private def toSource(input: Input): SourceFile = {
-    val filename = Paths.get(input.syntax).getFileName.toString
-    SourceFile.virtual(filename, new String(input.chars))
+    SourceFile.virtual(input.filename, new String(input.chars))
   }
 
   private def toInput(sourceFile: ISourceFile): Input = {
