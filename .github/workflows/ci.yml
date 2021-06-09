@@ -19,6 +19,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v11
       - run: sbt '++2.12.13 docs/mdoc'
+  test-windows:
+    name: "Windows"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.11
+      - run: sbt '++2.13.5 test'
+        shell: bash
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
     runs-on: ubuntu-latest

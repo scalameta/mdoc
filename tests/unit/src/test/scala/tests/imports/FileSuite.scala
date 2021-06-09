@@ -3,6 +3,7 @@ package tests.imports
 import tests.markdown.BaseMarkdownSuite
 import tests.cli.BaseCliSuite
 import scala.meta.io.RelativePath
+import java.io.File
 
 class FileSuite extends BaseCliSuite {
 
@@ -126,10 +127,10 @@ class FileSuite extends BaseCliSuite {
       assertNoDiff(
         stdout,
         """|info: Compiling 3 files to <output>
-           |error: <input>/readme.md:2:14: illegal cyclic dependency. To fix this problem, refactor the code so that no transitive $file imports end up depending on the original file.
-           | -- root       --> <input>/readme.md:1
-           | -- depends on --> <input>/hello1.sc:0
-           | -- depends on --> <input>/hello2.sc:0
+           |error: readme.md:2:14: illegal cyclic dependency. To fix this problem, refactor the code so that no transitive $file imports end up depending on the original file.
+           | -- root       --> readme.md:1
+           | -- depends on --> hello1.sc:0
+           | -- depends on --> hello2.sc:0
            | -- cycle      --> <input>/hello1.sc
            |import $file.hello1
            |             ^^^^^^
@@ -170,7 +171,7 @@ class FileSuite extends BaseCliSuite {
            | required: Int
            |val number: Int = ""
            |                  ^^
-           |error: <input>/readme.md:3:22: type mismatch;
+           |error: readme.md:3:22: type mismatch;
            | found   : String("")
            | required: Int
            |val something: Int = ""
@@ -262,7 +263,7 @@ class FileSuite extends BaseCliSuite {
       assertNoDiff(
         stdout,
         """|info: Compiling 2 files to <output>
-           |error: <input>/readme.md:2:16: unimports are not supported for $file imports. To fix this problem, remove the unimported symbol.
+           |error: readme.md:2:16: unimports are not supported for $file imports. To fix this problem, remove the unimported symbol.
            |import $file.{ hello0 => _ }
            |               ^^^^^^^^^^^
            |""".stripMargin
@@ -288,7 +289,7 @@ class FileSuite extends BaseCliSuite {
       assertNoDiff(
         stdout,
         """|info: Compiling 2 files to <output>
-           |error: <input>/readme.md:2:14: wildcards are not supported for $file imports. To fix this problem, explicitly import files using the `import $file.FILENAME` syntax.
+           |error: readme.md:2:14: wildcards are not supported for $file imports. To fix this problem, explicitly import files using the `import $file.FILENAME` syntax.
            |import $file._
            |             ^
            |""".stripMargin

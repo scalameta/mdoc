@@ -70,8 +70,7 @@ class MarkdownCompiler(
     }
 
   private def toSource(input: Input): BatchSourceFile = {
-    val filename = Paths.get(input.syntax).getFileName.toString
-    new BatchSourceFile(filename, new String(input.chars))
+    new BatchSourceFile(input.filename, new String(input.chars))
   }
 
   def shutdown(): Unit = {

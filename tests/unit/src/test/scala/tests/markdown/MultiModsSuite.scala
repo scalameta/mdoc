@@ -102,7 +102,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: silent:invisible.md:2:15: invalid combination of modifiers 'silent' and 'invisible'
+    """|error: silent-invisible.md:2:15: invalid combination of modifiers 'silent' and 'invisible'
        |```scala mdoc:reset:silent:invisible
        |              ^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -115,7 +115,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: fail:crash.md:2:15: invalid combination of modifiers 'crash' and 'fail'
+    """|error: fail-crash.md:2:15: invalid combination of modifiers 'crash' and 'fail'
        |```scala mdoc:reset:fail:crash
        |              ^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -128,7 +128,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: compile-only:passthrough.md:2:15: compile-only cannot be used in combination with passthrough
+    """|error: compile-only-passthrough.md:2:15: compile-only cannot be used in combination with passthrough
        |```scala mdoc:compile-only:passthrough
        |              ^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
@@ -155,7 +155,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = "* 43"
       |```
     """.stripMargin,
-    """|error: nest:reset.md:5:15: the modifier 'nest' is redundant when used in combination with 'reset'. To fix this error, remove 'nest'
+    """|error: nest-reset.md:5:15: the modifier 'nest' is redundant when used in combination with 'reset'. To fix this error, remove 'nest'
        |```scala mdoc:nest:reset
        |              ^^^^^^^^^^
        |""".stripMargin
@@ -168,7 +168,7 @@ class MultiModsSuite extends BaseMarkdownSuite {
       |val x = 2
       |```
     """.stripMargin,
-    """|error: compile-only:multiple.md:2:15: compile-only cannot be used in combination with to-string, silent
+    """|error: compile-only-multiple.md:2:15: compile-only cannot be used in combination with to-string, silent
        |```scala mdoc:compile-only:to-string:silent
        |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
