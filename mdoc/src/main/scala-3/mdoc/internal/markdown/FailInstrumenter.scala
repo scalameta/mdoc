@@ -39,7 +39,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
                   case importer =>
                     sb.line {
                       _.append("import ")
-                      .append(importer.syntax)
+                      .append(importer.pos.text)
                       .append(";")
                     }
                 }
