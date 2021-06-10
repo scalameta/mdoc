@@ -10,7 +10,7 @@ final class Binder[T](val value: T, val name: String, val tpe: TPrint[T], val po
     s"""Binder($valueString, "$name", "$tpeString")"""
   }
 
-  def tpeString = Printing.typeString(tpe)
+  def tpeString = Printing.typeString(tpe).stripPrefix("<empty>.")
 }
 object Binder {
   def generate[A](e: SourceStatement[A], pos: RangePosition)(implicit
