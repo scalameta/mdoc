@@ -38,7 +38,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
                       ) if Instrumenter.magicImports(name) =>
                   case importer =>
                     sb.print("import ")
-                    sb.print(importer.syntax)
+                    sb.print(importer.pos.text)
                     sb.print(";")
                 }
               case _ =>

@@ -51,6 +51,19 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  checkDecorations(
+    "import-future".tag(OnlyScala3),
+    """|import $scalac.`-source future`
+       |import scala.collection.*
+       |val x = 1.to(4).toVector
+       |""".stripMargin,
+    """|import $scalac.`-source future`
+       |import scala.collection.*
+       |<val x = 1.to(4).toVector> // : Vector[Int] = Vect...
+       |x: Vector[Int] = Vector(1, 2, 3, 4)
+       |""".stripMargin
+  )
+
   checkDiagnostics(
     "value-class",
     """|object Foo {

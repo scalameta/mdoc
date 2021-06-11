@@ -103,7 +103,7 @@ class Instrumenter(
         case i: Import =>
           def printImporter(importer: Importer): Unit = {
             sb.print("import ")
-            sb.print(importer.syntax)
+            sb.print(importer.pos.text)
             sb.print(";")
           }
           i.importers.foreach {
