@@ -23,31 +23,32 @@ object SimpleHtml {
       url: String
   ): String = {
     val toc = tableOfContents.toHTML(fromLevel = 2, toLevel = 3, indent = "      ")
-    s"""|<html>
-        |<head>
-        |    <title>$title</title>
-        |    <meta charset="UTF-8">
-        |    <link rel="stylesheet" href="$url/github.css">
-        |    <link rel="stylesheet" href="$url/custom.css">
-        |    <script src="$url/highlight.js"></script>
-        |    <script>
-        |      hljs.configure({languages: []});
-        |      hljs.initHighlightingOnLoad();
-        |    </script>
-        |    <script src="$url/livereload.js"></script>
-        |</head>
-        |<body>
-        |  <div class="wrapper">
-        |    <div class="main">
-        |      $body
-        |    </div>
-        |    <div class="sidebar">
-        |      $toc
-        |    </div>
-        |  </div>
-        |</body>
-        |</html>
-        |""".stripMargin
+    s"""
+<html>
+<head>
+    <title>$title</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="$url/github.css">
+    <link rel="stylesheet" href="$url/custom.css">
+    <script src="$url/highlight.js"></script>
+    <script>
+      hljs.configure({languages: []});
+      hljs.initHighlightingOnLoad();
+    </script>
+    <script src="$url/livereload.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="main">
+      $body
+    </div>
+    <div class="sidebar">
+      $toc
+    </div>
+  </div>
+</body>
+</html>
+"""
   }
 
 }
