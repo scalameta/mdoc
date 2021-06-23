@@ -1,4 +1,4 @@
-scalaVersion.in(ThisBuild) := "2.12.13"
+scalaVersion.in(ThisBuild) := "2.12.14"
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)
@@ -28,6 +28,6 @@ println("Hello Scala.js!")
 
 lazy val jsapp = project
   .settings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
   )
   .enablePlugins(ScalaJSPlugin)
