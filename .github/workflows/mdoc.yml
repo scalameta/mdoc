@@ -12,6 +12,6 @@ jobs:
           fetch-depth: 0
       - uses: olafurpg/setup-scala@v11
       - uses: olafurpg/setup-gpg@v3
-      - run: sbt '++2.12.13 docs/docusaurusPublishGhpages'
+      - run: sbt '++2.12.14 docs/docusaurusPublishGhpages'
         env:
           GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
