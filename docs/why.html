@@ -1,0 +1,298 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Why mdoc? · mdoc</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="The distinguishing features of mdoc are the following."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Why mdoc? · mdoc"/><meta property="og:type" content="website"/><meta property="og:url" content="https://scalameta.org/mdoc/mdoc/index.html"/><meta property="og:description" content="The distinguishing features of mdoc are the following."/><meta property="og:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><link rel="shortcut icon" href="/mdoc/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://scalameta.org/mdoc/mdoc/blog/atom.xml" title="mdoc Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://scalameta.org/mdoc/mdoc/blog/feed.xml" title="mdoc Blog RSS Feed"/><link rel="stylesheet" href="/mdoc/css/custom.css"/><script src="/mdoc/js/scrollSpy.js"></script><link rel="stylesheet" href="/mdoc/css/main.css"/><script src="/mdoc/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mdoc/"><img class="logo" src="/mdoc/img/mdoc-logo.png" alt="mdoc"/><h2 class="headerTitleWithLogo">mdoc</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/mdoc/docs/installation.html" target="_self">Docs</a></li><li class=""><a href="/mdoc/blog/" target="_self">Blog</a></li><li class=""><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Overview</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Overview</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/installation.html">Installation</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/mdoc/docs/why.html">Why mdoc?</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/tut.html">Coming from tut</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/changelog.html">Changelog</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Modifiers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/modifiers.html">JVM</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/js.html">Scala.js</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Site generators</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/docusaurus.html">Docusaurus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/scalameta/mdoc/edit/main/docs/why.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Why mdoc?</h1></header><article><div><span><p>The distinguishing features of mdoc are the following.</p>
+<ul>
+<li><a href="#performance">good performance</a>: markdown documents compile as a single Scala
+program and evaluate in one run. Combined with incremental and hot compilation
+from file watching, medium sized documents can generate in a few hundred
+milliseconds.</li>
+<li><a href="#program-semantics">program semantics</a>: markdown documents are compiled into
+normal Scala programs making language features work as you expect them to.</li>
+<li><a href="#good-error-messages">good error messages</a>: compile errors and crashes are
+reported with positions of the original markdown source making it easy to
+track down where things went wrong.</li>
+<li><a href="#link-hygiene">link hygiene</a>: catch broken links to non-existing sections
+while generating the site.</li>
+<li><a href="#variable-injection">variable injection</a>: use variables like <code>@VERSION@</code> to
+that make sure the documentation stays up-to-date with new releases.</li>
+<li><a href="#extensibility">extensibility</a>: custom modifiers allow you to
+programmatically control how the resulting markdown gets rendered.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="performance"></a><a href="#performance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Performance</h2>
+<p>mdoc is designed to provide a tight edit/render/preview feedback loop while
+writing documentation. mdoc achieves good performance through</p>
+<ul>
+<li><a href="#program-semantics">program semantics</a>: each markdown file compiles into a
+single Scala program that executes in one run.</li>
+<li>being incremental: with <code>--watch</code>, mdoc compiles individual files as they
+change avoiding unnecessary work re-generating the full site.</li>
+<li>keeping the compiler hot: with <code>--watch</code>, mdoc re-uses the same Scala compiler
+instance for subsequent runs making compilation faster after a few iterations.
+A medium sized document can go from compiling in ~5 seconds with a cold
+compiler down to 500ms with a hot compiler.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="good-error-messages"></a><a href="#good-error-messages" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Good error messages</h2>
+<p>mdoc tries to report helpful error messages when things go wrong. Here below,
+the program that is supposed to compile successfully but it has a type error so
+the build is stopped with an error message from the Scala compiler.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-title">val typeError:</span> Int = <span class="hljs-string">"should be int"</span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: why.md:2:22:<span class="hljs-built_in"> type </span>mismatch;
+ found   : String(<span class="hljs-string">"should be int"</span>)
+ required: Int
+val typeError: Int = <span class="hljs-string">"should be int"</span>
+                     ^^^^^^^^^^^^^^^
+</code></pre>
+<p>Here below, the programs are supposed to fail due to the <code>fail</code> and <code>crash</code>
+modifiers but they succeed so the build is stopped with an error message from
+mdoc.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:fail
+val noFail = <span class="hljs-string">"success"</span>
+```
+```scala mdoc:crash
+val noCrash = <span class="hljs-string">"success"</span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: why.md:2:1: Expected compile errors but program compiled successfully without errors
+<span class="hljs-section">val noFail = "success"
+^^^^^^^^^^^^^^^^^^^^^^</span>
+error: why.md:5:1: Expected runtime exception but program completed successfully
+<span class="hljs-section">val noCrash = "success"
+^^^^^^^^^^^^^^^^^^^^^^^</span>
+</code></pre>
+<p>Observe that positions of the reported diagnostics point to line numbers and
+columns in the original markdown document. Internally, mdoc instruments code
+fences to extract metadata like variable types and runtime values. Positions of
+error messages in the instrumented code are translated into positions in the
+markdown document.</p>
+<h2><a class="anchor" aria-hidden="true" id="link-hygiene"></a><a href="#link-hygiene" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Link hygiene</h2>
+<p>Docs get quickly out date, in particular links to different sections. After
+generating a site, mdoc analyzes links for references to non-existent sections.
+For the example below, mdoc reports a warning that the <code>doesnotexist</code> link is
+invalid.</p>
+<p>Before:</p>
+<pre><code class="hljs"><span class="hljs-section"># My title</span>
+
+Link to [<span class="hljs-string">my title</span>](<span class="hljs-link">#my-title</span>).
+Link to [<span class="hljs-string">typo section</span>](<span class="hljs-link">#mytitle</span>).
+Link to [<span class="hljs-string">old section</span>](<span class="hljs-link">#doesnotexist</span>).
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">warning: why.md:4:9: Unknown link 'why.md#mytitle', did you mean 'why.md#my-title'?
+Link to [<span class="hljs-string">typo section</span>](<span class="hljs-link">#mytitle</span>).
+<span class="hljs-code">        ^^^^^^^^^^^^^^^^^^^^^^^^</span>
+warning: why.md:5:9: Unknown link 'why.md#doesnotexist'.
+Link to [<span class="hljs-string">old section</span>](<span class="hljs-link">#doesnotexist</span>).
+<span class="hljs-code">        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+</code></pre>
+<p>Observe that mdoc suggests a fix if there exists a header that is similar to the
+unknown link.</p>
+<h2><a class="anchor" aria-hidden="true" id="program-semantics"></a><a href="#program-semantics" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Program semantics</h2>
+<p>mdoc interprets code fences as normal Scala programs instead of using the REPL.
+This behavior is different from tut that interprets statements as if they were
+typed in a REPL session. Using &quot;program semantics&quot; instead of &quot;repl semantics&quot;
+has benefits and downsides.</p>
+<p><strong>Downside</strong>: It's not possible to bind the same variable twice, for example the
+code below fails compilation with mdoc but compiles successfully with tut</p>
+<pre><code class="hljs">```scala mdoc
+val x = <span class="hljs-number">1</span>
+val x = <span class="hljs-number">1</span>
+```
+</code></pre>
+<p><strong>Upside</strong>: Code examples from the documentation can be copy-pasted into normal
+Scala programs and compile.</p>
+<p><strong>Upside</strong>: Companion objects work as expected.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">case</span> <span class="hljs-keyword">class</span> User(<span class="hljs-keyword">name</span>: String)
+object User {
+  <span class="hljs-keyword">implicit</span> val ordering: Ordering[User] = Ordering.by(_.<span class="hljs-keyword">name</span>)
+}
+List(User(<span class="hljs-string">"Susan"</span>), User(<span class="hljs-string">"John"</span>)).sorted
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+<span class="hljs-keyword">case</span> <span class="hljs-keyword">class</span> <span class="hljs-keyword">User</span>(<span class="hljs-type">name</span>: String)
+<span class="hljs-keyword">object</span> <span class="hljs-keyword">User</span> {
+  implicit val ordering: Ordering[<span class="hljs-keyword">User</span>] = Ordering.<span class="hljs-keyword">by</span>(_.name)
+}
+List(<span class="hljs-keyword">User</span>("Susan"), <span class="hljs-keyword">User</span>("John")).sorted
+// res0: List[<span class="hljs-keyword">User</span>] = List(<span class="hljs-keyword">User</span>("John"), <span class="hljs-keyword">User</span>("Susan"))
+```
+</code></pre>
+<p><strong>Upside</strong>: Overloaded methods work as expected.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+def <span class="hljs-keyword">add</span>(a: <span class="hljs-type">Int</span>, b: <span class="hljs-type">Int</span>): <span class="hljs-type">Int</span> = a + b
+def <span class="hljs-keyword">add</span>(a: <span class="hljs-type">Int</span>): <span class="hljs-type">Int</span> = <span class="hljs-keyword">add</span>(a, <span class="hljs-number">1</span>)
+<span class="hljs-keyword">add</span>(<span class="hljs-number">3</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+def <span class="hljs-keyword">add</span>(a: <span class="hljs-type">Int</span>, b: <span class="hljs-type">Int</span>): <span class="hljs-type">Int</span> = a + b
+def <span class="hljs-keyword">add</span>(a: <span class="hljs-type">Int</span>): <span class="hljs-type">Int</span> = <span class="hljs-keyword">add</span>(a, <span class="hljs-number">1</span>)
+<span class="hljs-keyword">add</span>(<span class="hljs-number">3</span>)
+// res0: <span class="hljs-type">Int</span> = <span class="hljs-number">4</span>
+```
+</code></pre>
+<p><strong>Upside</strong>: Mutually recursive methods work as expected.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+def <span class="hljs-built_in">isEven</span>(<span class="hljs-symbol">n:</span> <span class="hljs-built_in">Int</span>)<span class="hljs-symbol">:</span> Boolean = <span class="hljs-built_in">n</span> == <span class="hljs-number">0</span> || !<span class="hljs-built_in">isOdd</span>(<span class="hljs-built_in">n</span> - <span class="hljs-number">1</span>)
+def <span class="hljs-built_in">isOdd</span>(<span class="hljs-symbol">n:</span> <span class="hljs-built_in">Int</span>)<span class="hljs-symbol">:</span> Boolean  = <span class="hljs-built_in">n</span> == <span class="hljs-number">1</span> || !<span class="hljs-built_in">isEven</span>(<span class="hljs-built_in">n</span> - <span class="hljs-number">1</span>)
+<span class="hljs-built_in">isEven</span>(<span class="hljs-number">8</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+def <span class="hljs-built_in">isEven</span>(<span class="hljs-symbol">n:</span> <span class="hljs-built_in">Int</span>)<span class="hljs-symbol">:</span> Boolean = <span class="hljs-built_in">n</span> == <span class="hljs-number">0</span> || !<span class="hljs-built_in">isOdd</span>(<span class="hljs-built_in">n</span> - <span class="hljs-number">1</span>)
+def <span class="hljs-built_in">isOdd</span>(<span class="hljs-symbol">n:</span> <span class="hljs-built_in">Int</span>)<span class="hljs-symbol">:</span> Boolean  = <span class="hljs-built_in">n</span> == <span class="hljs-number">1</span> || !<span class="hljs-built_in">isEven</span>(<span class="hljs-built_in">n</span> - <span class="hljs-number">1</span>)
+<span class="hljs-built_in">isEven</span>(<span class="hljs-number">8</span>)
+// r<span class="hljs-symbol">es0:</span> Boolean = <span class="hljs-built_in">false</span>
+```
+</code></pre>
+<p><strong>Upside</strong>: Compiler options like <code>-Ywarn-unused</code> don't report spurious errors
+like they do in the REPL.</p>
+<pre><code class="hljs css language-scala">$ scala -<span class="hljs-type">Ywarn</span>-unused
+scala&gt; <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Future</span>
+&lt;console&gt;:<span class="hljs-number">11</span>: warning: <span class="hljs-type">Unused</span> <span class="hljs-keyword">import</span>
+       <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">Future</span>
+                               ^
+scala&gt; <span class="hljs-type">Future</span>.successful(<span class="hljs-number">1</span>)
+res0: scala.concurrent.<span class="hljs-type">Future</span>[<span class="hljs-type">Int</span>] = <span class="hljs-type">Future</span>(<span class="hljs-type">Success</span>(<span class="hljs-number">1</span>))
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="variable-injection"></a><a href="#variable-injection" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Variable injection</h2>
+<p>mdoc renders variables like <code>@VERSION@</code> into <code>2.2.21</code>. This makes it easy to
+keep documentation up-to-date as new releases are published. Variables can be
+passed from the command-line interface with the syntax <code>--site.VARIABLE=value</code>.</p>
+<pre><code class="hljs"><span class="hljs-selector-tag">mdoc</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.VERSION</span> 1<span class="hljs-selector-class">.0</span><span class="hljs-selector-class">.0</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.SCALA_VERSION</span> 2<span class="hljs-selector-class">.12</span><span class="hljs-selector-class">.13</span>
+</code></pre>
+<p>When using the library API, variables are passed with the
+<code>MainSettings.withSiteVariables(Map[String, String])</code> method</p>
+<pre><code class="hljs css language-diff"> val settings = mdoc.MainSettings()
+<span class="hljs-addition">+  .withSiteVariables(Map(</span>
+<span class="hljs-addition">+    "VERSION" -&gt; "1.0.0",</span>
+<span class="hljs-addition">+    "SCALA_VERSION" -&gt; "2.12.13"</span>
+<span class="hljs-addition">+  ))</span>
+</code></pre>
+<p>When using sbt-mdoc, variables are defined with the <code>mdocVariables</code> setting.</p>
+<pre><code class="hljs css language-diff">// build.sbt
+lazy val docs = project
+  .settings(
+<span class="hljs-addition">+   mdocVariables := Map(</span>
+<span class="hljs-addition">+     "VERSION" -&gt; "1.0.0"</span>
+<span class="hljs-addition">+   )</span>
+  )
+  .enablePlugins(MdocPlugin)
+</code></pre>
+<p>Variables are replaced with the regular expression <code>@(\w+)@</code>. An error is
+reported when a variable that matches this pattern is not provided.</p>
+<p>Before:</p>
+<pre><code class="hljs">Install <span class="hljs-keyword">version</span> <span class="hljs-keyword">@DOES_NOT_EXIST</span>@
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs"><span class="hljs-attribute">error</span>: why.<span class="hljs-attribute">md</span>:<span class="hljs-number">1</span>:<span class="hljs-number">17</span>: key not <span class="hljs-attribute">found</span>: DOES_NOT_EXIST
+Install version <span class="hljs-variable">@DOES_NOT_EXIST</span>@
+                ^^^^^^^^^^^^^^^^
+</code></pre>
+<p>Use double <code>@@</code> to escape variable injection.</p>
+<p>Before:</p>
+<pre><code class="hljs">Install <span class="hljs-keyword">version</span> @<span class="hljs-keyword">@OLD_VERSION</span>@
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">Install <span class="hljs-keyword">version</span> <span class="hljs-keyword">@OLD_VERSION</span>@
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="extensibility"></a><a href="#extensibility" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Extensibility</h2>
+<p>The mdoc library APi enables you to implement custom modifiers like
+<a href="/mdoc/docs/modifiers.html#postmodifier"><code>PostModifier</code></a>, which have access to the original
+code fence text, the static types and runtime values of the evaluated Scala
+code, the input and output file paths and other contextual information.</p>
+<p>Example usages of custom modifiers:</p>
+<ul>
+<li>This website has a <code>mdoc:mdoc</code> modifier to render before/after examples of
+rendered markdown.</li>
+<li>The <a href="https://scalameta.org/scalafmt/docs/configuration.html">Scalafmt website</a>
+has a <code>mdoc:scalafmt</code> modifier to show before/after code examples with a given
+configuration.</li>
+</ul>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mdoc/docs/installation.html"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/mdoc/docs/tut.html"><span>Coming from tut</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#performance">Performance</a></li><li><a href="#good-error-messages">Good error messages</a></li><li><a href="#link-hygiene">Link hygiene</a></li><li><a href="#program-semantics">Program semantics</a></li><li><a href="#variable-injection">Variable injection</a></li><li><a href="#extensibility">Extensibility</a></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2021 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '5791175eba35c6626d93ae96610a8ae9',
+                indexName: 'scalamenta_mdoc',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

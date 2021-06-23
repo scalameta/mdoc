@@ -1,0 +1,303 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Docusaurus · mdoc</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="It&#x27;s possible to use mdoc with [Docusaurus](https://docusaurus.io/) to build"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Docusaurus · mdoc"/><meta property="og:type" content="website"/><meta property="og:url" content="https://scalameta.org/mdoc/mdoc/index.html"/><meta property="og:description" content="It&#x27;s possible to use mdoc with [Docusaurus](https://docusaurus.io/) to build"/><meta property="og:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><link rel="shortcut icon" href="/mdoc/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://scalameta.org/mdoc/mdoc/blog/atom.xml" title="mdoc Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://scalameta.org/mdoc/mdoc/blog/feed.xml" title="mdoc Blog RSS Feed"/><link rel="stylesheet" href="/mdoc/css/custom.css"/><script src="/mdoc/js/scrollSpy.js"></script><link rel="stylesheet" href="/mdoc/css/main.css"/><script src="/mdoc/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mdoc/"><img class="logo" src="/mdoc/img/mdoc-logo.png" alt="mdoc"/><h2 class="headerTitleWithLogo">mdoc</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/mdoc/docs/installation.html" target="_self">Docs</a></li><li class=""><a href="/mdoc/blog/" target="_self">Blog</a></li><li class=""><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Site generators</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Overview</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/why.html">Why mdoc?</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/tut.html">Coming from tut</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/changelog.html">Changelog</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Modifiers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/modifiers.html">JVM</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/js.html">Scala.js</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Site generators</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/mdoc/docs/docusaurus.html">Docusaurus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/scalameta/mdoc/edit/main/docs/docusaurus.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Docusaurus</h1></header><article><div><span><p>It's possible to use mdoc with <a href="https://docusaurus.io/">Docusaurus</a> to build
+documentation websites. Several projects already use mdoc in combination with
+Docusaurus:</p>
+<ul>
+<li><a href="https://scalameta.org/scalafmt/">Scalafmt</a></li>
+<li><a href="https://scalacenter.github.io/scalafix/">Scalafix</a></li>
+<li><a href="http://scalameta.org/">Scalameta</a></li>
+<li><a href="https://scalameta.org/metals/">Metals</a></li>
+<li><a href="https://scalacenter.github.io/bloop/">Bloop</a></li>
+<li><a href="https://coursier.github.io/coursier/">Coursier</a></li>
+<li><a href="http://almond-sh.github.io/almond/stable/docs/intro">Almond</a></li>
+<li><a href="https://ovotech.github.io/fs2-kafka/">fs2-kafka</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="requirements"></a><a href="#requirements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Requirements</h2>
+<ul>
+<li><a href="https://yarnpkg.com/en/"><code>yarn</code></a>: to run docusaurus.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="installation"></a><a href="#installation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h2>
+<p>First, install the sbt-mdoc plugin using the normal
+<a href="/mdoc/docs/installation.html#sbt">mdoc installation instructions</a>.</p>
+<p>Next, enable the <code>mdoc.DocusaurusPlugin</code> in addition to the <code>mdoc.MdocPlugin</code>
+and define the <code>moduleName</code> setting to have your project name suffixed with
+<code>-docs</code>.</p>
+<pre><code class="hljs css language-diff"> // build.sbt
+ lazy val docs = project
+   .settings(
+<span class="hljs-addition">+    moduleName := "myproject-docs",</span>
+   )
+<span class="hljs-deletion">-  .enablePlugins(MdocPlugin)</span>
+<span class="hljs-addition">+  .enablePlugins(MdocPlugin, DocusaurusPlugin)</span>
+   .dependsOn(myproject)
+</code></pre>
+<p>Next, setup a normal Docusaurus site following the
+<a href="https://docusaurus.io/">Docusaurus installation instructions</a>.</p>
+<p>Once you have a Docusaurus site setup, update <code>siteConfig.js</code> to point
+<code>customDocsPath</code> to the <code>mdocOut</code> directory with the generated mdoc output.</p>
+<pre><code class="hljs css language-diff"><span class="hljs-addition">+ customDocsPath: "myproject-docs/target/mdoc",</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="create-static-site"></a><a href="#create-static-site" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create static site</h2>
+<p>Generate a static website with <code>docs/docusaurusCreateSite</code>. This task runs
+several steps:</p>
+<ul>
+<li><code>sbt docs/mdoc</code></li>
+<li><code>cd website &amp;&amp; yarn install &amp;&amp; yarn run build</code></li>
+<li>creates <code>website/build/index.html</code> that redirects to <code>/myproject/</code></li>
+<li>relativizes all links in the generated html so that it can be hosted on
+<a href="http://static.javadoc.io/">http://static.javadoc.io/</a></li>
+</ul>
+<p>The static website gets generated in the <code>website/build</code> directory. You can copy
+these files over to any static HTTP server to host your website. A simple
+<code>sbt docs/clean</code> will delete the previous folder since the <code>DocusaurusPlugin</code>
+will also bind it to the standard SBT <code>clean</code> task.</p>
+<h2><a class="anchor" aria-hidden="true" id="publish-to-github-pages-locally"></a><a href="#publish-to-github-pages-locally" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Publish to GitHub pages locally</h2>
+<p>If you have a GitHub repository with a gh-pages branch, update <code>siteConfig.js</code>
+to include the following information:</p>
+<pre><code class="hljs css language-diff"><span class="hljs-addition">+  projectName: "mdoc",</span>
+<span class="hljs-addition">+  organizationName: "scalameta",</span>
+</code></pre>
+<p>Next, run <code>docs/docusaurusPublishGhpages</code> to publish the website to GitHub
+pages. This task run several steps:</p>
+<ul>
+<li><code>sbt docs/mdoc</code></li>
+<li><code>cd website &amp;&amp; yarn install &amp;&amp; USE_SSH=true yarn publish-gh-pages</code></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="publish-to-github-pages-from-ci"></a><a href="#publish-to-github-pages-from-ci" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Publish to GitHub pages from CI</h2>
+<p>You can configure GitHub Actions or Travis CI server to publish docs after merge
+into main. The
+<a href="https://docusaurus.io/docs/en/publishing#using-travis-cih">Docusaurus docs</a>
+already have instructions for how to set this up. If those instructions work for
+you, then that's great! No need to read this section here. However, you prefer
+to use &quot;deploy keys&quot; over &quot;personal access tokens because deploy keys are
+limited to individual repositories instead of per-account. If this sounds
+interesting, read ahead.</p>
+<h3><a class="anchor" aria-hidden="true" id="deploy-key"></a><a href="#deploy-key" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deploy key</h3>
+<p>Open the &quot;Deploy key&quot; menu in your project settings:
+<a href="https://github.com/scalameta/mdoc/settings/keys">https://github.com/scalameta/mdoc/settings/keys</a>. Press &quot;Add deploy key&quot;.</p>
+<ul>
+<li><p><code>Title</code>: use &quot;Docusaurus Travis&quot;.</p></li>
+<li><p><code>Allow write access</code>: check the box, this is requires since we want to write
+to the <code>gh-pages</code> branch from CI.</p></li>
+<li><p><code>Key</code>: generate a fresh SSH key using <code>ssh-keygen</code></p>
+<pre><code class="hljs css language-sh">mkdir ~/.github
+<span class="hljs-built_in">cd</span> ~/.github
+ssh-keygen -t rsa -b 4096 -C <span class="hljs-string">"olafurpg@gmail.com"</span>
+Enter file <span class="hljs-keyword">in</span> <span class="hljs-built_in">which</span> to save the key (/Users/ollie/.ssh/id_rsa): myproject
+Enter passphrase (empty <span class="hljs-keyword">for</span> no passphrase): &lt;ENTER, NO PASSPHRASE&gt;
+Enter same passphrase again: &lt;ENTER, NO PASSPHRASE&gt;
+Your identification has been saved <span class="hljs-keyword">in</span> myproject.
+Your public key has been saved <span class="hljs-keyword">in</span> myproject.pub.
+</code></pre>
+<p>It's important to use an <strong>empty passphrase</strong> so that the CI can install the
+key. Next, copy the public key and paste it into the GitHub &quot;Key&quot; field.</p>
+<pre><code class="hljs css language-sh"><span class="hljs-comment"># macOS</span>
+cat myproject.pub | pbcopy
+<span class="hljs-comment"># Linux</span>
+cat myproject.pub | xclip
+</code></pre></li>
+</ul>
+<p>Your screen should look like this</p>
+<p><img src="https://i.imgur.com/hm3MpUK.png" alt="Add GitHub deploy key"></p>
+<h3><a class="anchor" aria-hidden="true" id="environment-variables"></a><a href="#environment-variables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Environment variables</h3>
+<p>Next open the secrets settings for your CI provider. The URL for the mdoc repo
+looks like this:</p>
+<ul>
+<li>GitHub Actions: <a href="https://github.com/scalameta/mdoc/settings/secrets">https://github.com/scalameta/mdoc/settings/secrets</a></li>
+<li>Travis CI: <a href="https://travis-ci.org/scalameta/mdoc/settings">https://travis-ci.org/scalameta/mdoc/settings</a></li>
+</ul>
+<p>Add the following values:</p>
+<ul>
+<li><code>GIT_DEPLOY_KEY</code>: the base64 encoded secret key. Note, the secret key is the
+file without the <code>.pub</code> extension.
+<pre><code class="hljs css language-sh"><span class="hljs-comment"># macOS</span>
+cat myproject | base64 | pbcopy
+<span class="hljs-comment"># Ubuntu (assuming GNU base64)</span>
+cat myproject | base64 -w0 | xclip
+<span class="hljs-comment"># FreeBSD (assuming BSD base64)</span>
+cat myproject | base64 | xclip
+</code></pre></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="github-actions"></a><a href="#github-actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>GitHub Actions</h3>
+<blockquote>
+<p>Skip this part if you are not using GitHub Actions.</p>
+</blockquote>
+<p>Next, create a new file at <code>.github/workflows/mdoc.yml</code> to trigger
+<code>docs/docusaurusPublishGhpages</code> on successful merge into main and on tag push.</p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/.github/workflows/mdoc.yml">mdoc.yml</a></p>
+<pre><code class="hljs css language-text">name: Website
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: olafurpg/setup-scala@v11
+      - uses: olafurpg/setup-gpg@v3
+      - run: sbt '++2.12.13 docs/docusaurusPublishGhpages'
+        env:
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+</code></pre>
+<p>Commit your changes, push to main and you're all set! Merge a PR to your
+project and watch GitHub Actions release the docs 😎</p>
+<h3><a class="anchor" aria-hidden="true" id="travis-ci"></a><a href="#travis-ci" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Travis CI</h3>
+<blockquote>
+<p>Skip this part if you are not using Travis CI</p>
+</blockquote>
+<p>Next, update .travis.yml to trigger <code>docs/docusaurusPublishGhpages</code> on
+successful merge into main and on tag push. There are many ways to do this,
+but I recommend using Travis
+<a href="https://docs.travis-ci.com/user/build-stages/">&quot;build stages&quot;</a>. It's not
+necessary to use build stages but they make it easy to avoid publishing the
+website multiple times from parallel jobs. Define the <code>test</code> and <code>release</code> build
+stages</p>
+<pre><code class="hljs css language-yml"><span class="hljs-attr">stages:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">test</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">release</span>
+    <span class="hljs-attr">if:</span> <span class="hljs-string">(branch</span> <span class="hljs-string">=</span> <span class="hljs-string">main</span> <span class="hljs-string">AND</span> <span class="hljs-string">type</span> <span class="hljs-string">=</span> <span class="hljs-string">push)</span> <span class="hljs-string">OR</span> <span class="hljs-string">(tag</span> <span class="hljs-string">IS</span> <span class="hljs-string">present)</span>
+</code></pre>
+<p>Next, define your build matrix with <code>docs/docusaurusPublishGhpages</code> at the end</p>
+<pre><code class="hljs css language-yml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">include:</span>
+    <span class="hljs-comment"># stage="test" if no stage is specified</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">env:</span> <span class="hljs-string">TEST="test"</span>
+      <span class="hljs-attr">script:</span> <span class="hljs-string">sbt</span> <span class="hljs-string">test</span>
+    <span class="hljs-comment"># release runs only if the previous stages passed</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">stage:</span> <span class="hljs-string">release</span>
+      <span class="hljs-attr">script:</span> <span class="hljs-string">sbt</span> <span class="hljs-string">docs/docusaurusPublishGhpages</span>
+</code></pre>
+<p>For a complete example of the Travis configuration, see the
+<a href="https://github.com/scalameta/mdoc/blob/main/.travis.yml">.travis.yml</a> in this
+project.</p>
+<p>You're all set! Merge a PR to your project and watch the Travis job release the
+docs 😎</p>
+<h2><a class="anchor" aria-hidden="true" id="include-scaladoc-in-site"></a><a href="#include-scaladoc-in-site" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Include Scaladoc in site</h2>
+<p>You can configure a project to include Scaladocs in its site. Below is an
+example configuration that uses <a href="https://github.com/sbt/sbt-unidoc">sbt-unidoc</a>
+to aggregate Scaladocs across multiple projects.</p>
+<pre><code class="hljs css language-diff"> // build.sbt
+ lazy val docs = project
+   .settings(
+     moduleName := "myproject-docs",
+<span class="hljs-addition">+      unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(myproject1, myproject2),</span>
+<span class="hljs-addition">+      target in (ScalaUnidoc, unidoc) := (baseDirectory in LocalRootProject).value / "website" / "static" / "api",</span>
+<span class="hljs-addition">+      cleanFiles += (target in (ScalaUnidoc, unidoc)).value,</span>
+<span class="hljs-addition">+      docusaurusCreateSite := docusaurusCreateSite.dependsOn(unidoc in Compile).value,</span>
+<span class="hljs-addition">+      docusaurusPublishGhpages := docusaurusPublishGhpages.dependsOn(unidoc in Compile).value,</span>
+   )
+<span class="hljs-deletion">-  .enablePlugins(MdocPlugin, DocusaurusPlugin)</span>
+<span class="hljs-addition">+  .enablePlugins(MdocPlugin, DocusaurusPlugin, ScalaUnidocPlugin)</span>
+   .dependsOn(myproject1, myproject2)
+</code></pre>
+<p>Make sure that you've added the
+<a href="https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin">sbt-unidoc</a>
+dependency to <code>project/plugins.sbt</code>.</p>
+<p>Now the <code>docs/docusaurusCreateSite</code> command will generate Scaladocs in the
+<code>website/static/api</code> directory, which you'll probably want to add to your
+<code>.gitignore</code>:</p>
+<pre><code class="hljs css language-diff">  // .gitignore
+  website/translated_docs
+  website/build/
+  website/yarn.lock
+  website/node_modules
+  website/i18n/*
+  !website/i18n/en.json
+<span class="hljs-addition">+ website/static/api</span>
+</code></pre>
+<p>You'll need to tweak your <code>siteConfig.js</code> file to make Docusaurus play nicely
+with Scaladoc's CSS. You may want to add a header link to your API docs too:</p>
+<pre><code class="hljs css language-diff">  // website/siteConfig.js
+<span class="hljs-addition">+ const baseUrl = '/my-project/' // Base URL for your project */</span>
+
+  const siteConfig = {
+    ...
+<span class="hljs-deletion">-   baseUrl: /my-project/,</span>
+<span class="hljs-addition">+   baseUrl: baseUrl,</span>
+    ...
+    headerLinks: [
+<span class="hljs-addition">+    { href: `${baseUrl}api/index.html`, label: 'API'},</span>
+    ],
+    // by default Docusaurus combines CSS files in a way that doesn't play nicely with Scaladoc
+<span class="hljs-addition">+   separateCss: ["api"],</span>
+    ...
+  }
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mdoc/docs/js.html"><span class="arrow-prev">← </span><span>Scala.js</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#requirements">Requirements</a></li><li><a href="#installation">Installation</a></li><li><a href="#create-static-site">Create static site</a></li><li><a href="#publish-to-github-pages-locally">Publish to GitHub pages locally</a></li><li><a href="#publish-to-github-pages-from-ci">Publish to GitHub pages from CI</a><ul class="toc-headings"><li><a href="#deploy-key">Deploy key</a></li><li><a href="#environment-variables">Environment variables</a></li><li><a href="#github-actions">GitHub Actions</a></li><li><a href="#travis-ci">Travis CI</a></li></ul></li><li><a href="#include-scaladoc-in-site">Include Scaladoc in site</a></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2021 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '5791175eba35c6626d93ae96610a8ae9',
+                indexName: 'scalamenta_mdoc',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

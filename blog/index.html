@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Blog · mdoc</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Typechecked markdown documentation for Scala"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Blog · mdoc"/><meta property="og:type" content="website"/><meta property="og:url" content="https://scalameta.org/mdoc/mdoc/index.html"/><meta property="og:description" content="Typechecked markdown documentation for Scala"/><meta property="og:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><link rel="shortcut icon" href="/mdoc/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://scalameta.org/mdoc/mdoc/blog/atom.xml" title="mdoc Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://scalameta.org/mdoc/mdoc/blog/feed.xml" title="mdoc Blog RSS Feed"/><link rel="stylesheet" href="/mdoc/css/custom.css"/><script src="/mdoc/js/scrollSpy.js"></script><link rel="stylesheet" href="/mdoc/css/main.css"/><script src="/mdoc/js/codetabs.js"></script></head><body class="blog"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mdoc/"><img class="logo" src="/mdoc/img/mdoc-logo.png" alt="mdoc"/><h2 class="headerTitleWithLogo">mdoc</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/mdoc/docs/installation.html" target="_self">Docs</a></li><li class="siteNavGroupActive siteNavItemActive"><a href="/mdoc/blog/" target="_self">Blog</a></li><li class=""><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent Posts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent Posts</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/blog/2019/12/30/introduction.html">Fast typechecked markdown documentation with clear error messages</a></li><li class="navListItem"><a class="navItem" href="/mdoc/blog/2019/04/04/v1.3.0.html">mdoc v1.3.0</a></li><li class="navListItem"><a class="navItem" href="/mdoc/blog/2019/01/04/v1.2.4.html">mdoc v1.2.4</a></li><li class="navListItem"><a class="navItem" href="/mdoc/blog/2019/01/01/v1.1.1.html">mdoc v1.1.1</a></li><li class="navListItem"><a class="navItem" href="/mdoc/blog/2018/12/31/v1.1.0.html">mdoc v1.1.0</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="posts"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2019/12/30/introduction.html">Fast typechecked markdown documentation with clear error messages</a></h1><p class="post-meta">December 30, 2019</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><p>This post introduces how mdoc evaluates Scala code examples with good
+performance while reporting clear error messages. mdoc is a markdown
+documentation tool inspired by <a href="http://tpolecat.github.io/tut/">tut</a>.</p>
+<p>Like tut, mdoc reads markdown files as input and produces markdown files as
+output with the Scala code examples evaluated. Unlike tut, mdoc does not use the
+Scala REPL to evaluate Scala code examples. Instead, mdoc translates each
+markdown file into a regular Scala program that evaluates in one run. In this
+post, we look into the implications of this change and how it can deliver up to
+<strong>27x faster performance</strong> when processing invalid documents.</p>
+</span></div><div class="read-more"><a class="button" href="/mdoc/blog/2019/12/30/introduction.html">Read More</a></div></article></div><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2019/04/04/v1.3.0.html">mdoc v1.3.0</a></h1><p class="post-meta">April 4, 2019</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><h2><a class="anchor" aria-hidden="true" id="compile-only-modifier"></a><a href="#compile-only-modifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Compile-only modifier</h2>
+<p>The new <code>compile-only</code> modifier makes it possible to validate that a
+code-example compiles successfully without evaluating the program at runtime.
+This feature can be useful to demonstrate code that performs side-effects</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> name = scala.io.<span class="hljs-type">StdIn</span>.readLine(<span class="hljs-string">"Please enter your name: "</span>)
+</code></pre>
+<p>The <code>compile-only</code> modifier works for both for JVM and Scala.js code blocks.</p>
+</span></div></article></div><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2019/01/04/v1.2.4.html">mdoc v1.2.4</a></h1><p class="post-meta">January 4, 2019</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><h2><a class="anchor" aria-hidden="true" id="interactive-documentation-with-scalajs"></a><a href="#interactive-documentation-with-scalajs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interactive documentation with Scala.js</h2>
+<p>You can now write <code>mdoc:js</code> code fences that compile with Scala.js and evaluate
+as JavaScript in the browser. This features is great for Scala.js libraries to
+write interactive documentation. To learn more, see the
+<a href="https://scalameta.org/mdoc/docs/js.html">documentation</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="no-spurious--ywarn-discard-value-warnings"></a><a href="#no-spurious--ywarn-discard-value-warnings" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>No spurious <code>-Ywarn-discard-value</code> warnings</h2>
+<p>He mdoc generated code previously reported a warning when compiled with the
+<code>-Ywarn-discard-value</code> option. Now, the generated code no longer reports
+warnings.</p>
+<h2><a class="anchor" aria-hidden="true" id="clearer-error-messages-for-generated-code"></a><a href="#clearer-error-messages-for-generated-code" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Clearer error messages for generated code</h2>
+<p>Previously, errors in generated mdoc code only reported the message without a
+position making it difficult to track down the problem. Now, errors in generated
+code show the generated code making it easier to see what's going on.</p>
+<p>Before:</p>
+<pre><code class="hljs css language-scala">error: <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">scalajs</span> <span class="hljs-title">is</span> <span class="hljs-title">not</span> <span class="hljs-title">a</span> <span class="hljs-title">member</span> <span class="hljs-title">of</span> <span class="hljs-title">package</span> <span class="hljs-title">org</span></span>
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs css language-scala">error: readme.md:<span class="hljs-number">3</span> (mdoc generated code) <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">scalajs</span> <span class="hljs-title">is</span> <span class="hljs-title">not</span> <span class="hljs-title">a</span> <span class="hljs-title">member</span> <span class="hljs-title">of</span> <span class="hljs-title">package</span> <span class="hljs-title">org</span></span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run0</span></span>(node: _root_.org.scalajs.dom.raw.<span class="hljs-type">Element</span>): <span class="hljs-type">Unit</span> = {
+                           ^
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="--out-cannot-be-subdirectory-of---in"></a><a href="#--out-cannot-be-subdirectory-of---in" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>--out cannot be subdirectory of --in</h2>
+<p>It is no longer possible to make <code>--out</code> a subdirectory of <code>--in</code> to prevent the
+number of files for mdoc to process to grow exponentially. Previously, this
+situation could silently happen with mis-configuration in the build but now mdoc
+fails fast when it happens.</p>
+<h2><a class="anchor" aria-hidden="true" id="build-sbt-mdoc-against-sbt-100"></a><a href="#build-sbt-mdoc-against-sbt-100" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Build sbt-mdoc against sbt 1.0.0</h2>
+<p>The sbt-mdoc plugin is now compiled against sbt 1.0.0 to avoid binary
+compatibility issues.</p>
+<h2><a class="anchor" aria-hidden="true" id="credits"></a><a href="#credits" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Credits</h2>
+<p>Big thanks to <a href="https://github.com/vlovgr">@vlovgr</a>,
+<a href="https://github.com/fdietze">@fdietze</a>,
+<a href="https://github.com/nrinaudo">@nrinaudo</a>, and
+<a href="https://github.com/julienrf">@julienrf</a> for helping with this release!</p>
+</span></div></article></div><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2019/01/01/v1.1.1.html">mdoc v1.1.1</a></h1><p class="post-meta">January 1, 2019</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><h2><a class="anchor" aria-hidden="true" id="fix-timeout-issue-with-blocking-futures"></a><a href="#fix-timeout-issue-with-blocking-futures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fix timeout issue with blocking Futures</h2>
+<p>Scala 2.12 introduced a regression that caused asynchronous code to hang
+forever in object constructors, see
+<a href="https://github.com/scala/scala-dev/issues/195#issuecomment-450723181">scala-dev/#195</a>.
+This caused mdoc issues like
+<a href="https://github.com/scalameta/mdoc/issues/124">#124</a>, where futures would
+timeout.  To workaround this problem, mdoc now uses the compiler option
+<code>-Ydelambdafy:inline</code> by default.</p>
+<h2><a class="anchor" aria-hidden="true" id="new---no-link-hygiene-option"></a><a href="#new---no-link-hygiene-option" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New --no-link-hygiene option</h2>
+<p>Use the command-line argument <code>--no-link-hygiene</code> to disable link hygiene so that warnings are not reported. With sbt-mdoc, add</p>
+<pre><code class="hljs css language-scala">mdocExtraArguments := <span class="hljs-type">List</span>(<span class="hljs-string">"--no-link-hygiene"</span>)
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="markdown-footnotes-now-work"></a><a href="#markdown-footnotes-now-work" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Markdown footnotes now work</h2>
+<p>Previously, markdown footnotes would render incorrectly, which has now been fixed so it's possible to write like below.</p>
+<pre><code class="hljs css language-md">Paragraph with a footnote reference[^1]
+
+[<span class="hljs-symbol">^1</span>]: <span class="hljs-link">Footnote text added at the bottom of the document</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="improved-stack-traces"></a><a href="#improved-stack-traces" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improved stack traces</h2>
+<p>Previously, exceptions with causes were printed with full stack traces. Now, all exception stacktraces are trimmed to only show relevant parts.</p>
+</span></div></article></div><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2018/12/31/v1.1.0.html">mdoc v1.1.0</a></h1><p class="post-meta">December 31, 2018</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><h2><a class="anchor" aria-hidden="true" id="new-object-encoding"></a><a href="#new-object-encoding" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New object encoding</h2>
+<p>It's now possible to declare sealed ADTs like below without getting a warning <code>warning: The outer reference in this type test cannot be checked at run time.</code>.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">sealed</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Maybe</span>[+<span class="hljs-type">A</span>] <span class="hljs-keyword">extends</span> <span class="hljs-title">Product</span> <span class="hljs-keyword">with</span> <span class="hljs-title">Serializable</span></span>
+
+<span class="hljs-keyword">final</span> <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Just</span>[<span class="hljs-type">A</span>](<span class="hljs-params">value: <span class="hljs-type">A</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Maybe</span>[<span class="hljs-type">A</span>]</span>
+<span class="hljs-keyword">final</span> <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Nothing</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Maybe</span>[<span class="hljs-type">Nothing</span>]</span>
+</code></pre>
+<p>The error happened because we wrapped the code in <code>class Session { class App { ... } }</code>.  Now, we wrap the code in <code>object Session { object App { ... } }</code>
+instead, which removes the warning.</p>
+<p>Thanks <a href="https://github.com/nrinaudo">@nrinaudo</a> for reporting!</p>
+<h2><a class="anchor" aria-hidden="true" id="multiple-modifiers"></a><a href="#multiple-modifiers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Multiple modifiers</h2>
+<p>It's now possible to combine modifiers like <code>reset:silent</code> or <code>reset:fail</code>.</p>
+<pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc
+val x = 1
+<span class="hljs-code">```
+
+```scala mdoc:reset:fail
+println(x)
+```</span>
+</code></pre>
+<p>This example produces the following output.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> x = <span class="hljs-number">1</span>
+<span class="hljs-comment">// x: Int = 1</span>
+</code></pre>
+<pre><code class="hljs css language-scala">println(x)
+<span class="hljs-comment">// error: not found: value x</span>
+<span class="hljs-comment">// println(x)</span>
+<span class="hljs-comment">//         ^</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="relative-filenames-in-crash-stacktraces"></a><a href="#relative-filenames-in-crash-stacktraces" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Relative filenames in <code>:crash</code> stacktraces</h2>
+<p>Previously, stack traces from <code>:crash</code> included absolute paths. Now they include only relative filenames.</p>
+<pre><code class="hljs css language-diff"> // scala.MatchError: final val x = 2 (of class scala.meta.Defn$Val$DefnValImpl)
+<span class="hljs-deletion">-//  at repl.Session.$anonfun$app$47(/Users/ollie/dev/scalameta-tutorial/docs/trees/guide.md:252)</span>
+<span class="hljs-addition">+//  at repl.Session.$anonfun$app$47(guide.md:252)</span>
+</code></pre>
+</span></div></article></div><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/mdoc/blog/2018/12/30/v1.html">mdoc v1.0.0</a></h1><p class="post-meta">December 30, 2018</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener">Ólafur Páll Geirsson</a></p><div class="authorPhoto"><a href="https://twitter.com/olafurpg" target="_blank" rel="noreferrer noopener"><img src="https://avatars2.githubusercontent.com/u/1408093?s=460&amp;v=4" alt="Ólafur Páll Geirsson"/></a></div></div></header><article class="post-content"><div><span><p>I am pleased to announce the release of mdoc v1.0.0. mdoc is a markdown
+documentation tool for Scala inspired by <a href="https://github.com/tpolecat/tut">tut</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-website"></a><a href="#new-website" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New website</h2>
+<p>The mdoc readme has been replaced with this website and the documentation has
+been expanded to cover mdoc features in more depth. There is a new
+<a href="https://scalameta.org/mdoc/docs/tut.html">&quot;Coming from tut&quot;</a> guide to help tut
+users migrate to mdoc.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-sbt-plugin"></a><a href="#new-sbt-plugin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New sbt plugin</h2>
+<p>There is now an sbt-mdoc plugin that makes it easier to use mdoc from sbt
+builds. See the
+<a href="https://scalameta.org/mdoc/docs/installation.html#sbt">installation instructions</a>
+to learn how to use sbt-mdoc.</p>
+<h2><a class="anchor" aria-hidden="true" id="docusaurus-integration"></a><a href="#docusaurus-integration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Docusaurus integration</h2>
+<p>The sbt-mdoc plugin includes a <code>DocusaurusPlugin</code> to integrate mdoc with
+<a href="https://docusaurus.io/">Docusaurus</a>. Several projects already use mdoc in
+combination with Docusaurus:</p>
+<ul>
+<li><a href="https://scalameta.org/scalafmt/">Scalafmt</a></li>
+<li><a href="https://scalacenter.github.io/scalafix/">Scalafix</a></li>
+<li><a href="http://scalameta.org/">Scalameta</a></li>
+<li><a href="https://scalameta.org/metals/">Metals</a></li>
+<li><a href="https://scalacenter.github.io/bloop/">Bloop</a></li>
+<li><a href="https://coursier.github.io/coursier/">Coursier</a></li>
+<li><a href="http://almond-sh.github.io/almond/stable/docs/intro">Almond</a></li>
+<li><a href="https://ovotech.github.io/fs2-kafka/">fs2-kafka</a></li>
+</ul>
+<p>See the
+<a href="https://scalameta.org/mdoc/docs/installation.html#sbt">docusaurus instructions</a>
+to learn how to use <code>DocusaurusPlugin</code> and configure CI to publish to GitHub
+pages.</p>
+<h2><a class="anchor" aria-hidden="true" id="improved-fail-modifier"></a><a href="#improved-fail-modifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improved <code>:fail</code> modifier</h2>
+<p>Previously, mdoc used Scala macros to implement the <code>:fail</code> modifier which
+produces incorrect compilation errors in rare cases. See
+<a href="https://github.com/olafurpg/mdoc/issues/95">#95</a>. Now, mdoc translates each
+<code>:fail</code> modifier into a standalone Scala program and compiles it with the Scala
+compiler ensuring that compile errors are always accurate.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-reset-modifier"></a><a href="#new-reset-modifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New <code>:reset</code> modifier</h2>
+<p>Now it's possible to clear all leading imports and declarations in the markdown
+document with the
+<a href="https://scalameta.org/mdoc/docs/modifiers.html#reset"><code>mdoc:reset</code></a> modifier.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-organization"></a><a href="#new-organization" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New organization</h2>
+<p>Previously, the mdoc repository lived in olafurpg/mdoc and was published under
+<code>com.geirsson</code>. Now, mdoc lives in scalameta/mdoc and is published under
+<code>org.scalameta</code>.</p>
+</span></div></article></div><div class="docs-prevnext"></div></div></div></div></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2021 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '5791175eba35c6626d93ae96610a8ae9',
+                indexName: 'scalamenta_mdoc',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Installation · mdoc</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Create a `docs` directory and `docs/readme.md` file with some basic content."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Installation · mdoc"/><meta property="og:type" content="website"/><meta property="og:url" content="https://scalameta.org/mdoc/mdoc/index.html"/><meta property="og:description" content="Create a `docs` directory and `docs/readme.md` file with some basic content."/><meta property="og:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><link rel="shortcut icon" href="/mdoc/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://scalameta.org/mdoc/mdoc/blog/atom.xml" title="mdoc Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://scalameta.org/mdoc/mdoc/blog/feed.xml" title="mdoc Blog RSS Feed"/><link rel="stylesheet" href="/mdoc/css/custom.css"/><script src="/mdoc/js/scrollSpy.js"></script><link rel="stylesheet" href="/mdoc/css/main.css"/><script src="/mdoc/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mdoc/"><img class="logo" src="/mdoc/img/mdoc-logo.png" alt="mdoc"/><h2 class="headerTitleWithLogo">mdoc</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive siteNavItemActive"><a href="/mdoc/docs/installation.html" target="_self">Docs</a></li><li class=""><a href="/mdoc/blog/" target="_self">Blog</a></li><li class=""><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Overview</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Overview</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/mdoc/docs/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/why.html">Why mdoc?</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/tut.html">Coming from tut</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/changelog.html">Changelog</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Modifiers</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/modifiers.html">JVM</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/js.html">Scala.js</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Site generators</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/docusaurus.html">Docusaurus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/scalameta/mdoc/edit/main/docs/installation.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Installation</h1></header><article><div><span><p>Create a <code>docs</code> directory and <code>docs/readme.md</code> file with some basic content.</p>
+<pre><code class="hljs">$ tree
+.
+└── docs
+    └── readme.md
+$ cat docs/readme.md
+# My Project
+
+To install my project
+```scala
+libraryDependencies += <span class="hljs-string">"com"</span> % <span class="hljs-string">"lib"</span> % <span class="hljs-string">"@VERSION@"</span>
+```
+
+```scala mdoc
+val x = <span class="hljs-number">1</span>
+List(x, x)
+```
+</code></pre>
+<p>We process the markdown with one of the following mdoc integrations:</p>
+<ul>
+<li><a href="#sbt">sbt-mdoc</a>: for usage with sbt projects.</li>
+<li><a href="#command-line">command-line</a>: to run from the console outside of a build
+tool.</li>
+<li><a href="#library">library API</a>: for programmatic usage.</li>
+</ul>
+<p>The generated <code>readme.md</code> will look like this.</p>
+<pre><code class="hljs"># My Project
+
+To install my project
+
+```scala
+libraryDependencies += <span class="hljs-string">"com"</span> % <span class="hljs-string">"lib"</span> % <span class="hljs-string">"1.0.0"</span>
+```
+
+```scala
+val x = <span class="hljs-number">1</span>
+<span class="hljs-title">// x:</span> Int = <span class="hljs-number">1</span>
+List(x, x)
+<span class="hljs-title">// res0:</span> List[Int] = List(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+```
+</code></pre>
+<p>Observe that <code>VERSION</code> has been replaced with <code>1.0.0</code> and that the <code>scala mdoc</code>
+code fence has been evaluated.</p>
+<h2><a class="anchor" aria-hidden="true" id="sbt"></a><a href="#sbt" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>sbt</h2>
+<p>Install the <code>sbt-mdoc</code> plugin and create a <code>docs</code> project in build.sbt that
+enables <code>mdoc.MdocPlugin</code>.</p>
+<p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// project/plugins.sbt</span>
+addSbtPlugin(<span class="hljs-string">"org.scalameta"</span> % <span class="hljs-string">"sbt-mdoc"</span> % <span class="hljs-string">"2.2.21"</span> )
+<span class="hljs-comment">// build.sbt</span>
+<span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> myproject = project  <span class="hljs-comment">// your existing library</span>
+  .settings(...)
+<span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> docs = project       <span class="hljs-comment">// new documentation project</span>
+  .in(file(<span class="hljs-string">"myproject-docs"</span>)) <span class="hljs-comment">// important: it must not be docs/</span>
+  .dependsOn(myproject)
+  .enablePlugins(<span class="hljs-type">MdocPlugin</span>)
+</code></pre>
+<p>Next, from the sbt shell, run the <code>docs/mdoc</code> task to generate the documentation
+site. By default, the <code>mdoc</code> task looks for markdown sources in the toplevel
+<code>docs/</code> directory.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// sbt shell</span>
+&gt; docs/mdoc
+</code></pre>
+<p>Update <code>mdocVariables</code> to include site variables like <code>@VERSION@</code>.</p>
+<pre><code class="hljs css language-diff">// build.sbt
+lazy val docs = project
+  .in(file("myproject-docs"))
+  .settings(
+<span class="hljs-addition">+   mdocVariables := Map(</span>
+<span class="hljs-addition">+     "VERSION" -&gt; version.value</span>
+<span class="hljs-addition">+   )</span>
+  )
+  .dependsOn(myproject)
+  .enablePlugins(MdocPlugin)
+</code></pre>
+<p>The <code>mdoc</code> task runs the mdoc command-line interface so it's possible to pass in
+arguments like <code>--watch</code> to start file watcher with livereload. It's recommended
+to use <code>--watch</code> while writing documentation to enjoy 3-4x faster compilation
+performance.</p>
+<pre><code class="hljs css language-scala">&gt; docs/mdoc --watch
+</code></pre>
+<p>See <a href="#help"><code>--help</code></a> to learn more how to use the command-line interface.</p>
+<pre><code class="hljs css language-scala">&gt; docs/mdoc --help
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="reference"></a><a href="#reference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reference</h3>
+<p>The sbt-mdoc plugin supports the following settings.</p>
+<table>
+      <tr>
+        <th>Task</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><code>mdoc</code></td>
+        <td><code>InputTask[Unit]</code></td>
+        <td>Run mdoc to generate markdown sources. Supports arguments like --watch to start the file watcher with livereload.</td>
+      </tr><tr>
+        <td><code>mdocIn</code></td>
+        <td><code>File</code></td>
+        <td>Input directory or source file containing markdown to be processed by mdoc. Defaults to the toplevel docs/ directory.</td>
+      </tr><tr>
+        <td><code>mdocOut</code></td>
+        <td><code>File</code></td>
+        <td>Output directory or output file name for mdoc generated markdown. Defaults to the target/mdoc directory of this project. If this is a file name, it assumes your `in` was also an individual file</td>
+      </tr><tr>
+        <td><code>mdocVariables</code></td>
+        <td><code>Map[String, String]</code></td>
+        <td>Site variables that can be referenced from markdown with @VERSION@.</td>
+      </tr><tr>
+        <td><code>mdocExtraArguments</code></td>
+        <td><code>Seq[String]</code></td>
+        <td>Additional command-line arguments to pass on every mdoc invocation. For example, add '--no-link-hygiene' to disable link hygiene.</td>
+      </tr><tr>
+        <td><code>mdocJS</code></td>
+        <td><code>Option[Project]</code></td>
+        <td>Optional Scala.js classpath and compiler options to use for the mdoc:js modifier. To use this setting, set the value to `mdocJS := Some(jsproject)` where `jsproject` must be a Scala.js project.</td>
+      </tr><tr>
+        <td><code>mdocJSLibraries</code></td>
+        <td><code>Task[Seq[Attributed[File]]]</code></td>
+        <td>Additional local JavaScript files to load before loading the mdoc compiled Scala.js bundle. If using scalajs-bundler, set this key to `webpack.in(&lt;mdocJS project&gt;, Compile, fullOptJS).value`.</td>
+      </tr><tr>
+        <td><code>mdocAutoDependency</code></td>
+        <td><code>Boolean</code></td>
+        <td>If false, do not add mdoc as a library dependency this project. Default value is true.</td>
+      </tr>
+    </table>
+<h2><a class="anchor" aria-hidden="true" id="command-line"></a><a href="#command-line" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Command-line</h2>
+<p>Use <a href="https://github.com/coursier/coursier/#command-line">coursier</a> to launch
+mdoc outside of a build tool.</p>
+<p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
+<pre><code class="hljs css language-sh">curl -L -o coursier https://git.io/coursier
+chmod +x coursier
+coursier launch org.scalameta:mdoc_2.12:2.2.21 -- --site.VERSION 1.0.0
+info: Compiling 1 file to website/target/docs
+info: Compiled <span class="hljs-keyword">in</span> 1.2s (0 errors)
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="add-library-dependencies-to-classpath"></a><a href="#add-library-dependencies-to-classpath" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Add library dependencies to classpath</h3>
+<p>Use the <code>--classpath</code> argument to change the classpath used for compilation:</p>
+<pre><code class="hljs css language-diff"> coursier launch \
+   org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --classpath $(coursier fetch -p org.typelevel:cats-core_2.12:1.5.0)</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="customize-input-directory"></a><a href="#customize-input-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Customize input directory</h3>
+<p>By default the <code>docs/</code> directory is processed as input. Use <code>--in</code> to customize
+the input directory where markdown sources are contained,</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --in mydocs</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="process-single-markdown-file"></a><a href="#process-single-markdown-file" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Process single markdown file</h3>
+<p>The <code>--in</code> flag doesn't have to be a directory, it also supports individual
+files.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --in mydocs/readme.md</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="configure-site-variables-like-version"></a><a href="#configure-site-variables-like-version" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configure site variables like <code>@VERSION@</code></h3>
+<p>Use <code>--site.VARIABLE=value</code> to add site variables that can be referenced from
+markdown as <code>@VARIABLE@</code>.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --site.SCALA_VERSION 2.12.13</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="customize-output-directory"></a><a href="#customize-output-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Customize output directory</h3>
+<p>Use <code>--out</code> to customize where your markdown sources are generated, by default
+the <code>out/</code> directory is used.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --out target/docs</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="generate-single-output-file-instead-of-directory"></a><a href="#generate-single-output-file-instead-of-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Generate single output file instead of directory</h3>
+<p>The <code>--out</code> flag doesn't have to be a directory when the <code>--in</code> argument is a
+regular file, it can also be an individual file.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --in readme.template.md \</span>
+<span class="hljs-addition">+  --out readme.md</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="process-multiple-input-directories-and-files"></a><a href="#process-multiple-input-directories-and-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Process multiple input directories and files</h3>
+<p>Repeat the <code>--in</code> and <code>--out</code> arguments to process multiple directories and
+regular files.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --in readme.template.md \</span>
+<span class="hljs-addition">+  --out readme.md \</span>
+<span class="hljs-addition">+  --in changelog.template.md \</span>
+<span class="hljs-addition">+  --out changelog.md \</span>
+<span class="hljs-addition">+  --in mydocs-directory \</span>
+<span class="hljs-addition">+  --out out-directory \</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="live-reload-html-preview-on-file-save"></a><a href="#live-reload-html-preview-on-file-save" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Live reload HTML preview on file save</h3>
+<p>Use <code>--watch</code> to start the file watcher with livereload. It's recommended to use
+<code>--watch</code> while writing documentation to enjoy 3-4x faster compilation
+performance.</p>
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.2.21 -- \
+<span class="hljs-addition">+  --watch</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="help"></a><a href="#help" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Help</h3>
+<p>Use <code>--help</code> to learn more how to use the command-line interface.</p>
+<pre><code class="hljs css language-txt">mdoc v2.<span class="hljs-number">2.21</span>
+Usage:   mdoc [&lt;option&gt; ...]
+Example: mdoc <span class="hljs-comment">--in mydocs --out _site  (custom input/output directories)</span>
+         mdoc <span class="hljs-comment">--watch                  (watch for file changes)</span>
+         mdoc <span class="hljs-comment">--site.VERSION 1.0.0     (pass in site variables)</span>
+         mdoc <span class="hljs-comment">--include **/example.md  (process only files named example.md)</span>
+         mdoc <span class="hljs-comment">--exclude node_modules   (don't process node_modules directory)</span>
+         mdoc <span class="hljs-comment">--in readme.template.md --out readme.md \</span>
+              <span class="hljs-comment">--in examples.template.md --out examples.md (multiple input/output pairs)</span>
+
+mdoc <span class="hljs-keyword">is</span> a documentation tool that interprets Scala code examples within markdown
+code fences allowing you <span class="hljs-keyword">to</span> compile <span class="hljs-keyword">and</span> test documentation as part your build. 
+
+Common options:
+
+  <span class="hljs-comment">--in | -i [&lt;path&gt; ...] (default: ["docs"])</span>
+    The input directory <span class="hljs-keyword">or</span> regular <span class="hljs-keyword">file</span> containing markdown <span class="hljs-keyword">and</span> other documentation
+    sources that should be processed. Markdown files are processed by mdoc <span class="hljs-keyword">while</span>
+    non-markdown files are copied verbatim <span class="hljs-keyword">to</span> the output directory. Can be
+    repeated <span class="hljs-keyword">to</span> <span class="hljs-keyword">process</span> multiple input directories/files.
+
+  <span class="hljs-comment">--out | -o [&lt;path&gt; ...] (default: ["out"])</span>
+    The output directory <span class="hljs-keyword">or</span> regular <span class="hljs-keyword">file</span> where you<span class="hljs-symbol">'d</span> like <span class="hljs-keyword">to</span> <span class="hljs-keyword">generate</span> your markdown
+    <span class="hljs-keyword">or</span> other documentation sources. Must be repeated <span class="hljs-keyword">to</span> match the number <span class="hljs-keyword">of</span>
+    `<span class="hljs-comment">--in` arguments and must be a directory when the matching `--in` argument</span>
+    <span class="hljs-keyword">is</span> a directory.
+
+  <span class="hljs-comment">--watch | -w</span>
+    Start a <span class="hljs-keyword">file</span> watcher <span class="hljs-keyword">and</span> incrementally re-<span class="hljs-keyword">generate</span> the site <span class="hljs-keyword">on</span> <span class="hljs-keyword">file</span> save.
+
+  <span class="hljs-comment">--check</span>
+    Instead <span class="hljs-keyword">of</span> generating a <span class="hljs-keyword">new</span> site, <span class="hljs-keyword">report</span> an <span class="hljs-literal">error</span> <span class="hljs-keyword">if</span> generating the site would
+    produce a diff against an existing site. Useful <span class="hljs-keyword">for</span> asserting <span class="hljs-keyword">in</span> CI that a
+    site <span class="hljs-keyword">is</span> up-<span class="hljs-keyword">to</span>-date.
+
+  <span class="hljs-comment">--no-link-hygiene</span>
+    Disable link hygiene analysis so that no warnings are reported <span class="hljs-keyword">for</span> dead links.
+
+  <span class="hljs-comment">--verbose</span>
+    Include additional diagnostics <span class="hljs-keyword">for</span> debugging potential problems.
+
+  <span class="hljs-comment">--site Map[String, String] (default: {})</span>
+    Key/value pairs <span class="hljs-keyword">of</span> variables <span class="hljs-keyword">to</span> replace through @VAR@. <span class="hljs-keyword">For</span> example, the flag
+    '<span class="hljs-comment">--site.VERSION 1.0.0' will replace appearances of '@VERSION@' in markdown</span>
+    files <span class="hljs-keyword">with</span> the <span class="hljs-built_in">string</span> <span class="hljs-number">1.0</span>.<span class="hljs-number">0</span>
+
+Compiler options:
+
+  <span class="hljs-comment">--classpath String (default: "")</span>
+    Classpath <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">when</span> compiling Scala code examples. Defaults <span class="hljs-keyword">to</span> the current
+    thread<span class="hljs-symbol">'s</span> classpath.You can <span class="hljs-keyword">use</span> Coursier<span class="hljs-symbol">'s</span> fetch command <span class="hljs-keyword">to</span> <span class="hljs-keyword">generate</span> the
+    classpath <span class="hljs-keyword">for</span> you:`<span class="hljs-comment">--classpath $(cs fetch --classpath</span>
+    org::artifact:version)`
+
+  <span class="hljs-comment">--scalac-options String (default: "")</span>
+    Space separated list <span class="hljs-keyword">of</span> compiler flags such as '-Xplugin:kind-projector.jar
+    -deprecation -Yrangepos'. Defaults <span class="hljs-keyword">to</span> the value <span class="hljs-keyword">of</span> <span class="hljs-symbol">'scalacOptions</span>' <span class="hljs-keyword">in</span> the
+    <span class="hljs-symbol">'mdoc</span>.properties' resource <span class="hljs-keyword">file</span>, <span class="hljs-keyword">if</span> any. <span class="hljs-keyword">When</span> using sbt-mdoc, update the
+    `scalacOptions` sbt setting instead <span class="hljs-keyword">of</span> passing <span class="hljs-comment">--scalac-options to</span>
+    `mdocExtraArguments`.
+
+  <span class="hljs-comment">--clean-target</span>
+    Remove <span class="hljs-keyword">all</span> files <span class="hljs-keyword">in</span> the output directory before generating a <span class="hljs-keyword">new</span> site.
+
+LiveReload options:
+
+  <span class="hljs-comment">--no-livereload</span>
+    Don<span class="hljs-symbol">'t</span> start a LiveReload server under <span class="hljs-comment">--watch mode.</span>
+
+  <span class="hljs-comment">--port Int (default: 4000)</span>
+    Which <span class="hljs-keyword">port</span> the LiveReload server should listen <span class="hljs-keyword">to</span>. <span class="hljs-keyword">If</span> the <span class="hljs-keyword">port</span> <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> free,
+    another free <span class="hljs-keyword">port</span> close <span class="hljs-keyword">to</span> this number <span class="hljs-keyword">is</span> used.
+
+  <span class="hljs-comment">--host String (default: "localhost")</span>
+    Which hostname the LiveReload server should listen <span class="hljs-keyword">to</span>
+
+Less common options:
+
+  <span class="hljs-comment">--help</span>
+    Print <span class="hljs-keyword">out</span> a help message <span class="hljs-keyword">and</span> <span class="hljs-keyword">exit</span>
+
+  <span class="hljs-comment">--usage</span>
+    Print <span class="hljs-keyword">out</span> usage instructions <span class="hljs-keyword">and</span> <span class="hljs-keyword">exit</span>
+
+  <span class="hljs-comment">--version</span>
+    Print <span class="hljs-keyword">out</span> the version number <span class="hljs-keyword">and</span> <span class="hljs-keyword">exit</span>
+
+  <span class="hljs-comment">--markdown-extensions [String ...] (default: ["md", "html"])</span>
+    Set <span class="hljs-keyword">of</span> <span class="hljs-keyword">file</span> extensions <span class="hljs-keyword">to</span> treat as markdown files.
+
+  <span class="hljs-comment">--include [&lt;glob&gt; ...] (default: [])</span>
+    Glob <span class="hljs-keyword">to</span> filter which files <span class="hljs-keyword">to</span> <span class="hljs-keyword">process</span>. Defaults <span class="hljs-keyword">to</span> <span class="hljs-keyword">all</span> files. Example: <span class="hljs-comment">--include</span>
+    **/example.md will <span class="hljs-keyword">process</span> only files <span class="hljs-keyword">with</span> the name example.md.
+
+  <span class="hljs-comment">--exclude [&lt;glob&gt; ...] (default: [])</span>
+    Glob <span class="hljs-keyword">to</span> filter which files from exclude from processing. Defaults <span class="hljs-keyword">to</span> no files.
+    Example: <span class="hljs-comment">--include users/**.md --exclude **/example.md will process all</span>
+    files <span class="hljs-keyword">in</span> the users/ directory excluding files named example.md.
+
+  <span class="hljs-comment">--report-relative-paths</span>
+    <span class="hljs-keyword">Use</span> relative filenames <span class="hljs-keyword">when</span> reporting <span class="hljs-literal">error</span> messages. Useful <span class="hljs-keyword">for</span> producing
+    consistent docs <span class="hljs-keyword">on</span> a local machine <span class="hljs-keyword">and</span> CI. 
+
+  <span class="hljs-comment">--charset Charset (default: "UTF-8")</span>
+    The encoding <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">when</span> reading <span class="hljs-keyword">and</span> writing files.
+
+  <span class="hljs-comment">--cwd &lt;path&gt; (default: "&lt;current working directory&gt;")</span>
+    The working directory <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">for</span> making relative paths absolute.
+
+
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="library"></a><a href="#library" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Library</h2>
+<p>Add the following dependency to your build</p>
+<p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// build.sbt</span>
+scalaVersion := <span class="hljs-string">"2.12.13"</span> <span class="hljs-comment">// Any version in 2.12.x works.</span>
+libraryDependencies += <span class="hljs-string">"org.scalameta"</span> %% <span class="hljs-string">"mdoc"</span> % <span class="hljs-string">"2.2.21"</span>
+</code></pre>
+<p>Then write a main function that invokes mdoc as a library</p>
+<p>It's recommended to use <code>--watch</code> while writing documentation to enjoy 3-4x
+faster compilation performance.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Main</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span></span>(args: <span class="hljs-type">Array</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Unit</span> = {
+    <span class="hljs-comment">// build arguments for mdoc</span>
+    <span class="hljs-keyword">val</span> settings = mdoc.<span class="hljs-type">MainSettings</span>()
+      .withSiteVariables(<span class="hljs-type">Map</span>(<span class="hljs-string">"VERSION"</span> -&gt; <span class="hljs-string">"1.0.0"</span>))
+      .withArgs(args.toList)
+    <span class="hljs-comment">// generate out/readme.md from working directory</span>
+    <span class="hljs-keyword">val</span> exitCode = mdoc.<span class="hljs-type">Main</span>.process(settings)
+    <span class="hljs-comment">// (optional) exit the main function with exit code 0 (success) or 1 (error)</span>
+    <span class="hljs-keyword">if</span> (exitCode != <span class="hljs-number">0</span>) sys.exit(exitCode)
+  }
+}
+</code></pre>
+<p>If you use sbt-mdoc, update the <code>mdoc</code> task to call <code>run</code> instead of the default
+<code>runMain mdoc.Main</code>.</p>
+<pre><code class="hljs css language-diff">// build.sbt
+lazy val docs = project
+  .in(file("myproject-docs"))
+  .settings(
+<span class="hljs-addition">+   mdoc := run.in(Compile).evaluated</span>
+  )
+  .dependsOn(myproject)
+  .enablePlugins(MdocPlugin)
+</code></pre>
+<p>Consult the mdoc source to learn more how to use the library API. Scaladocs are
+available
+<a href="https://www.javadoc.io/doc/org.scalameta/mdoc_2.12/2.2.21">here</a>
+but beware there are limited docstrings for classes and methods. Keep in mind
+that code in the package <code>mdoc.internal</code> is subject to binary and source
+breaking changes between any release, including PATCH versions.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-next button" href="/mdoc/docs/why.html"><span>Why mdoc?</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#sbt">sbt</a><ul class="toc-headings"><li><a href="#reference">Reference</a></li></ul></li><li><a href="#command-line">Command-line</a><ul class="toc-headings"><li><a href="#add-library-dependencies-to-classpath">Add library dependencies to classpath</a></li><li><a href="#customize-input-directory">Customize input directory</a></li><li><a href="#process-single-markdown-file">Process single markdown file</a></li><li><a href="#configure-site-variables-like-version">Configure site variables like <code>@VERSION@</code></a></li><li><a href="#customize-output-directory">Customize output directory</a></li><li><a href="#generate-single-output-file-instead-of-directory">Generate single output file instead of directory</a></li><li><a href="#process-multiple-input-directories-and-files">Process multiple input directories and files</a></li><li><a href="#live-reload-html-preview-on-file-save">Live reload HTML preview on file save</a></li><li><a href="#help">Help</a></li></ul></li><li><a href="#library">Library</a></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2021 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '5791175eba35c6626d93ae96610a8ae9',
+                indexName: 'scalamenta_mdoc',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

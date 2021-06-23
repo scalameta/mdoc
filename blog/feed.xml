@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>mdoc Blog</title>
+        <link>https://scalameta.org/mdoc/mdoc/blog</link>
+        <description>The best place to stay up-to-date with the latest mdoc news and events.</description>
+        <lastBuildDate>Mon, 30 Dec 2019 06:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <image>
+            <title>mdoc Blog</title>
+            <url>https://scalameta.org/mdoc/mdoc/img/mdoc-logo.png</url>
+            <link>https://scalameta.org/mdoc/mdoc/blog</link>
+        </image>
+        <copyright>Copyright © 2021 mdoc developers</copyright>
+        <item>
+            <title><![CDATA[Fast typechecked markdown documentation with clear error messages]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2019/12/30/introduction.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2019/12/30/introduction.html</guid>
+            <pubDate>Mon, 30 Dec 2019 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>This post introduces how mdoc evaluates Scala code examples with good
+performance while reporting clear error messages. mdoc is a markdown
+documentation tool inspired by <a href="http://tpolecat.github.io/tut/">tut</a>.</p>
+<p>Like tut, mdoc reads markdown files as input and produces markdown files as
+output with the Scala code examples evaluated. Unlike tut, mdoc does not use the
+Scala REPL to evaluate Scala code examples. Instead, mdoc translates each
+markdown file into a regular Scala program that evaluates in one run. In this
+post, we look into the implications of this change and how it can deliver up to
+<strong>27x faster performance</strong> when processing invalid documents.</p>
+]]></description>
+        </item>
+        <item>
+            <title><![CDATA[mdoc v1.3.0]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2019/04/04/v1.3.0.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2019/04/04/v1.3.0.html</guid>
+            <pubDate>Thu, 04 Apr 2019 06:00:00 GMT</pubDate>
+            <description><![CDATA[<h2><a class="anchor" aria-hidden="true" id="compile-only-modifier"></a><a href="#compile-only-modifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>Compile-only modifier</h2> <p>The new <code>compile-only</code> modifier makes it possible to validate that a code-example compiles successfully without evaluating the program at runtime. This feature can be useful to demonstrate code that performs side-effects</p> <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> name ...</code></pre>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[mdoc v1.2.4]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2019/01/04/v1.2.4.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2019/01/04/v1.2.4.html</guid>
+            <pubDate>Fri, 04 Jan 2019 06:00:00 GMT</pubDate>
+            <description><![CDATA[<h2><a class="anchor" aria-hidden="true" id="interactive-documentation-with-scalajs"></a><a href="#interactive-documentation-with-scalajs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>Interactive documentation with Scala.js</h2> <p>You can now write <code>mdoc:js</code> code fences that compile with Scala.js and evaluate as JavaScript in the browser. This features is great for Scala.js libraries to write interactive documentation. To learn more, see t...</p>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[mdoc v1.1.1]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2019/01/01/v1.1.1.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2019/01/01/v1.1.1.html</guid>
+            <pubDate>Tue, 01 Jan 2019 06:00:00 GMT</pubDate>
+            <description><![CDATA[<h2><a class="anchor" aria-hidden="true" id="fix-timeout-issue-with-blocking-futures"></a><a href="#fix-timeout-issue-with-blocking-futures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>Fix timeout issue with blocking Futures</h2> <p>Scala 2.12 introduced a regression that caused asynchronous code to hang forever in object constructors, see <a href="https://github.com/scala/scala-dev/issues/195#issuecomment-450723181">scala-dev/#195</a>. This caused mdoc issues like <a href="https://github.com/scalameta/mdoc/issues/124">#124</a>, where futures would timeout. To workaround this pr...</p>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[mdoc v1.1.0]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2018/12/31/v1.1.0.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2018/12/31/v1.1.0.html</guid>
+            <pubDate>Mon, 31 Dec 2018 06:00:00 GMT</pubDate>
+            <description><![CDATA[<h2><a class="anchor" aria-hidden="true" id="new-object-encoding"></a><a href="#new-object-encoding" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>New object encoding</h2> <p>It's now possible to declare sealed ADTs like below without getting a warning <code>warning: The outer reference in this type test cannot be checked at run time.</code>.</p> <pre><code class="hljs css language-scala"><span class="hljs-keyword">sealed</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Maybe</span>[+<span class="hljs-type">A</span>] <span class="hljs-keyword">extends</span> <span class="hljs-title">Product</span> <span class="hljs-keyword">with</span> <span class="hljs-title">Serializable</span></span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">c...</span></code></pre>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[mdoc v1.0.0]]></title>
+            <link>https://scalameta.org/mdoc/mdoc/blog/2018/12/30/v1.html</link>
+            <guid>https://scalameta.org/mdoc/mdoc/blog/2018/12/30/v1.html</guid>
+            <pubDate>Sun, 30 Dec 2018 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>I am pleased to announce the release of mdoc v1.0.0. mdoc is a markdown documentation tool for Scala inspired by <a href="https://github.com/tpolecat/tut">tut</a>.</p> <h2><a class="anchor" aria-hidden="true" id="new-website"></a><a href="#new-website" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>New website</h2> <p>The mdoc readme has been replaced with this website and the documentation has been expanded to cover mdoc features in mo...</p>]]></description>
+        </item>
+    </channel>
+</rss>

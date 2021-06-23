@@ -1,0 +1,751 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>JVM Modifiers · mdoc</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Code fences with the `scala mdoc` modifier are compiled and evaluated on the JVM"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="JVM Modifiers · mdoc"/><meta property="og:type" content="website"/><meta property="og:url" content="https://scalameta.org/mdoc/mdoc/index.html"/><meta property="og:description" content="Code fences with the `scala mdoc` modifier are compiled and evaluated on the JVM"/><meta property="og:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://scalameta.org/mdoc/mdoc/img/scalameta-logo.png"/><link rel="shortcut icon" href="/mdoc/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://scalameta.org/mdoc/mdoc/blog/atom.xml" title="mdoc Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://scalameta.org/mdoc/mdoc/blog/feed.xml" title="mdoc Blog RSS Feed"/><link rel="stylesheet" href="/mdoc/css/custom.css"/><script src="/mdoc/js/scrollSpy.js"></script><link rel="stylesheet" href="/mdoc/css/main.css"/><script src="/mdoc/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mdoc/"><img class="logo" src="/mdoc/img/mdoc-logo.png" alt="mdoc"/><h2 class="headerTitleWithLogo">mdoc</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/mdoc/docs/installation.html" target="_self">Docs</a></li><li class=""><a href="/mdoc/blog/" target="_self">Blog</a></li><li class=""><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Modifiers</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Overview</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/why.html">Why mdoc?</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/tut.html">Coming from tut</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/changelog.html">Changelog</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Modifiers</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/mdoc/docs/modifiers.html">JVM</a></li><li class="navListItem"><a class="navItem" href="/mdoc/docs/js.html">Scala.js</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Site generators</h3><ul class=""><li class="navListItem"><a class="navItem" href="/mdoc/docs/docusaurus.html">Docusaurus</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/scalameta/mdoc/edit/main/docs/modifiers.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">JVM Modifiers</h1></header><article><div><span><p>Code fences with the <code>scala mdoc</code> modifier are compiled and evaluated on the JVM
+at markdown generation time.</p>
+<h2><a class="anchor" aria-hidden="true" id="default"></a><a href="#default" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Default</h2>
+<p>The default modifier compiles and executes the code fence as normal</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+val x = <span class="hljs-number">1</span>
+val y = <span class="hljs-number">2</span>
+x + y
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-string">```scala</span>
+<span class="hljs-string">val</span> <span class="hljs-string">x</span> <span class="hljs-string">=</span> <span class="hljs-number">1</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">x:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">1</span>
+<span class="hljs-string">val</span> <span class="hljs-string">y</span> <span class="hljs-string">=</span> <span class="hljs-number">2</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">y:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">2</span>
+<span class="hljs-string">x</span> <span class="hljs-string">+</span> <span class="hljs-string">y</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">res0:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">3</span>
+<span class="hljs-string">```</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="silent"></a><a href="#silent" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>silent</code></h2>
+<p>The <code>silent</code> modifier is identical to the default modifier except that it hides
+the evaluated output. The input code fence renders unchanged.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:silent
+val x = <span class="hljs-number">1</span>
+val y = <span class="hljs-number">2</span>
+x + y
+```
+```scala mdoc
+x + y
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+val x = <span class="hljs-number">1</span>
+val y = <span class="hljs-number">2</span>
+x + y
+```
+```scala
+x + y
+<span class="hljs-title">// res1:</span> Int = <span class="hljs-number">3</span>
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="fail"></a><a href="#fail" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>fail</code></h2>
+<p>The <code>fail</code> modifier asserts that the code block will not compile. The rendered
+output contains the type error message.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:fail
+<span class="hljs-title">val x:</span> Int = <span class="hljs-string">""</span>
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+val x: Int = <span class="hljs-string">""</span>
+<span class="hljs-regexp">//</span> error: type mismatch;
+<span class="hljs-regexp">//</span>  found   : String(<span class="hljs-string">""</span>)
+<span class="hljs-regexp">//</span>  required: Int
+<span class="hljs-regexp">//</span> val x: Int = <span class="hljs-string">""</span>
+<span class="hljs-regexp">//</span>              ^^
+```
+</code></pre>
+<p>A <code>fail</code> code fence with no compile error fails the build.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:fail
+<span class="hljs-title">val x:</span> String = <span class="hljs-string">""</span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:2:1: Expected compile errors but program compiled successfully without errors
+<span class="hljs-section">val x: String = ""
+^^^^^^^^^^^^^^^^^^</span>
+</code></pre>
+<blockquote>
+<p>Note that <code>fail</code> does not assert that the program compiles but crashes at
+runtime. To assert runtime exceptions, use the <code>crash</code> modifier.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="warn"></a><a href="#warn" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>warn</code></h2>
+<p>The <code>warn</code> modifier is similar to <code>fail</code> except that it asserts the code
+compiles successfully but with a warning message.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:warn
+List(<span class="hljs-number">1</span>) match {
+  case Nil =&gt;
+}
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```<span class="javascript">scala
+List(<span class="hljs-number">1</span>) match {
+  <span class="hljs-keyword">case</span> <span class="hljs-function"><span class="hljs-params">Nil</span> =&gt;</span>
+}
+<span class="hljs-comment">// warning: match may not be exhaustive.</span>
+<span class="hljs-comment">// It would fail on the following input: List(_)</span>
+<span class="hljs-comment">// List(1) match {</span>
+<span class="hljs-comment">// ^^^^^^^</span>
+</span>```
+</code></pre>
+<p>The build fails when a <code>warn</code> code fence compiles without warnings.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:warn
+List(1) <span class="hljs-keyword">match</span> {
+  <span class="hljs-keyword">case</span> head :: <span class="hljs-attr">tail</span> =&gt;
+  <span class="hljs-keyword">case</span> <span class="hljs-attr">Nil</span> =&gt;
+}
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs"><span class="hljs-keyword">error: </span>modifiers.md:2:1: Expected compile warnings but program compiled successfully without warnings
+List(1) match {
+^
+</code></pre>
+<p>The build also fails when a <code>warn</code> code fence fails to compile, even if the
+program has a warning. Use <code>fail</code> in these cases instead.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:warn
+<span class="hljs-title">val x:</span> Int = <span class="hljs-string">""</span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:2:1: Expected compile warnings but program failed to compile
+<span class="hljs-section">val x: Int = ""
+^^^^^^^^^^^^^^^</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="crash"></a><a href="#crash" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>crash</code></h2>
+<p>The <code>crash</code> modifier asserts that the code block throws an exception at runtime</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:crash
+val y = ???
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+val y = ???
+// scala.NotImplementedError: an implementation <span class="hljs-literal">is</span> missing
+//  <span class="hljs-keyword">at</span> scala.Predef$.<span class="hljs-variable">$qmark</span><span class="hljs-variable">$qmark</span><span class="hljs-variable">$qmark</span>(Predef.scala:<span class="hljs-number">288</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span><span class="hljs-variable">$mcV</span><span class="hljs-variable">$sp</span>(modifiers.md:<span class="hljs-number">9</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="passthrough"></a><a href="#passthrough" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>passthrough</code></h2>
+<p>The <code>passthrough</code> modifier collects the stdout and stderr output from the
+program and embeds it verbatim in the markdown file.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:passthrough
+<span class="hljs-meta">val</span> matrix = <span class="hljs-type">Array</span>.tabulate(<span class="hljs-number">4</span>, <span class="hljs-number">4</span>) { (a, b) =&gt;
+  <span class="hljs-meta">val</span> multiplied = (a + <span class="hljs-number">1</span>) * (b + <span class="hljs-number">1</span>)
+  f<span class="hljs-string">"$multiplied%2s"</span>
+}
+<span class="hljs-meta">val</span> table = matrix.map(_.mkString(<span class="hljs-string">"| "</span>, <span class="hljs-string">" | "</span>, <span class="hljs-string">" |"</span>)).mkString(<span class="hljs-string">"\n"</span>)
+println(s<span class="hljs-string">"""
+This will be rendered as markdown.
+
+* Bullet 1
+* Bullet 2
+
+Look at the table:
+
+$table
+"""</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">This will be rendered as markdown.
+
+<span class="hljs-symbol">*</span> Bullet 1
+<span class="hljs-symbol">*</span> Bullet 2
+
+Look at the table:
+
+|<span class="hljs-string">  1 </span>|<span class="hljs-string">  2 </span>|<span class="hljs-string">  3 </span>|<span class="hljs-string">  4 </span>|
+|<span class="hljs-string">  2 </span>|<span class="hljs-string">  4 </span>|<span class="hljs-string">  6 </span>|<span class="hljs-string">  8 </span>|
+|<span class="hljs-string">  3 </span>|<span class="hljs-string">  6 </span>|<span class="hljs-string">  9 </span>|<span class="hljs-string"> 12 </span>|
+|<span class="hljs-string">  4 </span>|<span class="hljs-string">  8 </span>|<span class="hljs-string"> 12 </span>|<span class="hljs-string"> 16 </span>|
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="invisible"></a><a href="#invisible" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>invisible</code></h2>
+<p>The <code>invisible</code> modifier evaluates the code but does not render anything. The
+<code>invisible</code> modifier is equivalent to <code>passthrough</code> when the expression does not
+print to stdout.</p>
+<p>Before:</p>
+<pre><code class="hljs">This is prose.
+```scala mdoc:invisible
+println(<span class="hljs-string">"I am invisible"</span>)
+```
+More prose.
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">This <span class="hljs-keyword">is</span> prose.
+More prose.
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="reset"></a><a href="#reset" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reset</code></h2>
+<p>The <code>reset</code> modifier starts a new scope where previous statements in the
+document are no longer available. This can be helpful to clear existing imports
+or implicits in scope.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">implicit</span> val x: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala mdoc:reset
+<span class="hljs-keyword">implicit</span> val y: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+implicitly[<span class="hljs-built_in">Int</span>] // x is no longer <span class="hljs-keyword">in</span> scope
+```
+```scala mdoc:fail
+println(x)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+<span class="hljs-keyword">implicit</span> val x: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+// x: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala
+<span class="hljs-keyword">implicit</span> val y: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+// y: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+implicitly[<span class="hljs-built_in">Int</span>] // x is no longer <span class="hljs-keyword">in</span> scope
+// res1: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+```
+```scala
+println(x)
+// error: not found: <span class="hljs-keyword">value</span> x
+// println(x)
+//         ^
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="reset-class"></a><a href="#reset-class" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reset-class</code></h2>
+<p>This modifier works exactly the same way as <code>:reset</code> and is deprecated. Please
+use <code>:reset</code> instead.</p>
+<h2><a class="anchor" aria-hidden="true" id="reset-object"></a><a href="#reset-object" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reset-object</code></h2>
+<p>The <code>:reset-object</code> modifier is similar to <code>:reset</code> except that it wraps the
+following statements in a object instead of a class. By default, statements are
+wrapped in an class but that encoding can cause problems compile errors such as</p>
+<ul>
+<li>&quot;Value class may not be a member of another class&quot;: happens when using
+<code>extends AnyVal</code></li>
+<li>&quot;The outer reference in this type test cannot be checked at run time&quot;: happens
+when pattern matching on sealed ADT.</li>
+</ul>
+<p>Example case where the default class wrapping does not compile:</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">final</span> <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Name</span>(<span class="hljs-params">val value: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">AnyVal</span></span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:<span class="hljs-number">2</span>:<span class="hljs-number">1</span>: value <span class="hljs-keyword">class</span> <span class="hljs-symbol">may</span> <span class="hljs-symbol">not</span> <span class="hljs-symbol">be</span> <span class="hljs-symbol">a</span> <span class="hljs-symbol">member</span> <span class="hljs-symbol">of</span> <span class="hljs-symbol">another</span> <span class="hljs-symbol">class</span>
+<span class="hljs-symbol">final</span> <span class="hljs-symbol">case</span> <span class="hljs-symbol">class</span> <span class="hljs-symbol">Name</span>(<span class="hljs-symbol">val</span> <span class="hljs-symbol">value: <span class="hljs-symbol">String</span></span>) <span class="hljs-symbol">extends</span> <span class="hljs-symbol">AnyVal</span>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+</code></pre>
+<p>Use <code>:reset-object</code> to avoid these compile errors</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:reset-<span class="hljs-class"><span class="hljs-keyword">object</span></span>
+<span class="hljs-keyword">final</span> <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Name</span>(<span class="hljs-params">val value: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">AnyVal</span></span>
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+<span class="hljs-keyword">final</span> <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Name</span>(<span class="hljs-params">val value: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">AnyVal</span></span>
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="nest"></a><a href="#nest" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>nest</code></h2>
+<p>The <code>nest</code> modifier starts a new scope similar to <code>reset</code> but previous variables
+in the scope are still accessible. This can be helpful to redefine variable
+names while still being able to access existing variables in scope.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+val x = <span class="hljs-number">40</span>
+val y = <span class="hljs-number">1</span>
+```
+
+```scala mdoc:nest
+<span class="hljs-title">val x:</span> Int = <span class="hljs-number">41</span>
+println(x + y)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-string">```scala</span>
+<span class="hljs-string">val</span> <span class="hljs-string">x</span> <span class="hljs-string">=</span> <span class="hljs-number">40</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">x:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">40</span>
+<span class="hljs-string">val</span> <span class="hljs-string">y</span> <span class="hljs-string">=</span> <span class="hljs-number">1</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">y:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">1</span>
+<span class="hljs-string">```</span>
+
+<span class="hljs-string">```scala</span>
+<span class="hljs-attr">val x:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">41</span>
+<span class="hljs-string">//</span> <span class="hljs-attr">x:</span> <span class="hljs-string">Int</span> <span class="hljs-string">=</span> <span class="hljs-number">41</span>
+<span class="hljs-string">println(x</span> <span class="hljs-string">+</span> <span class="hljs-string">y)</span>
+<span class="hljs-string">//</span> <span class="hljs-number">42</span>
+<span class="hljs-string">```</span>
+</code></pre>
+<p>Without <code>nest</code> in the example above, the document would fail to compile because
+the variable <code>x</code> was already defined in scope.</p>
+<p>A <code>nest</code> block wraps subsequent code blocks inside
+<code>_root_.scala.Predef.locally{...}</code>. This encoding means that it's not possible
+to define value classes inside a nested block.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">val</span> x: <span class="hljs-type">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala mdoc:nest
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span>(<span class="hljs-params">val y: <span class="hljs-type">Int</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">AnyVal</span></span>
+<span class="hljs-type">Foo</span>(x)
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:<span class="hljs-number">6</span>:<span class="hljs-number">1</span>: value <span class="hljs-keyword">class</span> <span class="hljs-symbol">may</span> <span class="hljs-symbol">not</span> <span class="hljs-symbol">be</span> <span class="hljs-symbol">a</span> <span class="hljs-symbol">local</span> <span class="hljs-symbol">class</span>
+<span class="hljs-symbol">case</span> <span class="hljs-symbol">class</span> <span class="hljs-symbol">Foo</span>(<span class="hljs-symbol">val</span> <span class="hljs-symbol">y: <span class="hljs-symbol">Int</span></span>) <span class="hljs-symbol">extends</span> <span class="hljs-symbol">AnyVal</span>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+</code></pre>
+<p>Also, nested scopes do not ambiguate between conflicting implicits.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">implicit</span> val x: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala mdoc:nest
+<span class="hljs-keyword">implicit</span> val y: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+implicitly[<span class="hljs-built_in">Int</span>]
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:7:1: ambiguous implicit values:
+ both value x <span class="hljs-keyword">in</span> class App of<span class="hljs-built_in"> type </span>=&gt; Int
+ <span class="hljs-keyword">and</span> value y of<span class="hljs-built_in"> type </span>Int
+ match expected<span class="hljs-built_in"> type </span>Int
+implicitly[Int]
+^^^^^^^^^^^^^^^
+</code></pre>
+<p>A workaround for ambiguous implicits in nested scopes is to shadow one implicit
+by redefining its variable name.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc
+<span class="hljs-keyword">implicit</span> val shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala mdoc:nest
+<span class="hljs-keyword">implicit</span> val shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+implicitly[<span class="hljs-built_in">Int</span>]
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+<span class="hljs-keyword">implicit</span> val shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+// shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">41</span>
+```
+
+```scala
+<span class="hljs-keyword">implicit</span> val shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+// shadowMe: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+implicitly[<span class="hljs-built_in">Int</span>]
+// res0: <span class="hljs-built_in">Int</span> = <span class="hljs-number">42</span>
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="to-string"></a><a href="#to-string" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>to-string</code></h2>
+<p>The <code>toString</code> modifier changes the pretty-printer for runtime values to use
+<code>Object.toString</code> instead of <a href="http://www.lihaoyi.com/PPrint/">PPrint</a>.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:to-string
+List(<span class="hljs-string">"no quotes"</span>)
+```
+```scala mdoc
+List(<span class="hljs-string">"with quotes"</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+List(<span class="hljs-string">"no quotes"</span>)
+<span class="hljs-title">// res0:</span> List[String] = List(no quotes)
+```
+```scala
+List(<span class="hljs-string">"with quotes"</span>)
+<span class="hljs-title">// res1:</span> List[String] = List(<span class="hljs-string">"with quotes"</span>)
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="width"></a><a href="#width" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>width</code></h2>
+<p>The <code>width=NUMBER</code> allows you to override max width (deault is 80) of
+pretty-printed values.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:width=<span class="hljs-number">20</span>
+List.fill(<span class="hljs-number">2</span>)(List(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>))
+```
+```scala mdoc
+List.fill(<span class="hljs-number">2</span>)(List(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>))
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+List.fill(<span class="hljs-number">2</span>)(List(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>))
+<span class="hljs-comment">// res0: List[List[Int]] = List(</span>
+<span class="hljs-comment">//   List(</span>
+<span class="hljs-comment">//     1,</span>
+<span class="hljs-comment">//     2,</span>
+<span class="hljs-comment">//     3,</span>
+<span class="hljs-comment">//     4,</span>
+<span class="hljs-comment">//     5</span>
+<span class="hljs-comment">//   ),</span>
+<span class="hljs-comment">//   List(</span>
+<span class="hljs-comment">//     1,</span>
+<span class="hljs-comment">//     2,</span>
+<span class="hljs-comment">//     3,</span>
+<span class="hljs-comment">//     4,</span>
+<span class="hljs-comment">//     5</span>
+<span class="hljs-comment">//   )</span>
+<span class="hljs-comment">// )</span>
+```
+```scala
+List.fill(<span class="hljs-number">2</span>)(List(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>))
+<span class="hljs-comment">// res1: List[List[Int]] = List(List(1, 2, 3, 4, 5), List(1, 2, 3, 4, 5))</span>
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="height"></a><a href="#height" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>height=</code></h2>
+<p>The <code>height=NUMBER</code> allows you to override max height (default is 50) of
+pretty-printed values.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:height=<span class="hljs-number">5</span>
+List.fill(<span class="hljs-number">15</span>)(<span class="hljs-string">"hello world!"</span>)
+```
+```scala mdoc
+List.fill(<span class="hljs-number">15</span>)(<span class="hljs-string">"hello world!"</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+List.fill(<span class="hljs-number">15</span>)(<span class="hljs-string">"hello world!"</span>)
+<span class="hljs-regexp">//</span> res0: List[String] = List(
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span> ...
+```
+```scala
+List.fill(<span class="hljs-number">15</span>)(<span class="hljs-string">"hello world!"</span>)
+<span class="hljs-regexp">//</span> res1: List[String] = List(
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>,
+<span class="hljs-regexp">//</span>   <span class="hljs-string">"hello world!"</span>
+<span class="hljs-regexp">//</span> )
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="compile-only"></a><a href="#compile-only" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>compile-only</code></h2>
+<p>The <code>compile-only</code> modifier ensures the code example compiles without evaluating
+the program at runtime. This can be helpful to demonstrate code examples that
+perform side-effects.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:compile-only
+val name = scala.io.StdIn.readLine(<span class="hljs-string">"Enter your name: "</span>)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">```scala
+val name = scala.io.StdIn.readLine(<span class="hljs-string">"Enter your name: "</span>)
+```
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="scastie"></a><a href="#scastie" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>scastie</code></h2>
+<p>The <code>scastie</code> modifier transforms a Scala code block into a
+<a href="https://scastie.scala-lang.org/">Scastie</a> snippet.</p>
+<blockquote>
+<p>ℹ️ This modifier will work only in environments that support embedding a
+<code>&lt;script&gt;</code> tag. For example, it won't work in GitHub readmes, but it will work
+when building a static website from Markdown (e.g., with
+<a href="https://docusaurus.io/">Docusaurus</a>)</p>
+</blockquote>
+<p>You can embed an existing Scastie snippet by its id:</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:scastie:xbrvky6fTjysG32zK6kzRQ
+
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">'https://scastie.scala-lang.org/xbrvky6fTjysG32zK6kzRQ.js?theme=light'</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>or in case of a user's snippet:</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:scastie:MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg
+
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">'https://scastie.scala-lang.org/MasseGuillaume/CpO2s8v2Q1qGdO3vROYjfg.js?theme=light'</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<blockquote>
+<p>⚠️ The empty line in the block can't be omitted due to how the Markdown parser
+works</p>
+</blockquote>
+<p>Moreover, you can quickly translate any Scala code block block into a Scastie
+snippet on the fly.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:scastie
+val x = <span class="hljs-number">1</span> + <span class="hljs-number">2</span>
+println(x)
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://scastie.scala-lang.org/embedded.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">pre</span> <span class="hljs-attr">class</span>=<span class="hljs-string">'scastie-snippet-4de30fdb-db25-492d-bdd3-6a1558dd90b3'</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"><span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'load'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+ scastie.Embedded(<span class="hljs-string">'.scastie-snippet-4de30fdb-db25-492d-bdd3-6a1558dd90b3'</span>, {
+   <span class="hljs-attr">code</span>: <span class="hljs-string">`val x = 1 + 2
+println(x)`</span>,
+   <span class="hljs-attr">theme</span>: <span class="hljs-string">'light'</span>,
+    <span class="hljs-attr">isWorksheetMode</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">targetType</span>: <span class="hljs-string">'jvm'</span>,
+    <span class="hljs-attr">scalaVersion</span>: <span class="hljs-string">'2.12.6'</span>
+  })
+})</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<blockquote>
+<p>⚠️ Inline snippets are slower to run than embedded ones, since they won't be
+cached. You should prefer embedding existing snippets whenever possible.</p>
+</blockquote>
+<p>You can choose the Scastie theme when initializing the Scastie modifier:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> mdoc.modifiers.<span class="hljs-type">ScastieModifier</span>
+<span class="hljs-keyword">new</span> <span class="hljs-type">ScastieModifier</span>(theme = <span class="hljs-string">"dark"</span>) <span class="hljs-comment">// default is "light"</span>
+<span class="hljs-comment">// res0: ScastieModifier = StringModifier(mdoc:scastie)</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="postmodifier"></a><a href="#postmodifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PostModifier</h2>
+<p>A <code>PostModifier</code> is a custom modifier that post-processes a compiled and
+interpreted mdoc code fence. Post modifiers have access to the original code
+fence text, the static types and runtime values of the evaluated Scala code, the
+input and output file paths and other contextual information.</p>
+<p>One example use-case for post modifiers is to render charts based on the runtime
+value of the last expression in the code fence.</p>
+<p><img src="/mdoc/docs/assets/evilplot.gif" alt=""></p>
+<p>Extend the <code>mdoc.PostModifier</code> trait to implement a post modifier.</p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/mdoc-docs/src/main/scala/mdoc/docs/EvilplotModifier.scala">EvilplotModifier.scala</a></p>
+<pre><code class="hljs css language-scala">package mdoc.docs
+
+import com.cibo.evilplot.geometry.Drawable
+import java.nio.file.Files
+import java.nio.file.Paths
+import mdoc._
+import scala.meta.inputs.Position
+
+class EvilplotModifier extends PostModifier {
+  val name = "evilplot"
+  def process(ctx: PostModifierContext): String = {
+    val relpath = Paths.get(ctx.info)
+    val out = ctx.outputFile.toNIO.getParent.resolve(relpath)
+    ctx.lastValue match {
+      case d: Drawable =&gt;
+        Files.createDirectories(out.getParent)
+        if (!Files.isRegularFile(out)) {
+          d.write(out.toFile)
+        }
+        s"![](${ctx.info})"
+      case _ =&gt;
+        val (pos, obtained) = ctx.variables.lastOption match {
+          case Some(variable) =&gt;
+            val prettyObtained =
+              s"${variable.staticType} = ${variable.runtimeValue}"
+            (variable.pos, prettyObtained)
+          case None =&gt;
+            (Position.Range(ctx.originalCode, 0, 0), "nothing")
+        }
+        ctx.reporter.error(
+          pos,
+          s"""type mismatch:
+  expected: com.cibo.evilplot.geometry.Drawable
+  obtained: $obtained"""
+        )
+        ""
+    }
+  }
+}
+</code></pre>
+<p>Next, create a resource file <code>META-INF/services/mdoc.PostModifier</code> so the post
+modififer is recognized by the JVM
+<a href="https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>
+framework.</p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/mdoc-docs/src/main/resources/META-INF/services/mdoc.PostModifier">mdoc.PostModifier</a></p>
+<pre><code class="hljs css language-text">mdoc.docs.EvilplotModifier
+</code></pre>
+<p>As long as <code>EvilplotModifier</code> is available on the classpath, for example via
+<code>libraryDependencies</code> in build.sbt, then you can use the modifier like this.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:evilplot:assets/scatterplot.png
+import com.cibo.evilplot._
+import com.cibo.evilplot.plot._
+import com.cibo.evilplot.plot.aesthetics.<span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">DefaultTheme</span>.</span><span class="hljs-module"><span class="hljs-identifier">_</span>
+i</span></span>mport com.cibo.evilplot.numeric.Point
+
+<span class="hljs-keyword">val</span> data = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Seq</span>.</span></span>tabulate(<span class="hljs-number">90</span>) {<span class="hljs-function"> <span class="hljs-params">i</span> =&gt;</span>
+  <span class="hljs-keyword">val</span> degree = i<span class="hljs-operator"> * </span><span class="hljs-number">8</span>
+  <span class="hljs-keyword">val</span> radian = math.<span class="hljs-keyword">to</span><span class="hljs-constructor">Radians(<span class="hljs-params">degree</span>)</span>
+  <span class="hljs-constructor">Point(<span class="hljs-params">i</span>.<span class="hljs-params">toDouble</span>, <span class="hljs-params">math</span>.<span class="hljs-params">sin</span>(<span class="hljs-params">radian</span>)</span>)
+}
+
+<span class="hljs-constructor">ScatterPlot(<span class="hljs-params">data</span>)</span>
+  .x<span class="hljs-constructor">Axis()</span>
+  .y<span class="hljs-constructor">Axis()</span>
+  .frame<span class="hljs-literal">()</span>
+  .x<span class="hljs-constructor">Label(<span class="hljs-string">"x"</span>)</span>
+  .y<span class="hljs-constructor">Label(<span class="hljs-string">"y"</span>)</span>
+  .render<span class="hljs-literal">()</span>
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs">!<span class="hljs-selector-attr">[]</span>(assets/scatterplot.png)
+</code></pre>
+<p>Which renders into a scatter plot like this:</p>
+<p><img src="/mdoc/docs/assets/scatterplot.png" alt=""></p>
+<p>It's important that post modifiers present helpful error messages to the user in
+case of failures. For example, if the last runtime value is not an EvilPlot
+<code>Drawable</code> we can report the expected and obtained types with carets pointing to
+the position of the last variable.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:evilplot:scatterplot.png
+val message = <span class="hljs-string">"hello world!"</span>
+```
+</code></pre>
+<p>Error:</p>
+<pre><code class="hljs">error: modifiers.md:2:5:<span class="hljs-built_in"> type </span>mismatch:
+  expected: com.cibo.evilplot.geometry.Drawable
+  obtained: String = hello world!
+val message = <span class="hljs-string">"hello world!"</span>
+    ^^^^^^^
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="stringmodifier"></a><a href="#stringmodifier" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>StringModifier</h2>
+<p>A <code>StringModifier</code> is a custom modifier that processes the plain text contents
+of a code block, ignoring the compilation and interpretation of the Scala code.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> mdoc.<span class="hljs-type">StringModifier</span>
+<span class="hljs-keyword">import</span> mdoc.<span class="hljs-type">Reporter</span>
+<span class="hljs-keyword">import</span> scala.meta.<span class="hljs-type">Input</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FooModifier</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">StringModifier</span> </span>{
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> name = <span class="hljs-string">"foo"</span>
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process</span></span>(info: <span class="hljs-type">String</span>, code: <span class="hljs-type">Input</span>, reporter: <span class="hljs-type">Reporter</span>): <span class="hljs-type">String</span> = {
+    <span class="hljs-keyword">val</span> originalCodeFenceText = code.text
+    <span class="hljs-keyword">val</span> isCrash = info == <span class="hljs-string">"crash"</span>
+    <span class="hljs-keyword">if</span> (isCrash) <span class="hljs-string">"BOOM"</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-string">"OK: "</span> + originalCodeFenceText
+  }
+}
+</code></pre>
+<p>Next, create a resource file <code>META-INF/services/mdoc.StringModifier</code> so the post
+modififer is recognized by the JVM
+<a href="https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>
+framework.</p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/mdoc-docs/src/main/resources/META-INF/services/mdoc.StringModifier">mdoc.StringModifier</a></p>
+<pre><code class="hljs css language-text">mdoc.docs.FooModifier
+mdoc.docs.SbtModifier
+mdoc.docs.FileModifier
+</code></pre>
+<p>Code blocks with the <code>mdoc:foo</code> modifier will render as follows.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:foo
+Hello world!
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-symbol">OK:</span> Hello world!
+</code></pre>
+<p>We can also add the argument <code>:crash</code> to render &quot;BOOM&quot;.</p>
+<p>Before:</p>
+<pre><code class="hljs">```scala mdoc:foo:crash
+Hello world!
+```
+</code></pre>
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-keyword">BOOM
+</span></code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mdoc/docs/changelog.html"><span class="arrow-prev">← </span><span>Changelog</span></a><a class="docs-next button" href="/mdoc/docs/js.html"><span>Scala.js</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#default">Default</a></li><li><a href="#silent"><code>silent</code></a></li><li><a href="#fail"><code>fail</code></a></li><li><a href="#warn"><code>warn</code></a></li><li><a href="#crash"><code>crash</code></a></li><li><a href="#passthrough"><code>passthrough</code></a></li><li><a href="#invisible"><code>invisible</code></a></li><li><a href="#reset"><code>reset</code></a></li><li><a href="#reset-class"><code>reset-class</code></a></li><li><a href="#reset-object"><code>reset-object</code></a></li><li><a href="#nest"><code>nest</code></a></li><li><a href="#to-string"><code>to-string</code></a></li><li><a href="#width"><code>width</code></a></li><li><a href="#height"><code>height=</code></a></li><li><a href="#compile-only"><code>compile-only</code></a></li><li><a href="#scastie"><code>scastie</code></a></li><li><a href="#postmodifier">PostModifier</a></li><li><a href="#stringmodifier">StringModifier</a></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2021 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '5791175eba35c6626d93ae96610a8ae9',
+                indexName: 'scalamenta_mdoc',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
