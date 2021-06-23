@@ -1,4 +1,4 @@
-scalaVersion.in(ThisBuild) := "2.12.13"
+scalaVersion.in(ThisBuild) := "2.12.14"
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)
