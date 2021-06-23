@@ -234,7 +234,7 @@ lazy val mdoc = project
       // live reload
       "io.undertow" % "undertow-core" % "2.2.7.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
-      "org.slf4j" % "slf4j-api" % "1.7.30"
+      "org.slf4j" % "slf4j-api" % "1.7.31"
     )
   )
   .dependsOn(runtime, cli)
