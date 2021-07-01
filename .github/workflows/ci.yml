@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v11
+      - uses: olafurpg/setup-scala@v12
       - run: ./bin/scalafmt --test
   docs:
     name: Website
@@ -19,14 +19,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: olafurpg/setup-scala@v11
+      - uses: olafurpg/setup-scala@v12
       - run: sbt '++2.12.14 docs/mdoc'
   test-windows:
     name: "Windows"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v12
         with:
           java-version: adopt@1.11
       - run: sbt '++2.13.5 test'
@@ -47,7 +47,7 @@ jobs:
           - "'++3.0.0 test'"
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v11
+      - uses: olafurpg/setup-scala@v12
         with:
           java-version: ${{ matrix.java }}
       - run: sbt ${{ matrix.command }}
