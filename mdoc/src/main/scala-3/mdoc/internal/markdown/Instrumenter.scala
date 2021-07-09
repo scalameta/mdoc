@@ -91,6 +91,7 @@ class Instrumenter(
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
+        case _ : Term.EndMarker => Nil
         case _ =>
           val fresh = gensym.fresh("res")
           sb.line{_.append(s"val $fresh = ")}
@@ -111,6 +112,7 @@ class Instrumenter(
             case importer =>
               printImporter(importer)
           }
+        case _ : Term.EndMarker => 
         case _ =>
           sb.appendLines(stat.pos.text)
       }
