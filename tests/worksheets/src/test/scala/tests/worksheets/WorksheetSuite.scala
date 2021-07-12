@@ -407,6 +407,24 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "end-markers".tag(OnlyScala3),
+    """|
+       |def hello() =
+       |  println("This is a method")
+       |end hello
+       |
+       |hello()
+       |""".stripMargin,
+    """|def hello() =
+       |  println("This is a method")
+       |end hello
+       |
+       |<hello()> // This is a method
+       |// This is a method
+       |""".stripMargin
+  )
+
+  checkDecorations(
     "akka".tag(SkipScala3).tag(SkipScala211),
     """|import $dep.`com.typesafe.akka::akka-actor:2.6.13`
        |import akka.actor.ActorSystem
