@@ -15,3 +15,6 @@ jobs:
       - run: sbt '++2.12.14 docs/docusaurusPublishGhpages'
         env:
           GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+      - name: Check git diff
+        if: ${{ failure() }}
+        run: git diff
