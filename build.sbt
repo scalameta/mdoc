@@ -3,9 +3,9 @@ import scala.collection.mutable
 def scala212 = "2.12.14"
 def scala211 = "2.11.12"
 def scala213 = "2.13.6"
-def scala3 = List("3.0.0", "3.0.0-RC3", "3.0.0-RC2", "3.0.0-RC1")
+def scala3 = "3.0.1"
 def scala2Versions = List(scala212, scala211, scala213)
-def allScalaVersions = scala2Versions ::: scala3
+def allScalaVersions = scala2Versions :+ scala3
 
 def scalajs = "1.5.1"
 def scalajsBinaryVersion = "1"
@@ -68,7 +68,7 @@ def crossSetting[A](
 inThisBuild(
   List(
     scalaVersion := scala213,
-    crossScalaVersions := scala2Versions ::: scala3,
+    crossScalaVersions := allScalaVersions,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -130,7 +130,6 @@ lazy val fansiVersion = Def.setting {
 
 lazy val fs2Version = Def.setting {
   if (scalaVersion.value.startsWith("2.11")) "2.1.0"
-  else if (scalaVersion.value == "3.0.0-RC1") "2.5.4"
   else "2.5.5"
 }
 
