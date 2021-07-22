@@ -1,2 +1,3 @@
 * eol=lf
 *.png eol=autocrlf
+*.gif eol=autocrlf
