@@ -113,7 +113,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.24"
-  val munit = "0.7.26"
+  val munit = "0.7.27"
   val coursier = "1.0.4"
   val scalacheck = "1.15.4"
 }
@@ -233,7 +233,7 @@ lazy val mdoc = project
       // live reload
       "io.undertow" % "undertow-core" % "2.2.8.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
-      "org.slf4j" % "slf4j-api" % "1.7.31"
+      "org.slf4j" % "slf4j-api" % "1.7.32"
     )
   )
   .dependsOn(runtime, cli)
