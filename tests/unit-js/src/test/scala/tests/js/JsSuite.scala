@@ -282,10 +282,14 @@ class JsSuite extends BaseMarkdownSuite {
       |println(jsdocs.ExampleJS.greeting)
       |```
     """.stripMargin,
-    """|error: no-dom.md:4 (mdoc generated code) object scalajs is not a member of package org
+    """|error: no-dom.md:3 (mdoc generated code) object scalajs is not a member of package org
+       |class HTMLElementImplicit(val value: _root_.org.scalajs.dom.raw.HTMLElement)
+       |                                                ^
+       |
+       |error: no-dom.md:5 (mdoc generated code) object scalajs is not a member of package org
        |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
        |                          ^
-    """.stripMargin,
+       |""".stripMargin,
     settings = {
       val noScalajsDom = Classpath(baseSettings.site("js-classpath")).entries
         .filterNot(_.toNIO.getFileName.toString.contains("scalajs-dom"))
@@ -376,5 +380,25 @@ class JsSuite extends BaseMarkdownSuite {
         site = baseSettings.site.updated("js-html-header", unpkgReact)
       )
     }
+  )
+
+  check(
+    "implicit-node",
+    """
+      |```scala mdoc:js:shared:invisible
+      |def div(msg: String)(implicit node: HTMLElementImplicit) =
+      |  node.value.innerHTML = "msg"
+      |```
+      |```scala mdoc:js
+      |div("hello world")
+      |```
+      |""".stripMargin,
+    """|```scala
+       |div("hello world")
+       |```
+       |<div id="mdoc-html-run1" data-mdoc-js></div>
+       |<script type="text/javascript" src="implicit-node.md.js" defer></script>
+       |<script type="text/javascript" src="mdoc.js" defer></script>
+       |""".stripMargin
   )
 }
