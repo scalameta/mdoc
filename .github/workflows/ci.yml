@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [adopt@1.8, adopt@1.11]
+        java: ['adopt@1.8', 'adopt@1.11', 'zulu@1.17.0-0']
         command:
           - "'++2.11.12 test'"
           # Test legacy Scala versions, where reporting API changed
