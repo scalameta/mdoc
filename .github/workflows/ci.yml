@@ -50,4 +50,4 @@ jobs:
       - uses: olafurpg/setup-scala@v12
         with:
           java-version: ${{ matrix.java }}
-      - run: ./sbt ${{ matrix.command }}
+      - run: sbt ${{ matrix.command }}
