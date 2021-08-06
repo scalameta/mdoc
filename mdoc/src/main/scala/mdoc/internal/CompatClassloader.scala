@@ -27,7 +27,7 @@ object CompatClassloader {
 
         // jdk.internal.loader.ClassLoaders.AppClassLoader.ucp
         val ucpField = {
-          if(System.getProperty("java.version").split("\\.")(0).toInt >= 16) {
+          if (System.getProperty("java.version").split("\\.")(0).toInt >= 16) {
             // the `ucp` field is  not in `AppClassLoader` anymore, but in `BuiltinClassLoader`
             classLoader.getClass().getSuperclass()
           } else {
