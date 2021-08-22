@@ -6,11 +6,16 @@ import scala.meta.internal.io.PathIO
 import metaconfig.Input
 import java.nio.file.Files
 
-/** @param relpath the input filename relativized by its input directory.
-  * @param inputFile the input file to read from.
-  * @param outputFile the output file to write to.
-  * @param inputDirectory directory enclosing the input file.
-  * @param outputDirectory directory enclosing the output file.
+/** @param relpath
+  *   the input filename relativized by its input directory.
+  * @param inputFile
+  *   the input file to read from.
+  * @param outputFile
+  *   the output file to write to.
+  * @param inputDirectory
+  *   directory enclosing the input file.
+  * @param outputDirectory
+  *   directory enclosing the output file.
   */
 case class InputFile(
     relpath: RelativePath,

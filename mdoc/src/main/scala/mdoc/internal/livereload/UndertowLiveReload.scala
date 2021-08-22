@@ -58,13 +58,16 @@ object UndertowLiveReload {
     *
     * See LiveReload protocol for more details: http://livereload.com/api/protocol/
     *
-    * @param root the root directory to serve files from.
-    * @param host the hostname of the server.
-    * @param preferredPort the preferred port of the server. If the port is not free,
-    *                      the first free port that is an increment of this port is picked.
-    *                      For example, if preferredPort == 4000 and 4000 is not free, then
-    *                      4001 will be picked instead.
-    * @param reporter the reporter to use for logging purposes.
+    * @param root
+    *   the root directory to serve files from.
+    * @param host
+    *   the hostname of the server.
+    * @param preferredPort
+    *   the preferred port of the server. If the port is not free, the first free port that is an
+    *   increment of this port is picked. For example, if preferredPort == 4000 and 4000 is not
+    *   free, then 4001 will be picked instead.
+    * @param reporter
+    *   the reporter to use for logging purposes.
     */
   def apply(
       root: Path,
