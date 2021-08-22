@@ -17,10 +17,11 @@ object MdocExtensions {
 
   /** Defines mdoc's markdown extensions.
     *
-    *  Inspired by CommonMark formatter options so that pandoc understands it.
-    *  https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/samples/FormatConverterCommonMark.java#L27-L37
+    * Inspired by CommonMark formatter options so that pandoc understands it.
+    * https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/samples/FormatConverterCommonMark.java#L27-L37
     *
-    * @return A sequence of extensions to be applied to Flexmark's options.
+    * @return
+    *   A sequence of extensions to be applied to Flexmark's options.
     */
   def mdoc(context: Context): List[Extension] = {
     plain

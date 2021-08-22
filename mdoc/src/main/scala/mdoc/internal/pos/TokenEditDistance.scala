@@ -79,10 +79,10 @@ object TokenEditDistance {
 
   /** Build utility to map offsets between two slightly different strings.
     *
-    * @param original The original snapshot of a string, for example the latest
-    *                 semanticdb snapshot.
-    * @param revised The current snapshot of a string, for example open buffer
-    *                in an editor.
+    * @param original
+    *   The original snapshot of a string, for example the latest semanticdb snapshot.
+    * @param revised
+    *   The current snapshot of a string, for example open buffer in an editor.
     */
   def apply(original: IndexedSeq[Token], revised: IndexedSeq[Token]): TokenEditDistance = {
     val buffer = Array.newBuilder[MatchingToken]

@@ -34,8 +34,8 @@ object Markdown {
 
   /** Defines the default markdown settings.
     *
-    * Do not use directly. The default flexmark settings have special keys set
-    * up by mdoc to keep track of certain document-specific information like path.
+    * Do not use directly. The default flexmark settings have special keys set up by mdoc to keep
+    * track of certain document-specific information like path.
     */
   def mdocSettings(context: Context): MutableDataSet = {
     // Scalac doesn't understand that it has to box the values, so we do it manually for primitives
