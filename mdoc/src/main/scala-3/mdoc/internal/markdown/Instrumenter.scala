@@ -67,6 +67,21 @@ class Instrumenter(
         sb.definition(s"""object ${gensym.fresh("compile")}""") {
           _.println(section.source.pos.text)
         }
+      } else if (section.mod.isCrash) {
+        section.source.stats match {
+          case head :: _ =>
+            sb.println(s"$$doc.startStatement(${position(head.pos)});")
+
+            sb.definition("$doc.crash(" ++ position(head.pos) ++ ")") { cb =>
+              section.source.stats.foreach { stat =>
+                cb.appendLines(stat.pos.text)
+              }
+            }
+            
+            sb.println("\n$doc.endStatement();")
+
+          case Nil =>
+        }
       } else {
         section.source.stats.foreach { stat =>
           sb.println(s"$$doc.startStatement(${position(stat.pos)});")
@@ -83,11 +98,7 @@ class Instrumenter(
     sb.println(s"$$doc.binder($name, ${position(pos)});")
   }
   private def printStatement(stat: Tree, m: Modifier, sb: CodePrinter): Unit = {
-    if (m.isCrash) {
-      sb.definition("$doc.crash(" ++ position(stat.pos) ++ ")") {
-        _.appendLines(stat.pos.text)
-      }
-    } else {
+    if (!m.isCrash) {
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
