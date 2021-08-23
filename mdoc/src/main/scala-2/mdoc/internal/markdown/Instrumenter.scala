@@ -104,14 +104,6 @@ class Instrumenter(
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
   private def printStatement(stat: Tree, m: Modifier, sb: PrintStream): Unit = {
-    // if (m.isCrash) {
-    //   sb.append("$doc.crash(")
-    //     .append(position(stat.pos))
-    //     .append(") {\n")
-    //     .append(stat.pos.text)
-    //     .append("\n}")
-    // }
-
     if (!m.isCrash) {
       val binders = stat match {
         case Binders(names) =>
