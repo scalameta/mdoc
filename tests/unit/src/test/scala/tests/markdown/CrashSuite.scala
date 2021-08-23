@@ -236,4 +236,24 @@ class CrashSuite extends BaseMarkdownSuite {
     )
   )
 
+  check(
+    "multiple-statements",
+    """
+      |```scala mdoc:crash
+      |class Cat { def func = ??? }
+      |(new Cat).func
+      |```
+      |""".stripMargin,
+    """|```scala
+       |class Cat { def func = ??? }
+       |(new Cat).func
+       |// scala.NotImplementedError: an implementation is missing
+       |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
+       |// 	at repl.MdocSession$App$$anonfun$1$Cat$1.func(multiple-statements.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:10)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:8)
+       |```
+      """.stripMargin
+  )
+
 }
