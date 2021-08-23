@@ -12,7 +12,6 @@ import mdoc.Reporter
 import mdoc.internal.cli.InputFile
 import java.nio.file.Path
 import mdoc.internal.cli.Settings
-import scala.collection.immutable
 
 /* note(@tgodzik) if the class will be used in Scala 3
  * we need to make sure that proper indentation is achieved */
@@ -79,7 +78,7 @@ class Instrumenter(
               .append(") {\n")
 
             section.source.stats.foreach { stat =>
-              sb.append(stat.pos.text).append("\n")
+              sb.append(stat.pos.text).append(";\n")
             }
             // closing the $doc.crash {... block
             sb.append("\n}\n")
