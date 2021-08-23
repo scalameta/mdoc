@@ -52,6 +52,16 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "null",
+    """
+      |val x: String = null
+      |""".stripMargin,
+    """|<val x: String = null> // : String = null
+       |x: String = null
+       |""".stripMargin
+  )
+
+  checkDecorations(
     "import-future".tag(OnlyScala3),
     """|import $scalac.`-source future`
        |import scala.collection.*
