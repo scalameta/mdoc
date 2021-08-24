@@ -14,8 +14,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |???
        |// scala.NotImplementedError: an implementation is missing
        |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:288)
-       |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
-       |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(basic.md:10)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(basic.md:8)
        |```
     """.stripMargin,
     compat = Map(
@@ -25,8 +25,8 @@ class CrashSuite extends BaseMarkdownSuite {
            |???
            |// scala.NotImplementedError: an implementation is missing
            |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
-           |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
-           |// 	at repl.MdocSession$App$$anonfun$3.apply(basic.md:14)
+           |// 	at repl.MdocSession$App$$anonfun$1.apply(basic.md:10)
+           |// 	at repl.MdocSession$App$$anonfun$1.apply(basic.md:8)
            |```
     """.stripMargin,
       Compat.Scala3 ->
@@ -233,6 +233,55 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$App.$init$$$anonfun$1(fatal4.md:9)
            |```
            |""".stripMargin
+    )
+  )
+
+  check(
+    "multiple-statements",
+    """
+      |```scala mdoc:crash
+      |class Cat { def func = ??? }
+      |(new Cat).func
+      |```
+      |""".stripMargin,
+    """|```scala
+       |class Cat { def func = ??? }
+       |(new Cat).func
+       |// scala.NotImplementedError: an implementation is missing
+       |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
+       |// 	at repl.MdocSession$App$$anonfun$1$Cat$1.func(multiple-statements.md:9)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:10)
+       |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:8)
+       |```
+      """.stripMargin,
+    compat = Map(
+      Compat.Scala212 -> """|```scala
+                            |class Cat { def func = ??? }
+                            |(new Cat).func
+                            |// scala.NotImplementedError: an implementation is missing
+                            |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
+                            |// 	at repl.MdocSession$App$$anonfun$1$Cat$1.func(multiple-statements.md:9)
+                            |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:10)
+                            |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:8)
+                            |```""".stripMargin,
+      Compat.Scala211 -> """|```scala
+                            |class Cat { def func = ??? }
+                            |(new Cat).func
+                            |// scala.NotImplementedError: an implementation is missing
+                            |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:230)
+                            |// 	at repl.MdocSession$App$$anonfun$1$Cat$1.func(multiple-statements.md:9)
+                            |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:10)
+                            |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:8)
+                            |```""".stripMargin,
+      Compat.Scala3 -> """|```scala
+                          |class Cat { def func = ??? }
+                          |(new Cat).func
+                          |// scala.NotImplementedError: an implementation is missing
+                          |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:344)
+                          |// 	at repl.MdocSession$App$$anonfun$1$Cat$1.func(multiple-statements.md:9)
+                          |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:10)
+                          |// 	at repl.MdocSession$App$$anonfun$1.apply(multiple-statements.md:8)
+                          |```""".stripMargin
     )
   )
 

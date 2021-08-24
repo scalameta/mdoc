@@ -68,6 +68,25 @@ class Instrumenter(
         sb.println(s"""object ${gensym.fresh("compile")} {""")
         sb.println(section.source.pos.text)
         sb.println("\n}")
+      } else if (section.mod.isCrash) {
+        section.source.stats match {
+          case head :: _ =>
+            sb.println(s"$$doc.startStatement(${position(head.pos)});")
+
+            sb.append("$doc.crash(")
+              .append(position(head.pos))
+              .append(") {\n")
+
+            section.source.stats.foreach { stat =>
+              sb.append(stat.pos.text).append(";\n")
+            }
+            // closing the $doc.crash {... block
+            sb.append("\n}\n")
+
+            sb.println("\n$doc.endStatement();")
+
+          case Nil =>
+        }
       } else {
         section.source.stats.foreach { stat =>
           sb.println(s"$$doc.startStatement(${position(stat.pos)});")
@@ -84,13 +103,7 @@ class Instrumenter(
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
   }
   private def printStatement(stat: Tree, m: Modifier, sb: PrintStream): Unit = {
-    if (m.isCrash) {
-      sb.append("$doc.crash(")
-        .append(position(stat.pos))
-        .append(") {\n")
-        .append(stat.pos.text)
-        .append("\n}")
-    } else {
+    if (!m.isCrash) {
       val binders = stat match {
         case Binders(names) =>
           names.map(name => name -> name.pos)
