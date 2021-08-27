@@ -236,6 +236,23 @@ class CrashSuite extends BaseMarkdownSuite {
     )
   )
 
+  check("significant-indentation".tag(OnlyScala3),
+    """
+    |```scala mdoc:nest
+    |println("what!")
+    |```
+    |
+    |```scala mdoc:crash
+    |def hello(x: Int) = 
+    |  if x != 0 then
+    |    println(x)
+    |    x / 0
+    |hello(5)
+    |```
+    |""".stripMargin,
+    ""
+  )
+
   check(
     "multiple-statements",
     """
