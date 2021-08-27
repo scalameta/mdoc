@@ -251,7 +251,7 @@ class CrashSuite extends BaseMarkdownSuite {
       |hello(5)
       |```
       |""".stripMargin,
-      """
+    """
       |```scala
       |println("what!")
       |// what!
@@ -268,7 +268,6 @@ class CrashSuite extends BaseMarkdownSuite {
       |//  at repl.MdocSession$App.$init$$$anonfun$1(significant-indentation.md:20)
       |//  at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
       |```""".stripMargin
-
   )
 
   check(

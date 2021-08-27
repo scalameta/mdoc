@@ -16,10 +16,10 @@ class BaseSuite extends FunSuite {
       clue
     )
   }
-  
-  private def processOutput(raw: String) = 
+
+  private def processOutput(raw: String) =
     raw.replaceAll("\t", " ")
-  
+
   object OnlyScala213 extends munit.Tag("OnlyScala213")
   object OnlyScala3 extends munit.Tag("OnlyScala3")
   object SkipScala3 extends munit.Tag("SkipScala3")
