@@ -93,7 +93,7 @@ find . -name '*.md' -type f -exec perl -pi -e '
 <code>sbt docs/tut</code>.</p>
 <pre><code class="hljs css language-diff">// project/plugins.sbt
 <span class="hljs-deletion">- addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.10")</span>
-<span class="hljs-addition">+ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.22")</span>
+<span class="hljs-addition">+ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.23")</span>
 // build.sbt
 <span class="hljs-deletion">- enablePlugins(TutPlugin)</span>
 <span class="hljs-addition">+ enablePlugins(MdocPlugin)</span>
