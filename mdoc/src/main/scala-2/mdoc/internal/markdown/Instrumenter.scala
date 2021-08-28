@@ -37,67 +37,101 @@ class Instrumenter(
   private val sb = new PrintStream(out)
   val gensym = new Gensym()
   val nest = new Nesting(sb)
-  private def printAsScript(): Unit = {
-    sections.zipWithIndex.foreach { case (section, i) =>
-      if (section.mod.isReset) {
-        nest.unnest()
-        sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
-      } else if (section.mod.isNest) {
-        nest.nest()
-      }
-      sb.println("\n$doc.startSection();")
-      if (section.mod.isFailOrWarn) {
-        sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
-        val out = new FailInstrumenter(sections, i).instrument()
-        val literal = Instrumenter.stringLiteral(out)
-        val binder = gensym.fresh("res")
-        sb.append("val ")
-          .append(binder)
-          .append(" = _root_.mdoc.internal.document.FailSection(")
-          .append(literal)
-          .append(", ")
-          .append(position(section.source.pos))
-          .append(");")
-        printBinder(binder, section.source.pos)
-        sb.println("\n$doc.endStatement();")
-      } else if (section.mod.isCompileOnly) {
-        section.source.stats.foreach { stat =>
-          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
-          sb.println("\n$doc.endStatement();")
-        }
-        sb.println(s"""object ${gensym.fresh("compile")} {""")
-        sb.println(section.source.pos.text)
-        sb.println("\n}")
-      } else if (section.mod.isCrash) {
-        section.source.stats match {
-          case head :: _ =>
-            sb.println(s"$$doc.startStatement(${position(head.pos)});")
+  private def printAsScript(): Unit =
+    sections.zipWithIndex.foreach { case (section: SectionInput, i) =>
 
-            sb.append("$doc.crash(")
-              .append(position(head.pos))
-              .append(") {\n")
-
-            section.source.stats.foreach { stat =>
-              sb.append(stat.pos.text).append(";\n")
-            }
-            // closing the $doc.crash {... block
-            sb.append("\n}\n")
-
+      section.mod match {
+        case fenceModifier: Modifier => {
+          if (fenceModifier.isReset) {
+            nest.unnest()
+            sb.print(Instrumenter.reset(fenceModifier, gensym.fresh("App")))
+          } else if (fenceModifier.isNest) {
+            nest.nest()
+          }
+          sb.println("\n$doc.startSection();")
+          if (fenceModifier.isFailOrWarn) {
+            sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
+            val out = new FailInstrumenter(sections, i).instrument()
+            val literal = Instrumenter.stringLiteral(out)
+            val binder = gensym.fresh("res")
+            sb.append("val ")
+              .append(binder)
+              .append(" = _root_.mdoc.internal.document.FailSection(")
+              .append(literal)
+              .append(", ")
+              .append(position(section.source.pos))
+              .append(");")
+            printBinder(binder, section.source.pos)
             sb.println("\n$doc.endStatement();")
+          } else if (fenceModifier.isCompileOnly) {
+            section.source.stats.foreach { stat =>
+              sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+              sb.println("\n$doc.endStatement();")
+            }
+            sb.println(s"""object ${gensym.fresh("compile")} {""")
+            sb.println(section.source.pos.text)
+            sb.println("\n}")
+          } else if (fenceModifier.isCrash) {
+            section.source.stats match {
+              case head :: _ =>
+                sb.println(s"$$doc.startStatement(${position(head.pos)});")
 
-          case Nil =>
+                sb.append("$doc.crash(")
+                  .append(position(head.pos))
+                  .append(") {\n")
+
+                section.source.stats.foreach { stat =>
+                  sb.append(stat.pos.text).append(";\n")
+                }
+                // closing the $doc.crash {... block
+                sb.append("\n}\n")
+
+                sb.println("\n$doc.endStatement();")
+
+              case Nil =>
+            }
+          } else {
+            section.source.stats.foreach { stat =>
+              sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+              printStatement(stat, fenceModifier, sb)
+              sb.println("\n$doc.endStatement();")
+            }
+          }
+          sb.println("$doc.endSection();")
         }
-      } else {
-        section.source.stats.foreach { stat =>
-          sb.println(s"$$doc.startStatement(${position(stat.pos)});")
-          printStatement(stat, section.mod, sb)
-          sb.println("\n$doc.endStatement();")
+          nest.unnest()
+        case modifierInline: ModifierInline => {
+          nest.nest()
+          sb.println("\n$doc.startSection();")
+          if (modifierInline.isFailOrWarn) {
+            sb.println(s"$$doc.startStatement(${position(section.source.pos)});")
+            val out = new FailInstrumenter(sections, i).instrument()
+            val literal = Instrumenter.stringLiteral(out)
+            val binder = gensym.fresh("res")
+            sb.append("val ")
+              .append(binder)
+              .append(" = _root_.mdoc.internal.document.FailSection(")
+              .append(literal)
+              .append(", ")
+              .append(position(section.source.pos))
+              .append(");")
+            printBinder(binder, section.source.pos)
+            sb.println("\n$doc.endStatement();")
+          } else {
+            section.source.stats.foreach { stat =>
+              sb.println(s"$$doc.startStatement(${position(stat.pos)});")
+              sb.println("\n$doc.endStatement();")
+            }
+            sb.println(s"""object ${gensym.fresh("compile")} {""")
+            sb.println(section.source.pos.text)
+            sb.println("\n}")
+          }
+          nest.unnest()
         }
       }
-      sb.println("$doc.endSection();")
+
     }
-    nest.unnest()
-  }
+
 
   private def printBinder(name: String, pos: Position): Unit = {
     sb.print(s"; $$doc.binder($name, ${position(pos)})")
@@ -134,6 +168,7 @@ class Instrumenter(
       }
     }
   }
+
 }
 object Instrumenter {
   val magicImports = Set(

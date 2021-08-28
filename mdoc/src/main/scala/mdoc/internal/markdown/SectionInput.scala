@@ -9,7 +9,7 @@ import mdoc.internal.cli.{Context => MContext}
 import scala.meta.parsers.Parsed.Success
 import mdoc.internal.pos.PositionSyntax._
 
-case class SectionInput(input: Input, source: ParsedSource, mod: Modifier)
+case class SectionInput(input: Input, source: ParsedSource, mod: GenModifier)
 
 object SectionInput {
 

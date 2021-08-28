@@ -8,42 +8,19 @@ import mdoc.internal.markdown.Modifier.Default
 import mdoc.internal.markdown.Modifier.Post
 import mdoc.internal.markdown.Modifier.Pre
 
-case class PreFenceInput(block: CodeFence, input: Input, mod: Pre)
-case class StringFenceInput(block: CodeFence, input: Input, mod: Str)
-case class ScalaFenceInput(block: CodeFence, input: Input, mod: Modifier)
+case class PreInlineInput(block: CodeFence, input: Input, mod: Pre) // TODO Delete?
+case class StringInlineInput(block: InlineCode, input: Input, mod: Str)
+case class ScalaInlineInput(block: InlineMdoc, input: Input, mod: ModifierInline)
 
-class FenceInput(ctx: Context, baseInput: Input) {
-  def getModifier(info: Text): Option[Modifier] = {
+class InlineInput(ctx: Context, baseInput: Input) {
+  def getModifier(info: Text): Option[ModifierInline] = {
     val string = info.value.stripLineEnd
     if (!string.startsWith("scala mdoc")) None
     else {
-      if (!string.contains(':')) Some(Modifier.Default())
+      if (!string.contains(':')) Some(ModifierInline.Default())
       else {
         val mode = string.stripPrefix("scala mdoc:")
-        Modifier(mode)
-          .orElse {
-            val (name, info) = mode.split(":", 2) match {
-              case Array(a) => (a, "")
-              case Array(a, b) => (a, b)
-            }
-            ctx.settings.stringModifiers
-              .collectFirst[Modifier] {
-                case mod if mod.name == name =>
-                  Str(mod, info)
-              }
-              .orElse {
-                ctx.settings.postModifiers.collectFirst {
-                  case mod if mod.name == name =>
-                    Post(mod, info)
-                }
-              }
-              .orElse {
-                ctx.settings.preModifiers.collectFirst {
-                  case mod if mod.name == name =>
-                    Pre(mod, info)
-                }
-              }
-          }
+        ModifierInline(mode)
           .orElse {
             invalid(info, s"Invalid mode '$mode'")
             None
@@ -64,8 +41,10 @@ class FenceInput(ctx: Context, baseInput: Input) {
     false
   }
 
-  private def isValid(info: Text, mod: Modifier): Boolean = {
-    if (mod.isFailOrWarn && mod.isCrash) {
+  private def isValid(info: Text, mod: ModifierInline): Boolean = {
+    true
+    // TODO Pick out relevant logic below to restore this method
+    /* if (mod.isFailOrWarn && mod.isCrash) {
       invalidCombination(info, "crash", "fail")
     } else if (mod.isSilent && mod.isInvisible) {
       invalidCombination(info, "silent", "invisible")
@@ -91,13 +70,15 @@ class FenceInput(ctx: Context, baseInput: Input) {
     } else {
       true
     }
+    */
   }
-  def unapply(block: CodeFence): Option[ScalaFenceInput] = {
+  def unapply(block: InlineMdoc): Option[ScalaInlineInput] = {
+    println("InlineInput.unapply")
     getModifier(block.info) match {
       case Some(mod) =>
         if (isValid(block.info, mod)) {
           val input = Input.Slice(baseInput, block.body.pos.start, block.body.pos.end)
-          Some(ScalaFenceInput(block, input, mod))
+          Some(ScalaInlineInput(block, input, mod))
         } else {
           None
         }

@@ -53,29 +53,34 @@ object Renderer {
       reporter: Reporter,
       edit: TokenEditDistance
   ): String = {
-    require(section.mod.isCrash, section.mod)
-    val out = new ByteArrayOutputStream()
-    val ps = new PrintStream(out)
-    ps.println("```scala")
-    ps.println(section.source.pos.text)
-    val crashes = for {
-      statement <- section.section.statements
-      binder <- statement.binders
-      if binder.value.isInstanceOf[Crashed]
-    } yield binder.value.asInstanceOf[Crashed]
-    crashes.headOption match {
-      case Some(CrashResult.Crashed(e, _)) =>
-        MdocExceptions.trimStacktrace(e)
-        val stacktrace = new ByteArrayOutputStream()
-        e.printStackTrace(new PrintStream(stacktrace))
-        appendFreshMultiline(ps, stacktrace.toString())
-        ps.append('\n')
-      case None =>
-        val mpos = section.source.pos.toUnslicedPosition
-        reporter.error(mpos, "Expected runtime exception but program completed successfully")
+    section.mod match {
+      case fenceModifier: Modifier =>
+        require(fenceModifier.isCrash, fenceModifier)
+        val out = new ByteArrayOutputStream()
+        val ps = new PrintStream(out)
+        ps.println("```scala")
+        ps.println(section.source.pos.text)
+        val crashes = for {
+          statement <- section.section.statements
+          binder <- statement.binders
+          if binder.value.isInstanceOf[Crashed]
+        } yield binder.value.asInstanceOf[Crashed]
+        crashes.headOption match {
+          case Some(CrashResult.Crashed(e, _)) =>
+            MdocExceptions.trimStacktrace(e)
+            val stacktrace = new ByteArrayOutputStream()
+            e.printStackTrace(new PrintStream(stacktrace))
+            appendFreshMultiline(ps, stacktrace.toString())
+            ps.append('\n')
+          case None =>
+            val mpos = section.source.pos.toUnslicedPosition
+            reporter.error(mpos, "Expected runtime exception but program completed successfully")
+        }
+        ps.println("```")
+        out.toString()
+      case modifierInline: ModifierInline =>
+        throw new RuntimeException("TODO Should never happen. How to guarantee this earlier?")
     }
-    ps.println("```")
-    out.toString()
   }
 
   @deprecated("this method will be removed", "2020-06-01")

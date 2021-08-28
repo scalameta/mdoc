@@ -99,22 +99,23 @@ object MarkdownFile {
      *        - Unbalanced tick marks
      *     -
      */
-    if (line.split("`").size % 2 == 0)
+    val tickSections = line.split("`").filterNot(s => s.isBlank)
+    if (line.contains("Inline")) {
+      tickSections.foreach(section => println("Section: " + section))
+    }
+    if (tickSections.nonEmpty && tickSections.size % 2 == 0)
       throw new RuntimeException("TODO How to handle Unbalanced ticks!")
 
-    line.split("`").toList.zipWithIndex.map { case (piece, index) =>
-      if (index % 2 == 0)
-        Text(piece)
-      else {
+    tickSections.toList.zipWithIndex.map { case (piece, index) =>
+        // TODO This might be dangerous. If the paragraph starts with "scala mdoc", outside of ticks, this
+        // could go haywire
         if (piece.startsWith("scala mdoc")) {
           val wordsInMdocPiece = piece.split("\\s+")
           val (info, body) = wordsInMdocPiece.splitAt(2)
-          InlineMdoc(Text(info.mkString(" ")) , Text(body.mkString(" ")))
+          InlineMdoc(Text("`" + info.mkString(" ")) , Text(body.mkString(" ")))
         }
         else
-          InlineCode(Text(s"`$piece`")) // TODO Any cleaner way of avoiding re-adding backticks here?
-
-      }
+          Text(s"`$piece`") // TODO Any cleaner way of avoiding re-adding backticks here?
     }
   }
 
@@ -149,6 +150,8 @@ sealed abstract class MarkdownPart {
             }
             fence.closeBackticks.renderToString(out)
         }
+      case inlineMdoc: InlineMdoc =>
+        out.append(inlineMdoc.body)
     }
 }
 final case class Text(value: String) extends MarkdownPart
@@ -161,4 +164,11 @@ final case class CodeFence(openBackticks: Text, info: Text, body: Text, closeBac
 
 // TODO Info/modifiers
 final case class InlineCode(body: Text) extends MarkdownPart
-final case class InlineMdoc(info: Text, body: Text) extends MarkdownPart
+final case class InlineMdoc(info: Text, body: Text) extends MarkdownPart {
+  val closeTick = "`"
+  // TODO See which vars are necessary
+  // Since we're not messing with output, I think these can actually go away
+  var newPart = Option.empty[String]
+  var newInfo = Option.empty[String]
+  var newBody = Option.empty[String]
+}

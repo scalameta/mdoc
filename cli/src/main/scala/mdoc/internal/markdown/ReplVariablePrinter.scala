@@ -27,8 +27,13 @@ class ReplVariablePrinter(
       if (binder.isToString) {
         appendMultiline(sb, binder.runtimeValue.toString)
       } else {
-        val heightOverride = binder.mods.heightOverride
-        val widthOverride = binder.mods.widthOverride
+        val (heightOverride, widthOverride) =
+          binder.mods match {
+            case fenceModifier: Modifier =>
+              (fenceModifier.heightOverride, fenceModifier.widthOverride)
+            case modifierInline: ModifierInline =>
+              (None, None)
+          }
 
         val lines = pprint.PPrinter.BlackWhite.tokenize(
           binder.runtimeValue,
