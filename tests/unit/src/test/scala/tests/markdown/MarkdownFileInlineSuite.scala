@@ -54,7 +54,7 @@ class MarkdownFileInlineSuite extends FunSuite {
     "inlineIgnoreNonMdoc",
     """Hello `println("Unevaluated code")` World""".stripMargin,
     Text("Hello "),
-    InlineCode(Text("""`println("Unevaluated code")`""")),
+    Text("""`println("Unevaluated code")`"""),
     Text(" World"),
   )
 

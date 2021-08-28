@@ -25,10 +25,13 @@ object MarkdownBuilder {
       instrumented: Instrumented,
       filename: String
   ): EvaluatedDocument = {
+    println("building document")
     // TODO Or hook in here
     val instrumentedInput = InstrumentedInput(filename, instrumented.source)
     reporter.debug(s"$filename: instrumented code\n$instrumented")
+//    println("instrumented.source: " + instrumented.source)
     val compileInput = Input.VirtualFile(filename, instrumented.source)
+//    println("Compile input: " + compileInput)
     val edit = SectionInput.tokenEdit(sectionInputs, compileInput)
     val compiled = compiler.compile(
       compileInput,
@@ -39,6 +42,7 @@ object MarkdownBuilder {
     )
     val doc = compiled match {
       case Some(cls) =>
+        println("Compiled cls: " + cls)
         val ctor = cls.getDeclaredConstructor()
         ctor.setAccessible(true)
         val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
@@ -46,6 +50,7 @@ object MarkdownBuilder {
         runInClassLoader(cls.getClassLoader()) { () =>
           try {
             evaluatedDoc = doc.build(instrumentedInput)
+            println("Evaluated Doc: " + evaluatedDoc)
           } catch {
             case e: DocumentException =>
               val index = e.sections.length - 1

@@ -181,10 +181,11 @@ class Processor(implicit ctx: Context) {
           SectionInput(input, ParsedSource.empty, mod)
       }
     }
-    if(true) throw new RuntimeException("XXX")
+    println("About to compile soon!! YYY")
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
 
     if (ctx.reporter.hasErrors) {
+      println("D'oh! Errors!")
       return
     }
     if (ctx.settings.verbose) {
@@ -199,6 +200,7 @@ class Processor(implicit ctx: Context) {
           handleCoursierError(instrumented, e)
           ctx.compiler
       }
+    println("Surived to process another day")
     processScalaInlineInputs(
       doc,
       inputs,
@@ -330,6 +332,7 @@ class Processor(implicit ctx: Context) {
                           markdownCompiler: MarkdownCompiler
                         ): Unit = {
     // TODO Possibly hook in here?
+    println("Rendered Markdown file: " + doc.renderToString)
     val rendered = MarkdownBuilder.buildDocument(
       markdownCompiler,
       ctx.reporter,
@@ -337,6 +340,10 @@ class Processor(implicit ctx: Context) {
       instrumented,
       filename
     )
+    println("Rendered: " + rendered)
+    rendered.sections.foreach { section =>
+      println("Rendered Section: " + section)
+    }
     rendered.sections.zip(inputs).foreach { case (section, ScalaInlineInput(block, _, mod)) =>
       block.newInfo = Some("scala")
       def defaultRender: String =

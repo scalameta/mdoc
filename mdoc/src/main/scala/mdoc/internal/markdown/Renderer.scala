@@ -101,6 +101,7 @@ object Renderer {
       printer: Variable => String,
       compiler: MarkdownCompiler
   ): String = {
+    println("ZZZ")
     val baos = new ByteArrayOutputStream()
     val sb = new PrintStream(baos)
     val stats = section.source.stats.lift
@@ -168,6 +169,7 @@ object Renderer {
                   )
               }
             case _ =>
+              println("Whoopsy!")
               val pos = binder.pos.toMeta(section)
               val variable = new mdoc.Variable(
                 binder.name,

@@ -49,11 +49,17 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
               }
             }
           case modifierInline: ModifierInline =>
+            println("FailInstrumenter.modifierInline branch")
             nest.nest()
+            println("j: " + j)
+            println("i: " + i)
+            sb.println(section.input)
             if (j == i || !modifierInline.isFailOrWarn) {
               section.source.stats.foreach { stat =>
+                println("stat: " + stat)
                 stat match {
                   case i: Import =>
+                    println("Uh? Import?")
                     i.importers.foreach {
                       case Importer(
                       Term.Name(name),
@@ -65,6 +71,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
                         sb.print(";")
                     }
                   case _ =>
+                    println("stat.pos.text: " + stat.pos.text)
                     sb.println(stat.pos.text)
                 }
               }
