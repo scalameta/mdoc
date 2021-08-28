@@ -181,6 +181,7 @@ class Processor(implicit ctx: Context) {
       instrumented: Instrumented,
       markdownCompiler: MarkdownCompiler
   ): Unit = {
+    // TODO Possibly hook in here?
     val rendered = MarkdownBuilder.buildDocument(
       markdownCompiler,
       ctx.reporter,

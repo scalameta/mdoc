@@ -1,5 +1,7 @@
 package tests.markdown
 
+// TODO Replicate these types of tests for inline.
+//    Also: why does this only exists for Scala-2?
 class CompileOnlySuite extends BaseMarkdownSuite {
   check(
     "compile-only",

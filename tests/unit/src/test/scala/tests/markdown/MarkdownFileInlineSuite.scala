@@ -38,7 +38,15 @@ class MarkdownFileInlineSuite extends FunSuite {
     "inlineSmall",
     """Hello `scala mdoc println(42)` World""".stripMargin,
     Text("Hello "),
-    InlineMdoc(Text("scala mdoc println(42)")),
+    InlineMdoc(Text("scala mdoc"), Text("println(42)")),
+    Text(" World"),
+  )
+
+  check(
+    "inlineCrash",
+    """Hello `scala mdoc:crash println(42)` World""".stripMargin,
+    Text("Hello "),
+    InlineMdoc(Text("scala mdoc:crash"), Text("println(42)")),
     Text(" World"),
   )
 

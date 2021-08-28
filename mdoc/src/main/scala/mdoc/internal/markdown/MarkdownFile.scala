@@ -106,8 +106,11 @@ object MarkdownFile {
       if (index % 2 == 0)
         Text(piece)
       else {
-        if (piece.contains("scala mdoc"))
-          InlineMdoc(Text(piece))
+        if (piece.startsWith("scala mdoc")) {
+          val wordsInMdocPiece = piece.split("\\s+")
+          val (info, body) = wordsInMdocPiece.splitAt(2)
+          InlineMdoc(Text(info.mkString(" ")) , Text(body.mkString(" ")))
+        }
         else
           InlineCode(Text(s"`$piece`")) // TODO Any cleaner way of avoiding re-adding backticks here?
 
@@ -158,4 +161,4 @@ final case class CodeFence(openBackticks: Text, info: Text, body: Text, closeBac
 
 // TODO Info/modifiers
 final case class InlineCode(body: Text) extends MarkdownPart
-final case class InlineMdoc(body: Text) extends MarkdownPart
+final case class InlineMdoc(info: Text, body: Text) extends MarkdownPart

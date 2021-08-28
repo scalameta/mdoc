@@ -129,6 +129,7 @@ object Markdown {
     )
     val file = MarkdownFile.parse(textWithVariables, inputFile, reporter)
     val processor = new Processor()(context)
+    // TODO Or look into this processDocumet call?
     processor.processDocument(file)
     file.renderToString
   }
