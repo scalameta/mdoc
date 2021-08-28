@@ -63,7 +63,8 @@ object MarkdownFile {
               val info = line.substring(backticks.length())
               state = State.CodeFence(curr, backticks, info)
             } else {
-              parts += newText(curr, end)
+              // TODO Consider putting conditional inside the block
+              parts ++= parseLineWithInlineCode(line)
             }
           case s: State.CodeFence =>
             if (
@@ -89,6 +90,31 @@ object MarkdownFile {
     val parts = parser.acceptParts()
     MarkdownFile(input, file, parts)
   }
+
+  def parseLineWithInlineCode(line: String): List[MarkdownPart] = {
+    /**  TODO
+     *    - How should we handle:
+     *      - Multiple ticks in a row
+     *        - Especially when at the beginning of the line, as other tests already focus on that case.
+     *        - Unbalanced tick marks
+     *     -
+     */
+    if (line.split("`").size % 2 == 0)
+      throw new RuntimeException("TODO How to handle Unbalanced ticks!")
+
+    line.split("`").toList.zipWithIndex.map { case (piece, index) =>
+      if (index % 2 == 0)
+        Text(piece)
+      else {
+        if (piece.contains("scala mdoc"))
+          InlineMdoc(Text(piece))
+        else
+          InlineCode(Text(s"`$piece`")) // TODO Any cleaner way of avoiding re-adding backticks here?
+
+      }
+    }
+  }
+
 }
 
 sealed abstract class MarkdownPart {
@@ -129,3 +155,7 @@ final case class CodeFence(openBackticks: Text, info: Text, body: Text, closeBac
   var newInfo = Option.empty[String]
   var newBody = Option.empty[String]
 }
+
+// TODO Info/modifiers
+final case class InlineCode(body: Text) extends MarkdownPart
+final case class InlineMdoc(body: Text) extends MarkdownPart
