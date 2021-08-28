@@ -42,7 +42,7 @@ object MarkdownBuilder {
     )
     val doc = compiled match {
       case Some(cls) =>
-        println("Compiled cls: " + cls)
+//        println("Compiled cls: " + cls)
         val ctor = cls.getDeclaredConstructor()
         ctor.setAccessible(true)
         val doc = ctor.newInstance().asInstanceOf[DocumentBuilder].$doc
@@ -50,7 +50,7 @@ object MarkdownBuilder {
         runInClassLoader(cls.getClassLoader()) { () =>
           try {
             evaluatedDoc = doc.build(instrumentedInput)
-            println("Evaluated Doc: " + evaluatedDoc)
+//            println("Evaluated Doc: " + evaluatedDoc)
           } catch {
             case e: DocumentException =>
               val index = e.sections.length - 1

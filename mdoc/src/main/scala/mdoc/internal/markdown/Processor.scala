@@ -340,7 +340,7 @@ class Processor(implicit ctx: Context) {
       instrumented,
       filename
     )
-    println("Rendered: " + rendered)
+//    println("Rendered: " + rendered)
     rendered.sections.foreach { section =>
       println("Rendered Section: " + section)
     }
@@ -397,7 +397,7 @@ class Processor(implicit ctx: Context) {
             inputs += input
         }
       case InterestingInlineCode(input) =>
-        println("Collecting inline: " + input)
+//        println("Collecting inline: " + input)
         inlineInputs += input
 //        input.mod match {
 //          case string: Str =>

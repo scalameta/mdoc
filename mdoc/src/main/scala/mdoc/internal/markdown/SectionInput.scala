@@ -14,6 +14,12 @@ case class SectionInput(input: Input, source: ParsedSource, mod: GenModifier)
 object SectionInput {
 
   def tokenEdit(sections: List[SectionInput], instrumented: Input): TokenEditDistance = {
+    sections.foreach { section =>
+      println("SectionInput.tokenEdit.section: " + section)
+    }
+    sections.foreach { section =>
+      println("SectionInput.tokenEdit.instrumented: " + instrumented)
+    }
     TokenEditDistance.fromTrees(sections.map(_.source.source), instrumented)
   }
 

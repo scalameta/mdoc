@@ -16,14 +16,14 @@ class InlineInput(ctx: Context, baseInput: Input) {
   def getModifier(info: Text): Option[ModifierInline] = {
     val string = info.value.stripLineEnd
     println("InlineInput string: " + string)
-    if (!string.startsWith("`scala mdoc")) None
+    if (!string.startsWith("scala mdoc")) None
     else {
       if (!string.contains(':')) {
         println("InlineInput Default modifiers")
         Some(ModifierInline.Default())
       }
       else {
-        val mode = string.stripPrefix("`scala mdoc:")
+        val mode = string.stripPrefix("scala mdoc:")
         println("InlineInput custom mode: " + mode)
         ModifierInline(mode)
           .orElse {

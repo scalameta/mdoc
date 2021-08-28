@@ -30,6 +30,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
               nest.nest()
             }
             if (j == i || !fenceModifier.isFailOrWarn) {
+              println("Should proceed for fence: " + section.source)
               section.source.stats.foreach { stat =>
                 stat match {
                   case i: Import =>
@@ -55,6 +56,7 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
             println("i: " + i)
             sb.println(section.input)
             if (j == i || !modifierInline.isFailOrWarn) {
+              println("Should proceed: " + section.source)
               section.source.stats.foreach { stat =>
                 println("stat: " + stat)
                 stat match {
