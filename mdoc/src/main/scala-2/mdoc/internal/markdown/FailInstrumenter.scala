@@ -52,8 +52,6 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
           case modifierInline: ModifierInline =>
             println("FailInstrumenter.modifierInline branch")
             nest.nest()
-            println("j: " + j)
-            println("i: " + i)
             sb.println(section.input)
             if (j == i || !modifierInline.isFailOrWarn) {
               println("Should proceed: " + section.source)

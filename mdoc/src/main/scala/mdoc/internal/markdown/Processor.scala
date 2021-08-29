@@ -32,6 +32,7 @@ import mdoc.internal.BuildInfo
 object MdocDialect {
 
   def parse(path: AbsolutePath): Parsed[Source] = {
+    println("Parsing with MdocDialect")
     (Input.VirtualFile(path.toString, path.readText), scala).parse[Source]
   }
 
@@ -46,9 +47,6 @@ class Processor(implicit ctx: Context) {
   def processDocument(doc: MarkdownFile): MarkdownFile = {
     val docInput = doc.input
     val (scalaInputs, customInputs, preInputs, scalaInlineInputs) = collectFenceInputs(doc)
-//    scalaInputs.foreach(scalaInput =>
-//      println("ScalaInputs: " + scalaInput)
-//    )
     val filename = docInput.toFilename(ctx.settings)
     val inputFile = doc.file.relpath
     customInputs.foreach { block => processStringInput(doc, block) }
@@ -56,7 +54,6 @@ class Processor(implicit ctx: Context) {
     if (scalaInputs.nonEmpty) {
       processScalaInputs(doc, scalaInputs, inputFile, filename)
     }
-    println("scalaInlineInputs.size: " + scalaInlineInputs.size)
     if (scalaInlineInputs.nonEmpty) {
       processScalaInlineInputs(doc, scalaInlineInputs, inputFile, filename)
     }
@@ -181,11 +178,9 @@ class Processor(implicit ctx: Context) {
           SectionInput(input, ParsedSource.empty, mod)
       }
     }
-    println("About to compile soon!! YYY")
     val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
 
     if (ctx.reporter.hasErrors) {
-      println("D'oh! Errors!")
       return
     }
     if (ctx.settings.verbose) {
@@ -200,7 +195,6 @@ class Processor(implicit ctx: Context) {
           handleCoursierError(instrumented, e)
           ctx.compiler
       }
-    println("Surived to process another day")
     processScalaInlineInputs(
       doc,
       inputs,
@@ -331,8 +325,6 @@ class Processor(implicit ctx: Context) {
                           instrumented: Instrumented,
                           markdownCompiler: MarkdownCompiler
                         ): Unit = {
-    // TODO Possibly hook in here?
-    println("Rendered Markdown file: " + doc.renderToString)
     val rendered = MarkdownBuilder.buildDocument(
       markdownCompiler,
       ctx.reporter,
@@ -376,16 +368,12 @@ class Processor(implicit ctx: Context) {
   def collectFenceInputs(
       doc: MarkdownFile
   ): (List[ScalaFenceInput], List[StringFenceInput], List[PreFenceInput], List[ScalaInlineInput]) = {
-    println("collectFenceInputs")
     val InterestingCodeFence = new FenceInput(ctx, doc.input)
     val InterestingInlineCode = new InlineInput(ctx, doc.input)
     val inputs = List.newBuilder[ScalaFenceInput]
     val strings = List.newBuilder[StringFenceInput]
     val pres = List.newBuilder[PreFenceInput]
     val inlineInputs = List.newBuilder[ScalaInlineInput]
-    doc.parts.foreach { part =>
-      println("Part: " + part)
-    }
     doc.parts.foreach {
       case InterestingCodeFence(input) =>
         input.mod match {
