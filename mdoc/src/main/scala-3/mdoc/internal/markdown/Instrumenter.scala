@@ -78,7 +78,8 @@ class Instrumenter(
               }
             }
             
-            sb.println("\n$doc.endStatement();")
+            sb.println("\n") // newline for posterity
+            sb.println("$doc.endStatement();")
 
           case Nil =>
         }

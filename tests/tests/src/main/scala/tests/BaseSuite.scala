@@ -11,11 +11,15 @@ class BaseSuite extends FunSuite {
       loc: Location
   ): Unit = {
     super.assertNoDiff(
-      Compat(obtained, Map.empty, postProcessObtained),
-      Compat(expected, Map.empty, postProcessExpected),
+      Compat(processOutput(obtained), Map.empty, postProcessObtained),
+      Compat(processOutput(expected), Map.empty, postProcessExpected),
       clue
     )
   }
+
+  private def processOutput(raw: String) =
+    raw.replaceAll("\t", " ")
+
   object OnlyScala213 extends munit.Tag("OnlyScala213")
   object OnlyScala3 extends munit.Tag("OnlyScala3")
   object SkipScala3 extends munit.Tag("SkipScala3")
