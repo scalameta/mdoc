@@ -9,11 +9,13 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
 
   def append(s: String) = {ps.append(s); this }
   
-  def println(s: String) = {ps.print(indent + s + "\n"); this}
+  def println(s: String) = {
+    ps.print(indent + s + "\n"); this
+  }
 
   def definition(header: String)(cb: CodePrinter => Unit): CodePrinter = {
-    val newCB = new CodePrinter(ps, baseIndent + 1, baseNest)
-
+    val newCB = new CodePrinter(ps, baseIndent + 1, nestCount)
+    
     this.println(header + " {")
     cb(newCB)
     this.println("}")
