@@ -1,9 +1,9 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.14"
+def scala212 = "2.12.15"
 def scala211 = "2.11.12"
 def scala213 = "2.13.6"
-def scala3 = "3.0.1"
+def scala3 = "3.0.2"
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
@@ -113,7 +113,7 @@ lazy val sharedSettings = List(
 
 val V = new {
   val scalameta = "4.4.28"
-  val munit = "0.7.28"
+  val munit = "0.7.29"
   val coursier = "1.0.4"
   val scalacheck = "1.15.4"
 }
