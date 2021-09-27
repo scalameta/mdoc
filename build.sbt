@@ -116,21 +116,36 @@ val V = new {
   val munit = "0.7.29"
   val coursier = "1.0.4"
   val scalacheck = "1.15.4"
-}
+  val kindProjector = "0.13.2"
+  val evilplot = "0.8.1"
 
-lazy val pprintVersion = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "0.5.4"
-  else "0.6.0"
-}
+  val flexmark = "0.62.2"
+  val diffutils = "1.3.0"
+  val directoryWatcher = "0.15.0"
+  val undertow = "2.2.10.Final"
+  val xnio = "3.8.4.Final"
+  val slf4j = "1.7.32"
 
-lazy val fansiVersion = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "0.2.6"
-  else "0.2.9"
-}
+  object npm {
+    val ms = "2.1.1"
+  }
 
-lazy val fs2Version = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "2.1.0"
-  else "2.5.5"
+  def pprint(scalaV: String) =
+    if (scalaV.startsWith("2.11")) "0.5.4"
+    else "0.6.0"
+
+  def fansi(scalaV: String) =
+    if (scalaV.startsWith("2.11")) "0.2.6"
+    else "0.2.9"
+
+  def fs2(scalaV: String) =
+    if (scalaV.startsWith("2.11")) "2.1.0"
+    else "2.5.5"
+
+  def metaconfig(scalaV: String) =
+    if (scalaV.startsWith("2.11")) "0.9.10"
+    else "0.9.15"
+
 }
 
 lazy val interfaces = project
@@ -164,7 +179,7 @@ lazy val runtime = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "com.lihaoyi" %% "pprint" % pprintVersion.value,
+        "com.lihaoyi" %% "pprint" % V.pprint(scalaVersion.value),
         "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
       ),
@@ -181,13 +196,13 @@ lazy val cli = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-cli",
-    scalaVersion := scala213,
-    crossScalaVersions := scala2Versions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
-      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      "org.scalameta" %% "scalameta" % V.scalameta,
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10"
+      "com.vladsch.flexmark" % "flexmark-all" % V.flexmark,
+      ("org.scalameta" %% "scalameta" % V.scalameta cross CrossVersion.for3Use2_13)
+        .exclude("com.lihaoyi", "sourcecode_2.13")
+        .exclude("org.scala-lang.modules", "scala-collection-compat_2.13"),
+      "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig(scalaVersion.value)
     )
   )
 
@@ -223,17 +238,17 @@ lazy val mdoc = project
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
         "org.scalameta" %% "scalameta" % V.scalameta,
-        "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
-        "com.lihaoyi" %% "fansi" % fansiVersion.value
+        "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig(scalaVersion.value),
+        "com.lihaoyi" %% "fansi" % V.fansi(scalaVersion.value)
       )
     ),
     libraryDependencies ++= List(
-      "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "io.methvin" % "directory-watcher" % "0.15.0",
+      "com.googlecode.java-diff-utils" % "diffutils" % V.diffutils,
+      "io.methvin" % "directory-watcher" % V.directoryWatcher,
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.10.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
-      "org.slf4j" % "slf4j-api" % "1.7.32"
+      "io.undertow" % "undertow-core" % V.undertow,
+      "org.jboss.xnio" % "xnio-nio" % V.xnio,
+      "org.slf4j" % "slf4j-api" % V.slf4j
     )
   )
   .dependsOn(runtime, cli)
@@ -282,7 +297,7 @@ val jsdocs = project
     ),
     scalaJSUseMainModuleInitializer := true,
     Compile / npmDependencies ++= List(
-      "ms" -> "2.1.1"
+      "ms" -> V.npm.ms
     ),
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -307,11 +322,16 @@ lazy val unit = project
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit").value,
     libraryDependencies ++= {
       if (isScala3.value) List()
-      else List(compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"))
+      else
+        List(
+          compilerPlugin(
+            "org.typelevel" %% "kind-projector" % V.kindProjector cross CrossVersion.full
+          )
+        )
     },
     scala212LibraryDependencies(
       List(
-        "io.github.cibotech" %% "evilplot" % "0.8.1"
+        "io.github.cibotech" %% "evilplot" % V.evilplot
       )
     ),
     libraryDependencies ++= List(
@@ -320,11 +340,10 @@ lazy val unit = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if3 = List(
-        ("co.fs2" %% "fs2-core" % fs2Version.value)
-          .cross(CrossVersion.for3Use2_13)
+        "co.fs2" %% "fs2-core" % V.fs2(scalaVersion.value)
       ),
       if2 = List(
-        "co.fs2" %% "fs2-core" % fs2Version.value
+        "co.fs2" %% "fs2-core" % V.fs2(scalaVersion.value)
       )
     ),
     buildInfoPackage := "tests.cli",
@@ -425,7 +444,7 @@ lazy val docs = project
     mdocAutoDependency := false,
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "io.github.cibotech" %% "evilplot" % "0.8.1"
+      "io.github.cibotech" %% "evilplot" % V.evilplot
     ),
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
