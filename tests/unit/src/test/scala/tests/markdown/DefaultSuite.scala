@@ -332,4 +332,19 @@ class DefaultSuite extends BaseMarkdownSuite {
        |""".stripMargin
   )
 
+  check(
+    "infix",
+    """
+      |```scala mdoc
+      |import scala.language.postfixOps
+      |42 toString
+      |```
+    """.stripMargin,
+    """|```scala
+       |import scala.language.postfixOps
+       |42 toString
+       |// res0: String = "42"
+       |```
+       |""".stripMargin
+  )
 }
