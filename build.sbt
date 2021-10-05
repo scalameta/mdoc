@@ -140,7 +140,7 @@ val V = new {
 
   def fs2(scalaV: String) =
     if (scalaV.startsWith("2.11")) "2.1.0"
-    else "2.5.5"
+    else "2.5.9"
 
   def metaconfig(scalaV: String) =
     if (scalaV.startsWith("2.11")) "0.9.10"
@@ -190,7 +190,9 @@ lazy val runtime = project
   )
   .dependsOn(interfaces)
 
-val excludePprint = ExclusionRule(organization = "com.lihaoyi")
+val excludeSourcecode = ExclusionRule("com.lihaoyi", "sourcecode_2.13")
+val excludeCollectionCompat =
+  ExclusionRule("org.scala-lang.modules", "scala-collection-compat_2.13")
 
 lazy val cli = project
   .settings(
@@ -200,8 +202,7 @@ lazy val cli = project
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % V.flexmark,
       ("org.scalameta" %% "scalameta" % V.scalameta cross CrossVersion.for3Use2_13)
-        .exclude("com.lihaoyi", "sourcecode_2.13")
-        .exclude("org.scala-lang.modules", "scala-collection-compat_2.13"),
+        .excludeAll(excludeSourcecode, excludeCollectionCompat),
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig(scalaVersion.value)
     )
   )
@@ -231,9 +232,8 @@ lazy val mdoc = project
       scalaVersion.value,
       if3 = List(
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
-        ("org.scalameta" %% "scalameta" % V.scalameta)
-          .excludeAll(excludePprint)
-          .cross(CrossVersion.for3Use2_13)
+        ("org.scalameta" %% "scalameta" % V.scalameta cross CrossVersion.for3Use2_13)
+          .excludeAll(excludeSourcecode, excludeCollectionCompat)
       ),
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
