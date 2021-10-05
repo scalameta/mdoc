@@ -65,7 +65,7 @@ class Instrumenter(
           sb.println("$doc.endStatement();")
         }
         sb.definition(s"""object ${gensym.fresh("compile")}""") {
-          _.println(section.source.pos.text)
+          _.appendLines(section.source.pos.text)
         }
       } else if (section.mod.isCrash) {
         section.source.stats match {
@@ -100,14 +100,14 @@ class Instrumenter(
   }
   private def printStatement(stat: Tree, m: Modifier, sb: CodePrinter): Unit = {
     if (!m.isCrash) {
-      val binders = stat match {
+      val (fresh, binders) = stat match {
         case Binders(names) =>
-          names.map(name => name -> name.pos)
-        case _ : Term.EndMarker => Nil
+          (false, names.map(name => name -> name.pos))
+        case _ : Term.EndMarker => (false, Nil)
         case _ =>
           val fresh = gensym.fresh("res")
           sb.line{_.append(s"val $fresh = ")}
-          List(Name(fresh) -> stat.pos)
+          (true, List(Name(fresh) -> stat.pos))
       }
       stat match {
         case i: Import =>
@@ -126,7 +126,7 @@ class Instrumenter(
           }
         case _ : Term.EndMarker => 
         case _ =>
-          sb.appendLines(stat.pos.text)
+          sb.appendLines(stat.pos.text, fresh)
       }
       binders.foreach { case (name, pos) =>
         printBinder(name.syntax, pos)

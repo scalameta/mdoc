@@ -23,8 +23,10 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
     this
   }
 
-  def appendLines(body: String) = {
+  def appendLines(body: String, nest: Boolean = false) = {
+    if (nest) nestCount += 1
     body.linesIterator.toArray.foreach(this.println)
+    if(nest) nestCount -= 1
     this
   }
 
