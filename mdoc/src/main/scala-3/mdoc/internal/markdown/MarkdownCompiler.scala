@@ -124,7 +124,7 @@ class MarkdownCompiler(
     report(vreporter, input, fileImports, run.runContext, edit)
   }
 
-  class CollectionReporter extends dotty.tools.dotc.reporting.Reporter {
+  class CollectionReporter extends dotty.tools.dotc.reporting.Reporter with UniqueMessagePositions {
     val allDiags = List.newBuilder[Diagnostic]
 
     override def doReport(dia: Diagnostic)(using Context) = 
