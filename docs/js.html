@@ -90,8 +90,8 @@ lazy val docs = project
 <p>Next, construct an <code>mdoc.properties</code> file with the necessary Scala.js
 configuration</p>
 <pre><code class="hljs css language-sh">cat &lt;&lt;EOT &gt; mdoc.properties
-js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:1.5.1 org.scala-js:scalajs-dom_sjs1_2.12:1.1.0 -p)
-js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.14:1.5.1)
+js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:1.7.1 org.scala-js:scalajs-dom_sjs1_2.12:1.1.0 -p)
+js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.14:1.7.1)
 EOT
 </code></pre>
 <p>Next, create a basic Markdown files with an <code>mdoc:js</code> modifier:</p>
