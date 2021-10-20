@@ -300,14 +300,6 @@ class JsSuite extends BaseMarkdownSuite {
           |no-dom.md:3 (mdoc generated code)
           | value scalajs is not a member of org
           |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
-          |
-          |
-          |error:
-          |no-dom.md:3 (mdoc generated code)
-          | (<error value scalajs is not a member of org>#dom.raw :
-          |  <error value scalajs is not a member of org>
-          |) is not a valid type prefix, since it is not an immutable path
-          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
       """.stripMargin
     )
   )

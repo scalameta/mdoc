@@ -30,6 +30,7 @@ out/
 .bloop/
 metals.sbt
 .vscode/
+.bsp
 
 website/translated_docs
 website/build/
