@@ -52,6 +52,24 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "infix",
+    """|import scala.language.postfixOps
+       |42 toString
+       |""".stripMargin,
+    """|import scala.language.postfixOps
+       |<42 toString> // : String = "42"
+       |res0: String = "42"
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|import scala.language.postfixOps
+           |<42 toString> // : String = 42
+           |res0: String = 42
+           |""".stripMargin
+    )
+  )
+
+  checkDecorations(
     "null",
     """
       |val x: String = null
