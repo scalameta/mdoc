@@ -269,7 +269,7 @@ class JsSuite extends BaseMarkdownSuite {
     "onclick",
     """
       |```scala mdoc:js
-      |import org.scalajs.dom.raw.MouseEvent
+      |import org.scalajs.dom.MouseEvent
       |node.onclick = {(_: MouseEvent) => println(42)}
       |```
     """.stripMargin
@@ -283,7 +283,7 @@ class JsSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """|error: no-dom.md:4 (mdoc generated code) object scalajs is not a member of package org
-       |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+       |def run0(node: _root_.org.scalajs.dom.html.Element): Unit = {
        |                          ^
     """.stripMargin,
     settings = {
@@ -299,7 +299,7 @@ class JsSuite extends BaseMarkdownSuite {
           |error:
           |no-dom.md:3 (mdoc generated code)
           | value scalajs is not a member of org
-          |def run0(node: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {
+          |def run0(node: _root_.org.scalajs.dom.html.Element): Unit = {
       """.stripMargin
     )
   )
