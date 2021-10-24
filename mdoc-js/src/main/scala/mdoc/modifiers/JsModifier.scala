@@ -252,7 +252,7 @@ class JsModifier extends mdoc.PreModifier {
         new CodeBuilder()
           .println(s"""@_root_.scala.scalajs.js.annotation.JSExportTopLevel("$jsId") """)
           .println(
-            s"""def $run($mountNodeParam: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {"""
+            s"""def $run($mountNodeParam: _root_.org.scalajs.dom.HTMLElement): Unit = {"""
           )
           .println(input.text)
           .println("}")
