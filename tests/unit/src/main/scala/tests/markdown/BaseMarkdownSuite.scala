@@ -43,9 +43,9 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       .withProperties(MdocProperties.default(PathIO.workingDirectory))
 
   private val myStdout = new ByteArrayOutputStream()
-  private def newReporter(): ConsoleReporter = {
+  private def newReporter(): TestConsoleReporter = {
     myStdout.reset()
-    new ConsoleReporter(new PrintStream(myStdout))
+    new TestConsoleReporter(new PrintStream(myStdout))
   }
   protected def scalacOptions: String = ""
   private val compiler = MarkdownBuilder.fromClasspath("", scalacOptions)
