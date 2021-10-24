@@ -6,6 +6,7 @@ import tests.markdown.StringSyntax._
 import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
 import tests.markdown.Compat
+import munit.TestOptions
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
@@ -15,6 +16,32 @@ class JsSuite extends BaseMarkdownSuite {
       "js-opt" -> "fast"
     )
   )
+
+  override def check(
+      name: TestOptions,
+      original: String,
+      expected: String,
+      settings: Settings = baseSettings,
+      compat: Map[Compat.ScalaVersion, String] = Map.empty
+  )(implicit loc: munit.Location): Unit = {
+    checkCompilesWithWarnings(
+      name,
+      original,
+      settings,
+      obtained => {
+        assertNoDiff(
+          Compat(obtained, compat, postProcessObtained),
+          Compat(expected, compat, postProcessExpected)
+        )
+      },
+      acceptedWarnings = scalajsDomDeprecations
+    )
+  }
+
+  def scalajsDomDeprecations: String => Boolean =
+    warnings =>
+      warnings.contains("HTMLElement in object raw is deprecated (since 2.0.0)") ||
+        warnings.contains("MouseEvent in object raw is deprecated (since 2.0.0)")
 
   check(
     "basic",
@@ -148,13 +175,14 @@ class JsSuite extends BaseMarkdownSuite {
     )
   )
 
-  checkCompiles(
+  checkCompilesWithWarnings(
     "mountNode",
     """
       |```scala mdoc:js
       |node.innerHTML = "<h3>Hello world!</h3>"
       |```
-    """.stripMargin
+    """.stripMargin,
+    acceptedWarnings = scalajsDomDeprecations
   )
 
   check(
@@ -256,23 +284,25 @@ class JsSuite extends BaseMarkdownSuite {
         |""".stripMargin
   )
 
-  checkCompiles(
+  checkCompilesWithWarnings(
     "deps",
     """
       |```scala mdoc:js
       |println(jsdocs.ExampleJS.greeting)
       |```
-    """.stripMargin
+    """.stripMargin,
+    acceptedWarnings = scalajsDomDeprecations
   )
 
-  checkCompiles(
+  checkCompilesWithWarnings(
     "onclick",
     """
       |```scala mdoc:js
       |import org.scalajs.dom.raw.MouseEvent
       |node.onclick = {(_: MouseEvent) => println(42)}
       |```
-    """.stripMargin
+    """.stripMargin,
+    acceptedWarnings = scalajsDomDeprecations
   )
 
   checkError(

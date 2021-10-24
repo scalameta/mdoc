@@ -103,6 +103,29 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     }
   }
 
+  def checkCompilesWithWarnings(
+      name: TestOptions,
+      original: String,
+      settings: Settings = baseSettings,
+      onOutput: String => Unit = _ => (),
+      acceptedWarnings: String => Boolean = _ => false
+  ): Unit = {
+    test(name) {
+      val reporter = newReporter()
+      val context = newContext(settings, reporter)
+      val input = Input.VirtualFile(name.name.replace(":", "-") + ".md", original)
+      val file = InputFile.fromRelativeFilename(input.path, settings)
+      val obtained =
+        Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
+      val colorOut = myStdout.toString()
+      print(colorOut)
+      val stdout = fansi.Str(colorOut).plainText
+      assert(!reporter.hasErrors, stdout)
+      assert(reporter.warnings.forall(acceptedWarnings), stdout)
+      onOutput(obtained)
+    }
+  }
+
   def check(
       name: TestOptions,
       original: String,

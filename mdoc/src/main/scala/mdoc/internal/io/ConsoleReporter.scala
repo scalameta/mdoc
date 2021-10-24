@@ -22,17 +22,17 @@ class ConsoleReporter(
   private val myWarning = yellow("warning")
   private val myError = red("error")
 
-  private var myWarnings = 0
+  private val myWarnings = List.newBuilder[String]
   private var myErrors = 0
 
   private val isDebugEnabled = new AtomicBoolean(false)
 
-  override def warningCount: Int = myWarnings
+  override def warningCount: Int = warnings.size
   override def errorCount: Int = myErrors
-  def hasWarnings: Boolean = myWarnings > 0
+  def hasWarnings: Boolean = warnings.size > 0
   def hasErrors: Boolean = myErrors > 0
   def reset(): Unit = {
-    myWarnings = 0
+    myWarnings.clear()
     myErrors = 0
   }
 
@@ -55,7 +55,7 @@ class ConsoleReporter(
     warning(formatMessage(pos.toUnslicedPosition, "warning", msg))
   }
   def warning(msg: String): Unit = {
-    myWarnings += 1
+    myWarnings += msg
     ps.println(myWarning ++ s": $msg")
   }
   def info(pos: Position, msg: String): Unit = {
@@ -80,6 +80,8 @@ class ConsoleReporter(
   override def println(msg: String): Unit = {
     ps.println(msg)
   }
+
+  def warnings: List[String] = myWarnings.result()
 }
 
 object ConsoleReporter {
