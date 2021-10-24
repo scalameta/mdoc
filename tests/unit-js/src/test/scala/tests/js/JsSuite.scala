@@ -40,8 +40,8 @@ class JsSuite extends BaseMarkdownSuite {
 
   def scalajsDomDeprecations: String => Boolean =
     warnings =>
-      warnings.contains("HTMLElement in object raw is deprecated (since 2.0.0)") ||
-        warnings.contains("MouseEvent in object raw is deprecated (since 2.0.0)")
+      warnings.contains("HTMLElement in object raw is deprecated") ||
+        warnings.contains("MouseEvent in object raw is deprecated")
 
   check(
     "basic",
