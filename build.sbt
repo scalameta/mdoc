@@ -1,13 +1,14 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.14"
+def scala212 = "2.12.15"
 def scala211 = "2.11.12"
 def scala213 = "2.13.6"
-def scala3 = "3.0.2"
+
+def scala3 = "3.1.0"
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.7.0"
+def scalajs = "1.7.1"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "1.1.0"
 
@@ -112,8 +113,8 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.4.27"
-  val munit = "0.7.28"
+  val scalameta = "4.4.29"
+  val munit = "0.7.29"
   val coursier = "1.0.4"
   val scalacheck = "1.15.4"
 }
@@ -231,7 +232,7 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.10.Final",
+      "io.undertow" % "undertow-core" % "2.2.12.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
       "org.slf4j" % "slf4j-api" % "1.7.32"
     )
