@@ -42,9 +42,10 @@ jobs:
           - "'++2.11.12 test'"
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12 test'"
-          - "'++2.12.14 test' scripted"
+          - "'++2.12.14 test'"
           - "'++2.13.6 test'"
           - "'++3.1.0 test'"
+          - "scripted"
     steps:
       - uses: actions/checkout@v2
       - uses: olafurpg/setup-scala@v13

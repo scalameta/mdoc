@@ -376,15 +376,13 @@ lazy val plugin = project
       IO.write(props, "sbt-mdoc properties", out)
       List(out)
     },
-    publishLocal := publishLocal
-      .dependsOn(
-        interfaces / publishLocal,
-        runtime / publishLocal,
-        mdoc / publishLocal,
-        cli / publishLocal,
-        js / publishLocal
-      )
-      .value,
+    publishLocal := {
+      publishLocal
+        .dependsOn(
+          (interfaces / publishLocal).dependsOn(localCrossPublish(List(scala212, scala213, scala3)))
+        )
+        .value
+    },
     scriptedBufferLog := false,
     scriptedLaunchOpts ++= Seq(
       "-Xmx2048M",
@@ -447,3 +445,39 @@ lazy val docs = project
   )
   .dependsOn(mdoc, js, plugin)
   .enablePlugins(DocusaurusPlugin)
+
+def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
+  versions
+    .map(localCrossPublishProjects)
+    .reduceLeft(_ dependsOn _)
+
+def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
+  val projects =
+    if (scalaV.startsWith("3"))
+      List(runtime, mdoc, js).reverse
+    else
+      List(runtime, cli, mdoc, js).reverse
+  projects
+    .map(p => localCrossPublishProject(p, scalaV))
+    .reduceLeft(_ dependsOn _)
+}
+
+def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
+  Def.task {
+    val versionValue = (ThisBuild / version).value
+    val projects =
+      if (scalaV.startsWith("3"))
+        List(runtime, mdoc, js)
+      else
+        List(runtime, cli, mdoc, js)
+    val setttings =
+      (ThisBuild / version := versionValue) ::
+        projects.map(p => p / scalaVersion := scalaV)
+    val newState = Project
+      .extract(state.value)
+      .appendWithSession(
+        setttings,
+        state.value
+      )
+    val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
+  }
