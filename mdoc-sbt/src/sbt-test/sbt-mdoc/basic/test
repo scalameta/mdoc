@@ -1,4 +1,8 @@
-> mdoc
+> ++2.12.15 mdoc
 > check
-> set mdocIn := baseDirectory.in(ThisBuild).value
+> ++2.13.6 mdoc
+> check
+> ++3.1.0 mdoc
+> check
+> set mdocIn := (ThisBuild / baseDirectory).value
 -> mdoc

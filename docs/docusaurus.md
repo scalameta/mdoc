@@ -13,8 +13,8 @@ Docusaurus:
 - [Metals](https://scalameta.org/metals/)
 - [Bloop](https://scalacenter.github.io/bloop/)
 - [Coursier](https://coursier.github.io/coursier/)
-- [Almond](http://almond-sh.github.io/almond/stable/docs/intro)
-- [fs2-kafka](https://ovotech.github.io/fs2-kafka/)
+- [Almond](https://almond.sh/)
+- [fs2-kafka](https://fd4s.github.io/fs2-kafka/)
 
 ## Requirements
 
