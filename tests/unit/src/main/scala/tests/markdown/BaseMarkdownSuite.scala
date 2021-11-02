@@ -86,7 +86,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       original: String,
       settings: Settings = baseSettings,
       onOutput: String => Unit = _ => ()
-  ): Unit = {
+  )(implicit loc: munit.Location): Unit = {
     test(name) {
       val reporter = newReporter()
       val context = newContext(settings, reporter)

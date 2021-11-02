@@ -29,6 +29,7 @@ import org.scalajs.linker.MemOutputFile
 import java.util.concurrent.Executor
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalajs.linker.interface.ClearableLinker
+import scala.util.Random
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -140,6 +141,7 @@ class JsModifier extends mdoc.PreModifier {
     val code = new CodeBuilder()
     val wrapped = code
       .println("object mdocjs {")
+      .println(s"""class HTMLElementImplicit(val value: _root_.org.scalajs.dom.raw.HTMLElement)""")
       .foreach(runs)(code.println)
       .println("}")
       .toString
@@ -254,6 +256,7 @@ class JsModifier extends mdoc.PreModifier {
           .println(
             s"""def $run($mountNodeParam: _root_.org.scalajs.dom.raw.HTMLElement): Unit = {"""
           )
+          .println(s"implicit val ${mountNodeParam}Implicit = new HTMLElementImplicit($mountNodeParam);")
           .println(input.text)
           .println("}")
           .toString
