@@ -32,11 +32,6 @@ println("Hello Scala.js!")
 
 lazy val jsapp = project
   .settings(
-    libraryDependencies += {
-      if (scalaVersion.value.startsWith("3"))
-        "org.scala-js" %%% "scalajs-dom" % "1.1.0" cross CrossVersion.for3Use2_13
-      else
-        "org.scala-js" %%% "scalajs-dom" % "1.1.0"
-    }
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.0.0"
   )
   .enablePlugins(ScalaJSPlugin)

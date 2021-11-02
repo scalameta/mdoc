@@ -9,7 +9,7 @@ def allScalaVersions = scala2Versions :+ scala3
 
 def scalajs = "1.7.1"
 def scalajsBinaryVersion = "1"
-def scalajsDom = "1.1.0"
+def scalajsDom = "2.0.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
@@ -278,7 +278,7 @@ val jsdocs = project
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % scalajsDom cross CrossVersion.for3Use2_13
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
     scalaJSUseMainModuleInitializer := true,
     Compile / npmDependencies ++= List(
