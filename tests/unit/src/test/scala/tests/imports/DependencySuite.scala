@@ -81,42 +81,23 @@ class DependencySuite extends BaseMarkdownSuite {
       |import $dep.`org.scalameta::munit:0.7.5` // resolves OK
       |println(42)
       |```
-      | """.stripMargin, {
-      if (Properties.isWin)
-        s"""|error: dep-error.md:3:49: Error downloading org.scalameta:foobar:1.2.1
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/foobar/1.2.1/foobar-1.2.1.pom
-            |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
-            |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_${BuildInfo.scalaVersion}:2.3.4
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_${BuildInfo.scalaVersion}/2.3.4/not-exists_${BuildInfo.scalaVersion}-2.3.4.pom
-            |import $$dep.`org.scalameta:::not-exists:2.3.4`
-            |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |error: dep-error.md:3:13: Error downloading org.scalameta:mmunit_2.13:2.3.4
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.13/2.3.4/mmunit_2.13-2.3.4.pom
-            |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
-            |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |""".stripMargin
-      else
-        s"""|error: dep-error.md:3:49: Error downloading org.scalameta:foobar:1.2.1
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/foobar/1.2.1/foobar-1.2.1.pom
-            |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
-            |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_${BuildInfo.scalaVersion}:2.3.4
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_${BuildInfo.scalaVersion}/2.3.4/not-exists_${BuildInfo.scalaVersion}-2.3.4.pom
-            |import $$dep.`org.scalameta:::not-exists:2.3.4`
-            |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |error: dep-error.md:3:13: Error downloading org.scalameta:mmunit_2.13:2.3.4
-            |<redacted user.home>
-            |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.13/2.3.4/mmunit_2.13-2.3.4.pom
-            |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
-            |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            |""".stripMargin
-    }
+      | """.stripMargin,
+    s"""|error: dep-error.md:3:49: Error downloading org.scalameta:foobar:1.2.1
+        |<redacted user.home>
+        |  not found: https://repo1.maven.org/maven2/org/scalameta/foobar/1.2.1/foobar-1.2.1.pom
+        |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
+        |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        |error: dep-error.md:3:13: Error downloading org.scalameta:mmunit_2.13:2.3.4
+        |<redacted user.home>
+        |  not found: https://repo1.maven.org/maven2/org/scalameta/mmunit_2.13/2.3.4/mmunit_2.13-2.3.4.pom
+        |import $$dep.`org.scalameta::mmunit:2.3.4`, $$dep.`org.scalameta:foobar:1.2.1`
+        |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        |error: dep-error.md:4:13: Error downloading org.scalameta:not-exists_${BuildInfo.scalaVersion}:2.3.4
+        |<redacted user.home>
+        |  not found: https://repo1.maven.org/maven2/org/scalameta/not-exists_${BuildInfo.scalaVersion}/2.3.4/not-exists_${BuildInfo.scalaVersion}-2.3.4.pom
+        |import $$dep.`org.scalameta:::not-exists:2.3.4`
+        |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        |""".stripMargin
   )
 
   checkError(

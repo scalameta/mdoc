@@ -29,7 +29,7 @@ jobs:
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: adopt@1.11
-      - run: sbt '++2.13.6 test'
+      - run: sbt '++2.13.7 test'
         shell: bash
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
@@ -43,7 +43,7 @@ jobs:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12 test'"
           - "'++2.12.14 test'"
-          - "'++2.13.6 test'"
+          - "'++2.13.7 test'"
           - "'++3.1.0 test'"
           - "scripted"
     steps:
