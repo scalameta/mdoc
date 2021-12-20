@@ -112,9 +112,9 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.4.30"
+  val scalameta = "4.4.31"
   val munit = "0.7.29"
-  val coursier = "1.0.4"
+  val coursier = "1.0.5"
   val scalacheck = "1.15.4"
 }
 
@@ -231,8 +231,8 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.14.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.4.Final",
+      "io.undertow" % "undertow-core" % "2.2.13.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.5.Final",
       "org.slf4j" % "slf4j-api" % "1.7.32"
     )
   )
