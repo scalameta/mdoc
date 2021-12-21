@@ -7,15 +7,15 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
 
   private var nestCount = baseNest
 
-  def append(s: String) = {ps.append(s); this }
-  
+  def append(s: String) = { ps.append(s); this }
+
   def println(s: String) = {
     ps.print(indent + s + "\n"); this
   }
 
   def definition(header: String)(cb: CodePrinter => Unit): CodePrinter = {
     val newCB = new CodePrinter(ps, baseIndent + 1, nestCount)
-    
+
     this.println(header + " {")
     cb(newCB)
     this.println("}")
@@ -26,7 +26,7 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
   def appendLines(body: String, nest: Boolean = false) = {
     if (nest) nestCount += 1
     body.linesIterator.toArray.foreach(this.println)
-    if(nest) nestCount -= 1
+    if (nest) nestCount -= 1
     this
   }
 
@@ -48,4 +48,3 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
     nestCount = baseNest
   }
 }
-
