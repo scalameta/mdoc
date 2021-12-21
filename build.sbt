@@ -7,7 +7,8 @@ def scala3 = "3.1.0"
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.8.0"
+def scala2js = "1.8.0"
+def scala3js = "1.7.1"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -400,11 +401,11 @@ lazy val js = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-linker" % scalajs
+        "org.scala-js" % "scalajs-compiler" % scala2js cross CrossVersion.full,
+        "org.scala-js" %% "scalajs-linker" % scala2js
       ),
       if3 = List(
-        "org.scala-js" %% "scalajs-linker" % scalajs cross CrossVersion.for3Use2_13
+        "org.scala-js" %% "scalajs-linker" % scala3js cross CrossVersion.for3Use2_13
       )
     )
   )
@@ -437,7 +438,7 @@ lazy val docs = project
         "VERSION" -> stableVersion,
         "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
         "SCALA_VERSION" -> scalaVersion.value,
-        "SCALAJS_VERSION" -> scalajs,
+        "SCALAJS_VERSION" -> scala2js,
         "SCALAJS_BINARY_VERSION" -> scalajsBinaryVersion,
         "SCALAJS_DOM_VERSION" -> scalajsDom
       )
