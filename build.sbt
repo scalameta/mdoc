@@ -7,7 +7,7 @@ def scala3 = "3.1.0"
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.7.1"
+def scalajs = "1.8.0"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
