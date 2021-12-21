@@ -49,13 +49,14 @@ class Instrumenter(
         val out = new FailInstrumenter(sections, i).instrument()
         val literal = Instrumenter.stringLiteral(out)
         val binder = gensym.fresh("res")
-        sb.line{_.append("val ")
-          .append(binder)
-          .append(" = _root_.mdoc.internal.document.FailSection(")
-          .append(literal)
-          .append(", ")
-          .append(position(section.source.pos))
-          .append(");")
+        sb.line {
+          _.append("val ")
+            .append(binder)
+            .append(" = _root_.mdoc.internal.document.FailSection(")
+            .append(literal)
+            .append(", ")
+            .append(position(section.source.pos))
+            .append(");")
         }
         printBinder(binder, section.source.pos)
         sb.println("$doc.endStatement();")
@@ -77,7 +78,7 @@ class Instrumenter(
                 cb.appendLines(stat.pos.text)
               }
             }
-            
+
             sb.println("\n") // newline for posterity
             sb.println("$doc.endStatement();")
 
@@ -103,18 +104,19 @@ class Instrumenter(
       val (fresh, binders) = stat match {
         case Binders(names) =>
           (false, names.map(name => name -> name.pos))
-        case _ : Term.EndMarker => (false, Nil)
+        case _: Term.EndMarker => (false, Nil)
         case _ =>
           val fresh = gensym.fresh("res")
-          sb.line{_.append(s"val $fresh = ")}
+          sb.line { _.append(s"val $fresh = ") }
           (true, List(Name(fresh) -> stat.pos))
       }
       stat match {
         case i: Import =>
           def printImporter(importer: Importer): Unit = {
-              sb.line {_.append("import ")
-              .append(importer.pos.text)
-              .append(";")
+            sb.line {
+              _.append("import ")
+                .append(importer.pos.text)
+                .append(";")
             }
           }
           i.importers.foreach {
@@ -124,7 +126,7 @@ class Instrumenter(
             case importer =>
               printImporter(importer)
           }
-        case _ : Term.EndMarker => 
+        case _: Term.EndMarker =>
         case _ =>
           sb.appendLines(stat.pos.text, fresh)
       }
@@ -178,9 +180,9 @@ object Instrumenter {
     cb.println("package repl")
     cb.definition("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder") {
       _.println("def app(): _root_.scala.Unit = {val _ = new App()}")
-       .definition("class App") {
-        _.appendLines(body)
-       }
+        .definition("class App") {
+          _.appendLines(body)
+        }
 
     }
 
