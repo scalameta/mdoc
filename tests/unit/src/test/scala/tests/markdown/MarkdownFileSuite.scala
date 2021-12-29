@@ -1,6 +1,6 @@
 package tests.markdown
 
-import munit.FunSuite
+import munit.{FunSuite, Location}
 import mdoc.internal.markdown.MarkdownFile
 import scala.meta.inputs.Input
 import mdoc.internal.io.ConsoleReporter
@@ -17,7 +17,7 @@ import scala.meta.internal.io.PathIO
 class MarkdownFileSuite extends FunSuite {
   val reporter = new ConsoleReporter(System.out)
 
-  def check(name: String, original: String, expected: MarkdownPart*): Unit = {
+  def checkParse(name: String, original: String, expected: MarkdownPart*)(implicit loc: Location): Unit = {
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name, original)
@@ -32,8 +32,19 @@ class MarkdownFileSuite extends FunSuite {
     }
   }
 
-  check(
-    "basic",
+  def checkRenderToString(name: String, original: MarkdownPart, expected: String)(implicit loc: Location): Unit = {
+    test(name) {
+      val sb = new StringBuilder
+      original.renderToString(sb)
+      assertNoDiff(
+        sb.toString,
+        expected
+      )
+    }
+  }
+
+  checkParse(
+    "parse. basic",
     """# Hello
       |World
       |```scala mdoc
@@ -52,8 +63,8 @@ class MarkdownFileSuite extends FunSuite {
     Text("End.\n")
   )
 
-  check(
-    "four-backtick",
+  checkParse(
+    "parse. four-backtick",
     """# Hello
       |World
       |````scala mdoc
@@ -74,8 +85,8 @@ class MarkdownFileSuite extends FunSuite {
     Text("End.\n")
   )
 
-  check(
-    "two-backtick",
+  checkParse(
+    "parse. two-backtick",
     """# Hello
       |World
       |``scala mdoc
@@ -91,8 +102,8 @@ class MarkdownFileSuite extends FunSuite {
     Text("End.\n")
   )
 
-  check(
-    "backtick-mismatch",
+  checkParse(
+    "parse. backtick-mismatch",
     """|````scala mdoc
        |`````
        |````
@@ -110,5 +121,105 @@ class MarkdownFileSuite extends FunSuite {
       Text("42"),
       Text("\n")
     )
+  )
+
+  checkParse(
+    "parse. indented with whitespaces",
+    """prefix
+      |  ```scala mdoc
+      |  println("foo")
+      |  println("bar")
+      |  ```
+      |suffix
+      |""".stripMargin,
+    Text("prefix\n"),
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(\"foo\")\nprintln(\"bar\")"),
+      Text("\n```\n"),
+      Text("  ")
+    ),
+    Text("suffix\n")
+  )
+
+  checkParse(
+    "parse. indented with tag",
+    """prefix
+      |: ```scala mdoc
+      |  println(42)
+      |  ```
+      |suffix
+      |""".stripMargin,
+    Text("prefix\n"),
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(42)"),
+      Text("\n```\n"),
+      Text(": ")
+    ),
+    Text("suffix\n")
+  )
+
+  checkRenderToString(
+    "render. basic",
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(42)"),
+      Text("\n```\n")
+    ),
+    """```scala mdoc
+      |println(42)
+      |```
+      |""".stripMargin
+  )
+
+  checkRenderToString(
+    "render. indented, one-liner body",
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(42)"),
+      Text("\n```\n"),
+      Text("  ")
+    ),
+    """  ```scala mdoc
+      |  println(42)
+      |  ```
+      |""".stripMargin
+  )
+
+  checkRenderToString(
+    "render. indented, multi-line body",
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(42)\nprintln(52)"),
+      Text("\n```\n"),
+      Text("  ")
+    ),
+    """  ```scala mdoc
+      |  println(42)
+      |  println(52)
+      |  ```
+      |""".stripMargin
+  )
+
+  checkRenderToString(
+    "render. indented with tag, multi-line body",
+    CodeFence(
+      Text("```"),
+      Text("scala mdoc\n"),
+      Text("println(42)\nprintln(52)"),
+      Text("\n```\n"),
+      Text(":   ")
+    ),
+    """:   ```scala mdoc
+      |    println(42)
+      |    println(52)
+      |    ```
+      |""".stripMargin
   )
 }
