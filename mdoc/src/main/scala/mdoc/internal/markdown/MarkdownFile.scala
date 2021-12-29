@@ -153,5 +153,5 @@ final case class CodeFence(
   var newInfo = Option.empty[String]
   var newBody = Option.empty[String]
   def indent: Int = tag.value.length
-  def hasBlankTag: Boolean = tag.value.isBlank
+  def hasBlankTag: Boolean = tag.value.forall(_.isWhitespace)
 }
