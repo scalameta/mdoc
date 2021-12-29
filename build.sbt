@@ -94,6 +94,8 @@ inThisBuild(
     packageDoc / publishArtifact := "true" == System.getenv("CI"),
     packageSrc / publishArtifact := "true" == System.getenv("CI"),
     turbo := true,
+    semanticdbEnabled := true,
+    semanticdbVersion := "4.4.31",
     useSuperShell := false // overlaps with MUnit test failure reports.
   )
 )

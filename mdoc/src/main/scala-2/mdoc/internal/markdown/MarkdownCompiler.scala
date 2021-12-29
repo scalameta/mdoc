@@ -30,6 +30,7 @@ import scala.annotation.implicitNotFound
 import mdoc.internal.CompatClassloader
 import mdoc.internal.worksheets.Compat._
 import scala.meta.internal.inputs._
+import scala.tools.nsc.plugins.Plugin
 
 class MarkdownCompiler(
     classpath: String,
@@ -52,7 +53,13 @@ class MarkdownCompiler(
   def classpathEntries: Seq[Path] = global.classPath.asURLs.map(url => Paths.get(url.toURI()))
 
   private val sreporter = new FilterStoreReporter(settings)
-  var global = new Global(settings, sreporter)
+  var global = new Global(settings, sreporter) {
+    // Disable the SemanticDB compiler plugin because it's not needed for
+    // Markdown evaluation.  The primary motivation to disable the SemanticDB
+    // compiler plugin was to work around this bug here
+    // https://github.com/scalameta/scalameta/pull/2528
+    override protected def loadPlugins(): List[Plugin] = super.loadPlugins().filterNot(_.name == "semanticdb")
+  }
   private def reset(): Unit = {
     global = new Global(settings, sreporter)
   }
