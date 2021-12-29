@@ -82,4 +82,5 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    // Hello!
       |    ```
     """.stripMargin
-  )}
+  )
+}

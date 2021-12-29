@@ -42,7 +42,8 @@ object MarkdownFile {
         backtickEnd: Int
     ): CodeFence = {
       val tag = newText(state.start, state.start + state.indent)
-      val open = newText(state.start, state.start + state.indent + state.backticks.length()).dropLinePrefix(state.indent)
+      val open = newText(state.start, state.start + state.indent + state.backticks.length())
+        .dropLinePrefix(state.indent)
       val info = newText(open.pos.end, open.pos.end + state.info.length())
       val adaptedBacktickStart = math.max(0, backtickStart - 1)
       val body = newText(info.pos.end, adaptedBacktickStart).dropLinePrefix(state.indent)
@@ -141,8 +142,13 @@ final case class Text(value: String) extends MarkdownPart {
     } else this
   }
 }
-final case class CodeFence(openBackticks: Text, info: Text, body: Text, closeBackticks: Text, tag: Text = Text(""))
-    extends MarkdownPart {
+final case class CodeFence(
+    openBackticks: Text,
+    info: Text,
+    body: Text,
+    closeBackticks: Text,
+    tag: Text = Text("")
+) extends MarkdownPart {
   var newPart = Option.empty[String]
   var newInfo = Option.empty[String]
   var newBody = Option.empty[String]

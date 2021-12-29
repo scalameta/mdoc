@@ -17,7 +17,9 @@ import scala.meta.internal.io.PathIO
 class MarkdownFileSuite extends FunSuite {
   val reporter = new ConsoleReporter(System.out)
 
-  def checkParse(name: String, original: String, expected: MarkdownPart*)(implicit loc: Location): Unit = {
+  def checkParse(name: String, original: String, expected: MarkdownPart*)(implicit
+      loc: Location
+  ): Unit = {
     test(name) {
       reporter.reset()
       val input = Input.VirtualFile(name, original)
@@ -32,7 +34,9 @@ class MarkdownFileSuite extends FunSuite {
     }
   }
 
-  def checkRenderToString(name: String, original: MarkdownPart, expected: String)(implicit loc: Location): Unit = {
+  def checkRenderToString(name: String, original: MarkdownPart, expected: String)(implicit
+      loc: Location
+  ): Unit = {
     test(name) {
       val sb = new StringBuilder
       original.renderToString(sb)
