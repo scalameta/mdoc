@@ -37,21 +37,23 @@ class SemanticsSuite extends BaseMarkdownSuite {
        |  implicit val ordering: Ordering[User] = Ordering.by(_.name)
        |}
        |List(User("Susan"), User("John")).sorted
-       |// res0: List[User] = List(User("John"), User("Susan"))
+       |// res0: List[User] = List(User(name = "John"), User(name = "Susan"))
        |```
-    """.stripMargin,
-    compat = Map(
-      Compat.Scala213 ->
+       |""".stripMargin,
+    compat = {
+      val oldScalaOutput =
         """|```scala
            |case class User(name: String)
            |object User {
            |  implicit val ordering: Ordering[User] = Ordering.by(_.name)
            |}
            |List(User("Susan"), User("John")).sorted
-           |// res0: List[User] = List(User(name = "John"), User(name = "Susan"))
+           |// res0: List[User] = List(User("John"), User("Susan"))
            |```
-           |""".stripMargin
-    )
+    """.stripMargin
+
+      Map(Compat.Scala212 -> oldScalaOutput, Compat.Scala211 -> oldScalaOutput)
+    }
   )
 
   check(

@@ -136,17 +136,22 @@ class DefaultSuite extends BaseMarkdownSuite {
     """|```scala
        |case class User(name: String, age: Int)
        |User("John", 42)
-       |// res0: User = User("John", 42)
+       |// res0: User = User(name = "John", age = 42)
        |```
-    """.stripMargin,
+       |""".stripMargin,
     compat = Map(
-      Compat.Scala213 ->
-        """|```scala
-           |case class User(name: String, age: Int)
-           |User("John", 42)
-           |// res0: User = User(name = "John", age = 42)
-           |```
-           |""".stripMargin
+      Compat.Scala212 -> """|```scala
+                            |case class User(name: String, age: Int)
+                            |User("John", 42)
+                            |// res0: User = User("John", 42)
+                            |```
+    """.stripMargin,
+      Compat.Scala211 -> """|```scala
+                            |case class User(name: String, age: Int)
+                            |User("John", 42)
+                            |// res0: User = User("John", 42)
+                            |```
+    """.stripMargin
     )
   )
 

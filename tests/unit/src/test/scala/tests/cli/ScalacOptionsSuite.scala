@@ -200,7 +200,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
            |final case class Test(value: Int)
            |
            |val test = Test(123)
-           |// test: Test = Test(123)
+           |// test: Test = Test(value = 123)
            |
            |test.value
            |// res0: Int = 123
