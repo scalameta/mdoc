@@ -2,14 +2,14 @@ import scala.collection.mutable
 
 def scala212 = "2.12.15"
 def scala211 = "2.11.12"
-def scala213 = "2.13.6"
+def scala213 = "2.13.7"
 def scala3 = "3.1.0"
 def scala2Versions = List(scala212, scala211, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
 def scalajs = "1.7.1"
 def scalajsBinaryVersion = "1"
-def scalajsDom = "1.1.0"
+def scalajsDom = "2.0.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
@@ -112,9 +112,9 @@ lazy val sharedSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.4.29"
+  val scalameta = "4.4.31"
   val munit = "0.7.29"
-  val coursier = "1.0.4"
+  val coursier = "1.0.5"
   val scalacheck = "1.15.4"
   val kindProjector = "0.13.2"
   val evilplot = "0.8.1"
@@ -122,8 +122,8 @@ val V = new {
   val flexmark = "0.62.2"
   val diffutils = "1.3.0"
   val directoryWatcher = "0.15.0"
-  val undertow = "2.2.12.Final"
-  val xnio = "3.8.4.Final"
+  val undertow = "2.2.14.Final"
+  val xnio = "3.8.5.Final"
   val slf4j = "1.7.32"
 
   object npm {
@@ -293,7 +293,7 @@ val jsdocs = project
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
     libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % scalajsDom cross CrossVersion.for3Use2_13
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom
     ),
     scalaJSUseMainModuleInitializer := true,
     Compile / npmDependencies ++= List(
@@ -395,15 +395,13 @@ lazy val plugin = project
       IO.write(props, "sbt-mdoc properties", out)
       List(out)
     },
-    publishLocal := publishLocal
-      .dependsOn(
-        interfaces / publishLocal,
-        runtime / publishLocal,
-        mdoc / publishLocal,
-        cli / publishLocal,
-        js / publishLocal
-      )
-      .value,
+    publishLocal := {
+      publishLocal
+        .dependsOn(
+          (interfaces / publishLocal).dependsOn(localCrossPublish(List(scala212, scala213, scala3)))
+        )
+        .value
+    },
     scriptedBufferLog := false,
     scriptedLaunchOpts ++= Seq(
       "-Xmx2048M",
@@ -466,3 +464,39 @@ lazy val docs = project
   )
   .dependsOn(mdoc, js, plugin)
   .enablePlugins(DocusaurusPlugin)
+
+def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
+  versions
+    .map(localCrossPublishProjects)
+    .reduceLeft(_ dependsOn _)
+
+def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
+  val projects =
+    if (scalaV.startsWith("3"))
+      List(runtime, mdoc, js).reverse
+    else
+      List(runtime, cli, mdoc, js).reverse
+  projects
+    .map(p => localCrossPublishProject(p, scalaV))
+    .reduceLeft(_ dependsOn _)
+}
+
+def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
+  Def.task {
+    val versionValue = (ThisBuild / version).value
+    val projects =
+      if (scalaV.startsWith("3"))
+        List(runtime, mdoc, js)
+      else
+        List(runtime, cli, mdoc, js)
+    val setttings =
+      (ThisBuild / version := versionValue) ::
+        projects.map(p => p / scalaVersion := scalaV)
+    val newState = Project
+      .extract(state.value)
+      .appendWithSession(
+        setttings,
+        state.value
+      )
+    val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
+  }

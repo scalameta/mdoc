@@ -85,6 +85,7 @@ object MarkdownBuilder {
         val runtime = defaultClasspath(path => {
           val pathString = path.toString
           pathString.contains("scala-library") ||
+          pathString.contains("scala3-library") ||
           pathString.contains("scala-reflect") ||
           pathString.contains("fansi") ||
           pathString.contains("pprint") ||

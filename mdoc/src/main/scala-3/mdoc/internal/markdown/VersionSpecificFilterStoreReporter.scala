@@ -1,4 +1,3 @@
-
 package mdoc.internal.markdown
 
 import scala.tools.nsc.Settings

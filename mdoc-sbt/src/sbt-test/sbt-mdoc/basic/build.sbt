@@ -1,11 +1,14 @@
-scalaVersion.in(ThisBuild) := "2.12.15"
+ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / crossScalaVersions := List("2.12.15", "2.13.7", "3.0.1")
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)
 
 TaskKey[Unit]("check") := {
-  val obtained = IO.read(mdocOut.value / "readme.md")
-  println()
+  val file = mdocOut.value / "readme.md"
+  val obtained = IO.read(file)
+  IO.delete(file)
+  println(s"----${scalaVersion.value}----")
   println(obtained)
   println()
   assert(
@@ -24,10 +27,11 @@ println("Hello Scala.js!")
 """.trim,
     "\"\"\"\n" + obtained + "\n\"\"\""
   )
+  println("------------------")
 }
 
 lazy val jsapp = project
   .settings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.0.0"
   )
   .enablePlugins(ScalaJSPlugin)

@@ -53,7 +53,6 @@ class MarkdownCompiler(
     target: AbstractFile = new VirtualDirectory("(memory)")
 ) {
 
-
   private def newContext: FreshContext = {
     val defaultFlags =
       List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
@@ -67,7 +66,8 @@ class MarkdownCompiler(
     ctx
       .setReporter(new CollectionReporter)
       .setSetting(
-        ctx.settings.outputDir, target
+        ctx.settings.outputDir,
+        target
       )
   }
 
@@ -127,7 +127,7 @@ class MarkdownCompiler(
   class CollectionReporter extends dotty.tools.dotc.reporting.Reporter with UniqueMessagePositions {
     val allDiags = List.newBuilder[Diagnostic]
 
-    override def doReport(dia: Diagnostic)(using Context) = 
+    override def doReport(dia: Diagnostic)(using Context) =
       allDiags += dia
 
     override def pendingMessages(using Context) = allDiags.result()
@@ -175,7 +175,7 @@ class MarkdownCompiler(
   def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
     val compiler = new Compiler
     val freshContext = context.fresh
-    
+
     val run = compiler.newRun(using freshContext)
     val inputs = List(input).map(toSource)
 
@@ -183,25 +183,24 @@ class MarkdownCompiler(
     val runContext = run.runContext
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
-    
+
     runContext.reporter.pendingMessages(using context).foreach { diagnostic =>
       val msg = nullableMessage(diagnostic.message)
       val mpos = toMetaPosition(edit, diagnostic.position.get)
-      if(sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
+      if (sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
         val severity = diagnostic.level match {
           case IDiagnostic.ERROR => "error"
           case IDiagnostic.WARNING => "warn"
           case IDiagnostic.INFO => "info"
         }
-        val formatted = 
+        val formatted =
           PositionSyntax.formatMessage(mpos, severity, "\n" + msg, includePath = false)
         ps.println(formatted)
       }
     }
-    
+
     out.toString()
   }
-
 
   def toMetaPosition(edit: TokenEditDistance, pos: SourcePosition): Position = {
     def toOffsetPosition(offset: Int): Position = {
@@ -216,11 +215,11 @@ class MarkdownCompiler(
 
     (edit.toOriginal(start), edit.toOriginal(end - 1)) match {
       case (Right(start), Right(end)) =>
-          Position.Range(start.input, start.start, end.end).toUnslicedPosition
+        Position.Range(start.input, start.start, end.end).toUnslicedPosition
       case (_, _) =>
-          toOffsetPosition(pos.point - 1)
+        toOffsetPosition(pos.point - 1)
     }
-    
+
   }
 
   private def nullableMessage(msgOrNull: String): String =
@@ -239,8 +238,8 @@ class MarkdownCompiler(
       case diagnostic if diagnostic.position.isPresent =>
         val pos = diagnostic.position.get
         val msg = nullableMessage(diagnostic.message)
-        
-        val mpos = toMetaPosition(edit, pos) 
+
+        val mpos = toMetaPosition(edit, pos)
         val actualMessage =
           if (mpos == Position.None) {
             val line = pos.lineContent
@@ -264,11 +263,11 @@ class MarkdownCompiler(
       message: String
   ): Unit = {
     diagnostic match {
-    case _: Diagnostic.Error => vreporter.error(mpos, message)
-    case _: Diagnostic.Info => vreporter.info(mpos, message)
-    case _: Diagnostic.Warning => vreporter.warning(mpos, message)
-    case _ =>
-  }
+      case _: Diagnostic.Error => vreporter.error(mpos, message)
+      case _: Diagnostic.Info => vreporter.info(mpos, message)
+      case _: Diagnostic.Warning => vreporter.warning(mpos, message)
+      case _ =>
+    }
   }
   private def formatMessage(pos: SourcePosition, message: String): String =
     new CodeBuilder()
