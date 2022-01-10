@@ -8,7 +8,7 @@ import Compat.TPrint
 object Printing {
 
   def stringValue[T](value: T) = PPrinter.BlackWhite.apply(value)
-  def typeString[T](tprint: TPrint[T]) = tprint.render(TPrintColors.BlackWhite)
+  def typeString[T](tprint: TPrint[T]): String = tprint.render(TPrintColors.BlackWhite).render
   def print[T](value: T, out: StringBuilder, width: Int, height: Int) = {
     BlackWhite
       .tokenize(value, width, height)

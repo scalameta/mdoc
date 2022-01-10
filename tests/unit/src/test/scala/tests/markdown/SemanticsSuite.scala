@@ -41,6 +41,16 @@ class SemanticsSuite extends BaseMarkdownSuite {
        |```
     """.stripMargin,
     compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |case class User(name: String)
+           |object User {
+           |  implicit val ordering: Ordering[User] = Ordering.by(_.name)
+           |}
+           |List(User("Susan"), User("John")).sorted
+           |// res0: List[User] = List(User(name = "John"), User(name = "Susan"))
+           |```
+           |""".stripMargin,
       Compat.Scala213 ->
         """|```scala
            |case class User(name: String)

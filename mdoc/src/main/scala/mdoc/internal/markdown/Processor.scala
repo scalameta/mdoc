@@ -17,9 +17,9 @@ import scala.meta.dialects.{Scala213, Scala3}
 import scala.util.control.NonFatal
 import mdoc.internal.cli.Context
 import mdoc.internal.document.MdocExceptions
+import mdoc.internal.document.Printing
 import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
-import pprint.TPrintColors
 import scala.meta.io.RelativePath
 import coursierapi.error.SimpleResolutionError
 import coursierapi.error.CoursierError
@@ -198,7 +198,6 @@ class Processor(implicit ctx: Context) {
           ctx.settings.variablePrinter,
           markdownCompiler
         )
-      implicit val pprintColor = TPrintColors.BlackWhite
       mod match {
         case Modifier.Post(modifier, info) =>
           val variables = for {
@@ -209,7 +208,7 @@ class Processor(implicit ctx: Context) {
           } yield {
             new mdoc.Variable(
               binder.name,
-              binder.tpe.render,
+              Printing.typeString(binder.tpe),
               binder.value,
               binder.pos.toMeta(section),
               j,

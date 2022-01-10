@@ -8,6 +8,6 @@ libraryDependencies ++= List(
   "org.jsoup" % "jsoup" % "1.12.1",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
-unmanagedSourceDirectories.in(Compile) +=
-  baseDirectory.in(ThisBuild).value.getParentFile /
+Compile / unmanagedSourceDirectories +=
+  (ThisBuild / baseDirectory).value.getParentFile /
     "mdoc-sbt" / "src" / "main" / "scala"

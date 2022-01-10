@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: olafurpg/setup-scala@v13
-      - run: sbt '++2.12.14 docs/mdoc'
+      - run: sbt '++2.12.15 docs/mdoc'
   test-windows:
     name: "Windows"
     runs-on: windows-latest
@@ -39,10 +39,9 @@ jobs:
       matrix:
         java: [adopt@1.8, adopt@1.11, 17]
         command:
-          - "'++2.11.12 test'"
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12 test'"
-          - "'++2.12.14 test'"
+          - "'++2.12.15 test'"
           - "'++2.13.8 test'"
           - "'++3.1.0 test'"
           - "scripted"

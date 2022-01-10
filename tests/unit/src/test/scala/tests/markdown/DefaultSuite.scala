@@ -146,6 +146,13 @@ class DefaultSuite extends BaseMarkdownSuite {
            |User("John", 42)
            |// res0: User = User(name = "John", age = 42)
            |```
+           |""".stripMargin,
+      Compat.Scala3 ->
+        """|```scala
+           |case class User(name: String, age: Int)
+           |User("John", 42)
+           |// res0: User = User(name = "John", age = 42)
+           |```
            |""".stripMargin
     )
   )

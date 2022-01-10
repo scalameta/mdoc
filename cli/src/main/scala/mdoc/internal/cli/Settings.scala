@@ -31,6 +31,7 @@ import mdoc.Reporter
 import mdoc.internal.markdown.{GitHubIdGenerator, ReplVariablePrinter}
 import mdoc.internal.cli.CliEnrichments._
 import pprint.TPrint
+import pprint.TPrintColors
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -300,13 +301,24 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
   def write(set: Settings) = ConfEncoder[Settings].write(set)
 
   implicit val absolutePathPrint: TPrint[AbsolutePath] =
-    TPrint.make[AbsolutePath](_ => "<path>")
+    new TPrint[AbsolutePath] {
+      def render(implicit tpc: TPrintColors): fansi.Str = fansi.Str("<path>")
+    }
+
   implicit val pathMatcherPrint: TPrint[PathMatcher] =
-    TPrint.make[PathMatcher](_ => "<glob>")
+    new TPrint[PathMatcher] {
+      def render(implicit tpc: TPrintColors): fansi.Str = fansi.Str("<glob>")
+    }
+
   implicit def optionPrint[T](implicit ev: pprint.TPrint[T]): TPrint[Option[T]] =
-    TPrint.make { implicit cfg => ev.render }
+    new TPrint[Option[T]] {
+      def render(implicit tpc: TPrintColors): fansi.Str = ev.render
+    }
+
   implicit def iterablePrint[C[x] <: Iterable[x], T](implicit ev: pprint.TPrint[T]): TPrint[C[T]] =
-    TPrint.make { implicit cfg => s"[${ev.render} ...]" }
+    new TPrint[C[T]] {
+      def render(implicit tpc: TPrintColors): fansi.Str = s"[${ev.render} ...]"
+    }
 
   implicit val pathMatcherDecoder: ConfDecoder[PathMatcher] =
     ConfDecoder.stringConfDecoder.map(glob => FileSystems.getDefault.getPathMatcher("glob:" + glob))
