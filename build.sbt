@@ -1,10 +1,9 @@
 import scala.collection.mutable
 
 def scala212 = "2.12.15"
-def scala211 = "2.11.12"
 def scala213 = "2.13.8"
 def scala3 = "3.1.0"
-def scala2Versions = List(scala212, scala211, scala213)
+def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
 def scalajs = "1.7.1"
@@ -13,7 +12,6 @@ def scalajsDom = "2.0.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
-def isScala211(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 11)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
 val isScala212 = Def.setting {
@@ -60,7 +58,6 @@ def crossSetting[A](
   CrossVersion.partialVersion(scalaVersion) match {
     case partialVersion if isScala2(partialVersion) => if2
     case partialVersion if isScala3(partialVersion) => if3
-    case partialVersion if isScala211(partialVersion) => if2 ::: if211
     case partialVersion if isScala212(partialVersion) => if2 ::: if212
     case _ => Nil
   }
@@ -116,21 +113,10 @@ val V = new {
   val munit = "0.7.29"
   val coursier = "1.0.6"
   val scalacheck = "1.15.4"
-}
-
-lazy val pprintVersion = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "0.5.4"
-  else "0.6.0"
-}
-
-lazy val fansiVersion = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "0.2.6"
-  else "0.2.9"
-}
-
-lazy val fs2Version = Def.setting {
-  if (scalaVersion.value.startsWith("2.11")) "2.1.0"
-  else "2.5.5"
+  val pprint = "0.7.1"
+  val fansi = "0.3.0"
+  val fs2 = "3.2.4"
+  val metaconfig = "0.9.16"
 }
 
 lazy val interfaces = project
@@ -164,7 +150,7 @@ lazy val runtime = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "com.lihaoyi" %% "pprint" % pprintVersion.value,
+        "com.lihaoyi" %% "pprint" % V.pprint,
         "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
       ),
@@ -176,18 +162,33 @@ lazy val runtime = project
   .dependsOn(interfaces)
 
 val excludePprint = ExclusionRule(organization = "com.lihaoyi")
+val excludeCollection =
+  ExclusionRule(organization = "org.scala-lang.modules", name = "scala-collection-compat_2.13")
 
 lazy val cli = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-cli",
     scalaVersion := scala213,
-    crossScalaVersions := scala2Versions,
+    crossScalaVersions := allScalaVersions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
-      "org.scalameta" %% "scalameta" % V.scalameta,
-      "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10"
+      "com.lihaoyi" %% "pprint" % V.pprint,
+      "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig
+    ),
+    libraryDependencies ++= crossSetting(
+      scalaVersion.value,
+      if2 = List(
+        ("org.scalameta" %% "scalameta" % V.scalameta)
+          .excludeAll(excludePprint)
+      ),
+      if3 = List(
+        ("org.scalameta" %% "scalameta" % V.scalameta)
+          .excludeAll(excludePprint)
+          .excludeAll(excludeCollection)
+          .cross(CrossVersion.for3Use2_13)
+      )
     )
   )
 
@@ -218,13 +219,13 @@ lazy val mdoc = project
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
         ("org.scalameta" %% "scalameta" % V.scalameta)
           .excludeAll(excludePprint)
+          .excludeAll(excludeCollection)
           .cross(CrossVersion.for3Use2_13)
       ),
       if2 = List(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-        "org.scalameta" %% "scalameta" % V.scalameta,
-        "com.geirsson" %% "metaconfig-typesafe-config" % "0.9.10",
-        "com.lihaoyi" %% "fansi" % fansiVersion.value
+        ("org.scalameta" %% "scalameta" % V.scalameta)
+          .excludeAll(excludePprint)
       )
     ),
     libraryDependencies ++= List(
@@ -233,7 +234,10 @@ lazy val mdoc = project
       // live reload
       "io.undertow" % "undertow-core" % "2.2.14.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.5.Final",
-      "org.slf4j" % "slf4j-api" % "1.7.33"
+      "org.slf4j" % "slf4j-api" % "1.7.33",
+      "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
+      "com.lihaoyi" %% "fansi" % V.fansi,
+      "com.lihaoyi" %% "pprint" % V.pprint
     )
   )
   .dependsOn(runtime, cli)
@@ -320,11 +324,11 @@ lazy val unit = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if3 = List(
-        ("co.fs2" %% "fs2-core" % fs2Version.value)
+        ("co.fs2" %% "fs2-core" % V.fs2)
           .cross(CrossVersion.for3Use2_13)
       ),
       if2 = List(
-        "co.fs2" %% "fs2-core" % fs2Version.value
+        "co.fs2" %% "fs2-core" % V.fs2
       )
     ),
     buildInfoPackage := "tests.cli",
@@ -452,11 +456,7 @@ def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
     .reduceLeft(_ dependsOn _)
 
 def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
-  val projects =
-    if (scalaV.startsWith("3"))
-      List(runtime, mdoc, js).reverse
-    else
-      List(runtime, cli, mdoc, js).reverse
+  val projects = List(runtime, cli, mdoc, js).reverse
   projects
     .map(p => localCrossPublishProject(p, scalaV))
     .reduceLeft(_ dependsOn _)
@@ -465,11 +465,7 @@ def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
 def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
   Def.task {
     val versionValue = (ThisBuild / version).value
-    val projects =
-      if (scalaV.startsWith("3"))
-        List(runtime, mdoc, js)
-      else
-        List(runtime, cli, mdoc, js)
+    val projects = List(runtime, cli, mdoc, js)
     val setttings =
       (ThisBuild / version := versionValue) ::
         projects.map(p => p / scalaVersion := scalaV)

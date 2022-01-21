@@ -10,6 +10,7 @@ import mdoc.document.CrashResult.Crashed
 import mdoc.document.RangePosition
 import mdoc.internal.document.FailSection
 import mdoc.internal.document.MdocExceptions
+import mdoc.internal.document.Printing
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
 import scala.meta._
@@ -157,7 +158,7 @@ object Renderer {
                   }
                   appendFreshMultiline(sb, compiled)
                 case _ =>
-                  val obtained = pprint.PPrinter.BlackWhite.apply(binder).toString()
+                  val obtained = Printing.stringValue(binder.value)
                   throw new IllegalArgumentException(
                     s"Expected FailSection. Obtained $obtained"
                   )
@@ -166,7 +167,7 @@ object Renderer {
               val pos = binder.pos.toMeta(section)
               val variable = new mdoc.Variable(
                 binder.name,
-                binder.tpe.render,
+                Printing.typeString(binder.tpe),
                 binder.value,
                 pos,
                 i,
