@@ -116,7 +116,7 @@ val V = new {
   val pprint = "0.7.1"
   val fansi = "0.3.0"
   val fs2 = "3.2.4"
-  val metaconfig = "0.9.16"
+  val metaconfig = "0.10.0"
 }
 
 lazy val interfaces = project
