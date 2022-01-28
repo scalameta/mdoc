@@ -262,13 +262,13 @@ code fences allowing you <span class="hljs-keyword">to</span> compile <span clas
 
 Common options:
 
-  <span class="hljs-comment">--in | -i [&lt;path&gt; ...] (default: ["docs"])</span>
+  <span class="hljs-comment">--in | -i List[AbsolutePath] (default: ["docs"])</span>
     The input directory <span class="hljs-keyword">or</span> regular <span class="hljs-keyword">file</span> containing markdown <span class="hljs-keyword">and</span> other documentation
     sources that should be processed. Markdown files are processed by mdoc <span class="hljs-keyword">while</span>
     non-markdown files are copied verbatim <span class="hljs-keyword">to</span> the output directory. Can be
     repeated <span class="hljs-keyword">to</span> <span class="hljs-keyword">process</span> multiple input directories/files.
 
-  <span class="hljs-comment">--out | -o [&lt;path&gt; ...] (default: ["out"])</span>
+  <span class="hljs-comment">--out | -o List[AbsolutePath] (default: ["out"])</span>
     The output directory <span class="hljs-keyword">or</span> regular <span class="hljs-keyword">file</span> where you<span class="hljs-symbol">'d</span> like <span class="hljs-keyword">to</span> <span class="hljs-keyword">generate</span> your markdown
     <span class="hljs-keyword">or</span> other documentation sources. Must be repeated <span class="hljs-keyword">to</span> match the number <span class="hljs-keyword">of</span>
     `<span class="hljs-comment">--in` arguments and must be a directory when the matching `--in` argument</span>
@@ -334,14 +334,14 @@ Less common options:
   <span class="hljs-comment">--version</span>
     Print <span class="hljs-keyword">out</span> the version number <span class="hljs-keyword">and</span> <span class="hljs-keyword">exit</span>
 
-  <span class="hljs-comment">--markdown-extensions [String ...] (default: ["md", "html"])</span>
+  <span class="hljs-comment">--markdown-extensions List[String] (default: ["md", "html"])</span>
     Set <span class="hljs-keyword">of</span> <span class="hljs-keyword">file</span> extensions <span class="hljs-keyword">to</span> treat as markdown files.
 
-  <span class="hljs-comment">--include [&lt;glob&gt; ...] (default: [])</span>
+  <span class="hljs-comment">--include List[PathMatcher] (default: [])</span>
     Glob <span class="hljs-keyword">to</span> filter which files <span class="hljs-keyword">to</span> <span class="hljs-keyword">process</span>. Defaults <span class="hljs-keyword">to</span> <span class="hljs-keyword">all</span> files. Example: <span class="hljs-comment">--include</span>
     **/example.md will <span class="hljs-keyword">process</span> only files <span class="hljs-keyword">with</span> the name example.md.
 
-  <span class="hljs-comment">--exclude [&lt;glob&gt; ...] (default: [])</span>
+  <span class="hljs-comment">--exclude List[PathMatcher] (default: [])</span>
     Glob <span class="hljs-keyword">to</span> filter which files from exclude from processing. Defaults <span class="hljs-keyword">to</span> no files.
     Example: <span class="hljs-comment">--include users/**.md --exclude **/example.md will process all</span>
     files <span class="hljs-keyword">in</span> the users/ directory excluding files named example.md.
@@ -353,7 +353,7 @@ Less common options:
   <span class="hljs-comment">--charset Charset (default: "UTF-8")</span>
     The encoding <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">when</span> reading <span class="hljs-keyword">and</span> writing files.
 
-  <span class="hljs-comment">--cwd &lt;path&gt; (default: "&lt;current working directory&gt;")</span>
+  <span class="hljs-comment">--cwd AbsolutePath (default: "&lt;current working directory&gt;")</span>
     The working directory <span class="hljs-keyword">to</span> <span class="hljs-keyword">use</span> <span class="hljs-keyword">for</span> making relative paths absolute.
 
 
