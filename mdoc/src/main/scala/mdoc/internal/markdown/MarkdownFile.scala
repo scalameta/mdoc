@@ -133,7 +133,7 @@ sealed abstract class MarkdownPart {
 final case class Text(value: String) extends MarkdownPart {
   def dropLinePrefix(indent: Int): Text = {
     if (indent > 0) {
-      val updatedValue = value.linesWithSeparators.zipWithIndex.map { case (line, i) =>
+      val updatedValue = value.linesWithSeparators.map { line =>
         if (!line.isNL && line.length >= indent) line.substring(indent) else line
       }.mkString
       val updatedText = Text(updatedValue)
