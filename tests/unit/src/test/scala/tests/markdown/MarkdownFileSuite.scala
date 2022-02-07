@@ -2,16 +2,21 @@ package tests.markdown
 
 import munit.{FunSuite, Location}
 import mdoc.internal.markdown.MarkdownFile
+
 import scala.meta.inputs.Input
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.Text
 import mdoc.internal.markdown.MarkdownPart
 import mdoc.internal.markdown.CodeFence
+
 import scala.meta.io.RelativePath
 import mdoc.internal.cli.InputFile
+
 import scala.meta.io.AbsolutePath
 import java.nio.file.Files
 import mdoc.internal.cli.Settings
+import mdoc.internal.markdown.MarkdownFile.Parser
+
 import scala.meta.internal.io.PathIO
 
 class MarkdownFileSuite extends FunSuite {
@@ -24,7 +29,9 @@ class MarkdownFileSuite extends FunSuite {
       reporter.reset()
       val input = Input.VirtualFile(name, original)
       val file = InputFile.fromRelativeFilename(name, Settings.default(PathIO.workingDirectory))
-      val obtained = MarkdownFile.parse(input, file, reporter).parts
+      val obtained = MarkdownFile
+        .parse(input, file, reporter, Parser.ParseSettings(allowCodeFenceIndented = true))
+        .parts
       require(!reporter.hasErrors)
       val expectedParts = expected.toList
       assertNoDiff(

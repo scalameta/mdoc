@@ -125,6 +125,8 @@ case class Settings(
     charset: Charset = StandardCharsets.UTF_8,
     @Description("The working directory to use for making relative paths absolute.")
     cwd: AbsolutePath,
+    @Description("Allow indented code fence blocks")
+    allowCodeFenceIndented: Boolean = false,
     @Hidden()
     stringModifiers: List[StringModifier] = StringModifier.default(),
     @Hidden()

@@ -15,7 +15,8 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |  val msg = "Hello!"
       |  println(msg)
       |  ```
-    """.stripMargin
+    """.stripMargin,
+    settings = baseSettings.copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -31,7 +32,8 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    val msg = "Hello!"
       |    println(msg)
       |    ```
-    """.stripMargin
+    """.stripMargin,
+    settings = baseSettings.copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -47,7 +49,8 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       | val msg = "Hello!"
       | println(msg)
       | ```
-    """.stripMargin
+    """.stripMargin,
+    settings = baseSettings.copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -63,7 +66,8 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    val msg = "Hello!"
       |    println(msg)
       |    ```
-    """.stripMargin
+    """.stripMargin,
+    settings = baseSettings.copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -81,6 +85,7 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    println(msg)
       |    // Hello!
       |    ```
-    """.stripMargin
+    """.stripMargin,
+    settings = baseSettings.copy(allowCodeFenceIndented = true)
   )
 }
