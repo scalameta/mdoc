@@ -40,7 +40,7 @@ object MarkdownFile {
     case class CodeFence(start: Int, backticks: String, info: String, indent: Int) extends State
     case object Text extends State
   }
-  class Parser(input: Input, reporter: Reporter, settings: Parser.ParseSettings) {
+  class Parser(input: Input, reporter: Reporter, settings: Settings) {
     private val text = input.text
     private def newPos(start: Int, end: Int): Position = {
       Position.Range(input, start, end)
@@ -105,19 +105,11 @@ object MarkdownFile {
       parts.toList
     }
   }
-  object Parser {
-    case class ParseSettings(allowCodeFenceIndented: Boolean = false)
-    object ParseSettings {
-      def fromSettings(settings: Settings): ParseSettings = ParseSettings(
-        allowCodeFenceIndented = settings.allowCodeFenceIndented
-      )
-    }
-  }
   def parse(
       input: Input,
       file: InputFile,
       reporter: Reporter,
-      settings: Parser.ParseSettings
+      settings: Settings
   ): MarkdownFile = {
     val parser = new Parser(input, reporter, settings)
     val parts = parser.acceptParts()

@@ -131,7 +131,7 @@ object Markdown {
       textWithVariables,
       inputFile,
       reporter,
-      MarkdownFile.Parser.ParseSettings.fromSettings(settings)
+      settings
     )
     val processor = new Processor()(context)
     processor.processDocument(file)

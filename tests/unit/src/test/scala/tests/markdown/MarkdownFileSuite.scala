@@ -19,7 +19,7 @@ import mdoc.internal.markdown.MarkdownFile.Parser
 
 import scala.meta.internal.io.PathIO
 
-class MarkdownFileSuite extends FunSuite {
+class MarkdownFileSuite extends BaseMarkdownSuite {
   val reporter = new ConsoleReporter(System.out)
 
   def checkParse(name: String, original: String, expected: MarkdownPart*)(implicit
@@ -30,7 +30,7 @@ class MarkdownFileSuite extends FunSuite {
       val input = Input.VirtualFile(name, original)
       val file = InputFile.fromRelativeFilename(name, Settings.default(PathIO.workingDirectory))
       val obtained = MarkdownFile
-        .parse(input, file, reporter, Parser.ParseSettings(allowCodeFenceIndented = true))
+        .parse(input, file, reporter, baseSettings.copy(allowCodeFenceIndented = true))
         .parts
       require(!reporter.hasErrors)
       val expectedParts = expected.toList
