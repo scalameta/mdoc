@@ -127,7 +127,12 @@ object Markdown {
       reporter,
       settings
     )
-    val file = MarkdownFile.parse(textWithVariables, inputFile, reporter)
+    val file = MarkdownFile.parse(
+      textWithVariables,
+      inputFile,
+      reporter,
+      settings
+    )
     val processor = new Processor()(context)
     processor.processDocument(file)
     file.renderToString
