@@ -173,7 +173,7 @@ lazy val cli = project
     crossScalaVersions := allScalaVersions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
-      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.64.0",
       "com.lihaoyi" %% "pprint" % V.pprint,
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig
     ),
