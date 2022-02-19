@@ -32,22 +32,22 @@ import scala.meta.inputs.Position
   *   is 1 and for `val (a, b) = ...` the total number is 2.
   * @param indexOfStatementInCodeFence
   *   the index of the enclosing statement within the enclosing code fence. For example, in
-  * {{{
+  *   {{{
   *                                     ```scala
   *                                     val x = 1
   *                                     val y = 2
   *                                     ```
-  * }}}
-  * The variable `y` has index 1 and variable `x` has index 0.
+  *   }}}
+  *   The variable `y` has index 1 and variable `x` has index 0.
   * @param totalStatementsInCodeFence
   *   the total number of statement in the enclosing code fence. For example, the total number is 2
   *   for the code fence below.
-  * {{{
+  *   {{{
   *                                     ```scala
   *                                     val x = 1
   *                                     val y = 2
   *                                     ```
-  * }}}
+  *   }}}
   */
 final class Variable private[mdoc] (
     val name: String,
