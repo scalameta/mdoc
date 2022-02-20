@@ -411,7 +411,13 @@ lazy val js = project
         "org.scala-js" %% "scalajs-linker-interface" % scalajs cross CrossVersion.for3Use2_13
       )
     ),
-    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0" cross CrossVersion.for3Use2_13
+    libraryDependencies ++= {
+      if (scalaBinaryVersion.value == "2.12") Seq.empty
+      else
+        Seq(
+          "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0" cross CrossVersion.for3Use2_13
+        )
+    }
   )
   .dependsOn(mdoc)
 
