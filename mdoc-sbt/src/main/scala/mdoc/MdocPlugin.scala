@@ -108,9 +108,9 @@ object MdocPlugin extends AutoPlugin {
         }
         def getJars(mid: ModuleID) = {
 
-          val depRes = (update / dependencyResolution).value
-          val updc = (update / updateConfiguration).value
-          val uwconfig = (update / unresolvedWarningConfiguration).value
+          val depRes = dependencyResolution.in(update).value
+          val updc = updateConfiguration.in(update).value
+          val uwconfig = unresolvedWarningConfiguration.in(update).value
           val modDescr = depRes.wrapDependencyInModule(mid)
 
           depRes
