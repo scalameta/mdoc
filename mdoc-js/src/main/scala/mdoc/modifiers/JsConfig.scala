@@ -11,6 +11,7 @@ import scala.meta.io.Classpath
 
 case class JsConfig(
     moduleKind: ModuleKind = ModuleKind.NoModule,
+    classpath: String = "",
     htmlHeader: String = "",
     libraries: List[AbsolutePath] = Nil,
     mountNode: String = "node",
@@ -22,7 +23,7 @@ case class JsConfig(
     relativeLinkPrefix: String = "",
     batchMode: Boolean = false
 ) {
-  def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
+  def isCommonJS: Boolean = true // moduleKind == ModuleKind.CommonJSModule
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
@@ -64,6 +65,7 @@ object JsConfig {
               base.moduleKind
           }
       },
+      ctx.site.getOrElse("js-linker-classpath", ""),
       ctx.site.getOrElse("js-html-header", ""),
       Classpath(ctx.site.getOrElse("js-libraries", "")).entries,
       mountNode = ctx.site.getOrElse("js-mount-node", base.mountNode),

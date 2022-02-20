@@ -6,7 +6,7 @@ def scala3 = "3.1.0"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.7.1"
+def scalajs = "1.9.0"
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -405,12 +405,13 @@ lazy val js = project
       scalaVersion.value,
       if2 = List(
         "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-linker" % scalajs
+        "org.scala-js" %% "scalajs-linker-interface" % scalajs
       ),
       if3 = List(
-        "org.scala-js" %% "scalajs-linker" % scalajs cross CrossVersion.for3Use2_13
+        "org.scala-js" %% "scalajs-linker-interface" % scalajs cross CrossVersion.for3Use2_13
       )
-    )
+    ),
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0" cross CrossVersion.for3Use2_13
   )
   .dependsOn(mdoc)
 
