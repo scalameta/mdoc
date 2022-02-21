@@ -125,6 +125,7 @@ object MdocPlugin extends AutoPlugin {
         }
 
         val binaryVersion = scalaBinaryVersion.value
+        val log = streams.value.log
 
         mdocJSCompileOptions.value.foreach { options =>
           val sjsVersion = {
@@ -134,10 +135,15 @@ object MdocPlugin extends AutoPlugin {
             method.invoke(null).asInstanceOf[String]
           }
 
+          log.debug(s"MDOC.JS: Detected SJS version: $sjsVersion")
+
           val linkerDependency = binaryVersion match {
             case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
             case other => "org.scala-js" % s"scalajs-linker_$other" % sjsVersion
           }
+
+          log.debug("MDOC.JS: Linker dependency:" + linkerDependency)
+          log.debug("MDOC.JS: Linker jars:" + getJars(linkerDependency))
           props.put(
             s"js-scalac-options",
             options.options.mkString(" ")

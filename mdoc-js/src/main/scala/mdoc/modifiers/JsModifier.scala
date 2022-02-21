@@ -89,6 +89,7 @@ class JsModifier extends mdoc.PreModifier {
         reporter = ctx.reporter
         val compileClasspath = classpath.split(":").map(s => new URL("file:///" + s))
         val linkerClasspath = config.classpath.split(":").map(s => new URL("file:///" + s))
+
         val newClasspathHash =
           (classpath, linkerClasspath, scalacOptions, config.fullOpt).hashCode()
         // Reuse the  linker and compiler when the classpath+scalacOptions haven't changed

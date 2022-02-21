@@ -39,6 +39,7 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
       "scala.",
       "org.scalajs.linker.interface.",
       "org.scalajs.logging.",
+      "org.scalajs.ir.",
       "sun.reflect.",
       "jdk.internal.reflect."
     )
