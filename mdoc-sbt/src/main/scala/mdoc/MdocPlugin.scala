@@ -133,6 +133,7 @@ object MdocPlugin extends AutoPlugin {
             val method = klass.getMethod("current")
             method.invoke(null).asInstanceOf[String]
           }
+
           val linkerDependency = binaryVersion match {
             case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
             case other => "org.scala-js" % s"scalajs-linker_$other" % sjsVersion

@@ -6,7 +6,13 @@ def scala3 = "3.1.1"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.9.0"
+// This will work as long as mdoc has scala-js SBT plugin
+def scalajs = {
+  val klass =
+    Class.forName("org.scalajs.ir.ScalaJSVersions", true, getClass.getClassLoader())
+  val method = klass.getMethod("current")
+  method.invoke(null).asInstanceOf[String]
+}
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 

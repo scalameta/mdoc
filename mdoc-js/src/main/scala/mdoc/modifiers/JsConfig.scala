@@ -23,7 +23,7 @@ case class JsConfig(
     relativeLinkPrefix: String = "",
     batchMode: Boolean = false
 ) {
-  def isCommonJS: Boolean = true // moduleKind == ModuleKind.CommonJSModule
+  def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
