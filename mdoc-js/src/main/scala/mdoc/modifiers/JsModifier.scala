@@ -64,18 +64,14 @@ class JsModifier extends mdoc.PreModifier {
     result
   }
 
-  // def scalajsConfig(config: JsConfig) = {
-  //   val semantics: Semantics =
-  //     if (config.fullOpt) Semantics.Defaults.optimized
-  //     else Semantics.Defaults
-
-  //   StandardConfig()
-  //     .withSemantics(semantics)
-  //     .withSourceMap(false)
-  //     .withModuleKind(config.moduleKind)
-  //     .withBatchMode(config.batchMode)
-  //     .withClosureCompilerIfAvailable(config.fullOpt)
-  // }
+  def scalajsConfig(base: _StandardConfig, config: JsConfig) = {
+    base
+      .withOptimized(config.fullOpt)
+      .withModuleKind(config.moduleKind)
+      .withSourceMap(false)
+      .withBatchMode(config.batchMode)
+      .withClosureCompilerIfAvailable(config.fullOpt)
+  }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
     (ctx.site.get("js-classpath"), ctx.site.get("js-scalac-options")) match {
@@ -90,9 +86,9 @@ class JsModifier extends mdoc.PreModifier {
         val compileClasspath = classpath.split(":").map(s => new URL("file:///" + s))
         val linkerClasspath = config.classpath.split(":").map(s => new URL("file:///" + s))
 
-        // println(s"Compile classpath: ${compileClasspath.toList.map("\n  " + _)}")
-        // println(s"Linker classpath: ${linkerClasspath.toList.map("\n  " + _)}")
-        // println(s"Scalac options: $scalacOptions")
+        println(s"Compile classpath: ${compileClasspath.toList.map("\n  " + _)}")
+        println(s"Linker classpath: ${linkerClasspath.toList.map("\n  " + _)}")
+        println(s"Scalac options: $scalacOptions")
 
         val newClasspathHash =
           (classpath, linkerClasspath, scalacOptions, config.fullOpt).hashCode()
@@ -104,7 +100,12 @@ class JsModifier extends mdoc.PreModifier {
 
           val newWorker = new ScalajsWorker(compileClasspath, linkerClasspath)
           worker = Some(newWorker)
-          workerState = Some(Await.result(newWorker.newState(newWorker.emptyConfig), Duration.Inf))
+          workerState = Some(
+            Await.result(
+              newWorker.newState(scalajsConfig(newWorker.emptyConfig, config)),
+              Duration.Inf
+            )
+          )
         }
     }
   }

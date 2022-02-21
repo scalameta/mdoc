@@ -16,6 +16,13 @@ case class ScalajsWorkerState(
     linker: _Linker
 )
 
+sealed abstract class ModuleKind(val nm: String)
+object ModuleKind {
+  case object NoModule extends ModuleKind("ModuleKind$NoModule$")
+  case object ESModule extends ModuleKind("ModuleKind$ESModule$")
+  case object CommonJSModule extends ModuleKind("ModuleKind$CommonJSModule$")
+}
+
 class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
   def memOutputDirectory(): _MemOutputDirectory =
     new _MemOutputDirectory(
@@ -82,15 +89,65 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
 
 }
 
-class _StandardConfig(classes: Classes) {
-  def get =
+class _StandardConfig(classes: Classes) { self =>
+  private val kls = classes.klassStandardConfig
+  private var impl =
     classes.klassStandardConfig.getConstructor().newInstance().asInstanceOf[java.lang.Object]
+
+  def withModuleKind(kind: ModuleKind) = {
+    impl = kls
+      .getMethod("withModuleKind", classes.linkerClass("interface.ModuleKind"))
+      .invoke(impl, classes.linkerObject("interface." + kind.nm).getField("MODULE$").get(null))
+    self
+  }
+
+  def withOptimized(enable: Boolean) = {
+    val defaults = {
+      val kls = classes.linkerObject("interface.Semantics$")
+
+      val module = kls
+        .getField("MODULE$")
+        .get(null)
+
+      kls.getMethod("Defaults").invoke(module)
+    }
+
+    val klsSemantics = classes.linkerClass("interface.Semantics")
+
+    if (!enable)
+      impl = kls.getMethod("withSemantics", klsSemantics).invoke(impl, defaults)
+    else {
+      impl = kls
+        .getMethod("withSemantics", klsSemantics)
+        .invoke(impl, klsSemantics.getMethod("optimized").invoke(defaults))
+    }
+
+    self
+  }
+
+  private def flag(name: String, value: Boolean) = {
+    impl = kls
+      .getMethod("withSourceMap", classOf[Boolean])
+      .invoke(impl, java.lang.Boolean.valueOf(value))
+    self
+  }
+
+  def withSourceMap(enable: Boolean) =
+    flag("withSourceMap", enable)
+
+  def withBatchMode(enable: Boolean) =
+    flag("withBatchMode", enable)
+
+  def withClosureCompilerIfAvailable(enable: Boolean) =
+    flag("withClosureCompilerIfAvailable", enable)
+
+  def get = impl
 }
 
 class Classes(classloader: ClassLoader) {
-  private def linkerClass(nm: String): Class[_] =
+  def linkerClass(nm: String): Class[_] =
     Class.forName("org.scalajs.linker." + nm, false, classloader)
-  private def linkerObject(nm: String): Class[_] =
+  def linkerObject(nm: String): Class[_] =
     Class.forName("org.scalajs.linker." + nm, true, classloader)
 
   val klassLinker = linkerClass("interface.Linker")
