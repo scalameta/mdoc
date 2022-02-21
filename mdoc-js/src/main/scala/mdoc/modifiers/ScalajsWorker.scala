@@ -7,26 +7,41 @@ import java.nio.file.{Path, Paths}
 import scala.concurrent.ExecutionContext
 import scala.language.reflectiveCalls
 
-class ScalajsWorkerState(
+case class ScalajsWorkerState(
     cachedIRFiles: Seq[IRFile],
     linker: ClearableLinker
 )
 
 class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
-  private val shared = getClass().getClassLoader()
+  def memOutputDirectory(): OutputDirectory =
+    instMem.asInstanceOf[MemOutputFabric].apply()
+
+  def readMemoryFile(directory: OutputDirectory, fileName: String): Option[Array[Byte]] =
+    directory.asInstanceOf[MemOutputDirectoryFabric].content(fileName)
+
+  def memIRFile(path: String, content: Array[Byte]): IRFile =
+    klass
+      .getConstructor(classOf[String], classOf[Option[String]], classOf[Array[Byte]])
+      .newInstance(path, None, content)
+      .asInstanceOf[IRFile]
+
+  def newState(config: StandardConfig)(implicit ec: ExecutionContext): Future[ScalajsWorkerState] =
+    for {
+      irFiles <- pathIRContainer()
+      cache = irCache.newCache
+      clearableLinker = linker(config)
+      cached <- cache.cached(irFiles)
+    } yield ScalajsWorkerState(cached, clearableLinker)
 
   private final class FilteringClassLoader(parent: ClassLoader) extends ClassLoader(parent) {
     private val parentPrefixes = List(
       "java.",
       "scala.",
-      "org.scalajs.linker.",
+      "org.scalajs.linker.interface.",
       "org.scalajs.logging.",
-      "org.scalajs.ir.",
       "sun.reflect.",
       "jdk.internal.reflect."
     )
-
-    private val forbiddenFruit = List("org.scalajs.linker.interface")
 
     override def loadClass(name: String, resolve: Boolean): Class[_] = {
       if (parentPrefixes.exists(name.startsWith _))
@@ -36,16 +51,8 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
     }
   }
 
-  private val classloader = new URLClassLoader(claspath, ClassLoader.getPlatformClassLoader()) {
-    val toShared = Set("org.scalajs.linker.interface", "scala.", "java.", "org.scalajs.logging")
-    override def findClass(name: String): Class[_] =
-      if (toShared.exists(name.startsWith))
-        shared.loadClass(name)
-      else super.findClass(name)
-  }
-
-  // private val classloader =
-  //   new URLClassLoader(claspath, new FilteringClassLoader(ClassLoader.getPlatformClassLoader()))
+  private val classloader =
+    new URLClassLoader(claspath, new FilteringClassLoader(getClass.getClassLoader()))
 
   import scala.reflect.runtime.{universe => ru}
 
@@ -68,8 +75,13 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
 
   private val klass = classloader.loadClass("org.scalajs.linker.standard.MemIRFileImpl")
   private val klassOutput = classloader.loadClass("org.scalajs.linker.MemOutputDirectory")
+
   private type MemOutputFabric = {
     def apply(): OutputDirectory
+  }
+
+  private type MemOutputDirectoryFabric = {
+    def content(name: String): Option[Array[Byte]]
   }
 
   private type LinkerFabric = {
@@ -84,23 +96,16 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
     ): Future[(Seq[IRContainer], Seq[Path])]
   }
 
-  def linker(config: StandardConfig): ClearableLinker =
+  private def linker(config: StandardConfig): ClearableLinker =
     inst.asInstanceOf[LinkerFabric].clearableLinker(config)
-  def memOutputDirectory(): OutputDirectory =
-    instMem.asInstanceOf[MemOutputFabric].apply()
 
-  def memIRFile(path: String, content: Array[Byte]): IRFile =
-    klass
-      .getConstructor(classOf[String], classOf[Option[String]], classOf[Array[Byte]])
-      .newInstance(path, None, content)
-      .asInstanceOf[IRFile]
+  private def irCache = inst.asInstanceOf[LinkerFabric].irFileCache()
 
-  def irCache = inst.asInstanceOf[LinkerFabric].irFileCache()
-
-  def pathIRContainer()(implicit ec: ExecutionContext): Future[Seq[IRContainer]] = {
+  private def pathIRContainer()(implicit ec: ExecutionContext): Future[Seq[IRContainer]] = {
     instPathIR
       .asInstanceOf[PathIRContainerFabric]
       .fromClasspath(compilerClasspath.map(u => Paths.get(u.toURI)).toSeq)
       .map(_._1)
   }
+
 }
