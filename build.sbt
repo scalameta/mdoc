@@ -407,15 +407,7 @@ lazy val js = project
     sharedSettings,
     moduleName := "mdoc-js",
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
-    libraryDependencies ++= crossSetting(
-      scalaVersion.value,
-      if2 = List(
-        "org.scala-js" %% "scalajs-linker-interface" % scalajs
-      ),
-      if3 = List(
-        "org.scala-js" %% "scalajs-linker-interface" % scalajs cross CrossVersion.for3Use2_13
-      )
-    )
+    libraryDependencies += "org.scala-js" %% "scalajs-logging" % "1.1.1" cross CrossVersion.for3Use2_13
   )
   .dependsOn(mdoc)
 

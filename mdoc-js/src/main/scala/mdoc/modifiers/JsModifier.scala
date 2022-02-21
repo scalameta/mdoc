@@ -21,11 +21,11 @@ import java.net.URLClassLoader
 import java.net.URL
 import org.scalajs.logging.Level
 import org.scalajs.logging.Logger
-import org.scalajs.linker.interface.Semantics
-import org.scalajs.linker.interface.StandardConfig
+// import org.scalajs.linker.interface.Semantics
+// import org.scalajs.linker.interface.StandardConfig
 import java.nio.file.Path
 import scala.concurrent.Future
-import org.scalajs.linker.interface.IRContainer
+// import org.scalajs.linker.interface.IRContainer
 import java.nio.file.Paths
 
 class JsModifier extends mdoc.PreModifier {
@@ -64,18 +64,18 @@ class JsModifier extends mdoc.PreModifier {
     result
   }
 
-  def scalajsConfig(config: JsConfig) = {
-    val semantics: Semantics =
-      if (config.fullOpt) Semantics.Defaults.optimized
-      else Semantics.Defaults
+  // def scalajsConfig(config: JsConfig) = {
+  //   val semantics: Semantics =
+  //     if (config.fullOpt) Semantics.Defaults.optimized
+  //     else Semantics.Defaults
 
-    StandardConfig()
-      .withSemantics(semantics)
-      .withSourceMap(false)
-      .withModuleKind(config.moduleKind)
-      .withBatchMode(config.batchMode)
-      .withClosureCompilerIfAvailable(config.fullOpt)
-  }
+  //   StandardConfig()
+  //     .withSemantics(semantics)
+  //     .withSourceMap(false)
+  //     .withModuleKind(config.moduleKind)
+  //     .withBatchMode(config.batchMode)
+  //     .withClosureCompilerIfAvailable(config.fullOpt)
+  // }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
     (ctx.site.get("js-classpath"), ctx.site.get("js-scalac-options")) match {
@@ -90,6 +90,10 @@ class JsModifier extends mdoc.PreModifier {
         val compileClasspath = classpath.split(":").map(s => new URL("file:///" + s))
         val linkerClasspath = config.classpath.split(":").map(s => new URL("file:///" + s))
 
+        // println(s"Compile classpath: ${compileClasspath.toList.map("\n  " + _)}")
+        // println(s"Linker classpath: ${linkerClasspath.toList.map("\n  " + _)}")
+        // println(s"Scalac options: $scalacOptions")
+
         val newClasspathHash =
           (classpath, linkerClasspath, scalacOptions, config.fullOpt).hashCode()
         // Reuse the  linker and compiler when the classpath+scalacOptions haven't changed
@@ -100,7 +104,7 @@ class JsModifier extends mdoc.PreModifier {
 
           val newWorker = new ScalajsWorker(compileClasspath, linkerClasspath)
           worker = Some(newWorker)
-          workerState = Some(Await.result(newWorker.newState(scalajsConfig(config)), Duration.Inf))
+          workerState = Some(Await.result(newWorker.newState(newWorker.emptyConfig), Duration.Inf))
         }
     }
   }
@@ -156,7 +160,7 @@ class JsModifier extends mdoc.PreModifier {
       val linkingReport =
         Await.result(
           workerState.get.linker
-            .link(workerState.get.cachedIRFiles ++ sjsirFiles, Nil, memOutput, sjsLogger),
+            .link(workerState.get.cachedIRFiles ++ sjsirFiles, memOutput, sjsLogger),
           Duration.Inf
         )
 

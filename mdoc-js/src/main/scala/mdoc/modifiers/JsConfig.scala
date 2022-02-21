@@ -3,14 +3,14 @@ package mdoc.modifiers
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.internal.pos.PositionSyntax._
-import org.scalajs.linker.interface.ModuleKind
+// import org.scalajs.linker.interface.ModuleKind
 import org.scalajs.logging.Level
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
 
 case class JsConfig(
-    moduleKind: ModuleKind = ModuleKind.NoModule,
+    // moduleKind: ModuleKind = ModuleKind.NoModule,
     classpath: String = "",
     htmlHeader: String = "",
     libraries: List[AbsolutePath] = Nil,
@@ -23,7 +23,7 @@ case class JsConfig(
     relativeLinkPrefix: String = "",
     batchMode: Boolean = false
 ) {
-  def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
+  def isCommonJS: Boolean = true // moduleKind == ModuleKind.CommonJSModule
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
@@ -53,18 +53,18 @@ object JsConfig {
   def fromVariables(ctx: OnLoadContext): JsConfig = {
     val base = JsConfig()
     JsConfig(
-      ctx.site.get("js-module-kind") match {
-        case None => base.moduleKind
-        case Some(value) =>
-          value match {
-            case "NoModule" => ModuleKind.NoModule
-            case "CommonJSModule" => ModuleKind.CommonJSModule
-            case "ESModule" => ModuleKind.ESModule
-            case unknown =>
-              ctx.reporter.error(s"unknown 'js-module-kind': $unknown")
-              base.moduleKind
-          }
-      },
+      //   ctx.site.get("js-module-kind") match {
+      //     case None => base.moduleKind
+      //     case Some(value) =>
+      //       value match {
+      //         case "NoModule" => ModuleKind.NoModule
+      //         case "CommonJSModule" => ModuleKind.CommonJSModule
+      //         case "ESModule" => ModuleKind.ESModule
+      //         case unknown =>
+      //           ctx.reporter.error(s"unknown 'js-module-kind': $unknown")
+      //           base.moduleKind
+      //       }
+      //   },
       ctx.site.getOrElse("js-linker-classpath", ""),
       ctx.site.getOrElse("js-html-header", ""),
       Classpath(ctx.site.getOrElse("js-libraries", "")).entries,
