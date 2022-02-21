@@ -83,8 +83,10 @@ class JsModifier extends mdoc.PreModifier {
       case (Some(classpath), Some(scalacOptions)) =>
         config = JsConfig.fromVariables(ctx)
         reporter = ctx.reporter
-        val compileClasspath = classpath.split(":").map(s => new URL("file:///" + s))
-        val linkerClasspath = config.classpath.split(":").map(s => new URL("file:///" + s))
+        val compileClasspath =
+          classpath.split(java.io.File.pathSeparator).map(s => new URL("file:///" + s))
+        val linkerClasspath =
+          config.classpath.split(java.io.File.pathSeparator).map(s => new URL("file:///" + s))
 
         println(s"Compile classpath: ${compileClasspath.toList.map("\n  " + _)}")
         println(s"Linker classpath: ${linkerClasspath.toList.map("\n  " + _)}")
