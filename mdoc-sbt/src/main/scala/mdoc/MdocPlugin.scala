@@ -124,16 +124,19 @@ object MdocPlugin extends AutoPlugin {
             .fold(uw => throw uw.resolveException, identity)
         }
 
-        val linkerClasspath = scalaBinaryVersion.value match {
-          case "3" => "org.scala-js" % "scalajs-linker_2.13" % "1.9.0"
-          case other => "org.scala-js" % s"scalajs-linker_$other" % "1.9.0"
-        }
-
-        // println(
-        //   getJars(linkerClasspath.exclude("org.scala-js", "scala))
-        // )
+        val binaryVersion = scalaBinaryVersion.value
 
         mdocJSCompileOptions.value.foreach { options =>
+          val sjsVersion = {
+            val klass =
+              Class.forName("org.scalajs.ir.ScalaJSVersions", true, getClass.getClassLoader())
+            val method = klass.getMethod("current")
+            method.invoke(null).asInstanceOf[String]
+          }
+          val linkerDependency = binaryVersion match {
+            case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
+            case other => "org.scala-js" % s"scalajs-linker_$other" % sjsVersion
+          }
           props.put(
             s"js-scalac-options",
             options.options.mkString(" ")
@@ -144,7 +147,7 @@ object MdocPlugin extends AutoPlugin {
           )
           props.put(
             s"js-linker-classpath",
-            getJars(linkerClasspath).mkString(File.pathSeparator)
+            getJars(linkerDependency).mkString(File.pathSeparator)
           )
           options.moduleKind.foreach { moduleKind => props.put(s"js-module-kind", moduleKind) }
         }

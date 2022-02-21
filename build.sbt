@@ -404,7 +404,6 @@ lazy val js = project
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
       if2 = List(
-        "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
         "org.scala-js" %% "scalajs-linker-interface" % scalajs
       ),
       if3 = List(
