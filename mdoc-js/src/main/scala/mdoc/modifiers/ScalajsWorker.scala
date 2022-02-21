@@ -6,6 +6,7 @@ import scala.concurrent.Future
 import java.nio.file.{Path, Paths}
 import scala.concurrent.ExecutionContext
 import scala.language.reflectiveCalls
+import mdoc.internal.BuildInfo
 
 case class ScalajsWorkerState(
     cachedIRFiles: Seq[IRFile],
@@ -39,10 +40,12 @@ class ScalajsWorker(compilerClasspath: Array[URL], claspath: Array[URL]) {
       "scala.",
       "org.scalajs.linker.interface.",
       "org.scalajs.logging.",
-      "org.scalajs.ir.",
       "sun.reflect.",
       "jdk.internal.reflect."
-    )
+    ) ++ scalaSpecificPrefixes
+
+    private def scalaSpecificPrefixes =
+      if (BuildInfo.scalaBinaryVersion != "3") List("org.scalajs.ir.") else Nil
 
     override def loadClass(name: String, resolve: Boolean): Class[_] = {
       if (parentPrefixes.exists(name.startsWith _))
