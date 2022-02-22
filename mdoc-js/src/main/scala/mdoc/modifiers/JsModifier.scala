@@ -21,12 +21,11 @@ import java.net.URLClassLoader
 import java.net.URL
 import org.scalajs.logging.Level
 import org.scalajs.logging.Logger
-// import org.scalajs.linker.interface.Semantics
-// import org.scalajs.linker.interface.StandardConfig
 import java.nio.file.Path
 import scala.concurrent.Future
-// import org.scalajs.linker.interface.IRContainer
 import java.nio.file.Paths
+import mdoc.js.api.ScalajsConfig
+import mdoc.js.api.ScalajsWorkerApi
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -34,8 +33,7 @@ class JsModifier extends mdoc.PreModifier {
   val target = CompilerCompat.abstractFile("(memory)")
   var maybeCompiler: Option[MarkdownCompiler] = None
   var config = JsConfig()
-  var worker: Option[ScalajsWorker] = None
-  var workerState: Option[ScalajsWorkerState] = None
+  var scalajsApi: Option[ScalajsWorkerApi] = None
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
@@ -64,13 +62,13 @@ class JsModifier extends mdoc.PreModifier {
     result
   }
 
-  def scalajsConfig(base: _StandardConfig, config: JsConfig) = {
+  def scalajsConfig(base: ScalajsConfig, config: JsConfig) = {
     base
       .withOptimized(config.fullOpt)
       .withModuleKind(config.moduleKind)
       .withSourceMap(false)
       .withBatchMode(config.batchMode)
-      .withClosureCompilerIfAvailable(config.fullOpt)
+      .withClosureCompiler(config.fullOpt)
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
@@ -83,14 +81,8 @@ class JsModifier extends mdoc.PreModifier {
       case (Some(classpath), Some(scalacOptions)) =>
         config = JsConfig.fromVariables(ctx)
         reporter = ctx.reporter
-        val compileClasspath =
-          classpath.split(java.io.File.pathSeparator).map(s => new URL("file:///" + s))
-        val linkerClasspath =
-          config.classpath.split(java.io.File.pathSeparator).map(s => new URL("file:///" + s))
-
-        println(s"Compile classpath: ${compileClasspath.toList.map("\n  " + _)}")
-        println(s"Linker classpath: ${linkerClasspath.toList.map("\n  " + _)}")
-        println(s"Scalac options: $scalacOptions")
+        val compileClasspath = Classpath(classpath)
+        val linkerClasspath = Classpath(config.classpath)
 
         val newClasspathHash =
           (classpath, linkerClasspath, scalacOptions, config.fullOpt).hashCode()
@@ -99,15 +91,20 @@ class JsModifier extends mdoc.PreModifier {
         if (classpathHash != newClasspathHash) {
           classpathHash = newClasspathHash
           maybeCompiler = Some(new MarkdownCompiler(classpath, scalacOptions, target))
-
-          val newWorker = new ScalajsWorker(compileClasspath, linkerClasspath)
-          worker = Some(newWorker)
-          workerState = Some(
-            Await.result(
-              newWorker.newState(scalajsConfig(newWorker.emptyConfig, config)),
-              Duration.Inf
-            )
+          val loader =
+            ScalaJSClassloader.create(linkerClasspath.entries.map(_.toURI.toURL()).toArray)
+          scalajsApi = Some(
+            loader
+              .loadClass("mdoc.js.worker.ScalaJSWorker")
+              .getConstructor(classOf[ScalajsConfig])
+              .newInstance(new ScalajsConfig)
+              .asInstanceOf[ScalajsWorkerApi]
           )
+
+          scalajsApi.foreach { sjs =>
+            sjs.cache(compileClasspath.entries.map(_.toNIO).toArray)
+          }
+
         }
     }
   }
@@ -144,15 +141,13 @@ class JsModifier extends mdoc.PreModifier {
     val edit = TokenEditDistance.fromInputs(inputs, input)
     val oldErrors = ctx.reporter.errorCount
 
-    val memOutput = worker.get.memOutputDirectory()
-
     compiler.compileSources(input, ctx.reporter, edit, fileImports = Nil)
 
     val hasErrors = ctx.reporter.errorCount > oldErrors
 
     val sjsirFiles = target.toList
       .filter(_.name.endsWith(".sjsir"))
-      .map(file => worker.get.memIRFile(file.path, file.toByteArray))
+      .map(file => scalajsApi.get.inMemory(file.path, file.toByteArray))
 
     if (sjsirFiles.isEmpty) {
       if (!hasErrors) {
@@ -160,22 +155,8 @@ class JsModifier extends mdoc.PreModifier {
       }
       ""
     } else {
-      val linkingReport =
-        Await.result(
-          workerState.get.linker
-            .link(workerState.get.cachedIRFiles ++ sjsirFiles, memOutput, sjsLogger),
-          Duration.Inf
-        )
-
-      val modules = linkingReport.publicModules.toList
-      val firstModule = modules.head
-      val content = worker.get
-        .readMemoryFile(memOutput, firstModule.jsFileName)
-        .getOrElse(
-          throw new IllegalStateException(
-            s"Failed to read Scala.js linked file ${firstModule.jsFileName}"
-          )
-        )
+      val linkingReport = scalajsApi.get.link(sjsirFiles.toArray)
+      val content = linkingReport.values().iterator().next()
 
       ctx.settings.toInputFile(ctx.inputFile) match {
         case None =>

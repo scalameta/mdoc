@@ -7,9 +7,10 @@ import org.scalajs.logging.Level
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
+import mdoc.js.api.ModuleType
 
 case class JsConfig(
-    moduleKind: ModuleKind = ModuleKind.NoModule,
+    moduleKind: ModuleType = ModuleType.NoModule,
     classpath: String = "",
     htmlHeader: String = "",
     libraries: List[AbsolutePath] = Nil,
@@ -22,7 +23,7 @@ case class JsConfig(
     relativeLinkPrefix: String = "",
     batchMode: Boolean = false
 ) {
-  def isCommonJS: Boolean = moduleKind == ModuleKind.CommonJSModule
+  def isCommonJS: Boolean = moduleKind == ModuleType.CommonJSModule
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
@@ -56,9 +57,9 @@ object JsConfig {
         case None => base.moduleKind
         case Some(value) =>
           value match {
-            case "NoModule" => ModuleKind.NoModule
-            case "CommonJSModule" => ModuleKind.CommonJSModule
-            case "ESModule" => ModuleKind.ESModule
+            case "NoModule" => ModuleType.NoModule
+            case "CommonJSModule" => ModuleType.CommonJSModule
+            case "ESModule" => ModuleType.ESModule
             case unknown =>
               ctx.reporter.error(s"unknown 'js-module-kind': $unknown")
               base.moduleKind
