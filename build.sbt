@@ -109,6 +109,16 @@ lazy val sharedSettings = List(
   )
 )
 
+lazy val sharedJavaSettings = List(
+  javacOptions ++= {
+    val version = System.getProperty("java.version")
+    if (version.startsWith("1.8"))
+      Seq()
+    else
+      Seq("--release", "8")
+  }
+)
+
 val V = new {
   val scalameta = "4.4.32"
   val munit = "0.7.29"
@@ -142,6 +152,7 @@ lazy val interfaces = project
       "implNote:a:Implementation Note:"
     )
   )
+  .settings(sharedJavaSettings)
 
 lazy val runtime = project
   .settings(
@@ -407,6 +418,7 @@ lazy val jsApi =
   project
     .in(file("mdoc-js-api"))
     .settings(moduleName := "mdoc-js-worker-api", crossPaths := false, autoScalaLibrary := false)
+    .settings(sharedJavaSettings)
 
 lazy val jsWorker =
   project
