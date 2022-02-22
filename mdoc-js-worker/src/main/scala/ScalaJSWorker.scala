@@ -16,6 +16,7 @@ import java.{util => ju}
 import org.scalajs.logging.Logger
 import org.scalajs.logging.Level
 import org.scalajs.linker.standard.MemIRFileImpl
+import org.scalajs.linker.interface.Semantics
 
 class ScalaJSWorker(
     config: ScalajsConfig,
@@ -26,6 +27,10 @@ class ScalaJSWorker(
   val linker = {
     val cfg =
       StandardConfig()
+        .withSemantics {
+          if (config.fullOpt) Semantics.Defaults.optimized
+          else Semantics.Defaults
+        }
         .withBatchMode(config.batchMode)
         .withClosureCompilerIfAvailable(config.closureCompiler)
         .withSourceMap(config.sourceMap)
@@ -36,7 +41,6 @@ class ScalaJSWorker(
             case CommonJSModule => ModuleKind.CommonJSModule
           }
         }
-
     StandardImpl.clearableLinker(cfg)
   }
 
