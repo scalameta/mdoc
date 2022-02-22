@@ -13,13 +13,14 @@ import org.scalajs.linker.interface.IRFile
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import java.{util => ju}
-import mdoc.js.api.ScalajsWorkerApi.OutputDirectory
 import org.scalajs.logging.Logger
 import org.scalajs.logging.Level
 import org.scalajs.linker.standard.MemIRFileImpl
 
-class ScalaJSWorker(config: ScalajsConfig) extends ScalajsWorkerApi {
-  case class Oot(mem: MemOutputDirectory) extends ScalajsWorkerApi.OutputDirectory
+class ScalaJSWorker(
+    config: ScalajsConfig,
+    logger: Logger
+) extends ScalajsWorkerApi {
   case class IFile(mem: IRFile) extends ScalajsWorkerApi.IRFile
 
   val linker = {
@@ -35,14 +36,14 @@ class ScalaJSWorker(config: ScalajsConfig) extends ScalajsWorkerApi {
             case CommonJSModule => ModuleKind.CommonJSModule
           }
         }
+
+    println(cfg)
     StandardImpl.clearableLinker(cfg)
   }
 
   var cachedFiles = Seq.empty[org.scalajs.linker.interface.IRFile]
 
   val cache = StandardImpl.irFileCache().newCache
-
-  override def newFolder(): ScalajsWorkerApi.OutputDirectory = Oot(MemOutputDirectory())
 
   override def cache(x: Array[Path]): Unit =
     cachedFiles = Await.result(
@@ -52,18 +53,6 @@ class ScalaJSWorker(config: ScalajsConfig) extends ScalajsWorkerApi {
         .flatMap(cache.cached),
       Duration.Inf
     )
-  val loger = new Logger {
-    override def log(level: Level, message: => String): Unit = {
-      // if (level >= config.minLevel) {
-      //   if (level == Level.Warn) reporter.info(message)
-      //   else if (level == Level.Error) reporter.info(message)
-      //   else reporter.info(message)
-      // }
-    }
-
-    override def trace(t: => Throwable): Unit = ()
-    // reporter.error(t)
-  }
 
   override def link(
       in: Array[ScalajsWorkerApi.IRFile]
@@ -77,7 +66,7 @@ class ScalaJSWorker(config: ScalajsConfig) extends ScalajsWorkerApi {
           },
         Seq.empty,
         mem,
-        loger
+        logger
       ),
       Duration.Inf
     )

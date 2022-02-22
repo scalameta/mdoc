@@ -354,7 +354,11 @@ lazy val unitJS = project
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
     ),
     mdocJS := Some(jsdocs),
-    MdocPlugin.mdocJSWorkerClasspath := Some(Seq((jsWorker / Compile / classDirectory).value))
+    MdocPlugin.mdocJSWorkerClasspath := {
+      val _ = (jsWorker / Compile / compile).value
+
+      Some(Seq((jsWorker / Compile / classDirectory).value))
+    }
   )
   .dependsOn(mdoc, js, testsInput, tests, unit)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
@@ -445,6 +449,11 @@ lazy val docs = project
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jsdocs),
     mdocJSLibraries := (jsdocs / Compile / fullOptJS / webpack).value,
+    MdocPlugin.mdocJSWorkerClasspath := {
+      val _ = (jsWorker / Compile / compile).value
+
+      Some(Seq((jsWorker / Compile / classDirectory).value))
+    },
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")

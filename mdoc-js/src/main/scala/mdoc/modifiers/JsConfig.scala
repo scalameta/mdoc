@@ -56,6 +56,7 @@ object JsConfig {
       ctx.site.get("js-module-kind") match {
         case None => base.moduleKind
         case Some(value) =>
+          println(value)
           value match {
             case "NoModule" => ModuleType.NoModule
             case "CommonJSModule" => ModuleType.CommonJSModule
