@@ -97,7 +97,7 @@ class JsModifier extends mdoc.PreModifier {
             loader
               .loadClass("mdoc.js.worker.ScalaJSWorker")
               .getConstructor(classOf[ScalajsConfig], classOf[Logger])
-              .newInstance(new ScalajsConfig, sjsLogger)
+              .newInstance(scalajsConfig(new ScalajsConfig, config), sjsLogger)
               .asInstanceOf[ScalajsWorkerApi]
           )
 

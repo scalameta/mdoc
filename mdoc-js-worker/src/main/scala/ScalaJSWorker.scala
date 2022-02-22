@@ -37,7 +37,6 @@ class ScalaJSWorker(
           }
         }
 
-    println(cfg)
     StandardImpl.clearableLinker(cfg)
   }
 
