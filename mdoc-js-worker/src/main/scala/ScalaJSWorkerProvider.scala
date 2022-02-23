@@ -16,7 +16,7 @@ class ScalaJSWorkerProvider extends i.ScalajsWorkerProvider {
       case Level.Error => Error
     }
   }
-  def create(config: i.ScalajsConfig, logger: i.ScalajsLogger) = {
+  def create(config: i.ScalajsConfig, logger: i.ScalajsLogger): i.ScalajsWorkerApi = {
     val wrappedLogger = new sjslogging.Logger {
       def log(level: sjslogging.Level, message: => String) =
         logger.log(mapping(level), message)
