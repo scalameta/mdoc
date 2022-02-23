@@ -12,7 +12,7 @@ coursier fetch \
   org.scalameta:mdoc-js_2.12:$version \
   org.scalameta:mdoc-js_2.13:$version \
   org.scalameta:mdoc-js_3:$version \
-  org.scalameta:mdoc-js-worker-api:$version \
+  org.scalameta:mdoc-js-interfaces:$version \
   org.scalameta:mdoc-js-worker_2.12:$version \
   org.scalameta:mdoc-js-worker_2.13:$version $suffix
 
