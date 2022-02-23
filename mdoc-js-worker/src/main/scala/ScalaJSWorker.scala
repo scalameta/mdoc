@@ -1,6 +1,6 @@
 package mdoc.js.worker;
 
-import mdoc.js.api._
+import mdoc.js.interfaces._
 import java.nio.file.Path
 import org.scalajs.linker.MemOutputDirectory
 import scala.concurrent.ExecutionContext.Implicits.global

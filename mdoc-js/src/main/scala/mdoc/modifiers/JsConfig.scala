@@ -7,7 +7,7 @@ import org.scalajs.logging.Level
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
-import mdoc.js.api.ModuleType
+import mdoc.js.interfaces._
 
 case class JsConfig(
     moduleKind: ModuleType = ModuleType.NoModule,
@@ -15,7 +15,7 @@ case class JsConfig(
     htmlHeader: String = "",
     libraries: List[AbsolutePath] = Nil,
     mountNode: String = "node",
-    minLevel: Level = Level.Info,
+    minLevel: LogLevel = LogLevel.Info,
     outDirectories: List[AbsolutePath] = List(PathIO.workingDirectory),
     outPrefix: Option[String] = None,
     fullOpt: Boolean = true,
@@ -72,14 +72,14 @@ object JsConfig {
       outDirectories = ctx.settings.out,
       outPrefix = ctx.site.get("js-out-prefix"),
       minLevel = ctx.site.get("js-level") match {
-        case None => Level.Info
-        case Some("info") => Level.Info
-        case Some("warn") => Level.Warn
-        case Some("error") => Level.Error
-        case Some("debug") => Level.Debug
+        case None => LogLevel.Info
+        case Some("info") => LogLevel.Info
+        case Some("warn") => LogLevel.Warning
+        case Some("error") => LogLevel.Error
+        case Some("debug") => LogLevel.Debug
         case Some(unknown) =>
           ctx.reporter.warning(s"unknown 'js-level': $unknown")
-          Level.Info
+          LogLevel.Info
       },
       fullOpt = ctx.site.get("js-opt") match {
         case None =>

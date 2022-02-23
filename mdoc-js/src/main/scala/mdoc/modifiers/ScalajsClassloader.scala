@@ -4,7 +4,7 @@ import java.net.URL
 import java.net.URLClassLoader
 
 final class FilteringClassLoader(parent: ClassLoader) extends ClassLoader(parent) {
-  private val parentPrefixes = List(
+  private val parentPrefixes = Array(
     "java.",
     "scala.",
     "org.scalajs.linker.",

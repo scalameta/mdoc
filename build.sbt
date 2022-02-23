@@ -368,7 +368,11 @@ lazy val unitJS = project
     MdocPlugin.mdocJSWorkerClasspath := {
       val _ = (jsWorker / Compile / compile).value
 
-      Some(Seq((jsWorker / Compile / classDirectory).value))
+      val folders = Seq(
+        (jsWorker / Compile / classDirectory).value
+      ) ++ (jsWorker / Compile / resourceDirectories).value
+
+      Some(folders)
     }
   )
   .dependsOn(mdoc, js, testsInput, tests, unit)
@@ -416,8 +420,8 @@ lazy val plugin = project
 
 lazy val jsApi =
   project
-    .in(file("mdoc-js-api"))
-    .settings(moduleName := "mdoc-js-worker-api", crossPaths := false, autoScalaLibrary := false)
+    .in(file("mdoc-js-interfaces"))
+    .settings(moduleName := "mdoc-js-interfaces", crossPaths := false, autoScalaLibrary := false)
     .settings(sharedJavaSettings)
 
 lazy val jsWorker =
@@ -464,7 +468,11 @@ lazy val docs = project
     MdocPlugin.mdocJSWorkerClasspath := {
       val _ = (jsWorker / Compile / compile).value
 
-      Some(Seq((jsWorker / Compile / classDirectory).value))
+      val folders = Seq(
+        (jsWorker / Compile / classDirectory).value
+      ) ++ (jsWorker / Compile / resourceDirectories).value
+
+      Some(folders)
     },
     mdocVariables := {
       val stableVersion: String =

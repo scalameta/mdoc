@@ -1,4 +1,4 @@
-package mdoc.js.api;
+package mdoc.js.interfaces;
 
 public class ScalajsConfig {
 	public ModuleType moduleType;

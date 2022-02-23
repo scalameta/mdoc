@@ -24,8 +24,8 @@ import org.scalajs.logging.Logger
 import java.nio.file.Path
 import scala.concurrent.Future
 import java.nio.file.Paths
-import mdoc.js.api.ScalajsConfig
-import mdoc.js.api.ScalajsWorkerApi
+import mdoc.js.interfaces._
+import java.util.ServiceLoader
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -37,17 +37,21 @@ class JsModifier extends mdoc.PreModifier {
   var classpathHash: Int = 0
   var reporter: mdoc.Reporter = new ConsoleReporter(System.out)
   var gensym = new Gensym()
+  import mdoc.js.{interfaces => i}
 
-  val sjsLogger: Logger = new Logger {
-    override def log(level: Level, message: => String): Unit = {
-      if (level >= config.minLevel) {
-        if (level == Level.Warn) reporter.info(message)
-        else if (level == Level.Error) reporter.info(message)
+  implicit val ordering: Ordering[LogLevel] = Ordering.by[LogLevel, Int](_.getOrder)
+
+  val sjsLogger = new i.ScalajsLogger {
+    import i.LogLevel
+    override def log(level: LogLevel, message: String): Unit = {
+      if (Ordering[LogLevel].gt(level, config.minLevel)) {
+        if (level == LogLevel.Warning) reporter.info(message)
+        else if (level == LogLevel.Error) reporter.info(message)
         else reporter.info(message)
       }
     }
 
-    override def trace(t: => Throwable): Unit =
+    override def trace(t: Throwable): Unit =
       reporter.error(t)
   }
 
@@ -91,14 +95,16 @@ class JsModifier extends mdoc.PreModifier {
         if (classpathHash != newClasspathHash) {
           classpathHash = newClasspathHash
           maybeCompiler = Some(new MarkdownCompiler(classpath, scalacOptions, target))
+
           val loader =
             ScalaJSClassloader.create(linkerClasspath.entries.map(_.toURI.toURL()).toArray)
+
           scalajsApi = Some(
-            loader
-              .loadClass("mdoc.js.worker.ScalaJSWorker")
-              .getConstructor(classOf[ScalajsConfig], classOf[Logger])
-              .newInstance(scalajsConfig(new ScalajsConfig, config), sjsLogger)
-              .asInstanceOf[ScalajsWorkerApi]
+            ServiceLoader
+              .load(classOf[ScalajsWorkerProvider], loader)
+              .iterator()
+              .next()
+              .create(scalajsConfig(new ScalajsConfig, config), sjsLogger)
           )
 
           scalajsApi.foreach { sjs =>
