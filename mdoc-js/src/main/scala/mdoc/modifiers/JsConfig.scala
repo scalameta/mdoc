@@ -3,7 +3,6 @@ package mdoc.modifiers
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.internal.pos.PositionSyntax._
-import org.scalajs.logging.Level
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath

@@ -440,8 +440,7 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
-    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
-    libraryDependencies += "org.scala-js" %% "scalajs-logging" % "1.1.1" cross CrossVersion.for3Use2_13
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
   )
   .dependsOn(mdoc)
 

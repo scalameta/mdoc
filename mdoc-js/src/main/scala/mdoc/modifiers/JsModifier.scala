@@ -19,8 +19,6 @@ import java.util.concurrent.Executor
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.net.URLClassLoader
 import java.net.URL
-import org.scalajs.logging.Level
-import org.scalajs.logging.Logger
 import java.nio.file.Path
 import scala.concurrent.Future
 import java.nio.file.Paths
