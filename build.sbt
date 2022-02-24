@@ -2,11 +2,12 @@ import scala.collection.mutable
 
 def scala212 = "2.12.15"
 def scala213 = "2.13.8"
-def scala3 = "3.1.0"
+def scala3 = "3.1.1"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
-def scalajs = "1.7.1"
+// This will work as long as mdoc has scala-js SBT plugin
+def scalajs = MdocPlugin.detectScalaJSVersion
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -108,6 +109,16 @@ lazy val sharedSettings = List(
   )
 )
 
+lazy val sharedJavaSettings = List(
+  javacOptions ++= {
+    val version = System.getProperty("java.version")
+    if (version.startsWith("1.8"))
+      Seq()
+    else
+      Seq("--release", "8")
+  }
+)
+
 val V = new {
   val scalameta = "4.4.35"
   val munit = "0.7.29"
@@ -141,6 +152,7 @@ lazy val interfaces = project
       "implNote:a:Implementation Note:"
     )
   )
+  .settings(sharedJavaSettings)
 
 lazy val runtime = project
   .settings(
@@ -352,7 +364,16 @@ lazy val unitJS = project
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
     ),
-    mdocJS := Some(jsdocs)
+    mdocJS := Some(jsdocs),
+    MdocPlugin.mdocJSWorkerClasspath := {
+      val _ = (jsWorker / Compile / compile).value
+
+      val folders = Seq(
+        (jsWorker / Compile / classDirectory).value
+      ) ++ (jsWorker / Compile / resourceDirectories).value
+
+      Some(folders)
+    }
   )
   .dependsOn(mdoc, js, testsInput, tests, unit)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
@@ -383,7 +404,9 @@ lazy val plugin = project
     publishLocal := {
       publishLocal
         .dependsOn(
-          (interfaces / publishLocal).dependsOn(localCrossPublish(List(scala212, scala213, scala3)))
+          (interfaces / publishLocal)
+            .dependsOn(jsApi / publishLocal)
+            .dependsOn(localCrossPublish(List(scala212, scala213, scala3)))
         )
         .value
     },
@@ -395,22 +418,29 @@ lazy val plugin = project
   )
   .enablePlugins(ScriptedPlugin)
 
+lazy val jsApi =
+  project
+    .in(file("mdoc-js-interfaces"))
+    .settings(moduleName := "mdoc-js-interfaces", crossPaths := false, autoScalaLibrary := false)
+    .settings(sharedJavaSettings)
+
+lazy val jsWorker =
+  project
+    .in(file("mdoc-js-worker"))
+    .dependsOn(jsApi)
+    .settings(
+      sharedSettings,
+      moduleName := "mdoc-js-worker",
+      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalajs % Provided) cross CrossVersion.for3Use2_13
+    )
+
 lazy val js = project
   .in(file("mdoc-js"))
+  .dependsOn(jsApi)
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
-    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
-    libraryDependencies ++= crossSetting(
-      scalaVersion.value,
-      if2 = List(
-        "org.scala-js" % "scalajs-compiler" % scalajs cross CrossVersion.full,
-        "org.scala-js" %% "scalajs-linker" % scalajs
-      ),
-      if3 = List(
-        "org.scala-js" %% "scalajs-linker" % scalajs cross CrossVersion.for3Use2_13
-      )
-    )
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
   )
   .dependsOn(mdoc)
 
@@ -434,6 +464,15 @@ lazy val docs = project
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jsdocs),
     mdocJSLibraries := (jsdocs / Compile / fullOptJS / webpack).value,
+    MdocPlugin.mdocJSWorkerClasspath := {
+      val _ = (jsWorker / Compile / compile).value
+
+      val folders = Seq(
+        (jsWorker / Compile / classDirectory).value
+      ) ++ (jsWorker / Compile / resourceDirectories).value
+
+      Some(folders)
+    },
     mdocVariables := {
       val stableVersion: String =
         version.value.replaceFirst("\\+.*", "")
@@ -456,7 +495,7 @@ def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
     .reduceLeft(_ dependsOn _)
 
 def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
-  val projects = List(runtime, cli, mdoc, js).reverse
+  val projects = List(runtime, cli, mdoc, js, jsWorker).reverse
   projects
     .map(p => localCrossPublishProject(p, scalaV))
     .reduceLeft(_ dependsOn _)
@@ -465,7 +504,7 @@ def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
 def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
   Def.task {
     val versionValue = (ThisBuild / version).value
-    val projects = List(runtime, cli, mdoc, js)
+    val projects = List(runtime, cli, mdoc, js, jsWorker)
     val setttings =
       (ThisBuild / version := versionValue) ::
         projects.map(p => p / scalaVersion := scalaV)

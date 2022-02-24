@@ -66,6 +66,11 @@ object MdocPlugin extends AutoPlugin {
     }
   }
 
+  lazy val mdocJSWorkerClasspath = taskKey[Option[Seq[File]]](
+    "Optional classpath to use for Mdoc.js worker - " +
+      "if not provided, the classpath will be formed by resolving the worker dependency"
+  )
+
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
       mdocIn := baseDirectory.in(ThisBuild).value / "docs",
@@ -74,6 +79,7 @@ object MdocPlugin extends AutoPlugin {
       mdocExtraArguments := Nil,
       mdocJS := None,
       mdocJSLibraries := Nil,
+      mdocJSWorkerClasspath := None,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
       mdoc := Def.inputTaskDyn {
@@ -106,21 +112,52 @@ object MdocPlugin extends AutoPlugin {
         mdocInternalVariables.value.foreach { case (key, value) =>
           props.put(key, value)
         }
-        mdocJSCompileOptions.value.foreach { options =>
-          props.put(
-            s"js-scalac-options",
-            options.options.mkString(" ")
-          )
-          props.put(
-            s"js-classpath",
-            options.classpath.mkString(File.pathSeparator)
-          )
-          options.moduleKind.foreach { moduleKind => props.put(s"js-module-kind", moduleKind) }
+        def getJars(mid: ModuleID) = {
+
+          val depRes = dependencyResolution.in(update).value
+          val updc = updateConfiguration.in(update).value
+          val uwconfig = unresolvedWarningConfiguration.in(update).value
+          val modDescr = depRes.wrapDependencyInModule(mid)
+
+          depRes
+            .update(
+              modDescr,
+              updc,
+              uwconfig,
+              streams.value.log
+            )
+            .map(_.allFiles)
+            .fold(uw => throw uw.resolveException, identity)
         }
-        props.put(
-          s"js-libraries",
-          mdocJSLibraries.value.map(_.data).mkString(File.pathSeparator)
-        )
+
+        val binaryVersion = scalaBinaryVersion.value
+        val log = streams.value.log
+        val libraries = mdocJSLibraries.value.map(_.data)
+        val workerClasspathOverride = mdocJSWorkerClasspath.value
+
+        mdocJSCompileOptions.value.foreach { options =>
+          val sjsVersion = detectScalaJSVersion
+
+          val linkerDependency = binaryVersion match {
+            case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
+            case other => "org.scala-js" % s"scalajs-linker_$other" % sjsVersion
+          }
+
+          val mdocJSDependency = binaryVersion match {
+            case "3" => "org.scalameta" % "mdoc-js-worker_3" % BuildInfo.version
+            case other => "org.scalameta" % s"mdoc-js-worker_$other" % BuildInfo.version
+          }
+
+          val workerClasspath = workerClasspathOverride.getOrElse(getJars(mdocJSDependency))
+
+          MdocJSConfiguration(
+            scalacOptions = options.options,
+            compileClasspath = options.classpath,
+            linkerClassPath = getJars(linkerDependency) ++ workerClasspath,
+            moduleKind = options.moduleKind,
+            jsLibraries = libraries
+          ).writeTo(props)
+        }
         props.put("in", mdocIn.value.toString)
         props.put("out", mdocOut.value.toString)
         props.put(
@@ -140,6 +177,35 @@ object MdocPlugin extends AutoPlugin {
         List(out)
       }
     )
+
+  case class MdocJSConfiguration(
+      scalacOptions: Seq[String],
+      compileClasspath: Seq[File],
+      linkerClassPath: Seq[File],
+      moduleKind: Option[String],
+      jsLibraries: Seq[File]
+  ) {
+    def writeTo(props: java.util.Properties): Unit = {
+
+      props.put(
+        s"js-scalac-options",
+        scalacOptions.mkString(" ")
+      )
+      props.put(
+        s"js-classpath",
+        compileClasspath.mkString(File.pathSeparator)
+      )
+      props.put(
+        s"js-linker-classpath",
+        linkerClassPath.mkString(File.pathSeparator)
+      )
+      props.put(
+        s"js-libraries",
+        jsLibraries.mkString(File.pathSeparator)
+      )
+      moduleKind.foreach { moduleKind => props.put(s"js-module-kind", moduleKind) }
+    }
+  }
 
   private lazy val mdocJSCompileOptions: Def.Initialize[Task[Option[CompileOptions]]] =
     Def.taskDyn[Option[CompileOptions]] {
@@ -193,4 +259,10 @@ object MdocPlugin extends AutoPlugin {
       )
     }
 
+  def detectScalaJSVersion = {
+    val klass =
+      Class.forName("org.scalajs.ir.ScalaJSVersions", true, getClass.getClassLoader())
+    val method = klass.getMethod("current")
+    method.invoke(null).asInstanceOf[String]
+  }
 }
