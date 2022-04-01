@@ -9,14 +9,14 @@ jobs:
     name: Scalafmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
       - run: ./bin/scalafmt --test
   docs:
     name: Website
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: olafurpg/setup-scala@v13
@@ -25,7 +25,7 @@ jobs:
     name: "Windows"
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: adopt@1.11
@@ -46,7 +46,7 @@ jobs:
           - "'++3.1.1 test'"
           - "scripted"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.java }}
