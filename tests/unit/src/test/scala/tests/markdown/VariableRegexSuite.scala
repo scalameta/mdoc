@@ -68,4 +68,14 @@ class VariableRegexSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "escape $",
+    """
+      |@boom@
+    """.stripMargin,
+    """
+      |$boom
+    """.stripMargin
+  )
+
 }
