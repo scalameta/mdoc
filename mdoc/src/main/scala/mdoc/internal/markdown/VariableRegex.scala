@@ -23,7 +23,7 @@ object VariableRegex {
           case _ =>
             val key = m.group(1)
             variables.get(key) match {
-              case Some(value) => value
+              case Some(value) => value.replace("$", "\\$")
               case None =>
                 val pos = Position.Range(input, m.start, m.end)
                 reporter.error(pos, s"key not found: $key")
