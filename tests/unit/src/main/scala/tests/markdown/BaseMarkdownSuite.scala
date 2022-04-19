@@ -37,7 +37,8 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       .default(createTempDirectory())
       .copy(
         site = Map(
-          "version" -> "1.0"
+          "version" -> "1.0",
+          "boom" -> "$boom"
         )
       )
       .withProperties(MdocProperties.default(PathIO.workingDirectory))
