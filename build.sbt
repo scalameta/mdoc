@@ -245,7 +245,7 @@ lazy val mdoc = project
       "io.methvin" % "directory-watcher" % "0.15.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.16.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.6.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.7.Final",
       "org.slf4j" % "slf4j-api" % "1.7.36",
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
