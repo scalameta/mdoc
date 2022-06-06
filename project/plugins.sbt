@@ -5,7 +5,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.9.0")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.20.0")
 
 libraryDependencies ++= List(
-  "org.jsoup" % "jsoup" % "1.12.1",
+  "org.jsoup" % "jsoup" % "1.12.2",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
 Compile / unmanagedSourceDirectories +=
