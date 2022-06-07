@@ -120,13 +120,13 @@ lazy val sharedJavaSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.5.0"
+  val scalameta = "4.5.9"
   val munit = "0.7.29"
-  val coursier = "1.0.6"
+  val coursier = "1.0.7"
   val scalacheck = "1.16.0"
   val pprint = "0.7.3"
   val fansi = "0.3.1"
-  val fs2 = "3.2.5"
+  val fs2 = "3.2.7"
   val metaconfig = "0.10.0"
 }
 
@@ -242,7 +242,7 @@ lazy val mdoc = project
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "io.methvin" % "directory-watcher" % "0.15.0",
+      "io.methvin" % "directory-watcher" % "0.15.1",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.16.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.6.Final",
