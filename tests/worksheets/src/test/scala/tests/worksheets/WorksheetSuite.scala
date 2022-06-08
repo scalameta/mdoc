@@ -289,8 +289,8 @@ class WorksheetSuite extends BaseSuite {
       |crash(filename)
       |""".stripMargin,
     """|crash:4:1: error: java.lang.RuntimeException: boom
-       |	at repl.MdocSession$App.crash(crash.scala:8)
-       |	at repl.MdocSession$App.<init>(crash.scala:14)
+       |	at repl.MdocSession$MdocApp.crash(crash.scala:8)
+       |	at repl.MdocSession$MdocApp.<init>(crash.scala:14)
        |	at repl.MdocSession$.app(crash.scala:3)
        |
        |crash(filename)
@@ -299,8 +299,8 @@ class WorksheetSuite extends BaseSuite {
     compat = Map(
       Compat.Scala3 ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
-           |	at repl.MdocSession$App.crash(crash.scala:7)
-           |	at repl.MdocSession$App.<init>(crash.scala:15)
+           |	at repl.MdocSession$MdocApp.crash(crash.scala:7)
+           |	at repl.MdocSession$MdocApp.<init>(crash.scala:15)
            |	at repl.MdocSession$.app(crash.scala:3)
            |
            |crash(filename)
@@ -404,7 +404,7 @@ class WorksheetSuite extends BaseSuite {
         |val xx = fn
         |""".stripMargin,
     """|dotty-ambiguous-implicit:8:12: error:
-       |ambiguous implicit arguments: both object c1 in class App and object c2 in class App match type App.this.C of parameter c of method fn in class App
+       |ambiguous implicit arguments: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
        |val xx = fn
        |           ^
        |""".stripMargin

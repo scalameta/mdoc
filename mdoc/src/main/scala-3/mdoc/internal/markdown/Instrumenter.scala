@@ -39,7 +39,7 @@ class Instrumenter(
     sections.zipWithIndex.foreach { case (section, i) =>
       if (section.mod.isReset) {
         sb.unnest()
-        sb.println(Instrumenter.reset(section.mod, gensym.fresh("App")))
+        sb.println(Instrumenter.reset(section.mod, gensym.fresh("MdocApp")))
       } else if (section.mod.isNest) {
         sb.nest()
       }
@@ -179,8 +179,8 @@ object Instrumenter {
     val cb = new CodePrinter(ps)
     cb.println("package repl")
     cb.definition("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder") {
-      _.println("def app(): _root_.scala.Unit = {val _ = new App()}")
-        .definition("class App") {
+      _.println("def app(): _root_.scala.Unit = {val _ = new MdocApp()}")
+        .definition("class MdocApp") {
           _.appendLines(body)
         }
 

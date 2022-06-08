@@ -16,14 +16,14 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   private def printAsScript(): Unit = {
     sb.println("package repl")
     sb.println("object MdocSession {")
-    sb.println("  object App {")
+    sb.println("  object MdocApp {")
 
     sections.zipWithIndex.foreach { case (section, j) =>
       if (j > i) ()
       else {
         if (section.mod.isReset) {
           nest.unnest()
-          sb.print(Instrumenter.reset(section.mod, gensym.fresh("App")))
+          sb.print(Instrumenter.reset(section.mod, gensym.fresh("MdocApp")))
         } else if (section.mod.isNest) {
           nest.nest()
         }

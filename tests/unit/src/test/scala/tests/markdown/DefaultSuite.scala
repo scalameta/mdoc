@@ -334,7 +334,7 @@ class DefaultSuite extends BaseMarkdownSuite {
        |throw new StackOverflowError()
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |java.lang.StackOverflowError
-       |	at repl.MdocSession$App.<init>(fatal-exception.md:8)
+       |	at repl.MdocSession$MdocApp.<init>(fatal-exception.md:8)
        |	at repl.MdocSession$.app(fatal-exception.md:3)
        |""".stripMargin
   )
