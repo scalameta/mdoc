@@ -377,4 +377,30 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
     )
   )
+
+  check(
+    "mismatchInline",
+    """`scala mdoc:fail val x: Int = "Inline"`""",
+    """|```scala
+       |val x: Int = "String"
+       |// error: type mismatch;
+       |//  found   : String("String")
+       |//  required: Int
+       |// val x: Int = "String"
+       |//              ^^^^^^^^
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |val x: Int = "String"
+           |// error:
+           |// Found:    String("String")
+           |// Required: Int
+           |// val x: Int = "String"
+           |//              ^^^^^^^^
+           |```
+    """.stripMargin
+    )
+  )
 }

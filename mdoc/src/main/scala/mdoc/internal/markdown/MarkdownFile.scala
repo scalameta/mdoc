@@ -83,7 +83,8 @@ object MarkdownFile {
               val info = fence.substring(backticks.length())
               state = State.CodeFence(curr, backticks, info, indent = start)
             } else {
-              parts += newText(curr, end)
+              // TODO Consider putting conditional inside the block
+              parts ++= parseLineWithInlineCode(line)
             }
           case s: State.CodeFence =>
             val start = line.indexOf(s.backticks)
@@ -115,6 +116,46 @@ object MarkdownFile {
     val parts = parser.acceptParts()
     MarkdownFile(input, file, parts)
   }
+
+  def parseLineWithInlineCode(line: String): List[MarkdownPart] = {
+    if (!line.contains("`")) {
+      List(Text(line))
+    } else {
+      /** TODO
+       *    - How should we handle:
+       *      - Multiple ticks in a row
+       *        - Especially when at the beginning of the line, as other tests already focus on that case.
+       *        - Unbalanced tick marks
+       *     -
+       */
+      val prefix = if (line.startsWith("`")) " " else ""
+      val suffix = if (line.endsWith("`")) " " else ""
+      val tickSections = (prefix + line + suffix).split("`")//.filterNot(s => s.isBlank)
+      if (line.contains("Inline")) {
+        tickSections.foreach(section => println("Section: " + section))
+      }
+      if (tickSections.nonEmpty && tickSections.size % 2 == 0)
+        throw new RuntimeException("TODO How to handle Unbalanced ticks!")
+
+      tickSections.toList.zipWithIndex.map { case (piece, index) =>
+        // TODO This might be dangerous. If the paragraph starts with "scala mdoc", outside of ticks, this
+        // could go haywire
+        if (index % 2 != 0) {
+          if (piece.startsWith("scala mdoc")) {
+            val wordsInMdocPiece = piece.split("\\s+")
+            val (info, body) = wordsInMdocPiece.splitAt(2)
+            InlineMdoc(Text(info.mkString(" ")), Text(body.mkString(" ")))
+          } else {
+            Text(s"`$piece`") // TODO Any cleaner way of avoiding re-adding backticks here?
+
+          }
+        }
+        else
+          Text(s"$piece") // TODO Any cleaner way of avoiding re-adding backticks here?
+      }
+    }
+  }
+
 }
 
 sealed abstract class MarkdownPart {
@@ -150,6 +191,11 @@ sealed abstract class MarkdownPart {
             }
             out.appendLinesPrefixed(indentation, fence.closeBackticks.value)
         }
+      case inlineMdoc: InlineMdoc =>
+        out.append("`")
+        inlineMdoc.body.renderToString(out)
+        out.append("`")
+//        out.append(inlineMdoc.body)
     }
 }
 final case class Text(value: String) extends MarkdownPart {
@@ -178,4 +224,15 @@ final case class CodeFence(
   var newBody = Option.empty[String]
   def indent: Int = tag.value.length
   def hasBlankTag: Boolean = tag.value.forall(_.isWhitespace)
+}
+
+// TODO Info/modifiers
+final case class InlineCode(body: Text) extends MarkdownPart
+final case class InlineMdoc(info: Text, body: Text) extends MarkdownPart {
+  val closeTick = "`"
+  // TODO See which vars are necessary
+  // Since we're not messing with output, I think these can actually go away
+  var newPart = Option.empty[String]
+  var newInfo = Option.empty[String]
+  var newBody = Option.empty[String]
 }

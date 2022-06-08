@@ -134,6 +134,7 @@ object Markdown {
       settings
     )
     val processor = new Processor()(context)
+    // TODO Or look into this processDocument call?
     processor.processDocument(file)
     file.renderToString
   }

@@ -32,6 +32,7 @@ import mdoc.internal.BuildInfo
 object MdocDialect {
 
   def parse(path: AbsolutePath): Parsed[Source] = {
+    println("Parsing with MdocDialect")
     (Input.VirtualFile(path.toString, path.readText), scala).parse[Source]
   }
 
@@ -45,13 +46,16 @@ class Processor(implicit ctx: Context) {
 
   def processDocument(doc: MarkdownFile): MarkdownFile = {
     val docInput = doc.input
-    val (scalaInputs, customInputs, preInputs) = collectFenceInputs(doc)
+    val (scalaInputs, customInputs, preInputs, scalaInlineInputs) = collectFenceInputs(doc)
     val filename = docInput.toFilename(ctx.settings)
     val inputFile = doc.file.relpath
     customInputs.foreach { block => processStringInput(doc, block) }
     preInputs.foreach { block => processPreInput(doc, block) }
     if (scalaInputs.nonEmpty) {
       processScalaInputs(doc, scalaInputs, inputFile, filename)
+    }
+    if (scalaInlineInputs.nonEmpty) {
+      processScalaInlineInputs(doc, scalaInlineInputs, inputFile, filename)
     }
     if (preInputs.nonEmpty) {
       val post = new PostProcessContext(ctx.reporter, doc.file, ctx.settings)
@@ -156,6 +160,51 @@ class Processor(implicit ctx: Context) {
       compiler
     )
   }
+
+  def processScalaInlineInputs(
+                          doc: MarkdownFile,
+                          inputs: List[ScalaInlineInput],
+                          relpath: RelativePath,
+                          filename: String
+                        ): Unit = {
+    val sectionInputs = inputs.map { case ScalaInlineInput(_, input, mod) =>
+      import scala.meta._
+
+      (input, MdocDialect.scala).parse[Source] match {
+        case parsers.Parsed.Success(source) =>
+          SectionInput(input, ParsedSource(source), mod)
+        case parsers.Parsed.Error(pos, msg, _) =>
+          ctx.reporter.error(pos.toUnslicedPosition, msg)
+          SectionInput(input, ParsedSource.empty, mod)
+      }
+    }
+    val instrumented = Instrumenter.instrument(doc.file, sectionInputs, ctx.settings, ctx.reporter)
+
+    if (ctx.reporter.hasErrors) {
+      return
+    }
+    if (ctx.settings.verbose) {
+      ctx.reporter.info(s"Instrumented $filename")
+      ctx.reporter.println(instrumented.source)
+    }
+    val compiler =
+      try {
+        ctx.compiler(instrumented)
+      } catch {
+        case e: CoursierError =>
+          handleCoursierError(instrumented, e)
+          ctx.compiler
+      }
+    processScalaInlineInputs(
+      doc,
+      inputs,
+      relpath,
+      filename,
+      sectionInputs,
+      instrumented,
+      compiler
+    )
+  }
   def handleCoursierError(instrumented: Instrumented, e: CoursierError): Unit = {
     e match {
       case m: MultipleResolutionError =>
@@ -181,6 +230,7 @@ class Processor(implicit ctx: Context) {
       instrumented: Instrumented,
       markdownCompiler: MarkdownCompiler
   ): Unit = {
+    // TODO Possibly hook in here?
     val rendered = MarkdownBuilder.buildDocument(
       markdownCompiler,
       ctx.reporter,
@@ -265,6 +315,41 @@ class Processor(implicit ctx: Context) {
     }
   }
 
+  def processScalaInlineInputs(
+                          doc: MarkdownFile,
+                          inputs: List[ScalaInlineInput],
+                          relpath: RelativePath,
+                          filename: String,
+                          sectionInputs: List[SectionInput],
+                          instrumented: Instrumented,
+                          markdownCompiler: MarkdownCompiler
+                        ): Unit = {
+    val rendered = MarkdownBuilder.buildDocument(
+      markdownCompiler,
+      ctx.reporter,
+      sectionInputs,
+      instrumented,
+      filename
+    )
+//    println("Rendered: " + rendered)
+    rendered.sections.foreach { section =>
+      println("Rendered Section: " + section)
+    }
+    rendered.sections.zip(inputs).foreach { case (section, ScalaInlineInput(block, _, mod)) =>
+      block.newInfo = Some("scala")
+      def defaultRender: String =
+        Renderer.renderEvaluatedSection(
+          rendered,
+          section,
+          ctx.reporter,
+          ctx.settings.variablePrinter,
+          markdownCompiler
+        )
+      implicit val pprintColor = TPrintColors.BlackWhite
+      block.newBody = Some(defaultRender)
+    }
+  }
+
   def appendChild(doc: MarkdownFile, text: String): Unit = {
     if (text.nonEmpty) {
       doc.appendText(text)
@@ -275,13 +360,19 @@ class Processor(implicit ctx: Context) {
     toReplace.newPart = Some(text)
   }
 
+  def replaceNodeWithText(doc: MarkdownFile, toReplace: InlineMdoc, text: String): Unit = {
+    toReplace.newPart = Some(text)
+  }
+
   def collectFenceInputs(
       doc: MarkdownFile
-  ): (List[ScalaFenceInput], List[StringFenceInput], List[PreFenceInput]) = {
+  ): (List[ScalaFenceInput], List[StringFenceInput], List[PreFenceInput], List[ScalaInlineInput]) = {
     val InterestingCodeFence = new FenceInput(ctx, doc.input)
+    val InterestingInlineCode = new InlineInput(ctx, doc.input)
     val inputs = List.newBuilder[ScalaFenceInput]
     val strings = List.newBuilder[StringFenceInput]
     val pres = List.newBuilder[PreFenceInput]
+    val inlineInputs = List.newBuilder[ScalaInlineInput]
     doc.parts.foreach {
       case InterestingCodeFence(input) =>
         input.mod match {
@@ -292,8 +383,19 @@ class Processor(implicit ctx: Context) {
           case _ =>
             inputs += input
         }
+      case InterestingInlineCode(input) =>
+//        println("Collecting inline: " + input)
+        inlineInputs += input
+//        input.mod match {
+//          case string: Str =>
+//            strings += StringFenceInput(input.block, input.input, string)
+//          case pre: Pre =>
+//            pres += PreFenceInput(input.block, input.input, pre)
+//          case _ =>
+//            inputs += input
+//        }
       case _ =>
     }
-    (inputs.result(), strings.result(), pres.result())
+    (inputs.result(), strings.result(), pres.result(), inlineInputs.result())
   }
 }

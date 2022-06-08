@@ -25,6 +25,7 @@ object MarkdownBuilder {
       instrumented: Instrumented,
       filename: String
   ): EvaluatedDocument = {
+    println("building document")
     val instrumentedInput = InstrumentedInput(filename, instrumented.source)
     reporter.debug(s"$filename: instrumented code\n$instrumented")
     val compileInput = Input.VirtualFile(filename, instrumented.source)
