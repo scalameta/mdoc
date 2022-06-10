@@ -69,7 +69,7 @@ class NestSuite extends BaseMarkdownSuite {
        |val hakon = User("Hakon", 42)
        |// hakon: User = User("Hakon", 42)
        |susan
-       |// res0: App.this.type.User = User("Susan")
+       |// res0: MdocApp.this.type.User = User("Susan")
        |```
        |""".stripMargin,
     compat = Map(
@@ -84,7 +84,7 @@ class NestSuite extends BaseMarkdownSuite {
            |val hakon = User("Hakon", 42)
            |// hakon: User = User(name = "Hakon", age = 42)
            |susan
-           |// res0: App.this.type.User = User(name = "Susan")
+           |// res0: MdocApp.this.type.User = User(name = "Susan")
            |```
            |""".stripMargin,
       Compat.Scala3 ->
@@ -355,7 +355,7 @@ class NestSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """|error: implicit-nok.md:9:1: ambiguous implicit values:
-       | both value x in class App of type => Int
+       | both value x in class MdocApp of type => Int
        | and value y of type Int
        | match expected type Int
        |implicitly[Int]
@@ -409,8 +409,8 @@ class NestSuite extends BaseMarkdownSuite {
        |boom(x > 4)
        |^^^^^^^^^^^
        |java.lang.IllegalArgumentException
-       |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
-       |	at repl.MdocSession$App.<init>(stacktrace.md:35)
+       |	at repl.MdocSession$MdocApp.boom$1(stacktrace.md:32)
+       |	at repl.MdocSession$MdocApp.<init>(stacktrace.md:35)
        |	at repl.MdocSession$.app(stacktrace.md:3)
        |""".stripMargin,
     compat = Map(
@@ -419,8 +419,8 @@ class NestSuite extends BaseMarkdownSuite {
            |boom(x > 4)
            |^^^^^^^^^^^
            |java.lang.IllegalArgumentException
-           |	at repl.MdocSession$App.boom$1(stacktrace.md:32)
-           |	at repl.MdocSession$App.<init>(stacktrace.md:36)
+           |	at repl.MdocSession$MdocApp.boom$1(stacktrace.md:32)
+           |	at repl.MdocSession$MdocApp.<init>(stacktrace.md:36)
            |	at repl.MdocSession$.app(stacktrace.md:3)
            |""".stripMargin
     )
