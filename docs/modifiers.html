@@ -191,9 +191,9 @@ val y = ???
 val y = ???
 // scala.NotImplementedError: an implementation <span class="hljs-literal">is</span> missing
 //  <span class="hljs-keyword">at</span> scala.Predef$.<span class="hljs-variable">$qmark</span><span class="hljs-variable">$qmark</span><span class="hljs-variable">$qmark</span>(Predef.scala:<span class="hljs-number">288</span>)
-//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span><span class="hljs-variable">$mcV</span><span class="hljs-variable">$sp</span>(modifiers.md:<span class="hljs-number">9</span>)
-//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
-//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$App</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$MdocApp</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span><span class="hljs-variable">$mcV</span><span class="hljs-variable">$sp</span>(modifiers.md:<span class="hljs-number">9</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$MdocApp</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
+//  <span class="hljs-keyword">at</span> repl.MdocSession<span class="hljs-variable">$MdocApp</span>$<span class="hljs-variable">$anonfun</span><span class="hljs-variable">$1</span><span class="hljs-built_in">.apply</span>(modifiers.md:<span class="hljs-number">8</span>)
 ```
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="passthrough"></a><a href="#passthrough" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>passthrough</code></h2>
@@ -380,7 +380,7 @@ implicitly[<span class="hljs-built_in">Int</span>]
 </code></pre>
 <p>Error:</p>
 <pre><code class="hljs">error: modifiers.md:7:1: ambiguous implicit values:
- both value x <span class="hljs-keyword">in</span> class App of<span class="hljs-built_in"> type </span>=&gt; Int
+ both value x <span class="hljs-keyword">in</span> class MdocApp of<span class="hljs-built_in"> type </span>=&gt; Int
  <span class="hljs-keyword">and</span> value y of<span class="hljs-built_in"> type </span>Int
  match expected<span class="hljs-built_in"> type </span>Int
 implicitly[Int]
@@ -564,9 +564,9 @@ println(x)
 </code></pre>
 <p>After:</p>
 <pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://scastie.scala-lang.org/embedded.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">pre</span> <span class="hljs-attr">class</span>=<span class="hljs-string">'scastie-snippet-48813cad-5021-4e77-bcd2-81a7ad3cc7c0'</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">pre</span> <span class="hljs-attr">class</span>=<span class="hljs-string">'scastie-snippet-f8b1cdac-d4d7-4a97-80f0-da67a85e15dc'</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"><span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'load'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
- scastie.Embedded(<span class="hljs-string">'.scastie-snippet-48813cad-5021-4e77-bcd2-81a7ad3cc7c0'</span>, {
+ scastie.Embedded(<span class="hljs-string">'.scastie-snippet-f8b1cdac-d4d7-4a97-80f0-da67a85e15dc'</span>, {
    <span class="hljs-attr">code</span>: <span class="hljs-string">`val x = 1 + 2
 println(x)`</span>,
    <span class="hljs-attr">theme</span>: <span class="hljs-string">'light'</span>,
