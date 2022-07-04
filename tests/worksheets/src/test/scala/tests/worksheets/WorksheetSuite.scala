@@ -404,7 +404,7 @@ class WorksheetSuite extends BaseSuite {
         |val xx = fn
         |""".stripMargin,
     """|dotty-ambiguous-implicit:8:12: error:
-       |ambiguous implicit arguments: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
+       |ambiguous given instances: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
        |val xx = fn
        |           ^
        |""".stripMargin
