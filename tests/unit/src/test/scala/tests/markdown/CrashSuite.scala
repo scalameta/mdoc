@@ -251,23 +251,23 @@ class CrashSuite extends BaseMarkdownSuite {
       |hello(5)
       |```
       |""".stripMargin,
-    """
-      |```scala
-      |println("what!")
-      |// what!
-      |```
-      |
-      |```scala
-      |def hello(x: Int) =
-      |  if x != 0 then
-      |    println(x)
-      |    x / 0
-      |hello(5)
-      |// java.lang.ArithmeticException: / by zero
-      |//  at repl.MdocSession$MdocApp.hello$1(significant-indentation.md:19)
-      |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(significant-indentation.md:20)
-      |//  at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
-      |```""".stripMargin
+    """|```scala
+       |println("what!")
+       |// what!
+       |```
+       |
+       |```scala
+       |def hello(x: Int) =
+       |  if x != 0 then
+       |    println(x)
+       |    x / 0
+       |hello(5)
+       |// java.lang.ArithmeticException: / by zero
+       |//  at repl.MdocSession$MdocApp.hello$1(significant-indentation.md:19)
+       |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(significant-indentation.md:20)
+       |//  at repl.MdocSession$MdocApp.$init$$$anonfun$adapted$1(significant-indentation.md:21)
+       |```
+       |""".stripMargin
   )
 
   check(

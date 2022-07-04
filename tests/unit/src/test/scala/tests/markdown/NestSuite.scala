@@ -249,7 +249,7 @@ class NestSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |error: reset-scala3.md:9:15:
-      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |no given instance of type Int was found for parameter e of method implicitly in object Predef
       |implicitly[Int]
       |              ^
          """.stripMargin
@@ -288,11 +288,11 @@ class NestSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """
       |error: multi-reset-scala3.md:15:15:
-      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |no given instance of type Int was found for parameter e of method implicitly in object Predef
       |implicitly[Int]
       |              ^
       |error: multi-reset-scala3.md:27:15:
-      |no implicit argument of type Int was found for parameter e of method implicitly in object Predef
+      |no given instance of type Int was found for parameter e of method implicitly in object Predef
       |implicitly[Int]
       |              ^
     """.trim.stripMargin
