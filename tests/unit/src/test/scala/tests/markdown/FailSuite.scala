@@ -377,4 +377,53 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
     )
   )
+  check(
+    "two-errors",
+    """
+      |```scala mdoc:fail
+      |val nope = "foo" * "goo"
+      |```
+      |
+      |```scala mdoc:fail
+      |val bad = "moo" * "loo"
+      |```
+    """.stripMargin,
+    """|```scala
+       |val nope = "foo" * "goo"
+       |// error: type mismatch;
+       |//  found   : String("goo")
+       |//  required: Int
+       |```
+       |
+       |```scala
+       |val bad = "moo" * "loo"
+       |// error: type mismatch;
+       |//  found   : String("loo")
+       |//  required: Int
+       |// val bad = "moo" * "loo"
+       |//                   ^^^^^
+       |```
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |val nope = "foo" * "goo"
+           |// error:
+           |// Found:    ("goo" : String)
+           |// Required: Int
+           |// val nope = "foo" * "goo"
+           |//                    ^^^^^
+           |```
+           |
+           |```scala
+           |val bad = "moo" * "loo"
+           |// error:
+           |// Found:    ("loo" : String)
+           |// Required: Int
+           |// val bad = "moo" * "loo"
+           |//                   ^^^^^
+           |```
+           |""".stripMargin
+    )
+  )
 }
