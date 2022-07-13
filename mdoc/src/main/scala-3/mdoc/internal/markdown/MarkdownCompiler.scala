@@ -112,11 +112,10 @@ class MarkdownCompiler(
       input: Input,
       vreporter: Reporter,
       edit: TokenEditDistance,
-      fileImports: List[FileImport],
-      freshContext: Option[Context] = None
+      fileImports: List[FileImport]
   ): Unit = {
+    reset()
     clearTarget()
-    val context = freshContext.getOrElse(newContext)
     val compiler = new Compiler
     val run = compiler.newRun(using context)
     val inputs = List(input)
@@ -141,15 +140,8 @@ class MarkdownCompiler(
       fileImports: List[FileImport],
       retry: Int = 0
   ): Option[Class[_]] = {
-    reset()
-
-    val freshContext = context.fresh.setSetting(
-      context.settings.outputDir,
-      target
-    )
-
-    compileSources(input, vreporter, edit, fileImports, Some(freshContext))
-    if (!freshContext.reporter.hasErrors) {
+    compileSources(input, vreporter, edit, fileImports)
+    if (!context.reporter.hasErrors) {
       val loader = new AbstractFileClassLoader(target, appClassLoader)
       try {
         Some(loader.loadClass(className))
@@ -173,18 +165,16 @@ class MarkdownCompiler(
   }
 
   def fail(edit: TokenEditDistance, input: Input, sectionPos: Position): String = {
+    reset()
     val compiler = new Compiler
-    val freshContext = context.fresh
-
-    val run = compiler.newRun(using freshContext)
+    val run = compiler.newRun(using context)
     val inputs = List(input).map(toSource)
 
     run.compileSources(inputs)
-    val runContext = run.runContext
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
 
-    runContext.reporter.pendingMessages(using context).foreach { diagnostic =>
+    context.reporter.pendingMessages(using context).foreach { diagnostic =>
       val msg = nullableMessage(diagnostic.message)
       val mpos = toMetaPosition(edit, diagnostic.position.get)
       if (sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
