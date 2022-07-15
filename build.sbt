@@ -125,7 +125,7 @@ val V = new {
   val coursier = "1.0.7"
   val scalacheck = "1.16.0"
   val pprint = "0.7.3"
-  val fansi = "0.3.1"
+  val fansi = "0.4.0"
   val fs2 = "3.2.9"
   val metaconfig = "0.10.0"
 }
