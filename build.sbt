@@ -242,7 +242,7 @@ lazy val mdoc = project
     ),
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "io.methvin" % "directory-watcher" % "0.15.1",
+      "io.methvin" % "directory-watcher" % "0.16.1",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.18.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.7.Final",
