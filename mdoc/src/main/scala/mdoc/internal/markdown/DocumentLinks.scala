@@ -47,7 +47,7 @@ object DocumentLinks {
   private val HtmlName = "name=\"([^\"]+)\"".r
   private val HtmlId = "id=\"([^\"]+)\"".r
 
-  def fromGeneratedSite(settings: Settings, reporter: Reporter): List[DocumentLinks] = {
+  def fromGeneratedSite(settings: Settings): List[DocumentLinks] = {
     val links = List.newBuilder[DocumentLinks]
     IO.foreachOutput(settings) { (abspath, relpath) =>
       val isMarkdown = PathIO.extension(relpath.toNIO) == "md"

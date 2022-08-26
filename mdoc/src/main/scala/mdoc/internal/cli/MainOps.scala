@@ -13,6 +13,7 @@ import mdoc.internal.livereload.UndertowLiveReload
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.markdown.Markdown
+import mdoc.internal.markdown.DeadLinkInfo
 import mdoc.internal.pos.DiffUtils
 import metaconfig.Configured
 
@@ -27,6 +28,7 @@ import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
+import scala.meta.inputs.Position
 
 final class MainOps(
     context: Context
@@ -62,11 +64,19 @@ final class MainOps(
     }
   }
 
-  def lint(): Unit = {
-    settings.out.foreach { out =>
+  def lint(): Exit = {
+    settings.out.foldLeft(Exit.success) { case (acc, out) =>
       if (out.isDirectory && !settings.noLinkHygiene) {
-        val docs = DocumentLinks.fromGeneratedSite(settings, reporter)
-        LinkHygiene.lint(docs, reporter, settings.verbose)
+        val docs = DocumentLinks.fromGeneratedSite(settings)
+        val results = LinkHygiene.lint(docs, settings.verbose)
+        LinkHygiene.report(settings.checkLinkHygiene, results, reporter)
+        if (settings.checkLinkHygiene) {
+          acc.merge(Exit.error)
+        } else {
+          acc.merge(Exit.success)
+        }
+      } else {
+        Exit.success
       }
     }
   }
@@ -157,13 +167,13 @@ final class MainOps(
       val fileExit = handleFile(file)
       accum.merge(fileExit)
     }
-    lint()
+    val exitLint = exit.merge(lint())
     if (files.isEmpty) {
       reporter.error(s"no input files: ${settings.in}")
     } else {
       compiledFiles(n, timer)
     }
-    exit
+    exitLint
   }
 
   def run(): Exit = {
@@ -263,6 +273,11 @@ object MainOps {
             error.all.foreach(message => reporter.error(message))
             1
           case Configured.Ok(ctx) =>
+            if (ctx.settings.noLinkHygiene && ctx.settings.checkLinkHygiene) {
+              reporter.warning(
+                "--no-link-hygiene and --check-link-hygiene are mutually exclusive. Link hygiene is disabled."
+              )
+            }
             if (ctx.settings.verbose) {
               ctx.reporter.setDebugEnabled(true)
             }

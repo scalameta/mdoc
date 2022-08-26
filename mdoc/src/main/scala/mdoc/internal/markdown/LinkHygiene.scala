@@ -3,9 +3,12 @@ package mdoc.internal.markdown
 import java.net.URI
 import mdoc.Reporter
 import metaconfig.internal.Levenshtein
+import scala.meta.inputs.Position
+
+final case class DeadLinkInfo(ref: Position, msg: String)
 
 object LinkHygiene {
-  def lint(docs: List[DocumentLinks], reporter: Reporter, verbose: Boolean): Unit = {
+  def lint(docs: List[DocumentLinks], verbose: Boolean): List[DeadLinkInfo] = {
     val isValidHeading = docs.iterator.flatMap(_.absoluteDefinitions).toSet
     for {
       doc <- docs
@@ -14,7 +17,7 @@ object LinkHygiene {
       uri <- resolve(enclosingDocument, reference.url)
       if uri.getScheme == null && uri.getHost == null
       if !isValidHeading(uri)
-    } {
+    } yield {
       val isAbsolutePath = uri.getPath.startsWith("/")
       val debug =
         if (verbose) {
@@ -32,8 +35,22 @@ object LinkHygiene {
         if (isAbsolutePath)
           s" To fix this problem, either make the link relative or turn it into complete URL such as http://example.com$uri."
         else ""
-      reporter.warning(reference.pos, s"Unknown link '$uri'$help$hint$debug")
+      DeadLinkInfo(reference.pos, s"Unknown link '$uri'$help$hint$debug")
     }
+  }
+
+  def report(asError: Boolean, deadLinks: List[DeadLinkInfo], reporter: Reporter): Unit = {
+    def printDeadLink(print: (Position, String) => Unit)(deadLink: DeadLinkInfo): Unit = {
+      val DeadLinkInfo(pos, msg) = deadLink
+      print(pos, msg)
+    }
+
+    if (asError) {
+      deadLinks.foreach { printDeadLink(reporter.error) }
+    } else {
+      deadLinks.foreach { printDeadLink(reporter.warning) }
+    }
+
   }
 
   def closestCandidate(
