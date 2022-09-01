@@ -246,7 +246,7 @@ lazy val mdoc = project
       // live reload
       "io.undertow" % "undertow-core" % "2.2.19.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.7.Final",
-      "org.slf4j" % "slf4j-api" % "1.7.36",
+      "org.slf4j" % "slf4j-api" % "2.0.0",
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
