@@ -137,13 +137,12 @@ Link to [<span class="hljs-string">my title</span>](<span class="hljs-link">#my-
 Link to [<span class="hljs-string">typo section</span>](<span class="hljs-link">#mytitle</span>).
 Link to [<span class="hljs-string">old section</span>](<span class="hljs-link">#doesnotexist</span>).
 </code></pre>
-<p>Error:</p>
-<pre><code class="hljs">warning: why.md:4:9: Unknown link 'why.md#mytitle', did you mean 'why.md#my-title'?
+<p>After:</p>
+<pre><code class="hljs"><span class="hljs-section"># My title</span>
+
+Link to [<span class="hljs-string">my title</span>](<span class="hljs-link">#my-title</span>).
 Link to [<span class="hljs-string">typo section</span>](<span class="hljs-link">#mytitle</span>).
-<span class="hljs-code">        ^^^^^^^^^^^^^^^^^^^^^^^^</span>
-warning: why.md:5:9: Unknown link 'why.md#doesnotexist'.
 Link to [<span class="hljs-string">old section</span>](<span class="hljs-link">#doesnotexist</span>).
-<span class="hljs-code">        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
 </code></pre>
 <p>Observe that mdoc suggests a fix if there exists a header that is similar to the
 unknown link.</p>

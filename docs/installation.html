@@ -285,6 +285,12 @@ Common options:
   <span class="hljs-comment">--no-link-hygiene</span>
     Disable link hygiene analysis so that no warnings are reported <span class="hljs-keyword">for</span> dead links.
 
+  <span class="hljs-comment">--check-link-hygiene</span>
+    Link hygiene analysis reports dead links as errors. Useful <span class="hljs-keyword">for</span> asserting <span class="hljs-keyword">in</span> CI
+    that the site contains no dead links. This setting has no effect <span class="hljs-keyword">in</span> watch
+    mode. It <span class="hljs-keyword">is</span> also mutually exclusive <span class="hljs-keyword">with</span> <span class="hljs-comment">--no-link-hygiene, if both are set,</span>
+    link hygiene <span class="hljs-keyword">is</span> disabled.
+
   <span class="hljs-comment">--verbose</span>
     Include additional diagnostics <span class="hljs-keyword">for</span> debugging potential problems.
 
