@@ -15,7 +15,8 @@ class LinkHygieneSuite extends FunSuite {
       name: String,
       original: String,
       expected: String,
-      verbose: Boolean = false
+      verbose: Boolean = false,
+      asError: Boolean = false
   )(implicit loc: munit.Location): Unit = {
     test(name) {
       myOut.reset()
@@ -24,8 +25,8 @@ class LinkHygieneSuite extends FunSuite {
       val settings = Settings
         .default(root)
         .copy(reportRelativePaths = true, in = List(root), out = List(root))
-      val links = DocumentLinks.fromGeneratedSite(settings, reporter)
-      LinkHygiene.lint(links, reporter, verbose)
+      val links = DocumentLinks.fromGeneratedSite(settings)
+      LinkHygiene.report(asError, LinkHygiene.lint(links, verbose), reporter)
       val obtained = fansi.Str(myOut.toString()).plainText
       assertNoDiff(obtained, expected)
     }
@@ -135,6 +136,22 @@ class LinkHygieneSuite extends FunSuite {
        |^^^^^^^^^^^^^^^^
        |""".stripMargin,
     verbose = true
+  )
+
+  check(
+    "as error",
+    """
+      |/a.md
+      |# Header 1
+      |[2](b.md#header)
+      |/b.md
+      |# Header 2
+    """.stripMargin,
+    """|error: a.md:2:1: Unknown link 'b.md#header', did you mean 'b.md#header-2'?
+       |[2](b.md#header)
+       |^^^^^^^^^^^^^^^^
+       |""".stripMargin,
+    asError = true
   )
 
 }
