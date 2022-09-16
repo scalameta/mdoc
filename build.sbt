@@ -126,7 +126,7 @@ val V = new {
   val scalacheck = "1.17.0"
   val pprint = "0.7.3"
   val fansi = "0.4.0"
-  val fs2 = "3.2.14"
+  val fs2 = "3.3.0"
   val metaconfig = "0.11.1"
 }
 
