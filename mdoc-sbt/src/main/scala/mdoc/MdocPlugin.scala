@@ -96,7 +96,8 @@ object MdocPlugin extends AutoPlugin {
       dependencyOverrides ++= List(
         "org.scala-lang" %% "scala3-library" % scalaVersion.value,
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
-        "org.scala-lang" %% "tasty-core" % scalaVersion.value
+        "org.scala-lang" %% "tasty-core" % scalaVersion.value,
+        "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
       ),
       libraryDependencies ++= {
         val isJS = mdocJS.value.isDefined

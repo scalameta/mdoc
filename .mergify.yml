@@ -6,18 +6,18 @@ pull_request_rules:
       - check-success=Website
       - check-success=Windows
       - check-success="'++2.12.12! test' adopt@1.8"
-      - check-success="'++2.12.16 test' adopt@1.8"
-      - check-success="'++2.13.8 test' adopt@1.8"
+      - check-success="'++2.12.17 test' adopt@1.8"
+      - check-success="'++2.13.9 test' adopt@1.8"
       - check-success="'++3.1.3 test' adopt@1.8"
       - check-success="scripted adopt@1.8"
       - check-success="'++2.12.12! test' adopt@1.11"
-      - check-success="'++2.12.16 test' adopt@1.11"
-      - check-success="'++2.13.8 test' adopt@1.11"
+      - check-success="'++2.12.17 test' adopt@1.11"
+      - check-success="'++2.13.9 test' adopt@1.11"
       - check-success="'++3.1.3 test' adopt@1.11"
       - check-success="scripted adopt@1.11"
       - check-success="'++2.12.12! test' 17"
-      - check-success="'++2.12.16 test' 17"
-      - check-success="'++2.13.8 test' 17"
+      - check-success="'++2.12.17 test' 17"
+      - check-success="'++2.13.9 test' 17"
       - check-success="'++3.1.3 test' 17"
       - check-success=scripted 17
     actions:
