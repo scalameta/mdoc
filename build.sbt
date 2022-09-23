@@ -1,7 +1,7 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.16"
-def scala213 = "2.13.8"
+def scala212 = "2.12.17"
+def scala213 = "2.13.9"
 def scala3 = "3.1.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
@@ -13,6 +13,7 @@ def scalajsDom = "2.0.0"
 
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
+def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
 val isScala212 = Def.setting {
@@ -53,13 +54,14 @@ def crossSetting[A](
     scalaVersion: String,
     if2: List[A] = Nil,
     if3: List[A] = Nil,
-    if211: List[A] = Nil,
-    if212: List[A] = Nil
+    if212: List[A] = Nil,
+    if213: List[A] = Nil
 ): List[A] =
   CrossVersion.partialVersion(scalaVersion) match {
+    case partialVersion if isScala213(partialVersion) => if2 ::: if213
+    case partialVersion if isScala212(partialVersion) => if2 ::: if212
     case partialVersion if isScala2(partialVersion) => if2
     case partialVersion if isScala3(partialVersion) => if3
-    case partialVersion if isScala212(partialVersion) => if2 ::: if212
     case _ => Nil
   }
 
@@ -102,9 +104,9 @@ crossScalaVersions := Nil
 lazy val sharedSettings = List(
   scalacOptions ++= crossSetting(
     scalaVersion.value,
-    if2 = List("-target:jvm-1.8", "-Yrangepos", "-deprecation"),
-    if212 = List("-Xexperimental"),
-    if211 = List("-Xexperimental"),
+    if2 = List("-Yrangepos", "-deprecation"),
+    if213 = List("-release", "8"),
+    if212 = List("-Xexperimental", "-target:jvm-1.8"),
     if3 = List("-language:implicitConversions", "-Ximport-suggestion-timeout", "0")
   )
 )
@@ -472,6 +474,9 @@ lazy val docs = project
       ) ++ (jsWorker / Compile / resourceDirectories).value
 
       Some(folders)
+    },
+    dependencyOverrides += {
+      "org.scala-lang.modules" %%% "scala-xml" % "2.1.0"
     },
     mdocVariables := {
       val stableVersion: String =
