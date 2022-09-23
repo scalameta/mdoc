@@ -2,25 +2,24 @@ pull_request_rules:
   - name: Automatic merge
     conditions:
       - author=scalameta-bot
-      - label=library-update
       - check-success=Scalafmt
       - check-success=Website
       - check-success=Windows
-      - check-success='++2.12.12! test' adopt@1.8
-      - check-success='++2.12.16 test' adopt@1.8
-      - check-success='++2.13.8 test' adopt@1.8
-      - check-success='++3.1.3 test' adopt@1.8
-      - check-success=scripted adopt@1.8
-      - check-success='++2.12.12! test' adopt@1.11
-      - check-success='++2.12.16 test' adopt@1.11
-      - check-success='++2.13.8 test' adopt@1.11
-      - check-success='++3.1.3 test' adopt@1.11
-      - check-success=scripted adopt@1.11
-      - check-success='++2.12.12! test' 17
-      - check-success='++2.12.16 test' 17
-      - check-success='++2.13.8 test' 17
-      - check-success='++3.1.3 test' 17
+      - check-success="'++2.12.12! test' adopt@1.8"
+      - check-success="'++2.12.16 test' adopt@1.8"
+      - check-success="'++2.13.8 test' adopt@1.8"
+      - check-success="'++3.1.3 test' adopt@1.8"
+      - check-success="scripted adopt@1.8"
+      - check-success="'++2.12.12! test' adopt@1.11"
+      - check-success="'++2.12.16 test' adopt@1.11"
+      - check-success="'++2.13.8 test' adopt@1.11"
+      - check-success="'++3.1.3 test' adopt@1.11"
+      - check-success="scripted adopt@1.11"
+      - check-success="'++2.12.12! test' 17"
+      - check-success="'++2.12.16 test' 17"
+      - check-success="'++2.13.8 test' 17"
+      - check-success="'++3.1.3 test' 17"
       - check-success=scripted 17
     actions:
       merge:
-        method: rebase
+        method: merge
