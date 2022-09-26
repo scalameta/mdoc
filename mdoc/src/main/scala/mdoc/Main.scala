@@ -10,13 +10,21 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.Markdown
 
-object Main {
-
+object Main extends MainProcess {
   def main(args: Array[String]): Unit = {
     val code = process(args, System.out, PathIO.workingDirectory.toNIO)
     if (code != 0) sys.exit(code)
   }
+}
 
+object SbtMain extends MainProcess {
+  def main(args: Array[String]): Unit = {
+    val code = process(args, System.out, PathIO.workingDirectory.toNIO)
+    if (code != 0) sys.error("mdoc failed")
+  }
+}
+
+trait MainProcess {
   def process(args: Array[String], out: PrintStream, cwd: Path): Int = {
     process(args, new ConsoleReporter(out), cwd)
   }
@@ -28,5 +36,4 @@ object Main {
   def process(settings: MainSettings): Int = {
     MainOps.process(Configured.ok(settings.settings), settings.reporter)
   }
-
 }
