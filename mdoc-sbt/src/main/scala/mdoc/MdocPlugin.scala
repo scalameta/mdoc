@@ -90,7 +90,7 @@ object MdocPlugin extends AutoPlugin {
           parsed
         ).flatten.mkString(" ")
         Def.taskDyn {
-          runMain.in(Compile).toTask(s" mdoc.Main $args")
+          runMain.in(Compile).toTask(s" mdoc.SbtMain $args")
         }
       }.evaluated,
       dependencyOverrides ++= List(
