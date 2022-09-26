@@ -21,4 +21,19 @@ class CheckLinkHygieneSuite extends BaseCliSuite {
     expectedExitCode = 1
   )
 
+  val valid =
+    """/readme.md
+      |# Valid
+    """.stripMargin
+
+  checkCli(
+    "pass",
+    valid,
+    valid,
+    extraArgs = Array(
+      "--check-link-hygiene"
+    ),
+    expectedExitCode = 0
+  )
+
 }
