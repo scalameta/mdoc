@@ -70,7 +70,8 @@ final class MainOps(
         val docs = DocumentLinks.fromGeneratedSite(settings)
         val results = LinkHygiene.lint(docs, settings.verbose)
         LinkHygiene.report(settings.checkLinkHygiene, results, reporter)
-        if (settings.checkLinkHygiene) {
+
+        if (settings.checkLinkHygiene && results.nonEmpty) {
           acc.merge(Exit.error)
         } else {
           acc.merge(Exit.success)
