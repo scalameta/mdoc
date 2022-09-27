@@ -1,0 +1,22 @@
+# valid
+$ copy-file test-docs/valid.md docs/readme.md
+> mdoc
+
+# --check tests 
+## file has not changed to `--check` is expected to succeed
+> set mdocExtraArguments := Seq("--check")
+> mdoc
+## replace the content
+$ copy-file test-docs/valid-check.md docs/readme.md
+-> mdoc
+
+
+# --check-link-hygiene
+## file is valid so mdoc is expected to succeed
+> set mdocExtraArguments := Seq("--check-link-hygiene")
+## replace the content with a markdown with broken links
+$ copy-file test-docs/invalid.md docs/readme.md
+-> mdoc
+
+> set mdocExtraArguments := Seq.empty
+> mdoc # no error, just warnings
