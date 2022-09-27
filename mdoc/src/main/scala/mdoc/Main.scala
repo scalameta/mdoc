@@ -17,6 +17,13 @@ object Main extends MainProcess {
   }
 }
 
+/** This main is meant to be called from a running JVM. Rather than exiting with a non-zero code on
+  * error, it will throw an exception. This is useful when calling from another JVM and you don't
+  * want this JVM to exit and mdoc fails.
+  *
+  * This is the case for the `sbt` integration. When an exception is raised, `sbt` will make the
+  * task as failed but won't exit. This provides a better user experience.
+  */
 object SbtMain extends MainProcess {
   def main(args: Array[String]): Unit = {
     val code = process(args, System.out, PathIO.workingDirectory.toNIO)
