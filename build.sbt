@@ -211,15 +211,7 @@ lazy val mdoc = project
     sharedSettings,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("mdoc").value,
     moduleName := "mdoc",
-    assembly / mainClass := Some("mdoc.Main"),
-    assembly / assemblyJarName := "mdoc.jar",
-    assembly / test := {},
-    assembly / assemblyMergeStrategy ~= { old =>
-      {
-        case PathList("META-INF", "CHANGES") => MergeStrategy.discard
-        case x => old(x)
-      }
-    },
+    Compile / mainClass := Some("mdoc.Main"),
     run / fork := true,
     buildInfoPackage := "mdoc.internal",
     buildInfoKeys := Seq[BuildInfoKey](
