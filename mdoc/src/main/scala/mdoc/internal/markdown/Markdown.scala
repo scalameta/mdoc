@@ -1,6 +1,5 @@
 package mdoc.internal.markdown
 
-import scala.meta.internal.inputs._
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterBlock
 import com.vladsch.flexmark.formatter.Formatter
 import com.vladsch.flexmark.html.HtmlRenderer
