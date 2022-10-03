@@ -1,20 +1,20 @@
 package mdoc.internal.cli
 
+import coursierapi.Dependency
+
+import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import scala.meta.Input
 import scala.meta.Position
+import scala.meta.internal.io.FileIO
+import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import scala.meta.internal.io.PathIO
-import scala.util.control.NonFatal
-import coursierapi.Dependency
-import scala.meta.internal.io.FileIO
-import scala.meta.internal.inputs._
-import java.io.PrintStream
 import scala.util.Try
+import scala.util.control.NonFatal
 
 trait CliEnrichments {
   implicit class XtensionInputMdoc(input: Input) {
@@ -26,6 +26,12 @@ trait CliEnrichments {
           Try(AbsolutePath(Paths.get(v.path)).filename).getOrElse(v.path)
         case _ => input.syntax
       }
+    def syntax: String = input match {
+      case Input.None => "<none>"
+      case Input.File(path, _) => path.toString
+      case Input.VirtualFile(path, _) => path
+      case _ => "<input>"
+    }
     def relativeFilename(sourceroot: AbsolutePath): RelativePath =
       input match {
         case s: Input.Slice =>
@@ -64,7 +70,17 @@ trait CliEnrichments {
     }
   }
 
-  implicit class XtensionPositionMdoc(pos: Position) {
+  implicit class XtensionPositionMdoc(pos: Position) extends InternalInput(pos.input) {
+    def lineContent: String = {
+      val input = pos.input
+      val start = lineToOffset(pos.startLine)
+      val notEof = start < input.chars.length
+      val end = if (notEof) lineToOffset(pos.startLine + 1) else start
+      new String(input.chars, start, end - start).stripLineEnd
+    }
+    def lineCaret: String = {
+      " " * pos.startColumn + "^"
+    }
     def addStart(offset: Int): Position =
       pos match {
         case Position.Range(i, start, end) =>

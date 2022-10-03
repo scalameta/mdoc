@@ -27,7 +27,6 @@ import scala.meta.Classpath
 import scala.meta.AbsolutePath
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
-import scala.meta.internal.inputs.XtensionInputSyntaxStructure
 
 import dotty.tools.dotc.interactive.InteractiveDriver
 import dotty.tools.dotc.interactive.Interactive

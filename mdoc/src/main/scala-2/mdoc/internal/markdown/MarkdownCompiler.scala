@@ -29,7 +29,6 @@ import scala.tools.nsc.io.VirtualDirectory
 import scala.annotation.implicitNotFound
 import mdoc.internal.CompatClassloader
 import mdoc.internal.worksheets.Compat._
-import scala.meta.internal.inputs._
 
 class MarkdownCompiler(
     classpath: String,
