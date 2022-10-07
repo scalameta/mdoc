@@ -173,4 +173,33 @@ class MultiModsSuite extends BaseMarkdownSuite {
        |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     """.stripMargin
   )
+
+  check(
+    "keep non-mdoc directives. basic",
+    """
+      |```scala mdoc title="Example.scala"
+      |val x = 1
+      |```
+    """.stripMargin,
+    """
+      |```scala title="Example.scala"
+      |val x = 1
+      |// x: Int = 1
+      |```
+    """.stripMargin
+  )
+
+  check(
+    "keep non-mdoc directives. mods",
+    """
+      |```scala mdoc:reset:silent title="Example.scala"
+      |val x = 1
+      |```
+    """.stripMargin,
+    """
+      |```scala title="Example.scala"
+      |val x = 1
+      |```
+    """.stripMargin
+  )
 }

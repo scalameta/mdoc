@@ -189,7 +189,7 @@ class Processor(implicit ctx: Context) {
       filename
     )
     rendered.sections.zip(inputs).foreach { case (section, ScalaFenceInput(block, _, mod)) =>
-      block.newInfo = Some("scala")
+      block.newInfo = Some(removeMdocDirective(block.info.value))
       def defaultRender: String =
         Renderer.renderEvaluatedSection(
           rendered,
@@ -296,4 +296,7 @@ class Processor(implicit ctx: Context) {
     }
     (inputs.result(), strings.result(), pres.result())
   }
+
+  private def removeMdocDirective(blockInfo: String): String =
+    blockInfo.replaceAll("""\s+mdoc(:\S+)?""", "")
 }
