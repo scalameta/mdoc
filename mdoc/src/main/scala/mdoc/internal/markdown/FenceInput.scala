@@ -20,7 +20,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
     else {
       if (!string.contains(':')) Some(Modifier.Default())
       else {
-        val mode = string.stripPrefix("scala mdoc:")
+        val mode = string.stripPrefix("scala mdoc:").takeWhile(!_.isWhitespace)
         Modifier(mode)
           .orElse {
             val (name, info) = mode.split(":", 2) match {
