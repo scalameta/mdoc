@@ -1,11 +1,14 @@
 package mdoc.internal.io
 
+import coursierapi.Logger
+import fansi.ErrorMode
+import fansi.Str
+import mdoc.Reporter
+import mdoc.internal.pos.PositionSyntax._
+
 import java.io.PrintStream
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.meta.Position
-import mdoc.Reporter
-import mdoc.internal.pos.PositionSyntax._
-import coursierapi.Logger
 
 class ConsoleReporter(
     ps: PrintStream,
@@ -49,24 +52,24 @@ class ConsoleReporter(
   }
   def error(msg: String): Unit = {
     myErrors += 1
-    ps.println(myError ++ s": $msg")
+    ps.println(myError ++ Str(s": $msg", ErrorMode.Strip))
   }
   def warning(pos: Position, msg: String): Unit = {
     warning(formatMessage(pos.toUnslicedPosition, "warning", msg))
   }
   def warning(msg: String): Unit = {
     myWarnings += 1
-    ps.println(myWarning ++ s": $msg")
+    ps.println(myWarning ++ Str(s": $msg", ErrorMode.Strip))
   }
   def info(pos: Position, msg: String): Unit = {
     info(formatMessage(pos.toUnslicedPosition, "info", msg))
   }
   def info(msg: String): Unit = {
-    ps.println(myInfo ++ s": $msg")
+    ps.println(myInfo ++ Str(s": $msg", ErrorMode.Strip))
   }
   def debug(msg: => String): Unit = {
     if (isDebugEnabled.get()) {
-      ps.println(myDebug ++ s": $msg")
+      ps.println(myDebug ++ Str(s": $msg", ErrorMode.Strip))
     }
   }
 
