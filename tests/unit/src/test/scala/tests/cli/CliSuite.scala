@@ -3,6 +3,7 @@ package tests.cli
 import java.nio.file.Files
 import scala.meta.io.AbsolutePath
 import java.nio.file.Paths
+import tests.markdown.Compat
 
 class CliSuite extends BaseCliSuite {
 
@@ -24,6 +25,43 @@ class CliSuite extends BaseCliSuite {
       |```
     """.stripMargin
   )
+
+  if (!Compat.isScala212)
+    checkCli(
+      "fansi-error",
+      s"""
+         |/index.md
+         |```scala mdoc
+         |val a : "\u001b[2m" = ""
+         |```
+    """.stripMargin,
+      "".stripMargin,
+      expectedExitCode = 1,
+      onStdout = { out =>
+        if (Compat.isScala3)
+          assertNoDiff(
+            out,
+            """|info: Compiling 1 file to <output>
+               |error: index.md:2:18: 
+               |Found:    ("" : String)
+               |Required: ("/u001b[2m" : String)
+               |val a : "" = ""
+               |                 ^^
+               |""".stripMargin
+          )
+        else
+          assertNoDiff(
+            out,
+            """|info: Compiling 1 file to <output>
+               |error: index.md:2:18: type mismatch;
+               | found   : String("")
+               | required: "/u001B[2m"
+               |val a : "" = ""
+               |                 ^^
+               |""".stripMargin
+          )
+      }
+    )
 
   checkCli(
     "classpath",
