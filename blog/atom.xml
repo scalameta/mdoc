@@ -7,7 +7,7 @@
     <link rel="alternate" href="https://scalameta.org/mdoc/mdoc/blog"/>
     <subtitle>The best place to stay up-to-date with the latest mdoc news and events.</subtitle>
     <logo>https://scalameta.org/mdoc/mdoc/img/mdoc-logo.png</logo>
-    <rights>Copyright © 2022 mdoc developers</rights>
+    <rights>Copyright © 2023 mdoc developers</rights>
     <entry>
         <title type="html"><![CDATA[Fast typechecked markdown documentation with clear error messages]]></title>
         <id>https://scalameta.org/mdoc/mdoc/blog/2019/12/30/introduction.html</id>
