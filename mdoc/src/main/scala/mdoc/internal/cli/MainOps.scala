@@ -282,11 +282,16 @@ object MainOps {
               ctx.reporter.setDebugEnabled(true)
             }
             val runner = new MainOps(ctx)
-            val exit = runner.run()
-            if (exit.isSuccess) {
-              0
-            } else {
-              1 // error
+            try {
+              val exit = runner.run()
+              if (exit.isSuccess) {
+                0
+              } else {
+                1 // error
+              }
+            } catch {
+              case _: InterruptedException if ctx.settings.background =>
+                0 // It is expected that we are interrupted when running in the background.
             }
         }
     }

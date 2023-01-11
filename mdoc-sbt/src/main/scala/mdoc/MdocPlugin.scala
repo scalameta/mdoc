@@ -2,7 +2,8 @@ package mdoc
 
 import java.io.File
 import sbt.Keys._
-import sbt._
+import sbt.{taskKey, _}
+
 import scala.collection.mutable.ListBuffer
 
 object MdocPlugin extends AutoPlugin {
@@ -47,6 +48,15 @@ object MdocPlugin extends AutoPlugin {
         "If false, do not add mdoc as a library dependency this project. " +
           "Default value is true."
       )
+    val mdocBgStart =
+      inputKey[JobHandle](
+        "Run mdoc in the background. " +
+          "By default it runs with arguments --watch and --background (via `mdocBgStart/mdocExtraArguments`)."
+      )
+    val mdocBgStop =
+      taskKey[Unit](
+        "Stops mdoc that is running in the background."
+      )
   }
   val mdocInternalVariables =
     settingKey[List[(String, String)]](
@@ -71,19 +81,23 @@ object MdocPlugin extends AutoPlugin {
       "if not provided, the classpath will be formed by resolving the worker dependency"
   )
 
+  // The macro is overzealous and prevents us using this.
+  private val showKey = Def.showFullKey.show _
+
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
       mdocIn := baseDirectory.in(ThisBuild).value / "docs",
       mdocOut := target.in(Compile).value / "mdoc",
       mdocVariables := Map.empty,
       mdocExtraArguments := Nil,
+      mdocExtraArguments.in(mdocBgStart) := Vector("--watch", "--background"),
       mdocJS := None,
       mdocJSLibraries := Nil,
       mdocJSWorkerClasspath := None,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
       mdoc := Def.inputTaskDyn {
-        validateSettings.value
+        val _ = validateSettings.value
         val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
         val args = Iterator(
           mdocExtraArguments.value,
@@ -93,6 +107,55 @@ object MdocPlugin extends AutoPlugin {
           runMain.in(Compile).toTask(s" mdoc.SbtMain $args")
         }
       }.evaluated,
+      // Workaround for https://github.com/sbt/sbt/issues/3572.
+      mdocBgStart := InputTask
+        .createDyn[Seq[String], JobHandle] {
+          InputTask.initParserAsInput(Def.setting {
+            sbt.complete.DefaultParsers.spaceDelimited("<arg>")
+          })
+        } {
+          Def.task { parsed =>
+            Def.taskDyn {
+              val _ = validateSettings.value
+              val args = Iterator(
+                mdocExtraArguments.in(mdocBgStart).value,
+                parsed
+              ).flatten.mkString(" ")
+              val service = bgJobService.value
+              val spawningTask = resolvedScoped.value
+              val s = state.value
+              service.jobs.find(_.spawningTask == spawningTask) match {
+                case Some(jobHandle) =>
+                  Def.task {
+                    s.log.info(s"mdoc is already running in the background")
+                    jobHandle
+                  }
+                case None =>
+                  // Use this rather than bgRunMain so that the spawningTask is set correctly.
+                  Defaults.bgRunMainTask(
+                    exportedProductJars.in(Compile),
+                    fullClasspathAsJars.in(Compile),
+                    bgCopyClasspath.in(Compile, bgRunMain),
+                    runner.in(run)
+                  ).toTask(s" mdoc.SbtMain $args")
+              }
+            }
+          }
+        }.evaluated,
+      mdocBgStop := Def.task {
+        val service = bgJobService.value
+        val spawningTask = resolvedScoped.value.copy(key = mdocBgStart.key)
+        val s = state.value
+        s.log.debug(s"looking for background job that was spawned by ${showKey(spawningTask)}")
+        service.jobs.find(_.spawningTask == spawningTask) match {
+          case Some(jobHandle) =>
+            s.log.info(s"stopping mdoc")
+            service.stop(jobHandle)
+            service.waitFor(jobHandle)
+          case None =>
+            s.log.info(s"mdoc is not running in the background")
+        }
+      }.value,
       dependencyOverrides ++= List(
         "org.scala-lang" %% "scala3-library" % scalaVersion.value,
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,

@@ -105,12 +105,11 @@ performance.
 > docs/mdoc --watch
 ```
 
-If running mdoc as a background job in sbt then you should enable watch mode
-with the `--background` argument so that it is non-interactive and you can
-still issue commands to sbt.
+You can run mdoc in the background so that you can issue other commands to sbt.
 
 ```scala
-> docs/bgRunMain mdoc.SbtMain --watch --background
+> docs/mdocBgStart
+> docs/mdocBgStop
 ```
 
 See [`--help`](#help) to learn more how to use the command-line interface.
