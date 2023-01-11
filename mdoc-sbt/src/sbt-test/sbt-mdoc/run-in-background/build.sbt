@@ -38,7 +38,7 @@ TaskKey[Unit]("check") := {
   val output = new StringBuilder()
   def processOut(out: String): Unit = {
     if (out.endsWith("[info] started sbt server")) {
-      commands.put("mdocBg --watch")
+      commands.put("mdocBg --watch --background")
     } else if (out.endsWith("Waiting for file changes (press enter to interrupt)")) {
       // Wait for the input eating to start.
       Thread.sleep(3000)

@@ -1,6 +1,5 @@
 package mdoc.internal.cli
 
-import com.vladsch.flexmark.parser.Parser
 import io.methvin.watcher.DirectoryChangeEvent
 import io.methvin.watcher.hashing.FileHash
 import io.methvin.watcher.hashing.FileHasher
@@ -13,7 +12,6 @@ import mdoc.internal.livereload.UndertowLiveReload
 import mdoc.internal.markdown.DocumentLinks
 import mdoc.internal.markdown.LinkHygiene
 import mdoc.internal.markdown.Markdown
-import mdoc.internal.markdown.DeadLinkInfo
 import mdoc.internal.pos.DiffUtils
 import metaconfig.Configured
 
@@ -225,7 +223,8 @@ final class MainOps(
 
   def runFileWatcher(): Unit = {
     val executor = Executors.newFixedThreadPool(1)
-    val watcher = MdocFileListener.create(settings.in, executor, System.in)(handleWatchEvent)
+    val in = if (settings.background) None else Some(System.in)
+    val watcher = MdocFileListener.create(settings.in, executor, in)(handleWatchEvent)
     watcher.watchUntilInterrupted()
     this.livereload.foreach(_.stop())
   }
