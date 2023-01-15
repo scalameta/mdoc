@@ -15,7 +15,7 @@ import mdoc.internal.pos.PositionSyntax._
 final class MdocFileListener(
     executor: ExecutorService,
     in: Option[InputStream],
-    runAction: DirectoryChangeEvent => Unit,
+    runAction: DirectoryChangeEvent => Unit
 ) extends DirectoryChangeListener {
   private var myIsWatching: Boolean = true
   private var watcher: DirectoryWatcher = _

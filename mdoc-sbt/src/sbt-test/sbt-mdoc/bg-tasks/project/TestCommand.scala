@@ -1,9 +1,11 @@
 import scala.concurrent.duration._
 
-/**
-  * @param command the command to send
-  * @param expectedOutput expected output of the command
-  * @param delay time to wait before sending the command
+/** @param command
+  *   the command to send
+  * @param expectedOutput
+  *   expected output of the command
+  * @param delay
+  *   time to wait before sending the command
   */
 final case class TestCommand(command: String, expectedOutput: Option[String], delay: FiniteDuration)
 

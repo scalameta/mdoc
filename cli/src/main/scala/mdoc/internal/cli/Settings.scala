@@ -53,7 +53,9 @@ case class Settings(
     @Description("Start a file watcher and incrementally re-generate the site on file save.")
     @ExtraName("w")
     watch: Boolean = false,
-    @Description("Sets the file watcher to run in the background and not ask for user input in order to stop.")
+    @Description(
+      "Sets the file watcher to run in the background and not ask for user input in order to stop."
+    )
     @ExtraName("b")
     background: Boolean = false,
     @Description(

@@ -14,7 +14,10 @@ InputKey[Unit]("mdocBg") := Def.inputTaskDyn {
 
 TaskKey[Unit]("check") := {
   SbtTest.test(
-    TestCommand("mdocBg --watch --background", "Waiting for file changes (press enter to interrupt)"),
+    TestCommand(
+      "mdocBg --watch --background",
+      "Waiting for file changes (press enter to interrupt)"
+    ),
     TestCommand("show version", "[info] 0.1.0-SNAPSHOT", 3.seconds),
     TestCommand("exit")
   )

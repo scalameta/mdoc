@@ -132,16 +132,19 @@ object MdocPlugin extends AutoPlugin {
                   }
                 case None =>
                   // Use this rather than bgRunMain so that the spawningTask is set correctly.
-                  Defaults.bgRunMainTask(
-                    exportedProductJars.in(Compile),
-                    fullClasspathAsJars.in(Compile),
-                    bgCopyClasspath.in(Compile, bgRunMain),
-                    runner.in(run)
-                  ).toTask(s" mdoc.SbtMain $args")
+                  Defaults
+                    .bgRunMainTask(
+                      exportedProductJars.in(Compile),
+                      fullClasspathAsJars.in(Compile),
+                      bgCopyClasspath.in(Compile, bgRunMain),
+                      runner.in(run)
+                    )
+                    .toTask(s" mdoc.SbtMain $args")
               }
             }
           }
-        }.evaluated,
+        }
+        .evaluated,
       mdocBgStop := Def.task {
         val service = bgJobService.value
         val spawningTask = resolvedScoped.value.copy(key = mdocBgStart.key)
