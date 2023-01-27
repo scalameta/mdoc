@@ -6,6 +6,9 @@ object BuildInfo {
   def version: String =
     props.getProperty("version", "0.8.0-SNAPSHOT")
 
+  def scalaJSVersion: String =
+    props.getProperty("scalaJSVersion", "1.12.0")
+
   private lazy val props: Properties = {
     val props = new Properties()
     val path = "sbt-mdoc.properties"
