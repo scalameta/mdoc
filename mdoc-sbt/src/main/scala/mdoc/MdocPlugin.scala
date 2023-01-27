@@ -142,7 +142,15 @@ object MdocPlugin extends AutoPlugin {
         val workerClasspathOverride = mdocJSWorkerClasspath.value
 
         mdocJSCompileOptions.value.foreach { options =>
-          val sjsVersion = detectScalaJSVersion
+          val userSJSVersion = detectScalaJSVersion
+          val mdocSJSVersion = BuildInfo.scalaJSVersion
+          val sjsVersion =
+            (VersionNumber(userSJSVersion)._2, VersionNumber(mdocSJSVersion)._2) match {
+              case (Some(userSJSMinor), Some(mdocSJSMinor)) =>
+                if (userSJSMinor > mdocSJSMinor) userSJSVersion
+                else mdocSJSVersion
+              case _ => mdocSJSVersion // fallback for this unlikely case
+            }
 
           val linkerDependency = binaryVersion match {
             case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
