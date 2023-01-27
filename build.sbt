@@ -215,7 +215,7 @@ lazy val mdoc = project
     buildInfoKeys := Seq[BuildInfoKey](
       version,
       scalaVersion,
-      scalaBinaryVersion,
+      scalaBinaryVersion
     ),
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
