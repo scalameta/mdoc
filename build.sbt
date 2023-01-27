@@ -7,7 +7,6 @@ def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
 // This will work as long as mdoc has scala-js SBT plugin
-def scalajs = MdocPlugin.detectScalaJSVersion
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -425,7 +424,7 @@ lazy val jsWorker =
     .settings(
       sharedSettings,
       moduleName := "mdoc-js-worker",
-      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalajs % Provided) cross CrossVersion.for3Use2_13
+      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion) cross CrossVersion.for3Use2_13
     )
 
 lazy val js = project
@@ -477,7 +476,7 @@ lazy val docs = project
         "VERSION" -> stableVersion,
         "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
         "SCALA_VERSION" -> scalaVersion.value,
-        "SCALAJS_VERSION" -> scalajs,
+        "SCALAJS_VERSION" -> scalaJSVersion,
         "SCALAJS_BINARY_VERSION" -> scalajsBinaryVersion,
         "SCALAJS_DOM_VERSION" -> scalajsDom
       )

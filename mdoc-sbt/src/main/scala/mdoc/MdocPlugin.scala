@@ -159,7 +159,7 @@ object MdocPlugin extends AutoPlugin {
           MdocJSConfiguration(
             scalacOptions = options.options,
             compileClasspath = options.classpath,
-            linkerClassPath = getJars(linkerDependency) ++ workerClasspath,
+            linkerClassPath = workerClasspath,
             moduleKind = options.moduleKind,
             jsLibraries = libraries
           ).writeTo(props)
