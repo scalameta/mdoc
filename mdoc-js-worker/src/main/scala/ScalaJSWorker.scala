@@ -2,6 +2,7 @@ package mdoc.js.worker;
 
 import mdoc.js.interfaces._
 import java.nio.file.Path
+import org.scalajs.ir
 import org.scalajs.linker.MemOutputDirectory
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalajs.linker.StandardImpl
@@ -86,7 +87,7 @@ class ScalaJSWorker(
   }
 
   override def inMemory(path: String, contents: Array[Byte]): ScalajsWorkerApi.IRFile = IFile(
-    new MemIRFileImpl(path, None, contents)
+    new MemIRFileImpl(path, ir.Version.Unversioned, contents)
   )
 
 }
