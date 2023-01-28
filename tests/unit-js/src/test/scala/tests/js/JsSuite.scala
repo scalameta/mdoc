@@ -298,7 +298,7 @@ class JsSuite extends BaseMarkdownSuite {
         """
           |error:
           |no-dom.md:3 (mdoc generated code)
-          | value scalajs is not a member of org
+          | value dom is not a member of org.scalajs
           |def run0(node: _root_.org.scalajs.dom.html.Element): Unit = {
       """.stripMargin
     )
