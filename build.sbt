@@ -2,6 +2,8 @@ import scala.collection.mutable
 
 def scala212 = "2.12.17"
 def scala213 = "2.13.10"
+/* This should be kept at 3.1.3 until there is a
+ * need for change and in that case we should bump to LTS*/
 def scala3 = "3.1.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3

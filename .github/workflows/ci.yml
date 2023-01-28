@@ -43,6 +43,7 @@ jobs:
           - "'++2.12.12! test'"
           - "'++2.12.17 test'"
           - "'++2.13.10 test'"
+          # Minimal supported version
           - "'++3.1.3 test'"
           - "scripted"
     steps:
