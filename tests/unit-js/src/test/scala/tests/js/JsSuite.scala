@@ -282,9 +282,9 @@ class JsSuite extends BaseMarkdownSuite {
       |println(jsdocs.ExampleJS.greeting)
       |```
     """.stripMargin,
-    """|error: no-dom.md:4 (mdoc generated code) object scalajs is not a member of package org
+    """|error: no-dom.md:4 (mdoc generated code) object dom is not a member of package org.scalajs
        |def run0(node: _root_.org.scalajs.dom.html.Element): Unit = {
-       |                          ^
+       |                                  ^
     """.stripMargin,
     settings = {
       val noScalajsDom = Classpath(baseSettings.site("js-classpath")).entries
