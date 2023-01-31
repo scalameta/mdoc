@@ -6,6 +6,7 @@ import mdoc.document._
 import scala.meta._
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
+import scala.util.Try
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.document.DocumentBuilder
 import mdoc.internal.document.MdocNonFatal
@@ -114,7 +115,7 @@ object MarkdownBuilder {
       CompatClassloader
         .getURLs(getClass.getClassLoader)
         .iterator
-        .map(url => AbsolutePath(Paths.get(url.toURI)))
+        .flatMap(url => Try(AbsolutePath(Paths.get(url.toURI))).toOption)
         .filter(p => fn(p.toNIO))
         .toList
     Classpath(paths)
