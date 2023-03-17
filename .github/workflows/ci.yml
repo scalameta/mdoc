@@ -18,7 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0      
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
       - uses: olafurpg/setup-scala@v13
       - run: sbt '++2.12.17 docs/mdoc'
   test-windows:
@@ -26,6 +29,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: adopt@1.11
@@ -47,6 +53,9 @@ jobs:
           - "scripted"
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.java }}
