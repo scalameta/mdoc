@@ -44,16 +44,16 @@ class DependencySuite extends BaseMarkdownSuite {
     "repo".tag(OnlyScala213),
     """
       |```scala mdoc
-      |import $repo.`https://conjars.org/repo/`
-      |import $dep.`org.conjars.cilquirm:cascading-hbase:1.2.10`
-      |cascading.hbase.HBaseTap.SCHEME
+      |import $repo.`https://oss.sonatype.org/content/repositories/snapshots`
+      |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
+      |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
       |```
       | """.stripMargin,
     """|```scala
-       |import $repo.`https://conjars.org/repo/`
-       |import $dep.`org.conjars.cilquirm:cascading-hbase:1.2.10`
-       |cascading.hbase.HBaseTap.SCHEME
-       |// res0: String = "hbase"
+       |import $repo.`https://oss.sonatype.org/content/repositories/snapshots`
+       |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
+       |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
+       |// res0: Boolean = false
        |```
        |""".stripMargin
   )
