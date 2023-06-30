@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: "16"
       - uses: olafurpg/setup-scala@v13
-      - run: sbt '++2.12.17 docs/mdoc'
+      - run: sbt '++2.12.18 docs/mdoc'
   test-windows:
     name: "Windows"
     runs-on: windows-latest
@@ -35,7 +35,7 @@ jobs:
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: adopt@1.11
-      - run: sbt '++2.13.10 test'
+      - run: sbt '++2.13.11 test'
         shell: bash
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
@@ -47,8 +47,8 @@ jobs:
         command:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! test'"
-          - "'++2.12.17 test'"
-          - "'++2.13.10 test'"
+          - "'++2.12.18 test'"
+          - "'++2.13.11 test'"
           # Minimal supported version
           - "'++3.1.3 test'"
           - "scripted"
