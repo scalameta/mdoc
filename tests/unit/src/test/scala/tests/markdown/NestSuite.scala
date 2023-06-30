@@ -159,10 +159,10 @@ class NestSuite extends BaseMarkdownSuite {
     "implicit-ok".tag(SkipScala3),
     """
       |```scala mdoc
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc
       |implicitly[Int]
@@ -170,11 +170,11 @@ class NestSuite extends BaseMarkdownSuite {
     """.stripMargin,
     """|
        |```scala
-       |implicit val x = 1
+       |implicit val x: Int = 1
        |// x: Int = 1
        |```
        |```scala
-       |implicit val x = 1
+       |implicit val x: Int = 1
        |// x: Int = 1
        |```
        |```scala
@@ -219,10 +219,10 @@ class NestSuite extends BaseMarkdownSuite {
     "reset".tag(SkipScala3),
     """
       |```scala mdoc
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:reset
       |implicitly[Int]
@@ -302,28 +302,28 @@ class NestSuite extends BaseMarkdownSuite {
     "multi-reset".tag(SkipScala3),
     """
       |```scala mdoc
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:reset
       |implicitly[Int]
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:reset
       |implicitly[Int]
@@ -345,10 +345,10 @@ class NestSuite extends BaseMarkdownSuite {
     "implicit-nok".tag(SkipScala3),
     """
       |```scala mdoc
-      |implicit val x = 1
+      |implicit val x: Int = 1
       |```
       |```scala mdoc:nest
-      |implicit val y = 1
+      |implicit val y: Int = 1
       |```
       |```scala mdoc
       |implicitly[Int]
