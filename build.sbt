@@ -1,7 +1,7 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.17"
-def scala213 = "2.13.10"
+def scala212 = "2.12.18"
+def scala213 = "2.13.11"
 /* This should be kept at 3.1.3 until there is a
  * need for change and in that case we should bump to LTS*/
 def scala3 = "3.1.3"
@@ -122,9 +122,9 @@ lazy val sharedJavaSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.7.7"
+  val scalameta = "4.7.8"
   val munit = "1.0.0-M7"
-  val coursier = "1.0.16"
+  val coursier = "1.0.18"
   val scalacheck = "1.17.0"
   val pprint = "0.8.1"
   val fansi = "0.4.0"
@@ -321,7 +321,7 @@ lazy val unit = project
     },
     scala212LibraryDependencies(
       List(
-        "io.github.cibotech" %% "evilplot" % "0.8.1"
+        "io.github.cibotech" %% "evilplot" % "0.9.0"
       )
     ),
     libraryDependencies ++= List(
@@ -452,7 +452,7 @@ lazy val docs = project
     mdocAutoDependency := false,
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "io.github.cibotech" %% "evilplot" % "0.8.1"
+      "io.github.cibotech" %% "evilplot" % "0.9.0"
     ),
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
