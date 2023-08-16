@@ -27,7 +27,6 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.annotation.implicitNotFound
-import mdoc.internal.CompatClassloader
 import mdoc.internal.worksheets.Compat._
 
 class MarkdownCompiler(
