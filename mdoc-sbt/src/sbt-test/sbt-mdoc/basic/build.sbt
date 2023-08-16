@@ -1,5 +1,5 @@
 ThisBuild / scalaVersion := "2.12.18"
-ThisBuild / crossScalaVersions := List("2.12.18", "2.13.11", "3.1.3", "3.2.2")
+ThisBuild / crossScalaVersions := List("2.12.18", "2.13.11", "3.1.3", "3.3.0")
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)
