@@ -25,7 +25,7 @@ object CompatClassloader {
         .startsWith("jdk.internal.loader.ClassLoaders$")
     ) {
       try {
-          val unsafeClass = classLoader.loadClass("sun.misc.Unsafe")
+        val unsafeClass = classLoader.loadClass("sun.misc.Unsafe")
         val field = unsafeClass.getDeclaredField("theUnsafe")
         field.setAccessible(true)
         val unsafe = field.get(null)
@@ -39,7 +39,7 @@ object CompatClassloader {
             classLoader.getClass()
           }
         }.getDeclaredField("ucp")
-        
+
         def objectFieldOffset(field: java.lang.reflect.Field): Long =
           unsafeClass
             .getMethod(
@@ -62,7 +62,7 @@ object CompatClassloader {
         val ucpFieldOffset = objectFieldOffset(ucpField)
         val ucpObject = getObject(classLoader, ucpFieldOffset)
 
-        val pathField = ucpField.getType().getDeclaredField("path")        
+        val pathField = ucpField.getType().getDeclaredField("path")
         val pathFieldOffset = objectFieldOffset(pathField)
         val paths: Seq[URL] = getObject(ucpObject, pathFieldOffset)
           .asInstanceOf[java.util.ArrayList[URL]]
