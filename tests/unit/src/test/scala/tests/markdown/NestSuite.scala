@@ -383,6 +383,11 @@ class NestSuite extends BaseMarkdownSuite {
            |Value classes may not be a local class
            |class Foo(val x: Int) extends AnyVal
            |      ^
+           |""".stripMargin,
+      Compat.Scala213 ->
+        """|error: anyval-nok.md:6:7: value class may not be a local class
+           |class Foo(val x: Int) extends AnyVal
+           |      ^^^
            |""".stripMargin
     )
   )
