@@ -89,6 +89,10 @@ object DocusaurusPlugin extends AutoPlugin {
        |call yarn publish-gh-pages
     """.stripMargin
 
+  lazy val yarnBin =
+    if (scala.util.Properties.isWin) "yarn.cmd"
+    else "yarn"
+
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
       aggregate.in(docusaurusPublishGhpages) := false,
@@ -121,8 +125,8 @@ object DocusaurusPlugin extends AutoPlugin {
       },
       docusaurusCreateSite := {
         m.mdoc.in(Compile).toTask(" ").value
-        Process(List("yarn", "install"), cwd = website.value).execute()
-        Process(List("yarn", "run", "build"), cwd = website.value).execute()
+        Process(List(yarnBin, "install"), cwd = website.value).execute()
+        Process(List(yarnBin, "run", "build"), cwd = website.value).execute()
         val redirectUrl = docusaurusProjectName.value + "/index.html"
         val html = redirectHtml(redirectUrl)
         val out = website.value / "build"
