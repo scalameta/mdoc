@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: adopt
       - run: ./bin/scalafmt --test
   docs:
     name: Website
@@ -22,7 +25,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: adopt
       - run: sbt '++2.12.18 docs/mdoc'
   test-windows:
     name: "Windows"
@@ -32,9 +38,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v3
         with:
-          java-version: adopt@1.11
+          java-version: 11
+          distribution: adopt
       - run: sbt '++2.13.12 test'
         shell: bash
   test:
@@ -43,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [adopt@1.8, adopt@1.11, 17]
+        java: [8, 11, 17]
         command:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! test'"
@@ -57,7 +64,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
+          distribution: adopt
       - run: sbt ${{ matrix.command }}
