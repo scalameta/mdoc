@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 11
           distribution: adopt
       - run: ./bin/scalafmt --test
   docs:
@@ -27,7 +27,7 @@ jobs:
           node-version: "16"
       - uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 11
           distribution: adopt
       - run: sbt '++2.12.18 docs/mdoc'
   test-windows:
@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [8, 11, 17]
+        java: [11, 17]
         command:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! test'"

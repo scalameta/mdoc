@@ -15,7 +15,7 @@ jobs:
           node-version: "16"
       - uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 11
           distribution: adopt
       - uses: olafurpg/setup-gpg@v3
       - name: Publish ${{ github.ref }}
