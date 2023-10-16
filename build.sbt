@@ -105,20 +105,14 @@ lazy val sharedSettings = List(
   scalacOptions ++= crossSetting(
     scalaVersion.value,
     if2 = List("-Yrangepos", "-deprecation"),
-    if213 = List("-release", "8"),
-    if212 = List("-Xexperimental", "-target:jvm-1.8"),
+    if213 = List("-release", "11"),
+    if212 = List("-Xexperimental", "-target:11"),
     if3 = List("-language:implicitConversions", "-Ximport-suggestion-timeout", "0")
   )
 )
 
 lazy val sharedJavaSettings = List(
-  javacOptions ++= {
-    val version = System.getProperty("java.version")
-    if (version.startsWith("1.8"))
-      Seq()
-    else
-      Seq("--release", "8")
-  }
+  javacOptions ++= Seq("--release", "11")
 )
 
 val V = new {
