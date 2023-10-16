@@ -265,7 +265,6 @@ class CrashSuite extends BaseMarkdownSuite {
        |// java.lang.ArithmeticException: / by zero
        |//  at repl.MdocSession$MdocApp.hello$1(significant-indentation.md:19)
        |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(significant-indentation.md:20)
-       |//  at repl.MdocSession$MdocApp.$init$$$anonfun$adapted$1(significant-indentation.md:21)
        |```
        |""".stripMargin
   )
