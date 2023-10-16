@@ -106,7 +106,7 @@ lazy val sharedSettings = List(
     scalaVersion.value,
     if2 = List("-Yrangepos", "-deprecation"),
     if213 = List("-release", "11"),
-    if212 = List("-Xexperimental", "-target:11"),
+    if212 = List("-Xexperimental", "-release", "8"),
     if3 = List("-language:implicitConversions", "-Ximport-suggestion-timeout", "0")
   )
 )
