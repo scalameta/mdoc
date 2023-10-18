@@ -2,9 +2,7 @@ import scala.collection.mutable
 
 def scala212 = "2.12.18"
 def scala213 = "2.13.12"
-/* This should be kept at 3.1.3 until there is a
- * need for change and in that case we should bump to LTS*/
-def scala3 = "3.1.3"
+def scala3 = "3.3.1"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
@@ -123,7 +121,7 @@ val V = new {
   val pprint = "0.8.1"
   val fansi = "0.4.0"
   val fs2 = "3.9.2"
-  val metaconfig = "0.11.1"
+  val metaconfig = "0.12.0"
 }
 
 lazy val interfaces = project

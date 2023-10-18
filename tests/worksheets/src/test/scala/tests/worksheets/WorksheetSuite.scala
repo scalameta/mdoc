@@ -2,19 +2,18 @@ package tests.worksheets
 
 import mdoc.interfaces.DiagnosticSeverity
 import mdoc.interfaces.Mdoc
-import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.CompatClassloader
+import mdoc.internal.pos.PositionSyntax._
+import munit.Location
 import munit.TestOptions
-
-import java.lang.StringBuilder
-import java.{util => ju}
-import java.nio.file.Paths
-
-import scala.meta.inputs.Input
-import scala.meta.inputs.Position
-
 import tests.BaseSuite
 import tests.markdown.Compat
+
+import java.lang.StringBuilder
+import java.nio.file.Paths
+import java.{util => ju}
+import scala.meta.inputs.Input
+import scala.meta.inputs.Position
 
 class WorksheetSuite extends BaseSuite {
 
@@ -404,7 +403,7 @@ class WorksheetSuite extends BaseSuite {
         |val xx = fn
         |""".stripMargin,
     """|dotty-ambiguous-implicit:8:12: error:
-       |ambiguous given instances: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
+       |Ambiguous given instances: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
        |val xx = fn
        |           ^
        |""".stripMargin
@@ -485,7 +484,7 @@ class WorksheetSuite extends BaseSuite {
       expected: String,
       compat: Map[Compat.ScalaVersion, String] = Map.empty,
       modifier: Option[String] = None
-  ): Unit = {
+  )(implicit location: Location): Unit = {
     test(options) {
       val filename = options.name + ".scala"
       val worksheet = evaluateWorksheet(filename, original, modifier)
