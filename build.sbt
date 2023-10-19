@@ -103,20 +103,14 @@ lazy val sharedSettings = List(
   scalacOptions ++= crossSetting(
     scalaVersion.value,
     if2 = List("-Yrangepos", "-deprecation"),
-    if213 = List("-release", "8"),
-    if212 = List("-Xexperimental", "-target:jvm-1.8"),
+    if213 = List("-release", "11"),
+    if212 = List("-Xexperimental", "-release", "8"),
     if3 = List("-language:implicitConversions", "-Ximport-suggestion-timeout", "0")
   )
 )
 
 lazy val sharedJavaSettings = List(
-  javacOptions ++= {
-    val version = System.getProperty("java.version")
-    if (version.startsWith("1.8"))
-      Seq()
-    else
-      Seq("--release", "8")
-  }
+  javacOptions ++= Seq("--release", "11")
 )
 
 val V = new {
@@ -185,7 +179,7 @@ lazy val cli = project
     crossScalaVersions := allScalaVersions,
     libraryDependencies ++= List(
       "io.get-coursier" % "interface" % V.coursier,
-      "com.vladsch.flexmark" % "flexmark-all" % "0.62.2",
+      "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "com.lihaoyi" %% "pprint" % V.pprint,
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig
     ),
