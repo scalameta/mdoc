@@ -142,6 +142,12 @@ final case class Text(value: String) extends MarkdownPart {
     } else this
   }
 }
+
+object CodeFence {
+  val tag = "scala mdoc"
+  val taglen = tag.length
+}
+
 final case class CodeFence(
     openBackticks: Text,
     info: Text,
@@ -154,4 +160,22 @@ final case class CodeFence(
   var newBody = Option.empty[String]
   def indent: Int = tag.value.length
   def hasBlankTag: Boolean = tag.value.forall(_.isWhitespace)
+
+  def getMdocMode: Option[String] = {
+    val infoStr = info.value
+    if (!infoStr.startsWith(CodeFence.tag)) None
+    else if (infoStr.length == CodeFence.taglen) Some("")
+    else {
+      val head = infoStr.charAt(CodeFence.taglen)
+      if (head == ':') {
+        val idxSpace = infoStr.indexWhere(_.isWhitespace, CodeFence.taglen + 1)
+        Some(
+          if (idxSpace < 0) infoStr.substring(CodeFence.taglen + 1)
+          else infoStr.substring(CodeFence.taglen + 1, idxSpace)
+        )
+      } else {
+        if (head.isWhitespace) Some("") else None
+      }
+    }
+  }
 }

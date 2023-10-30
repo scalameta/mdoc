@@ -15,13 +15,10 @@ case class StringFenceInput(block: CodeFence, input: Input, mod: Str)
 case class ScalaFenceInput(block: CodeFence, input: Input, mod: Modifier)
 
 class FenceInput(ctx: Context, baseInput: Input) {
-  def getModifier(info: Text): Option[Modifier] = {
-    val string = info.value.stripLineEnd
-    if (!string.startsWith("scala mdoc")) None
-    else {
-      if (!string.contains(':')) Some(Modifier.Default())
+  def getModifier(block: CodeFence): Option[Modifier] = {
+    block.getMdocMode.flatMap { mode =>
+      if (mode.isEmpty) Some(Modifier.Default())
       else {
-        val mode = string.stripPrefix("scala mdoc:").takeWhile(!_.isWhitespace)
         Modifier(mode)
           .orElse {
             val (name, info) = mode.split(":", 2) match {
@@ -47,7 +44,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
               }
           }
           .orElse {
-            invalid(info, s"Invalid mode '$mode'")
+            invalid(block.info, s"Invalid mode '$mode'")
             None
           }
       }
@@ -55,7 +52,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
   }
 
   private def invalid(info: Text, message: String): Unit = {
-    val offset = "scala mdoc:".length
+    val offset = CodeFence.taglen + 1 // includes colon
     val start = info.posBeg + offset
     val end = info.posEnd - 1
     val pos = Position.Range(baseInput, start, end)
@@ -95,7 +92,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
     }
   }
   def unapply(block: CodeFence): Option[ScalaFenceInput] = {
-    getModifier(block.info) match {
+    getModifier(block) match {
       case Some(mod) =>
         if (isValid(block.info, mod)) {
           val input = Input.Slice(baseInput, block.body.posBeg, block.body.posEnd)
