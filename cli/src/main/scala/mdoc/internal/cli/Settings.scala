@@ -156,7 +156,7 @@ case class Settings(
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
     coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
-) {
+) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
 

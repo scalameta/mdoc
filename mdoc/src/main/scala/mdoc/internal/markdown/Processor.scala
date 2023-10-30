@@ -28,6 +28,7 @@ import scala.meta.io.AbsolutePath
 import scala.meta.parsers.Parsed
 import scala.meta.Source
 import mdoc.internal.BuildInfo
+import mdoc.parser.CodeFence
 
 object MdocDialect {
 

@@ -171,6 +171,12 @@ val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 val excludeCollection =
   ExclusionRule(organization = "org.scala-lang.modules", name = "scala-collection-compat_2.13")
 
+lazy val parser = project
+  .settings(
+    sharedSettings,
+    moduleName := "mdoc-parser"
+  )
+
 lazy val cli = project
   .settings(
     sharedSettings,
@@ -197,6 +203,7 @@ lazy val cli = project
       )
     )
   )
+  .dependsOn(parser)
 
 lazy val mdoc = project
   .settings(
@@ -238,7 +245,7 @@ lazy val mdoc = project
       "com.lihaoyi" %% "pprint" % V.pprint
     )
   )
-  .dependsOn(runtime, cli)
+  .dependsOn(parser, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project
@@ -334,7 +341,7 @@ lazy val unit = project
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
     )
   )
-  .dependsOn(mdoc, testsInput, tests)
+  .dependsOn(parser, mdoc, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 lazy val unitJS = project
@@ -485,7 +492,7 @@ def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
     .reduceLeft(_ dependsOn _)
 
 def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
-  val projects = List(runtime, cli, mdoc, js, jsWorker).reverse
+  val projects = List(parser, runtime, cli, mdoc, js, jsWorker).reverse
   projects
     .map(p => localCrossPublishProject(p, scalaV))
     .reduceLeft(_ dependsOn _)
@@ -494,7 +501,7 @@ def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
 def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
   Def.task {
     val versionValue = (ThisBuild / version).value
-    val projects = List(runtime, cli, mdoc, js, jsWorker)
+    val projects = List(parser, runtime, cli, mdoc, js, jsWorker)
     val setttings =
       (ThisBuild / version := versionValue) ::
         projects.map(p => p / scalaVersion := scalaV)
