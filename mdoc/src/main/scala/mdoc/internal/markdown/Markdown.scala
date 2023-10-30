@@ -129,7 +129,6 @@ object Markdown {
     val file = MarkdownFile.parse(
       textWithVariables,
       inputFile,
-      reporter,
       settings
     )
     val processor = new Processor()(context)

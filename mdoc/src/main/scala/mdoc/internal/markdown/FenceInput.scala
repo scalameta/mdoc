@@ -8,6 +8,7 @@ import mdoc.internal.markdown.Modifier.Str
 import mdoc.internal.markdown.Modifier.Default
 import mdoc.internal.markdown.Modifier.Post
 import mdoc.internal.markdown.Modifier.Pre
+import mdoc.parser.{CodeFence, Text}
 
 case class PreFenceInput(block: CodeFence, input: Input, mod: Pre)
 case class StringFenceInput(block: CodeFence, input: Input, mod: Str)
@@ -55,8 +56,8 @@ class FenceInput(ctx: Context, baseInput: Input) {
 
   private def invalid(info: Text, message: String): Unit = {
     val offset = "scala mdoc:".length
-    val start = info.pos.start + offset
-    val end = info.pos.end - 1
+    val start = info.posBeg + offset
+    val end = info.posEnd - 1
     val pos = Position.Range(baseInput, start, end)
     ctx.reporter.error(pos, message)
   }
@@ -97,7 +98,7 @@ class FenceInput(ctx: Context, baseInput: Input) {
     getModifier(block.info) match {
       case Some(mod) =>
         if (isValid(block.info, mod)) {
-          val input = Input.Slice(baseInput, block.body.pos.start, block.body.pos.end)
+          val input = Input.Slice(baseInput, block.body.posBeg, block.body.posEnd)
           Some(ScalaFenceInput(block, input, mod))
         } else {
           None
