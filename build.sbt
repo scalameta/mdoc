@@ -144,9 +144,9 @@ lazy val interfaces = project
     Compile / doc / javacOptions ++= List(
       "-tag",
       "implNote:a:Implementation Note:"
-    )
+    ),
+    javacOptions ++= Seq("--release", "8")
   )
-  .settings(sharedJavaSettings)
 
 lazy val runtime = project
   .settings(
