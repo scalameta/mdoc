@@ -320,7 +320,7 @@ lazy val unit = project
     },
     scala212LibraryDependencies(
       List(
-        "io.github.cibotech" %% "evilplot" % "0.9.0"
+        "io.github.cibotech" %% "evilplot" % "0.9.1"
       )
     ),
     libraryDependencies ++= List(
@@ -451,7 +451,7 @@ lazy val docs = project
     mdocAutoDependency := false,
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
-      "io.github.cibotech" %% "evilplot" % "0.9.0"
+      "io.github.cibotech" %% "evilplot" % "0.9.1"
     ),
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
