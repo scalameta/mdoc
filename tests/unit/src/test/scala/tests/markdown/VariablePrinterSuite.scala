@@ -3,6 +3,44 @@ import mdoc.internal.markdown.ReplVariablePrinter
 
 class VariablePrinterSuite extends BaseMarkdownSuite {
 
+  check(
+    "single-line-comment",
+    """
+      |```scala mdoc
+      |import scala.Some // an import statement
+      |val a = Some(1) // a variable
+      |val b = 2 // another variable
+      |```
+    """.stripMargin,
+    """|```scala
+       |import scala.Some // an import statement
+       |val a = Some(1) // a variable
+       |// a: Some[Int] = Some(value = 1)
+       |val b = 2 // another variable
+       |// b: Int = 2
+       |```
+    """.stripMargin,
+    baseSettings
+  )
+
+  check(
+    "single-line-comment:compile-only",
+    """|```scala mdoc:compile-only
+       |// a
+       |val a = 10
+       |val b = 20 // b
+       |val c = 30
+       |```""".stripMargin,
+    """|```scala
+       |// a
+       |val a = 10
+       |val b = 20 // b
+       |val c = 30
+       |```
+    """.stripMargin,
+    baseSettings
+  )
+
   val trailingComment = baseSettings.copy(variablePrinter = { variable =>
     variable.runtimeValue match {
       case n: Int if variable.totalVariablesInStatement == 1 => s" // Number($n)"
@@ -10,7 +48,7 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     }
   })
 
-  check(
+    check(
     "trailing-comment",
     """
       |```scala mdoc

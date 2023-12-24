@@ -2,6 +2,7 @@ package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.util.regex.Pattern
 import mdoc.Reporter
 import mdoc.Variable
 import mdoc.document.CompileResult
@@ -90,6 +91,7 @@ object Renderer {
     sb.appendMultiline(string, N)
   }
 
+  // Beneath each binding statement, we insert the evaluated variable, e.g., `x: Int = 1`
   def renderEvaluatedSection(
       doc: EvaluatedDocument,
       section: EvaluatedSection,
@@ -108,15 +110,43 @@ object Renderer {
     section.section.statements.zip(section.source.stats).zipWithIndex.foreach {
       case ((statement, tree), statementIndex) =>
         val pos = tree.pos
-        val leadingStart = stats(statementIndex - 1) match {
+        // for each statement, we need to manage:
+        //   1. the leading trivia: whitespace, newlines
+        //   2. a footer: empty until filled on the last statement in the section
+        //   3. and, internally, the trailing single-line comments of the previous statement
+        val (leading, footer) = stats(statementIndex - 1) match {
           case None =>
-            0
+            (Position.Range(input, 0, pos.start).text, "")
           case Some(previousStatement) =>
-            previousStatement.pos.end
+            // for each statement, we need to:
+            //   1. check the previous statement in order to find where the current statement begins
+            //   2. re-split the input, as a workaround to missing comments in 'stats' and `Position.Range`
+            //     a. use the stored comment-less variables to re-split the input
+            //     b. split again on the newline to collect a comment, the trivia, and maybe a footer
+            val escapedPrevStmt = Pattern.quote(previousStatement.toString())
+            val prevWithTrivia = section.source.pos.text.split(escapedPrevStmt, 2).toList
+            val (prevTrailingSingleLineComment, leadingTrivia, footerTrivia) =
+              if (prevWithTrivia.length == 2) {
+                val a2 = prevWithTrivia(1).split(Pattern.quote("\n"), 2)
+                val prevComment = a2(0)
+                val withTrivia = a2(1).split(Pattern.quote(tree.pos.text), 2)
+                val (trivia, foot) = {
+                  // ensure the last statement includes the footer if present
+                  if ((withTrivia.length == 2) && (statementIndex != (totalStats - 1))) (withTrivia(0), "")
+                  else if (withTrivia.length == 2) (withTrivia(0), withTrivia(1).dropWhile(_ != '\n'))
+                  else (tree.pos.text, "")
+                }
+                (prevComment, trivia, foot)
+              }
+              else ("","","")
+            val lead =
+              // if no trailing single-line comments, then we can use the established `Position.Range` system
+              if (prevWithTrivia.length == 0) Position.Range(input, previousStatement.pos.end, pos.start).text
+              else "\n" + leadingTrivia
+            (lead, footerTrivia)
         }
-        val leadingTrivia = Position.Range(input, leadingStart, pos.start)
         if (!section.mod.isFailOrWarn) {
-          sb.append(leadingTrivia.text)
+          sb.append(leading )
         }
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
@@ -177,8 +207,9 @@ object Renderer {
                 section.mod
               )
               sb.append(printer(variable))
-          }
+          } 
         }
+        sb.append(footer)
     }
     baos.toString.trim
   }
