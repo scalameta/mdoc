@@ -211,6 +211,8 @@ class DefaultSuite extends BaseMarkdownSuite {
       |val (a, b) = Future.successful(Try(1)) -> 2
       |
       |Future.successful(Try(1))
+      |
+      |// penultimate
       |```
     """.stripMargin,
     """|```scala
@@ -226,6 +228,8 @@ class DefaultSuite extends BaseMarkdownSuite {
        |
        |Future.successful(Try(1))
        |// res1: Future[Try[Int]] = Future(Success(Success(1)))
+       |
+       |// penultimate
        |```
     """.stripMargin
   )
@@ -272,7 +276,8 @@ class DefaultSuite extends BaseMarkdownSuite {
       |
       |/** Docstring */
       |class User()
-      |```
+      |
+      |// ultimate```
     """.stripMargin,
     """|```scala
        |/* Comment 1 */
@@ -290,7 +295,8 @@ class DefaultSuite extends BaseMarkdownSuite {
        |
        |/** Docstring */
        |class User()
-       |```
+       |
+       |// ultimate```
     """.stripMargin
   )
 
