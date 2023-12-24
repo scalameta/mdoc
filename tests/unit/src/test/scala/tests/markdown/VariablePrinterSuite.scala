@@ -48,7 +48,7 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     }
   })
 
-    check(
+  check(
     "trailing-comment",
     """
       |```scala mdoc

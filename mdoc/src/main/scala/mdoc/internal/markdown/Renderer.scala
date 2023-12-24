@@ -207,7 +207,7 @@ object Renderer {
                 section.mod
               )
               sb.append(printer(variable))
-          } 
+          }
         }
         sb.append(footer)
     }
