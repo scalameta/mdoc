@@ -7,15 +7,15 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     "single-line-comment",
     """
       |```scala mdoc
-      |import scala.Some // an import statement
-      |val a = Some(1) // a variable
+      |import scala.None // an import statement
+      |val a = None // a variable
       |val b = 2 // another variable
       |```
     """.stripMargin,
     """|```scala
-       |import scala.Some // an import statement
-       |val a = Some(1) // a variable
-       |// a: Some[Int] = Some(value = 1)
+       |import scala.None // an import statement
+       |val a = None // a variable
+       |// a: None.type = None
        |val b = 2 // another variable
        |// b: Int = 2
        |```
