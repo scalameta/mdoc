@@ -118,32 +118,23 @@ object Renderer {
           case None =>
             (Position.Range(input, 0, pos.start).text, "")
           case Some(previousStatement) =>
-            // for each statement, we need to:
-            //   1. check the previous statement in order to find where the current statement begins
-            //   2. re-split the input, as a workaround to missing comments in 'stats' and `Position.Range`
-            //     a. use the stored comment-less variables to re-split the input
-            //     b. split again on the newline to collect a comment, the trivia, and maybe a footer
-            val escapedPrevStmt = Pattern.quote(previousStatement.toString())
-            val prevWithTrivia = section.source.pos.text.split(escapedPrevStmt, 2).toList
-            val (prevTrailingSingleLineComment, leadingTrivia, footerTrivia) =
-              if (prevWithTrivia.length == 2) {
-                val a2 = prevWithTrivia(1).split(Pattern.quote("\n"), 2)
-                val prevComment = a2(0)
-                val withTrivia = a2(1).split(Pattern.quote(tree.pos.text), 2)
-                val (trivia, foot) = {
-                  // ensure the last statement includes the footer if present
-                  if ((withTrivia.length == 2) && (statementIndex != (totalStats - 1))) (withTrivia(0), "")
-                  else if (withTrivia.length == 2) (withTrivia(0), withTrivia(1).dropWhile(_ != '\n'))
-                  else (tree.pos.text, "")
-                }
-                (prevComment, trivia, foot)
-              }
-              else ("","","")
+            val betweenStatements =
+              section.source.pos.text.substring(previousStatement.pos.end, pos.start)
+            val Array(prevTrailingSingleLineComment, leadingTrivia) =
+              betweenStatements.split(Pattern.quote("\n"), 2)
+            val footerAtEnd = {
+              if (statementIndex != (totalStats - 1)) ""
+              else section.source.pos.text.substring(pos.end)
+            }
             val lead =
               // if no trailing single-line comments, then we can use the established `Position.Range` system
-              if (prevWithTrivia.length == 0) Position.Range(input, previousStatement.pos.end, pos.start).text
+              if (prevTrailingSingleLineComment.length == 0)
+                Position.Range(input, previousStatement.pos.end, pos.start).text
               else "\n" + leadingTrivia
-            (lead, footerTrivia)
+            val footer = footerAtEnd.split(Pattern.quote("\n")).drop(1)
+            if (footer.nonEmpty)
+              (lead, footer.mkString("\n", "\n", ""))
+            else (lead, "")
         }
         if (!section.mod.isFailOrWarn) {
           sb.append(leading )
