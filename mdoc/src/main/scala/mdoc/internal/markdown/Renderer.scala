@@ -2,7 +2,6 @@ package mdoc.internal.markdown
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import java.util.regex.Pattern
 import mdoc.Reporter
 import mdoc.Variable
 import mdoc.document.CompileResult
@@ -118,26 +117,15 @@ object Renderer {
           case None =>
             (Position.Range(input, 0, pos.start).text, "")
           case Some(previousStatement) =>
-            val betweenStatements =
-              section.source.pos.text.substring(previousStatement.pos.end, pos.start)
             val Array(prevTrailingSingleLineComment, leadingTrivia) =
-              betweenStatements.split(Pattern.quote("\n"), 2)
-            val footerAtEnd = {
+              section.source.pos.text.substring(previousStatement.pos.end, pos.start).split("\n", 2)
+            val foot =
               if (statementIndex != (totalStats - 1)) ""
-              else section.source.pos.text.substring(pos.end)
-            }
-            val lead =
-              // if no trailing single-line comments, then we can use the established `Position.Range` system
-              if (prevTrailingSingleLineComment.length == 0)
-                Position.Range(input, previousStatement.pos.end, pos.start).text
-              else "\n" + leadingTrivia
-            val footer = footerAtEnd.split(Pattern.quote("\n")).drop(1)
-            if (footer.nonEmpty)
-              (lead, footer.mkString("\n", "\n", ""))
-            else (lead, "")
+              else section.source.pos.text.substring(pos.end).split("\n").drop(1).mkString("\n", "\n", "")
+            ("\n" + leadingTrivia, foot)
         }
         if (!section.mod.isFailOrWarn) {
-          sb.append(leading )
+          sb.append(leading)
         }
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
