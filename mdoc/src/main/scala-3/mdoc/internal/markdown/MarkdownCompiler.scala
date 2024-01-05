@@ -28,13 +28,12 @@ import scala.meta.AbsolutePath
 import scala.meta.inputs.Input
 import scala.meta.inputs.Position
 
-import dotty.tools.dotc.interactive.InteractiveDriver
-import dotty.tools.dotc.interactive.Interactive
-import dotty.tools.dotc.interactive.InteractiveCompiler
+import dotty.tools.dotc.Driver
 import dotty.tools.dotc.core.Contexts.{Context, FreshContext}
 import dotty.tools.dotc.config.Settings.Setting._
 import dotty.tools.dotc.interfaces.SourcePosition
 import dotty.tools.dotc.ast.Trees.Tree
+import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.interfaces.{SourceFile => ISourceFile}
 import dotty.tools.dotc.interfaces.{Diagnostic => IDiagnostic}
 import dotty.tools.dotc.reporting._
@@ -46,19 +45,46 @@ import dotty.tools.dotc.util.SourceFile
 
 import scala.annotation.implicitNotFound
 
+class MarkdownDriver(val settings: List[String]) extends Driver {
+
+  /* Otherwise it will print usage instructions */
+  override protected def sourcesRequired: Boolean = false
+
+  def currentCtx = myInitCtx
+
+  private val myInitCtx: Context = {
+    val rootCtx = initCtx.fresh
+    val ctx = setup(settings.toArray, rootCtx) match
+      case Some((_, ctx)) => ctx
+      case None => rootCtx
+    ctx.initialize()(using ctx)
+    ctx
+  }
+}
+
 class MarkdownCompiler(
     classpath: String,
     val scalacOptions: String,
     target: AbstractFile = new VirtualDirectory("(memory)")
 ) {
 
+  private val defaultFlags =
+    List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
+  private val defaultFlagSet = defaultFlags.filter(_.startsWith("-")).toSet
+
   private def newContext: FreshContext = {
-    val defaultFlags =
-      List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
-    val options = scalacOptions.split("\\s+").toList
+    def removeDuplicatedOptions(options: List[String]): List[String] =
+      options match
+        case head :: next :: tail if defaultFlagSet(head) && !next.startsWith("-") =>
+          removeDuplicatedOptions(tail)
+        case head :: tail if defaultFlagSet(head) => head :: removeDuplicatedOptions(tail)
+        case head :: tail => head :: removeDuplicatedOptions(tail)
+        case Nil => options
+
+    val options = removeDuplicatedOptions(scalacOptions.split("\\s+").filter(_.nonEmpty).toList)
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
-    val driver = new InteractiveDriver(settings.distinct)
+    val driver = new MarkdownDriver(settings)
 
     val ctx = driver.currentCtx.fresh
 
