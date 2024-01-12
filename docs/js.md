@@ -71,8 +71,11 @@ configuration
 cat <<EOT > mdoc.properties
 js-classpath=$(coursier fetch org.scala-js:scalajs-library_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ org.scala-js:scalajs-dom_sjs@SCALAJS_BINARY_VERSION@_@SCALA_BINARY_VERSION@:@SCALAJS_DOM_VERSION@ -p)
 js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_@SCALA_VERSION@:@SCALAJS_VERSION@)
+js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_VERSION@:@@VERSION@ org.scala-js:scalajs-linker_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ -p)
 EOT
 ```
+
+Note: For scala 3, you may need `js-scalac-options=--scala-js` - this is currently untested.
 
 Next, create a basic Markdown files with an `mdoc:js` modifier:
 
@@ -402,7 +405,7 @@ By default, mdoc will re-use the Scala.js linker, exercising its ability to work
 incrementally. This can speed up linking and optimization dramatically.
 
 If incremental linking is causing issues in your project, use can use `js-batch-mode`
-site variable to enable batch mode (which will discard intermediate linker state 
+site variable to enable batch mode (which will discard intermediate linker state
 after processing each file):
 
 ```scala
