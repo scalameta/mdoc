@@ -92,8 +92,10 @@ configuration</p>
 <pre><code class="hljs css language-sh">cat &lt;&lt;EOT &gt; mdoc.properties
 js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:1.13.0 org.scala-js:scalajs-dom_sjs1_2.12:2.0.0 -p)
 js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.18:1.13.0)
+js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_2.12:@VERSION@ org.scala-js:scalajs-linker_2.12:1.13.0 -p)
 EOT
 </code></pre>
+<p>Note: For scala 3, you may need <code>js-scalac-options=--scala-js</code> - this is currently untested.</p>
 <p>Next, create a basic Markdown files with an <code>mdoc:js</code> modifier:</p>
 <pre><code class="hljs css language-sh">mkdir docs
 cat &lt;&lt;EOT &gt; docs/index.md
