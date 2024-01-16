@@ -251,6 +251,8 @@ class JsModifier extends mdoc.PreModifier {
       }
 
     runs += code
+    println(remainingMods.isEmpty)
+    println(remainingMods.mkString("", " ", "\n"))
     new CodeBuilder()
       .printIf(!mods.isInvisible, s"```scala")
       .printIf(!remainingMods.isEmpty && !mods.isInvisible, remainingMods.mkString(" ", " ", ""))
