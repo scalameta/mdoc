@@ -4,6 +4,10 @@ import mdoc.Reporter
 import mdoc.internal.pos.PositionSyntax._
 import scala.annotation.tailrec
 import scala.meta.inputs.Input
+import mdoc.parser.Text
+import mdoc.internal.markdown.LinkHygiene
+
+case class AllMods(jsMods: Option[JsMods], otherMods: Array[String])
 
 class JsMods private (val mods: Set[String]) {
   def isShared: Boolean = mods("shared")
@@ -13,7 +17,7 @@ class JsMods private (val mods: Set[String]) {
 }
 
 object JsMods {
-  val all = Set("shared", "invisible", "compile-only")
+  val validFences = Set("shared", "invisible", "compile-only")
   def parse(info: Input, reporter: Reporter): Option[JsMods] = {
     val text = info.text
     @tailrec def loop(from: Int, accum: Set[String]): Option[Set[String]] = {
@@ -25,7 +29,7 @@ object JsMods {
         } else {
           text.substring(from, colon)
         }
-        val isValid = all.contains(mod)
+        val isValid = validFences.contains(mod)
         if (isValid && colon < 0) {
           loop(text.length + 1, accum + mod)
         } else if (isValid) {
@@ -47,6 +51,21 @@ object JsMods {
       } else {
         Some(mods)
       }
+    }
+  }
+
+  def parse(fences: Text, info: Input, reporter: Reporter): AllMods = {
+    val jsMods = parse(info, reporter)
+
+    if( reporter.hasErrors ) {
+      AllMods(jsMods, Array[String]())
+    } else {
+      // We already know that the scala fences are valid.
+      val fenceBlocks = fences.value.split(" ")
+      val dropScala = fenceBlocks.tail // first entry is scala
+      val remainingFences = dropScala.filterNot(_.contains("mdoc:js"))
+      // println(remainingFences.mkString(" ", " ", ""))
+      AllMods(jsMods, remainingFences)
     }
   }
 }
