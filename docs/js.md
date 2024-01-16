@@ -71,7 +71,7 @@ configuration
 cat <<EOT > mdoc.properties
 js-classpath=$(coursier fetch org.scala-js:scalajs-library_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ org.scala-js:scalajs-dom_sjs@SCALAJS_BINARY_VERSION@_@SCALA_BINARY_VERSION@:@SCALAJS_DOM_VERSION@ -p)
 js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_@SCALA_VERSION@:@SCALAJS_VERSION@)
-js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_VERSION@:@@VERSION@ org.scala-js:scalajs-linker_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ -p)
+js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_VERSION@:@VERSION@ org.scala-js:scalajs-linker_@SCALA_BINARY_VERSION@:@SCALAJS_VERSION@ -p)
 EOT
 ```
 
