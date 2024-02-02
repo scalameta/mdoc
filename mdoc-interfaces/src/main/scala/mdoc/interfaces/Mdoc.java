@@ -1,11 +1,12 @@
 package mdoc.interfaces;
 
 import java.util.List;
+import java.util.Map;
 import java.nio.file.Path;
 import java.io.PrintStream;
 
 public abstract class Mdoc {
-
+  public abstract EvaluatedMarkdownDocument evaluateMarkdownDocument(String filename, String text, Map<String, String> variables);
   public abstract EvaluatedWorksheet evaluateWorksheet(String filename, String text);
   public abstract EvaluatedWorksheet evaluateWorksheet(String filename, String text, String modifier);
   public abstract Mdoc withWorkingDirectory(Path workingDirectory);
