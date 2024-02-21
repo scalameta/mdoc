@@ -63,7 +63,11 @@ object MarkdownBuilder {
                   )
                   slice.toUnslicedPosition
                 }
-              reporter.error(pos, e.getCause)
+              e.getCause match {
+                case cause: ExceptionInInitializerError if cause.getCause != null =>
+                  reporter.error(pos, cause.getCause)
+                case cause => reporter.error(pos, cause)
+              }
               evaluatedDoc = Document(instrumentedInput, e.sections)
             case MdocNonFatal(e) =>
               reporter.error(e)

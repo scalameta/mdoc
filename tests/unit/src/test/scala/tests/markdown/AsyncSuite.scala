@@ -34,7 +34,7 @@ class AsyncSuite extends BaseMarkdownSuite {
        |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:223)
        |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:57)
        |	at scala.concurrent.Await$.result(package.scala:146)
-       |	at repl.MdocSession$MdocApp.<init>(timeout.md:11)
+       |	at repl.MdocSession$MdocApp$.<init>(timeout.md:11)
        |	at repl.MdocSession$.app(timeout.md:3)
        |""".stripMargin,
     compat = Map(
@@ -48,7 +48,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$$anonfun$result$1.apply(package.scala:190)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:53)
            |	at scala.concurrent.Await$.result(package.scala:190)
-           |	at repl.MdocSession$MdocApp.<init>(timeout.md:11)
+           |	at repl.MdocSession$MdocApp$.<init>(timeout.md:11)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
       Compat.Scala213 ->
@@ -61,7 +61,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:201)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
            |	at scala.concurrent.Await$.result(package.scala:124)
-           |	at repl.MdocSession$MdocApp.<init>(timeout.md:11)
+           |	at repl.MdocSession$MdocApp$.<init>(timeout.md:11)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
       Compat.Scala3 ->
@@ -74,7 +74,7 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:201)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:62)
            |	at scala.concurrent.Await$.result(package.scala:124)
-           |	at repl.MdocSession$MdocApp.<init>(timeout.md:13)
+           |	at repl.MdocSession$MdocApp$.<init>(timeout.md:13)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin
     )

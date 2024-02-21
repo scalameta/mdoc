@@ -35,7 +35,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |???
            |// scala.NotImplementedError: an implementation is missing
            |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
-           |// 	at repl.MdocSession$MdocApp.$init$$anonfun$3(basic.md:14)
+           |// 	at repl.MdocSession$MdocApp$.$init$$anonfun$3(basic.md:14)
            |```
     """.stripMargin
     )
@@ -93,7 +93,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |  case 2 => // boom!
            |}
            |// scala.MatchError: 1 (of class java.lang.Integer)
-           |// 	at repl.MdocSession$MdocApp.$init$$anonfun$1(comments.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$anonfun$1(comments.md:9)
            |//  at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
            |```
     """.stripMargin
@@ -130,7 +130,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |???
            |// scala.NotImplementedError: an implementation is missing
            |// 	at scala.Predef$.$qmark$qmark$qmark(Predef.scala:347)
-           |// 	at repl.MdocSession$MdocApp.$init$$anonfun$1(relative.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$anonfun$1(relative.md:9)
            |```
     """.stripMargin
     )
@@ -155,7 +155,7 @@ class CrashSuite extends BaseMarkdownSuite {
         """|```scala
            |throw new StackOverflowError()
            |// java.lang.StackOverflowError
-           |// 	at repl.MdocSession$MdocApp.$init$$$anonfun$1(fatal.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$$anonfun$1(fatal.md:9)
            |```
            |""".stripMargin
     )
@@ -180,7 +180,7 @@ class CrashSuite extends BaseMarkdownSuite {
         """|```scala
            |throw new NoClassDefFoundError()
            |// java.lang.NoClassDefFoundError
-           |// 	at repl.MdocSession$MdocApp.$init$$$anonfun$1(fatal2.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$$anonfun$1(fatal2.md:9)
            |```
            |""".stripMargin
     )
@@ -205,7 +205,7 @@ class CrashSuite extends BaseMarkdownSuite {
         """|```scala
            |throw new NoSuchMethodError()
            |// java.lang.NoSuchMethodError
-           |// 	at repl.MdocSession$MdocApp.$init$$$anonfun$1(fatal3.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$$anonfun$1(fatal3.md:9)
            |```
            |""".stripMargin
     )
@@ -230,7 +230,7 @@ class CrashSuite extends BaseMarkdownSuite {
         """|```scala
            |throw new IncompatibleClassChangeError()
            |// java.lang.IncompatibleClassChangeError
-           |// 	at repl.MdocSession$MdocApp.$init$$$anonfun$1(fatal4.md:9)
+           |// 	at repl.MdocSession$MdocApp$.$init$$$anonfun$1(fatal4.md:9)
            |```
            |""".stripMargin
     )
@@ -263,8 +263,8 @@ class CrashSuite extends BaseMarkdownSuite {
        |    x / 0
        |hello(5)
        |// java.lang.ArithmeticException: / by zero
-       |//  at repl.MdocSession$MdocApp.hello$1(significant-indentation.md:19)
-       |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(significant-indentation.md:20)
+       |//  at repl.MdocSession$MdocApp$.hello$1(significant-indentation.md:19)
+       |//  at repl.MdocSession$MdocApp$.$init$$$anonfun$1(significant-indentation.md:20)
        |```
        |""".stripMargin
   )

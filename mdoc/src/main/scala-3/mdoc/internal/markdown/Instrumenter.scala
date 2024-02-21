@@ -179,8 +179,8 @@ object Instrumenter {
     val cb = new CodePrinter(ps)
     cb.println("package repl")
     cb.definition("object MdocSession extends _root_.mdoc.internal.document.DocumentBuilder") {
-      _.println("def app(): _root_.scala.Unit = {val _ = new MdocApp()}")
-        .definition("class MdocApp") {
+      _.println("def app(): _root_.scala.Unit = {val _ = MdocApp}")
+        .definition("object MdocApp") {
           _.appendLines(body)
         }
 

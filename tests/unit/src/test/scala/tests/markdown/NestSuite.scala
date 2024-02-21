@@ -355,7 +355,7 @@ class NestSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """|error: implicit-nok.md:9:1: ambiguous implicit values:
-       | both value x in class MdocApp of type => Int
+       | both value x in object MdocApp of type => Int
        | and value y of type Int
        | match expected type Int
        |implicitly[Int]
@@ -414,8 +414,8 @@ class NestSuite extends BaseMarkdownSuite {
        |boom(x > 4)
        |^^^^^^^^^^^
        |java.lang.IllegalArgumentException
-       |	at repl.MdocSession$MdocApp.boom$1(stacktrace.md:32)
-       |	at repl.MdocSession$MdocApp.<init>(stacktrace.md:35)
+       |	at repl.MdocSession$MdocApp$.boom$1(stacktrace.md:32)
+       |	at repl.MdocSession$MdocApp$.<init>(stacktrace.md:35)
        |	at repl.MdocSession$.app(stacktrace.md:3)
        |""".stripMargin,
     compat = Map(
@@ -424,8 +424,8 @@ class NestSuite extends BaseMarkdownSuite {
            |boom(x > 4)
            |^^^^^^^^^^^
            |java.lang.IllegalArgumentException
-           |	at repl.MdocSession$MdocApp.boom$1(stacktrace.md:32)
-           |	at repl.MdocSession$MdocApp.<init>(stacktrace.md:36)
+           |	at repl.MdocSession$MdocApp$.boom$1(stacktrace.md:32)
+           |	at repl.MdocSession$MdocApp$.<init>(stacktrace.md:36)
            |	at repl.MdocSession$.app(stacktrace.md:3)
            |""".stripMargin
     )

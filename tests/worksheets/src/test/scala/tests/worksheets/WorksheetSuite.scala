@@ -288,8 +288,8 @@ class WorksheetSuite extends BaseSuite {
       |crash(filename)
       |""".stripMargin,
     """|crash:4:1: error: java.lang.RuntimeException: boom
-       |	at repl.MdocSession$MdocApp.crash(crash.scala:8)
-       |	at repl.MdocSession$MdocApp.<init>(crash.scala:14)
+       |	at repl.MdocSession$MdocApp$.crash(crash.scala:8)
+       |	at repl.MdocSession$MdocApp$.<init>(crash.scala:14)
        |	at repl.MdocSession$.app(crash.scala:3)
        |
        |crash(filename)
@@ -298,8 +298,8 @@ class WorksheetSuite extends BaseSuite {
     compat = Map(
       Compat.Scala3 ->
         """|crash:4:1: error: java.lang.RuntimeException: boom
-           |	at repl.MdocSession$MdocApp.crash(crash.scala:7)
-           |	at repl.MdocSession$MdocApp.<init>(crash.scala:15)
+           |	at repl.MdocSession$MdocApp$.crash(crash.scala:7)
+           |	at repl.MdocSession$MdocApp$.<init>(crash.scala:15)
            |	at repl.MdocSession$.app(crash.scala:3)
            |
            |crash(filename)
@@ -403,7 +403,7 @@ class WorksheetSuite extends BaseSuite {
         |val xx = fn
         |""".stripMargin,
     """|dotty-ambiguous-implicit:8:12: error:
-       |Ambiguous given instances: both object c1 in class MdocApp and object c2 in class MdocApp match type MdocApp.this.C of parameter c of method fn in class MdocApp
+       |Ambiguous given instances: both object c1 in object MdocApp and object c2 in object MdocApp match type repl.MdocSession.MdocApp.C of parameter c of method fn in object MdocApp
        |val xx = fn
        |           ^
        |""".stripMargin
@@ -475,6 +475,41 @@ class WorksheetSuite extends BaseSuite {
     """|def x = 1 -> 2
        |<val (a, _) = x> // : Int = 1
        |a: Int = 1
+       |""".stripMargin
+  )
+
+  checkDecorations(
+    "metals-i4796",
+    """|class Animal(age: Int)
+       |
+       |class Rabbit(age: Int) extends Animal(age) {
+       |  val id = Rabbit.tag
+       |  Rabbit.tag += 1
+       |  def getId = id
+       |}
+       |
+       |object Rabbit {
+       |  val basic = new Rabbit(0)
+       |  var tag: Int = 0
+       |}
+       |
+       |val peter = new Rabbit(2).getId
+       |""".stripMargin,
+    """|class Animal(age: Int)
+       |
+       |class Rabbit(age: Int) extends Animal(age) {
+       |  val id = Rabbit.tag
+       |  Rabbit.tag += 1
+       |  def getId = id
+       |}
+       |
+       |object Rabbit {
+       |  val basic = new Rabbit(0)
+       |  var tag: Int = 0
+       |}
+       |
+       |<val peter = new Rabbit(2).getId> // : Int = 0
+       |peter: Int = 0
        |""".stripMargin
   )
 
