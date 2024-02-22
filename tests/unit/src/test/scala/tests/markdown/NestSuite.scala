@@ -69,7 +69,7 @@ class NestSuite extends BaseMarkdownSuite {
        |val hakon = User("Hakon", 42)
        |// hakon: User = User("Hakon", 42)
        |susan
-       |// res0: MdocApp.this.type.User = User("Susan")
+       |// res0: MdocApp.User = User("Susan")
        |```
        |""".stripMargin,
     compat = Map(
@@ -84,7 +84,7 @@ class NestSuite extends BaseMarkdownSuite {
            |val hakon = User("Hakon", 42)
            |// hakon: User = User(name = "Hakon", age = 42)
            |susan
-           |// res0: MdocApp.this.type.User = User(name = "Susan")
+           |// res0: MdocApp.User = User(name = "Susan")
            |```
            |""".stripMargin,
       Compat.Scala3 ->
@@ -426,6 +426,16 @@ class NestSuite extends BaseMarkdownSuite {
            |java.lang.IllegalArgumentException
            |	at repl.MdocSession$MdocApp$.boom$1(stacktrace.md:32)
            |	at repl.MdocSession$MdocApp$.<init>(stacktrace.md:36)
+           |	at repl.MdocSession$.app(stacktrace.md:3)
+           |""".stripMargin,
+      Compat.Scala212 ->
+        """|error: stacktrace.md:14:1: null
+           |boom(x > 4)
+           |^^^^^^^^^^^
+           |java.lang.IllegalArgumentException
+           |	at repl.MdocSession$MdocApp$.boom$1(stacktrace.md:32)
+           |	at repl.MdocSession$MdocApp$.<init>(stacktrace.md:35)
+           |	at repl.MdocSession$MdocApp$.<clinit>(stacktrace.md)
            |	at repl.MdocSession$.app(stacktrace.md:3)
            |""".stripMargin
     )

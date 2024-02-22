@@ -304,6 +304,16 @@ class WorksheetSuite extends BaseSuite {
            |
            |crash(filename)
            |^^^^^^^^^^^^^^^
+           |""".stripMargin,
+      Compat.Scala212 ->
+        """|crash:4:1: error: java.lang.RuntimeException: boom
+           |	at repl.MdocSession$MdocApp$.crash(crash.scala:8)
+           |	at repl.MdocSession$MdocApp$.<init>(crash.scala:14)
+           |	at repl.MdocSession$MdocApp$.<clinit>(crash.scala)
+           |	at repl.MdocSession$.app(crash.scala:3)
+           |
+           |crash(filename)
+           |^^^^^^^^^^^^^^^
            |""".stripMargin
     )
   )

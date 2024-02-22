@@ -35,6 +35,7 @@ class AsyncSuite extends BaseMarkdownSuite {
        |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:57)
        |	at scala.concurrent.Await$.result(package.scala:146)
        |	at repl.MdocSession$MdocApp$.<init>(timeout.md:11)
+       |	at repl.MdocSession$MdocApp$.<clinit>(timeout.md)
        |	at repl.MdocSession$.app(timeout.md:3)
        |""".stripMargin,
     compat = Map(

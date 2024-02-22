@@ -342,7 +342,18 @@ class DefaultSuite extends BaseMarkdownSuite {
        |java.lang.StackOverflowError
        |	at repl.MdocSession$MdocApp$.<init>(fatal-exception.md:8)
        |	at repl.MdocSession$.app(fatal-exception.md:3)
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala212 ->
+        """|error: fatal-exception.md:3:1: null
+           |throw new StackOverflowError()
+           |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           |java.lang.StackOverflowError
+           |	at repl.MdocSession$MdocApp$.<init>(fatal-exception.md:8)
+           |	at repl.MdocSession$MdocApp$.<clinit>(fatal-exception.md)
+           |	at repl.MdocSession$.app(fatal-exception.md:3)
+           |""".stripMargin
+    )
   )
 
   check(
