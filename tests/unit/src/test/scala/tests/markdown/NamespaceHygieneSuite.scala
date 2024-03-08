@@ -33,7 +33,7 @@ class NamespaceHygieneSuite extends BaseMarkdownSuite {
           |error: cannot import something called MdocSession.md:3:9:
           |Reference to MdocSession is ambiguous.
           |It is both defined in package repl
-          |and imported by name subsequently by import util.{...}
+          |and imported by name subsequently by import scala.util.{...}
           |val x = MdocSession.nextInt(1)
           |        ^^^^^^^^^^^
         """.stripMargin
