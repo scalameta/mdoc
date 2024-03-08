@@ -29,8 +29,8 @@ class AsyncSuite extends BaseMarkdownSuite {
        |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
        |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        |java.util.concurrent.TimeoutException: Futures timed out after [10 milliseconds]
-       |	at scala.concurrent.impl.Promise$DefaultPromise.ready(Promise.scala:259)
-       |	at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:263)
+       |	at scala.concurrent.impl.Promise$DefaultPromise.ready(Promise.scala:269)
+       |	at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:273)
        |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:223)
        |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:57)
        |	at scala.concurrent.Await$.result(package.scala:146)
@@ -48,6 +48,19 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$$anonfun$result$1.apply(package.scala:190)
            |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:53)
            |	at scala.concurrent.Await$.result(package.scala:190)
+           |	at repl.MdocSession$MdocApp.<init>(timeout.md:11)
+           |	at repl.MdocSession$.app(timeout.md:3)
+           |""".stripMargin,
+      Compat.Full("2.12.12") ->
+        """|error: timeout.md:4:1: Futures timed out after [10 milliseconds]
+           |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
+           |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           |java.util.concurrent.TimeoutException: Futures timed out after [10 milliseconds]
+           |	at scala.concurrent.impl.Promise$DefaultPromise.ready(Promise.scala:259)
+           |	at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:263)
+           |	at scala.concurrent.Await$.$anonfun$result$1(package.scala:223)
+           |	at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:57)
+           |	at scala.concurrent.Await$.result(package.scala:146)
            |	at repl.MdocSession$MdocApp.<init>(timeout.md:11)
            |	at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
