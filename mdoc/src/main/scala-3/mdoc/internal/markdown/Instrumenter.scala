@@ -107,8 +107,7 @@ class Instrumenter(
         case _: Term.EndMarker => (false, Nil)
         case _ =>
           val fresh = gensym.fresh("res")
-          sb.line { _.append(s"val $fresh = ") }
-          (true, List(Name(fresh) -> stat.pos))
+          sb.line { _.append(s"val $fresh = ") }(true, List(Name(fresh) -> stat.pos))
       }
       stat match {
         case i: Import =>
