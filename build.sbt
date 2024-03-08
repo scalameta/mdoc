@@ -1,6 +1,6 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.18"
+def scala212 = "2.12.19"
 def scala213 = "2.13.12"
 def scala3 = "3.3.1"
 def scala2Versions = List(scala212, scala213)
