@@ -105,6 +105,13 @@ performance.
 > docs/mdoc --watch
 ```
 
+You can run mdoc in the background so that you can issue other commands to sbt.
+
+```scala
+> docs/mdocBgStart
+> docs/mdocBgStop
+```
+
 See [`--help`](#help) to learn more how to use the command-line interface.
 
 ```scala

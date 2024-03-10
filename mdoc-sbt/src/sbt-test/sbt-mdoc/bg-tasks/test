@@ -1,0 +1,3 @@
+# Not sure why we need to do this. If we don't it fails with java.nio.file.NoSuchFileException.
+$ mkdir target/mdoc
+> check
