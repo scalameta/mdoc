@@ -7,6 +7,7 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.Modifier
+import mdoc.internal.markdown.EvaluatedMarkdownDocument
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.worksheets.Compat._
 import mdoc.{interfaces => i}
@@ -17,6 +18,10 @@ import java.nio.file.Path
 import java.{util => ju}
 import scala.meta.inputs.Input
 import scala.meta.internal.io.PathIO
+import mdoc.internal.markdown.Markdown
+import mdoc.internal.cli.InputFile
+import mdoc.internal.io.StoreReporter
+import mdoc.internal.markdown.EvaluatedDocument
 
 class Mdoc(settings: MainSettings) extends i.Mdoc {
 
@@ -46,6 +51,32 @@ class Mdoc(settings: MainSettings) extends i.Mdoc {
       myContext.compiler.shutdown()
       usedDummy()
     }
+  }
+
+  def evaluateMarkdownDocument(
+      filename: String,
+      text: String,
+      variables: ju.Map[String, String]
+  ): i.EvaluatedMarkdownDocument = {
+    val settings = this.settings.settings
+    val inputFile = InputFile.fromRelativeFilename(filename, settings)
+    val reporter = new StoreReporter()
+
+    val result = Markdown.toMarkdown(
+      Input.stringToInput(text),
+      this.context(),
+      inputFile,
+      variables.asScala.toMap,
+      reporter,
+      settings
+    )
+    val diagnostics = reporter.diagnostics.map(d => d: i.Diagnostic).toSeq.asJava
+
+    EvaluatedMarkdownDocument(
+      diagnostics = diagnostics,
+      content = result
+    )
+
   }
 
   def evaluateWorksheet(filename: String, text: String): i.EvaluatedWorksheet = {
