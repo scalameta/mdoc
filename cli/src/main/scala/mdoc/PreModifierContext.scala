@@ -6,9 +6,11 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.cli.CliEnrichments._
 import scala.meta.io.AbsolutePath
 import mdoc.internal.cli.InputFile
+import mdoc.parser.Text
 
 final class PreModifierContext private[mdoc] (
     val info: String,
+    val fences : Text,
     val originalCode: Input,
     val reporter: Reporter,
     private[mdoc] val file: InputFile,

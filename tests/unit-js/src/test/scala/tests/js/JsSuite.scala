@@ -32,6 +32,22 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "extra_fences",
+    """
+      |```scala mdoc:js sc:nocompile
+      |println("hello world!")
+      |```
+      |""".stripMargin,
+    """|```scala sc:nocompile
+       |println("hello world!")
+       |```
+       |<div id="mdoc-html-run0" data-mdoc-js></div>
+       |<script type="text/javascript" src="extra_fences.md.js" defer></script>
+       |<script type="text/javascript" src="mdoc.js" defer></script>
+    """.stripMargin
+  )
+
   checkError(
     "error",
     """
@@ -316,6 +332,7 @@ class JsSuite extends BaseMarkdownSuite {
        |                        ^^^
     """.stripMargin
   )
+
 
   check(
     "commonjs",

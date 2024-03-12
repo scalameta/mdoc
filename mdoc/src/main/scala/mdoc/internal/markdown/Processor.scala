@@ -78,11 +78,12 @@ class Processor(implicit ctx: Context) {
   }
 
   def processPreInput(doc: MarkdownFile, custom: PreFenceInput): Unit = {
-    val PreFenceInput(block, input, Pre(mod, info)) = custom
+    val PreFenceInput(block: CodeFence, input, Pre(mod, info)) = custom
     try {
       val inputFile = doc.file.relpath
       val preCtx = new PreModifierContext(
         info,
+        block.info,
         input,
         ctx.reporter,
         doc.file,
@@ -249,6 +250,7 @@ class Processor(implicit ctx: Context) {
         case c: Modifier.Pre =>
           val preCtx = new PreModifierContext(
             c.info,
+            block.info,
             section.input,
             ctx.reporter,
             doc.file,
