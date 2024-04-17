@@ -118,9 +118,9 @@ val V = new {
   val munit = "1.0.0-M11"
   val coursier = "1.0.19"
   val scalacheck = "1.17.1"
-  val pprint = "0.8.1"
+  val pprint = "0.9.0"
   val fansi = "0.4.0"
-  val fs2 = "3.9.4"
+  val fs2 = "3.10.2"
   val metaconfig = "0.12.0"
 }
 
