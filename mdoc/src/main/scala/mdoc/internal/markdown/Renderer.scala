@@ -121,7 +121,12 @@ object Renderer {
               section.source.pos.text.substring(previousStatement.pos.end, pos.start).split("\n", 2)
             val foot =
               if (statementIndex != (totalStats - 1)) ""
-              else section.source.pos.text.substring(pos.end).split("\n").drop(1).mkString("\n", "\n", "")
+              else
+                section.source.pos.text
+                  .substring(pos.end)
+                  .split("\n")
+                  .drop(1)
+                  .mkString("\n", "\n", "")
             ("\n" + leadingTrivia, foot)
         }
         if (!section.mod.isFailOrWarn) {

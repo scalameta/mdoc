@@ -1,8 +1,8 @@
 import scala.collection.mutable
 
-def scala212 = "2.12.18"
-def scala213 = "2.13.12"
-def scala3 = "3.3.1"
+def scala212 = "2.12.19"
+def scala213 = "2.13.13"
+def scala3 = "3.3.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
@@ -114,13 +114,13 @@ lazy val sharedJavaSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.9.0"
+  val scalameta = "4.9.3"
   val munit = "1.0.0-M11"
   val coursier = "1.0.19"
-  val scalacheck = "1.17.0"
-  val pprint = "0.8.1"
+  val scalacheck = "1.17.1"
+  val pprint = "0.9.0"
   val fansi = "0.4.0"
-  val fs2 = "3.9.4"
+  val fs2 = "3.10.2"
   val metaconfig = "0.12.0"
 }
 
@@ -238,8 +238,8 @@ lazy val mdoc = project
       "io.methvin" % "directory-watcher" % "0.18.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.24.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.10.Final",
-      "org.slf4j" % "slf4j-api" % "2.0.11",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.13.Final",
+      "org.slf4j" % "slf4j-api" % "2.0.13",
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
