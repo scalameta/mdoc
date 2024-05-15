@@ -10,7 +10,7 @@ import mdoc.parser.Text
 
 final class PreModifierContext private[mdoc] (
     val info: String,
-    val fences : Text,
+    val fences: Text,
     val originalCode: Input,
     val reporter: Reporter,
     private[mdoc] val file: InputFile,

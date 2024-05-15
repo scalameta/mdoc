@@ -57,7 +57,7 @@ object JsMods {
   def parse(fences: Text, info: Input, reporter: Reporter): AllMods = {
     val jsMods = parse(info, reporter)
 
-    if( reporter.hasErrors ) {
+    if (reporter.hasErrors) {
       AllMods(jsMods, Array[String]())
     } else {
       // We already know that the scala fences are valid.

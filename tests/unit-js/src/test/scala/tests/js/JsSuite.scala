@@ -333,7 +333,6 @@ class JsSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
-
   check(
     "commonjs",
     """
