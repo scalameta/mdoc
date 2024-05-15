@@ -200,7 +200,7 @@ class JsModifier extends mdoc.PreModifier {
 
   override def process(ctx: PreModifierContext): String = {
     JsMods.parse(ctx.fences, ctx.infoInput, ctx.reporter) match {
-      case AllMods(Some(jsmods), remaining ) =>
+      case AllMods(Some(jsmods), remaining) =>
         process(ctx, jsmods, remaining)
       case AllMods(None, _) =>
         ""
