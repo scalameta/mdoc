@@ -47,7 +47,7 @@ Use the sbt-mdoc plugin instead of sbt-tut and run `sbt docs/mdoc` instead of
 + enablePlugins(MdocPlugin)
 ```
 
-The sbt-mdoc plugin exposes only one task `mdoc`.
+The sbt-mdoc plugin exposes only one task `mdoc` .
 
 | tut                    | mdoc                                     |
 | ---------------------- | ---------------------------------------- |
