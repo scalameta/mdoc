@@ -29,7 +29,7 @@ jobs:
         with:
           java-version: 11
           distribution: adopt
-      - run: sbt '++2.12.19 docs/mdoc'
+      - run: sbt '++2.12.19; docs/mdoc'
   test-windows:
     name: "Windows"
     runs-on: windows-latest
