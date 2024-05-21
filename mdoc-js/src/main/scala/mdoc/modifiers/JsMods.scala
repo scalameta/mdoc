@@ -64,7 +64,6 @@ object JsMods {
       val fenceBlocks = fences.value.split(" ")
       val dropScala = fenceBlocks.tail // first entry is scala
       val remainingFences = dropScala.filterNot(_.contains("mdoc:js"))
-      // println(remainingFences.mkString(" ", " ", ""))
       AllMods(jsMods, remainingFences)
     }
   }
