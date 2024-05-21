@@ -115,9 +115,9 @@ lazy val sharedJavaSettings = List(
 
 val V = new {
   val scalameta = "4.9.5"
-  val munit = "1.0.0-M11"
+  val munit = "1.0.0-RC1"
   val coursier = "1.0.19"
-  val scalacheck = "1.17.1"
+  val scalacheck = "1.18.0"
   val pprint = "0.9.0"
   val fansi = "0.4.0"
   val fs2 = "3.10.2"
@@ -238,7 +238,7 @@ lazy val mdoc = project
       "io.methvin" % "directory-watcher" % "0.18.0",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.24.Final",
-      "org.jboss.xnio" % "xnio-nio" % "3.8.13.Final",
+      "org.jboss.xnio" % "xnio-nio" % "3.8.14.Final",
       "org.slf4j" % "slf4j-api" % "2.0.13",
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,

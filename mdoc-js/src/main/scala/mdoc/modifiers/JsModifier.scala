@@ -199,15 +199,15 @@ class JsModifier extends mdoc.PreModifier {
   }
 
   override def process(ctx: PreModifierContext): String = {
-    JsMods.parse(ctx.infoInput, ctx.reporter) match {
-      case Some(mods) =>
-        process(ctx, mods)
-      case None =>
+    JsMods.parse(ctx.fences, ctx.infoInput, ctx.reporter) match {
+      case AllMods(Some(jsmods), remaining) =>
+        process(ctx, jsmods, remaining)
+      case AllMods(None, _) =>
         ""
     }
   }
 
-  def process(ctx: PreModifierContext, mods: JsMods): String = {
+  def process(ctx: PreModifierContext, mods: JsMods, remainingMods: Array[String]): String = {
     val separator = "\n---\n"
     val text = ctx.originalCode.text
     val separatorIndex = text.indexOf(separator)
@@ -252,7 +252,11 @@ class JsModifier extends mdoc.PreModifier {
 
     runs += code
     new CodeBuilder()
-      .printlnIf(!mods.isInvisible, s"```scala\n${input.text}\n```")
+      .printIf(!mods.isInvisible, s"```scala")
+      .printIf(!remainingMods.isEmpty && !mods.isInvisible, remainingMods.mkString(" ", " ", ""))
+      .printIf(remainingMods.isEmpty && !mods.isInvisible, s"\n")
+      .printIf(!mods.isInvisible, s"${input.text}\n```")
+      .printIf(!mods.isInvisible, s"\n")
       .printlnIf(mods.isEntrypoint, s"""<div id="$htmlId" data-mdoc-js>$body</div>""")
       .toString
   }
