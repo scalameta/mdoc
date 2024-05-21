@@ -18,7 +18,7 @@ jobs:
           java-version: 11
           distribution: adopt
       - uses: olafurpg/setup-gpg@v3
-      - run: sbt '++2.12.18 docs/docusaurusPublishGhpages'
+      - run: sbt '++2.12.19 docs/docusaurusPublishGhpages'
         env:
           GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
       - name: Check git diff
