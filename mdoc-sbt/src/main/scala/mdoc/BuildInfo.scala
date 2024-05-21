@@ -7,7 +7,7 @@ object BuildInfo {
     props.getProperty("version", "0.8.0-SNAPSHOT")
 
   def scalaJSVersion: String =
-    props.getProperty("scalaJSVersion", "1.13.0")
+    props.getProperty("scalaJSVersion", "1.16.0")
 
   private lazy val props: Properties = {
     val props = new Properties()
