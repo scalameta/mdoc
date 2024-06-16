@@ -1,23 +1,24 @@
 package mdoc.internal.markdown
 
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import mdoc.Reporter
 import mdoc.Variable
 import mdoc.document.CompileResult
 import mdoc.document.CrashResult
 import mdoc.document.CrashResult.Crashed
 import mdoc.document.RangePosition
+import mdoc.internal.cli.Context
+import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.Settings
 import mdoc.internal.document.FailSection
 import mdoc.internal.document.MdocExceptions
 import mdoc.internal.document.Printing
 import mdoc.internal.pos.PositionSyntax._
 import mdoc.internal.pos.TokenEditDistance
+
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import scala.meta._
 import scala.meta.inputs.Position
-import mdoc.internal.cli.InputFile
-import mdoc.internal.cli.Settings
-import mdoc.internal.cli.Context
 
 object Renderer {
 
@@ -172,7 +173,7 @@ object Renderer {
                   }
                   appendFreshMultiline(sb, compiled)
                 case _ =>
-                  val obtained = Printing.stringValue(binder.value)
+                  val obtained = binder.stringValue
                   throw new IllegalArgumentException(
                     s"Expected FailSection. Obtained $obtained"
                   )

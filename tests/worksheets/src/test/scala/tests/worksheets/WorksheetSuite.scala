@@ -51,6 +51,27 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "updates",
+    """
+      |import scala.collection.mutable.ArrayBuffer
+      |val b = ArrayBuffer[Int]()
+      |b += 1
+      |b ++= ArrayBuffer(5, 8, 12)
+      |b.dropRight(3)
+      |""".stripMargin,
+    """|import scala.collection.mutable.ArrayBuffer
+       |<val b = ArrayBuffer[Int]()> // : ArrayBuffer[Int] =...
+       |b: ArrayBuffer[Int] = ArrayBuffer()
+       |<b += 1> // : ArrayBuffer[Int] = Arr...
+       |res0: ArrayBuffer[Int] = ArrayBuffer(1)
+       |<b ++= ArrayBuffer(5, 8, 12)> // : ArrayBuffer[Int] =...
+       |res1: ArrayBuffer[Int] = ArrayBuffer(1, 5, 8, 12)
+       |<b.dropRight(3)> // : ArrayBuffer[Int] =...
+       |res2: ArrayBuffer[Int] = ArrayBuffer(1)
+       |""".stripMargin
+  )
+
+  checkDecorations(
     "infix",
     """|import scala.language.postfixOps
        |42 toString
