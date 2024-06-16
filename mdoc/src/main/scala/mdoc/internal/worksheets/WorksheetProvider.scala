@@ -1,20 +1,21 @@
 package mdoc.internal.worksheets
 
-import scala.meta._
-import mdoc.internal.pos.PositionSyntax._
+import mdoc.document.RangePosition
+import mdoc.document.Statement
 import mdoc.internal.cli.Context
-import mdoc.internal.markdown.SectionInput
-import mdoc.internal.markdown.Modifier
+import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.Settings
+import mdoc.internal.document.Printing
+import mdoc.internal.io.StoreReporter
 import mdoc.internal.markdown.Instrumenter
 import mdoc.internal.markdown.MarkdownBuilder
-import mdoc.internal.document.Printing
-import mdoc.document.Statement
-import mdoc.document.RangePosition
-import mdoc.internal.cli.Settings
-import mdoc.internal.io.StoreReporter
+import mdoc.internal.markdown.Modifier
+import mdoc.internal.markdown.SectionInput
+import mdoc.internal.pos.PositionSyntax._
 import mdoc.{interfaces => i}
+
 import java.{util => ju}
-import mdoc.internal.cli.InputFile
+import scala.meta._
 
 class WorksheetProvider(settings: Settings) {
 
@@ -93,7 +94,7 @@ class WorksheetProvider(settings: Settings) {
           .append(": ")
           .append(binder.tpeString)
           .append(" = ")
-        Printing.print(binder.value, out, settings.screenWidth, settings.screenHeight)
+        Printing.print(binder.stringValue, out, settings.screenWidth, settings.screenHeight)
       }
     }
     statement.out.linesIterator.foreach { line =>
@@ -138,7 +139,7 @@ class WorksheetProvider(settings: Settings) {
                 .append(binder.tpeString)
                 .append(" = ")
 
-            Printing.printOneLine(binder.value, out, width = margin - out.length)
+            Printing.printOneLine(binder.stringValue, out, width = margin - out.length)
             out.length > margin
         }
       }
