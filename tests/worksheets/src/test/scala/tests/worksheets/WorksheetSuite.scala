@@ -72,6 +72,27 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "arrays",
+    """
+      |val x = Array(1, 2, 3)
+      |val y = Array("a", "b")
+      |""".stripMargin,
+    """|<val x = Array(1, 2, 3)> // : Array[Int] = Array...
+       |x: Array[Int] = Array(1, 2, 3)
+       |<val y = Array("a", "b")> // : Array[String] = Ar...
+       |y: Array[String] = Array("a", "b")
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|<val x = Array(1, 2, 3)> // : Array[Int] = Array...
+           |x: Array[Int] = Array(1, 2, 3)
+           |<val y = Array("a", "b")> // : Array[String] = Ar...
+           |y: Array[String] = Array(a, b)
+           |""".stripMargin
+    )
+  )
+
+  checkDecorations(
     "infix",
     """|import scala.language.postfixOps
        |42 toString
