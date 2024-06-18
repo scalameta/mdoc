@@ -15,6 +15,9 @@ object Printing {
   }
 
   inline private def nullableToString[T](value: T) = {
-    if (value != null) value.toString else "null"
+    value match
+      case arr: Array[_] => arr.mkString("Array(", ", ", ")")
+      case null => "null"
+      case _ => value.toString()
   }
 }
