@@ -14,9 +14,9 @@ object Printing {
     out.append(nullableToString(value).replace("\n", ""))
   }
 
-  inline private def nullableToString[T](value: T) = {
+  private def nullableToString[T](value: T): String = {
     value match
-      case arr: Array[_] => arr.mkString("Array(", ", ", ")")
+      case arr: Array[_] => arr.map(nullableToString).mkString("Array(", ", ", ")")
       case null => "null"
       case _ => value.toString()
   }

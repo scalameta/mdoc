@@ -76,11 +76,14 @@ class WorksheetSuite extends BaseSuite {
     """
       |val x = Array(1, 2, 3)
       |val y = Array("a", "b")
+      |val arrays = Array(Array(1, 2, 3), Array(2, 3, 4))
       |""".stripMargin,
     """|<val x = Array(1, 2, 3)> // : Array[Int] = Array...
        |x: Array[Int] = Array(1, 2, 3)
        |<val y = Array("a", "b")> // : Array[String] = Ar...
        |y: Array[String] = Array("a", "b")
+       |<val arrays = Array(Array(1, 2, 3), Array(2, 3, 4))> // : Array[Array[Int]] ...
+       |arrays: Array[Array[Int]] = Array(Array(1, 2, 3), Array(2, 3, 4))
        |""".stripMargin,
     compat = Map(
       Compat.Scala3 ->
@@ -88,6 +91,8 @@ class WorksheetSuite extends BaseSuite {
            |x: Array[Int] = Array(1, 2, 3)
            |<val y = Array("a", "b")> // : Array[String] = Ar...
            |y: Array[String] = Array(a, b)
+           |<val arrays = Array(Array(1, 2, 3), Array(2, 3, 4))> // : Array[Array[Int]] ...
+           |arrays: Array[Array[Int]] = Array(Array(1, 2, 3), Array(2, 3, 4))
            |""".stripMargin
     )
   )
