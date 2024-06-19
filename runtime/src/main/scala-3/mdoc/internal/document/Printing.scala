@@ -11,7 +11,7 @@ object Printing {
   }
 
   inline def printOneLine[T](value: T, out: StringBuilder, width: Int) = {
-    out.append(nullableToString(value).replace("\n", ""))
+    out.append(nullableToString(value).replace("\n", "").replaceAll("\\s+", " "))
   }
 
   private def nullableToString[T](value: T): String = {
