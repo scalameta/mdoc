@@ -1,8 +1,10 @@
 package mdoc.internal.document
 
-import pprint.TPrintColors
-import pprint.PPrinter.BlackWhite
+import fansi.Str
 import pprint.PPrinter
+import pprint.PPrinter.BlackWhite
+import pprint.TPrintColors
+
 import Compat.TPrint
 
 object Printing {
@@ -15,17 +17,8 @@ object Printing {
       .foreach(text => out.appendAll(text.getChars))
   }
 
-  def printOneLine[T](value: T, out: StringBuilder, width: Int) = {
-    val chunk = BlackWhite
-      .tokenize(value, width)
-      .map(_.getChars)
-      .filterNot(_.iterator.forall(_.isWhitespace))
-      .flatMap(_.iterator)
-      .filter {
-        case '\n' => false
-        case _ => true
-      }
-    out.appendAll(chunk)
-
+  def printOneLine(value: Str, out: StringBuilder, width: Int) = {
+    out.appendAll(value.toString().replace("\n", " ").replaceAll("\\s+", " ")).take(width + 1)
   }
+
 }
