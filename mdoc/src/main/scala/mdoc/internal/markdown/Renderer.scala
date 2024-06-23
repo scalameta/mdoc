@@ -151,7 +151,7 @@ object Renderer {
                 case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
                   val input = Input.String(instrumented)
                   val edit =
-                    TokenEditDistance.fromInputs(doc.sections.map(_.source.pos.input), input)
+                    TokenEditDistance.fromTrees(Seq(section.source.source), input)
                   val compiled = compiler.fail(edit, input, section.source.pos)
                   val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                   val pos = tpos.toMeta(section)
