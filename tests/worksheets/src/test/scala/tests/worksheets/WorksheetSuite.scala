@@ -21,7 +21,6 @@ class WorksheetSuite extends BaseSuite {
     .load(classOf[Mdoc], this.getClass().getClassLoader())
     .iterator()
     .next()
-    .withScreenWidth(30)
     .withScreenHeight(5)
     .withClasspath(
       CompatClassloader
@@ -145,6 +144,58 @@ class WorksheetSuite extends BaseSuite {
        |}""".stripMargin,
     "",
     modifier = Some("reset-object")
+  )
+
+  checkDecorations(
+    "scalatags",
+    """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+       |import scalatags.Text.all._
+       |val htmlFile = html(
+       |  body(
+       |    p("This is a big paragraph of text")
+       |  )
+       |)
+       |""".stripMargin,
+    """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+       |import scalatags.Text.all._
+       |<val htmlFile = html(
+       |  body(
+       |    p("This is a big paragraph of text")
+       |  )
+       |)> // : scalatags.Text.TypedTag[String] = TypedTag( tag = "html", modifiers = List( ArraySeq( TypedTag( t...
+       |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
+       |  tag = "html",
+       |  modifiers = List(
+       |    ArraySeq(
+       |...
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+           |import scalatags.Text.all._
+           |<val htmlFile = html(
+           |  body(
+           |    p("This is a big paragraph of text")
+           |  )
+           |)> // : TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+           |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+           |""".stripMargin,
+      Compat.Scala212 ->
+        """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+           |import scalatags.Text.all._
+           |<val htmlFile = html(
+           |  body(
+           |    p("This is a big paragraph of text")
+           |  )
+           |)> // : scalatags.Text.TypedTag[String] = TypedTag( "html", List( WrappedArray( TypedTag( "body", List( W...
+           |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
+           |  "html",
+           |  List(
+           |    WrappedArray(
+           |...
+           |""".stripMargin
+    ),
+    width = 100
   )
 
   checkDecorations(
@@ -290,19 +341,43 @@ class WorksheetSuite extends BaseSuite {
       |val n = User("Susan")
       |""".stripMargin,
     """|case class User(name: String)
-       |<val n = User("Susan")> // : User = User("Susan...
-       |n: User = User("Susan")
+       |<val n = User("Susan")> // : User = User(name =...
+       |n: User = User(name = "Susan")
        |""".stripMargin,
     compat = Map(
       Compat.Scala3 -> """|case class User(name: String)
                           |<val n = User("Susan")> // : User = User(Susan)
                           |n: User = User(Susan)
                           |""".stripMargin,
-      Compat.Scala213 -> """|case class User(name: String)
-                            |<val n = User("Susan")> // : User = User(name =...
-                            |n: User = User(name = "Susan")
+      Compat.Scala212 -> """|case class User(name: String)
+                            |<val n = User("Susan")> // : User = User("Susan...
+                            |n: User = User("Susan")
                             |""".stripMargin
     )
+  )
+
+  checkDecorations(
+    "whitespaces",
+    """|case class User(name: String)
+       |val n = User("Susan Nasus")
+       |""".stripMargin,
+    """|case class User(name: String)
+       |<val n = User("Susan Nasus")> // : User = User(name = "Susan Nasus")
+       |n: User = User(name = "Susan Nasus")
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|case class User(name: String)
+           |<val n = User("Susan Nasus")> // : User = User(Susan Nasus)
+           |n: User = User(Susan Nasus)
+           |""".stripMargin,
+      Compat.Scala212 ->
+        """|case class User(name: String)
+           |<val n = User("Susan Nasus")> // : User = User("Susan Nasus")
+           |n: User = User("Susan Nasus")
+           |""".stripMargin
+    ),
+    width = 500
   )
 
   checkDiagnostics(
@@ -534,7 +609,7 @@ class WorksheetSuite extends BaseSuite {
   )(implicit location: Location): Unit = {
     test(options) {
       val filename = options.name + ".scala"
-      val worksheet = evaluateWorksheet(filename, original, modifier)
+      val worksheet = evaluateWorksheet(filename, original, modifier, width = 30)
       val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
       var i = 0
@@ -562,11 +637,12 @@ class WorksheetSuite extends BaseSuite {
       original: String,
       expected: String,
       compat: Map[Compat.ScalaVersion, String] = Map.empty,
-      modifier: Option[String] = None
-  ): Unit = {
+      modifier: Option[String] = None,
+      width: Int = 30
+  )(implicit loc: Location): Unit = {
     test(options) {
       val filename = options.name + ".scala"
-      val worksheet = evaluateWorksheet(filename, original, modifier)
+      val worksheet = evaluateWorksheet(filename, original, modifier, width)
       val statements = worksheet.statements().asScala.sortBy(_.position().startLine())
       val input = Input.VirtualFile(options.name, original)
       val out = new StringBuilder()
@@ -596,12 +672,17 @@ class WorksheetSuite extends BaseSuite {
     }
   }
 
-  private def evaluateWorksheet(filename: String, original: String, modifier: Option[String]) = {
+  private def evaluateWorksheet(
+      filename: String,
+      original: String,
+      modifier: Option[String],
+      width: Int
+  ) = {
     modifier match {
       case Some(mod) =>
-        mdoc.evaluateWorksheet(filename, original, mod)
+        mdoc.withScreenWidth(width).evaluateWorksheet(filename, original, mod)
       case None =>
-        mdoc.evaluateWorksheet(filename, original)
+        mdoc.withScreenWidth(width).evaluateWorksheet(filename, original)
     }
   }
 }
