@@ -54,6 +54,11 @@ case class Settings(
     @ExtraName("w")
     watch: Boolean = false,
     @Description(
+      "Sets the file watcher to run in the background and not ask for user input in order to stop."
+    )
+    @ExtraName("b")
+    background: Boolean = false,
+    @Description(
       "Instead of generating a new site, report an error if generating the site would produce a diff " +
         "against an existing site. Useful for asserting in CI that a site is up-to-date."
     )
