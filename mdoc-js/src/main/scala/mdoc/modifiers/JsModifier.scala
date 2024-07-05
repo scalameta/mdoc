@@ -289,7 +289,7 @@ class JsModifier extends mdoc.PreModifier {
       .printIf(!mods.isInvisible, s"${input.text}\n```")
       .printIf(!mods.isInvisible, s"\n")
       .printlnIf(
-        mods.isEntrypoint && config.moduleKind == ModuleType.NoModule,
+        mods.isEntrypoint && (config.moduleKind == ModuleType.NoModule || config.moduleKind == ModuleType.CommonJSModule),
         s"""<div id="$htmlId" data-mdoc-js>$body</div>"""
       )
       .printlnIf(
