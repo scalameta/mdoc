@@ -22,7 +22,8 @@ case class JsConfig(
     relativeLinkPrefix: String = "",
     batchMode: Boolean = false
 ) {
-  def isCommonJS: Boolean = moduleKind == ModuleType.CommonJSModule
+  lazy val isCommonJS: Boolean = moduleKind == ModuleType.CommonJSModule
+  lazy val isEsModule: Boolean = moduleKind == ModuleType.ESModule
   def libraryScripts(
       outjsfile: AbsolutePath,
       ctx: PostProcessContext
@@ -37,7 +38,12 @@ case class JsConfig(
       if (filename.endsWith(".js")) {
         lib.copyTo(out)
         val src = out.toRelativeLinkFrom(ctx.outputFile, relativeLinkPrefix)
-        List(s"""<script type="text/javascript" src="$src" defer></script>""")
+        isEsModule match {
+          case true =>
+            List(s"""<script type="module" src="$src"></script>""")
+          case false =>
+            List(s"""<script type="text/javascript" src="$src" defer></script>""")
+        }
       } else if (filename.endsWith(".js.map")) {
         lib.copyTo(out)
         Nil

@@ -24,6 +24,9 @@ import scala.concurrent.Future
 import java.nio.file.Paths
 import mdoc.js.interfaces._
 import java.util.ServiceLoader
+import mdoc.js.interfaces.ModuleType.CommonJSModule
+import mdoc.js.interfaces.ModuleType.ESModule
+import mdoc.js.interfaces.ModuleType.NoModule
 
 class JsModifier extends mdoc.PreModifier {
   override val name = "js"
@@ -173,15 +176,31 @@ class JsModifier extends mdoc.PreModifier {
           val outjsfile = resolveOutputJsFile(inputFile)
           outjsfile.write(new String(content))
           val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
-          outmdoc.write(Resources.readPath("/mdoc.js"))
+          val selectMocTemplate = config.moduleKind match {
+            case CommonJSModule => ???
+            case ESModule => "/mdoc_esmodule.js"
+            case NoModule => "/mdoc_nomodule.js"
+          }
+          outmdoc.write(Resources.readPath(selectMocTemplate))
           val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
-          new CodeBuilder()
-            .println(config.htmlHeader)
-            .lines(config.libraryScripts(outjsfile, ctx))
-            .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
-            .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
-            .toString
+          config.moduleKind match {
+            case CommonJSModule => ???
+            case ESModule =>
+              new CodeBuilder()
+                .println(config.htmlHeader)
+                .lines(config.libraryScripts(outjsfile, ctx))
+                .println(s"""<script type="module" src="$relfile"></script>""")
+                .println(s"""<script type="module" src="$relmdoc"></script>""")
+                .toString
+            case NoModule =>
+              new CodeBuilder()
+                .println(config.htmlHeader)
+                .lines(config.libraryScripts(outjsfile, ctx))
+                .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
+                .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
+                .toString
+          }
       }
     }
   }
@@ -249,6 +268,10 @@ class JsModifier extends mdoc.PreModifier {
           .println("}")
           .toString
       }
+    val outputPath = ctx.outputFile
+    val outputDirectory = ctx.outDirectory
+
+    val outModule = ctx.outputFile.toRelative(ctx.outDirectory)
 
     runs += code
     new CodeBuilder()
@@ -257,7 +280,14 @@ class JsModifier extends mdoc.PreModifier {
       .printIf(remainingMods.isEmpty && !mods.isInvisible, s"\n")
       .printIf(!mods.isInvisible, s"${input.text}\n```")
       .printIf(!mods.isInvisible, s"\n")
-      .printlnIf(mods.isEntrypoint, s"""<div id="$htmlId" data-mdoc-js>$body</div>""")
+      .printlnIf(
+        mods.isEntrypoint && config.moduleKind == ModuleType.NoModule,
+        s"""<div id="$htmlId" data-mdoc-js>$body</div>"""
+      )
+      .printlnIf(
+        mods.isEntrypoint && config.moduleKind == ModuleType.ESModule,
+        s"""<div id="$htmlId" data-mdoc-js data-mdoc-module-name="./$outModule.js" >$body</div>"""
+      )
       .toString
   }
 }
