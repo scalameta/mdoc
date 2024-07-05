@@ -62,7 +62,6 @@ class ScalaJSWorker(
   override def link(
       in: Array[ScalajsWorkerApi.IRFile]
   ): ju.Map[String, Array[Byte]] = {
-    logger.info("Linking")
     val mem = MemOutputDirectory()
     val report = Await.result(
       linker.link(

@@ -276,8 +276,6 @@ class JsModifier extends mdoc.PreModifier {
           .println("}")
           .toString
       }
-    val outputPath = ctx.outputFile
-    val outputDirectory = ctx.outDirectory
 
     val outModule = ctx.outputFile.toRelative(ctx.outDirectory)
 
