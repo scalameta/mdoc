@@ -177,7 +177,7 @@ class JsModifier extends mdoc.PreModifier {
           outjsfile.write(new String(content))
           val outmdoc = outjsfile.resolveSibling(_ => "mdoc.js")
           val selectMocTemplate = config.moduleKind match {
-            case CommonJSModule => ???
+            case CommonJSModule => "/mdoc_nomodule.js"
             case ESModule => "/mdoc_esmodule.js"
             case NoModule => "/mdoc_nomodule.js"
           }
@@ -185,7 +185,15 @@ class JsModifier extends mdoc.PreModifier {
           val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           config.moduleKind match {
-            case CommonJSModule => ???
+            case CommonJSModule =>
+              // This is copied from the NoModule case.
+              // Although I'd be surprised if it was "right", it is tested.
+              new CodeBuilder()
+                .println(config.htmlHeader)
+                .lines(config.libraryScripts(outjsfile, ctx))
+                .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
+                .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
+                .toString
             case ESModule =>
               new CodeBuilder()
                 .println(config.htmlHeader)
