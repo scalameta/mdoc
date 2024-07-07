@@ -42,7 +42,7 @@ class JsSuite extends BaseMarkdownSuite {
     """|```scala
        |println("hello world!")
        |```
-       |<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./basic_es.md.js"></div>
+       |<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./basic_es.md.js" ></div>
        |<script type="module" src="basic_es.md.js"></script>
        |<script type="module" src="mdoc.js"></script>
     """.stripMargin,
