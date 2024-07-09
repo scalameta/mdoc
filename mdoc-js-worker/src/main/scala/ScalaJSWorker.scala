@@ -18,8 +18,6 @@ import org.scalajs.logging.Logger
 import org.scalajs.logging.Level
 import org.scalajs.linker.standard.MemIRFileImpl
 import org.scalajs.linker.interface.Semantics
-import org.scalajs.linker.interface.ModuleSplitStyle
-
 class ScalaJSWorker(
     config: ScalajsConfig,
     logger: Logger
@@ -42,7 +40,6 @@ class ScalaJSWorker(
             case CommonJSModule => ModuleKind.CommonJSModule
           }
         }
-        .withModuleSplitStyle(ModuleSplitStyle.SmallModulesFor(List("mdoc")))
     StandardImpl.clearableLinker(cfg)
   }
 
