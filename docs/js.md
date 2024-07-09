@@ -377,7 +377,7 @@ file in a different directory than the markdown source.
 By default, sbt-mdoc uses the `scalaJSModuleKind` sbt setting to determine the
 module kind.
 
-Outside of sbt, update the `js-module-kind` site variables to customizee the
+Outside of sbt, update the `js-module-kind` site variables to customize the
 module kind:
 
 - `js-module-kind=NoModule`: don't export modules, the default value.

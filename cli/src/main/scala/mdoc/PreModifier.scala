@@ -25,7 +25,7 @@ object PreModifier {
     ServiceLoader.load(classOf[PreModifier], classLoader).iterator().asScala.toList
   implicit val surface: Surface[Settings] = new Surface(Nil)
   implicit val decoder: ConfDecoder[PreModifier] =
-    ConfDecoder.instanceF[PreModifier](_ => ConfError.message("unsupported").notOk)
+    ConfDecoder.from[PreModifier](_ => ConfError.message("unsupported").notOk)
   implicit val encoder: ConfEncoder[PreModifier] =
     ConfEncoder.StringEncoder.contramap(mod => s"<${mod.name}>")
 }

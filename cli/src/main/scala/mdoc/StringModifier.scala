@@ -21,7 +21,7 @@ object StringModifier {
     ServiceLoader.load(classOf[StringModifier], classLoader).iterator().asScala.toList
   implicit val surface: Surface[Settings] = new Surface(Nil)
   implicit val decoder: ConfDecoder[StringModifier] =
-    ConfDecoder.instanceF[StringModifier](_ => ConfError.message("unsupported").notOk)
+    ConfDecoder.from[StringModifier](_ => ConfError.message("unsupported").notOk)
   implicit val encoder: ConfEncoder[StringModifier] =
     ConfEncoder.StringEncoder.contramap(mod => s"<${mod.name}>")
 }
