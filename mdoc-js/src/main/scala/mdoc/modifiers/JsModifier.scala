@@ -185,7 +185,7 @@ class JsModifier extends mdoc.PreModifier {
           val relfile = outjsfile.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           config.moduleKind match {
-            case CommonJSModule =>
+            case NoModule | CommonJSModule =>
               new CodeBuilder()
                 .println(config.htmlHeader)
                 .lines(config.libraryScripts(outjsfile, ctx))
@@ -198,13 +198,6 @@ class JsModifier extends mdoc.PreModifier {
                 .lines(config.libraryScripts(outjsfile, ctx))
                 .println(s"""<script type="module" src="$relfile"></script>""")
                 .println(s"""<script type="module" src="$relmdoc"></script>""")
-                .toString
-            case NoModule =>
-              new CodeBuilder()
-                .println(config.htmlHeader)
-                .lines(config.libraryScripts(outjsfile, ctx))
-                .println(s"""<script type="text/javascript" src="$relfile" defer></script>""")
-                .println(s"""<script type="text/javascript" src="$relmdoc" defer></script>""")
                 .toString
           }
       }
