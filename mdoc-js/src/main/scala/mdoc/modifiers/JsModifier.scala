@@ -186,8 +186,6 @@ class JsModifier extends mdoc.PreModifier {
           val relmdoc = outmdoc.toRelativeLinkFrom(ctx.outputFile, config.relativeLinkPrefix)
           config.moduleKind match {
             case CommonJSModule =>
-              // This is copied from the NoModule case.
-              // Although I'd be surprised if it was "right", it is tested.
               new CodeBuilder()
                 .println(config.htmlHeader)
                 .lines(config.libraryScripts(outjsfile, ctx))
@@ -287,11 +285,11 @@ class JsModifier extends mdoc.PreModifier {
       .printIf(!mods.isInvisible, s"${input.text}\n```")
       .printIf(!mods.isInvisible, s"\n")
       .printlnIf(
-        mods.isEntrypoint && (config.moduleKind == ModuleType.NoModule || config.moduleKind == ModuleType.CommonJSModule),
+        mods.isEntrypoint && !config.isEsModule,
         s"""<div id="$htmlId" data-mdoc-js>$body</div>"""
       )
       .printlnIf(
-        mods.isEntrypoint && config.moduleKind == ModuleType.ESModule,
+        mods.isEntrypoint && config.isEsModule,
         s"""<div id="$htmlId" data-mdoc-js data-mdoc-module-name="./$outModule.js" >$body</div>"""
       )
       .toString
