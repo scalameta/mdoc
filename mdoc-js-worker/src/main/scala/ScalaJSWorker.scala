@@ -18,13 +18,11 @@ import org.scalajs.logging.Logger
 import org.scalajs.logging.Level
 import org.scalajs.linker.standard.MemIRFileImpl
 import org.scalajs.linker.interface.Semantics
-
 class ScalaJSWorker(
     config: ScalajsConfig,
     logger: Logger
 ) extends ScalajsWorkerApi {
   case class IFile(mem: IRFile) extends ScalajsWorkerApi.IRFile
-
   val linker = {
     val cfg =
       StandardConfig()
