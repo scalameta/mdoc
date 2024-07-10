@@ -43,4 +43,45 @@ class JsCliSuite extends BaseCliSuite {
     includeOutputPath = { path => !path.toNIO.getFileName.toString.endsWith(".js") }
   )
 
+  checkCli(
+    "remap".only,
+    """/index1.md
+      |```scala mdoc:js
+      |println("hello world!")
+      |```
+      |/index2.md
+      |```scala mdoc:js
+      |println("hello world!")
+      |```
+      |/index3.md
+      |```scala mdoc:js
+      |println("hello world!")
+      |```
+      |""".stripMargin,
+    s"""|/index1.md
+        |```scala
+        |println("hello world!")
+        |```
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
+        |${suffix("index1")}
+        |
+        |/index2.md
+        |```scala
+        |println("hello world!")
+        |```
+        |<div id="mdoc-html-run0" data-mdoc-js></div>
+        |${suffix("index2")}
+        |""".stripMargin,
+    input = "index1.md",
+    extraArgs = Array(
+      "--in",
+      "index2.md",
+      "--out",
+      out().toString(),
+      "--import-map-path",
+      "/Users/simon/Code/mdoc-1/tests/unit-js/resources/importmap.json"
+    ),
+    includeOutputPath = { path => !path.toNIO.getFileName.toString.endsWith(".js") }
+  )
+
 }

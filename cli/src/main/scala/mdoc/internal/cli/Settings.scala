@@ -155,7 +155,11 @@ case class Settings(
     variablePrinter: Variable => String = ReplVariablePrinter,
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
-    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
+    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars(),
+    @Description(
+      "The absolute path to a file containing an import map file in this format; https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap"
+    )
+    importMapPath: Option[AbsolutePath] = None
 ) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet

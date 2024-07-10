@@ -14,6 +14,11 @@ def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
+def jsoniter = List(
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.13.5.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.13.5.2"
+)
+
 val isScala212 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
 }
@@ -250,7 +255,7 @@ lazy val mdoc = project
       "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
-    )
+    ) ++ jsoniter
   )
   .dependsOn(parser, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
@@ -358,7 +363,8 @@ lazy val unitJS = project
     publish / skip := true,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit % Test
+      "org.scalameta" %% "munit" % V.munit % Test,
+      "com.armanbilge" %%% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
     ),
     buildInfoPackage := "tests.js",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -432,7 +438,8 @@ lazy val jsWorker =
     .settings(
       sharedSettings,
       moduleName := "mdoc-js-worker",
-      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided) cross CrossVersion.for3Use2_13
+      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided) cross CrossVersion.for3Use2_13,
+      libraryDependencies += "com.armanbilge" %%% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
     )
 
 lazy val js = project
@@ -441,7 +448,8 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
-    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
+    libraryDependencies ++= jsoniter
   )
   .dependsOn(mdoc)
 

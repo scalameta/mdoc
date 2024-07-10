@@ -68,12 +68,14 @@ class JsModifier extends mdoc.PreModifier {
   }
 
   def scalajsConfig(base: ScalajsConfig, config: JsConfig) = {
+
     base
       .withOptimized(config.fullOpt)
       .withModuleKind(config.moduleKind)
       .withSourceMap(false)
       .withBatchMode(config.batchMode)
       .withClosureCompiler(config.fullOpt)
+      .withImportMap(config.importMap.asJava)
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {
@@ -99,6 +101,8 @@ class JsModifier extends mdoc.PreModifier {
 
           val loader =
             ScalaJSClassloader.create(linkerClasspath.entries.map(_.toURI.toURL()).toArray)
+
+          sjsLogger.log(LogLevel.Info, "loading Scala.js worker")
 
           scalajsApi = Some(
             ServiceLoader
