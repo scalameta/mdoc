@@ -6,15 +6,18 @@ import tests.markdown.StringSyntax._
 import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
 import tests.markdown.Compat
+import scala.meta.io.AbsolutePath
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
   // By default, we create new modifiers for each unit test, which is usually fast.
-  override lazy val baseSettings: Settings = super.baseSettings.copy(
-    site = super.baseSettings.site ++ Map(
-      "js-opt" -> "fast"
+  override def baseSettings(resourcePropertyFileName: String): Settings = super
+    .baseSettings()
+    .copy(
+      site = super.baseSettings().site ++ Map(
+        "js-opt" -> "fast"
+      )
     )
-  )
 
   check(
     "basic",
@@ -47,8 +50,37 @@ class JsSuite extends BaseMarkdownSuite {
        |<script type="module" src="mdoc.js"></script>
     """.stripMargin,
     settings = {
-      baseSettings.copy(
-        site = baseSettings.site.updated("js-module-kind", "ESModule")
+      baseSettings().copy(
+        site = baseSettings().site.updated("js-module-kind", "ESModule")
+      )
+    }
+  )
+
+  checkCompiles(
+    "es_remap_settings",
+    """
+      |```scala mdoc:js:shared
+      |
+      |import scala.scalajs.js
+      |import scala.scalajs.js.annotation.JSImport
+      |
+      |@js.native
+      |@JSImport("@stdlib/blas/base", JSImport.Namespace)
+      |object blas extends BlasArrayOps
+      |
+      |@js.native
+      |trait BlasArrayOps extends js.Object{}
+      |```
+      |
+      |```scala mdoc:js
+      |println(blas)
+      |```
+      |""".stripMargin,
+    settings = {
+      baseSettings().copy(
+        site = baseSettings().site.updated("js-module-kind", "ESModule"),
+        importMapPath =
+          Some(AbsolutePath(this.getClass.getClassLoader.getResource("importmap.json").getPath))
       )
     }
   )
@@ -324,10 +356,10 @@ class JsSuite extends BaseMarkdownSuite {
        |                                  ^
     """.stripMargin,
     settings = {
-      val noScalajsDom = Classpath(baseSettings.site("js-classpath")).entries
+      val noScalajsDom = Classpath(baseSettings().site("js-classpath")).entries
         .filterNot(_.toNIO.getFileName.toString.contains("scalajs-dom"))
-      baseSettings.copy(
-        site = baseSettings.site.updated("js-classpath", Classpath(noScalajsDom).syntax)
+      baseSettings().copy(
+        site = baseSettings().site.updated("js-classpath", Classpath(noScalajsDom).syntax)
       )
     },
     compat = Map(
@@ -377,8 +409,8 @@ class JsSuite extends BaseMarkdownSuite {
         createTempFile("mdoc-library.js"),
         createTempFile("mdoc-library.js.map")
       )
-      baseSettings.copy(
-        site = baseSettings.site
+      baseSettings().copy(
+        site = baseSettings().site
           .updated("js-module-kind", "CommonJSModule")
           .updated("js-libraries", Classpath(libraries).syntax)
       )
@@ -401,8 +433,8 @@ class JsSuite extends BaseMarkdownSuite {
         |<script type="text/javascript" src="mdoc.js" defer></script>
         |""".stripMargin,
     settings = {
-      baseSettings.copy(
-        site = baseSettings.site.updated("js-html-header", unpkgReact)
+      baseSettings().copy(
+        site = baseSettings().site.updated("js-html-header", unpkgReact)
       )
     }
   )

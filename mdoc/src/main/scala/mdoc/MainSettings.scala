@@ -23,7 +23,7 @@ final class MainSettings private (
   def withArgs(args: List[String]): MainSettings = {
     if (args.isEmpty) this
     else {
-      Settings.fromCliArgs(args, settings) match {
+      Settings.fromCliArgs(args, settings.cwd.toNIO) match {
         case Configured.Ok(newSettings) =>
           copy(settings = newSettings)
         case Configured.NotOk(error) =>
@@ -121,12 +121,12 @@ final class MainSettings private (
 }
 
 object MainSettings {
-  def apply(workingDirectory: Path): MainSettings = {
-    val settings = Settings.default(AbsolutePath(workingDirectory))
+  def apply(workingDirectory: Path, propertiesFileName: String): MainSettings = {
+    val settings = Settings.default(AbsolutePath(workingDirectory), propertiesFileName)
     val reporter = ConsoleReporter.default
     new MainSettings(settings, reporter)
   }
   def apply(): MainSettings = {
-    MainSettings(PathIO.workingDirectory.toNIO)
+    MainSettings(PathIO.workingDirectory.toNIO, "mdoc.properties")
   }
 }

@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@stdlib/blas": "https://cdn.jsdelivr.net/npm/@stdlib/blas@0.2.1/+esm"
+  }
+}

@@ -32,6 +32,7 @@ import mdoc.internal.markdown.{GitHubIdGenerator, ReplVariablePrinter}
 import mdoc.internal.cli.CliEnrichments._
 import pprint.TPrint
 import pprint.TPrintColors
+import java.nio.file.Path
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -155,7 +156,15 @@ case class Settings(
     variablePrinter: Variable => String = ReplVariablePrinter,
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
-    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
+    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars(),
+    @Description(
+      "The absolute path to a file containing an import map file in this format; https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap"
+    )
+    importMapPath: Option[AbsolutePath] = None,
+    @Description(
+      "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
+    )
+    propFileName: String = "mdoc.properties"
 ) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
@@ -261,9 +270,9 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
       cwd = cwd
     )
   }
-  def default(cwd: AbsolutePath): Settings = {
+  def default(cwd: AbsolutePath, filename: String): Settings = {
     val base = baseDefault(cwd)
-    val props = MdocProperties.default(cwd)
+    val props = MdocProperties.default(cwd, filename)
     base.withProperties(props)
   }
 
@@ -294,14 +303,20 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
     generic.deriveDecoder[Settings](base)
   }
 
-  def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
+  def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
       .andThen(conf => {
+        val base =
+          Settings.default(
+            AbsolutePath(workingDirectory),
+            conf.get[String]("propFileName").getOrElse("mdoc.properties")
+          )
         val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
-        conf.as[Settings](decoder(base.copy(cwd = cwd)))
+        conf
+          .as[Settings](decoder(base.copy(cwd = cwd)))
+          .map(_.addSite(base.site))
       })
-      .map(_.addSite(base.site))
   }
 
   def write(set: Settings) = ConfEncoder[Settings].write(set)

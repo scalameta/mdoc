@@ -73,7 +73,10 @@ class JsModifier extends mdoc.PreModifier {
       .withModuleKind(config.moduleKind)
       .withSourceMap(false)
       .withBatchMode(config.batchMode)
-      .withClosureCompiler(config.fullOpt)
+      .withClosureCompiler(
+        config.fullOpt && !(config.moduleKind == ModuleType.ESModule)
+      ) // Closure compiler dosen't work with ESModules
+      .withImportMap(config.importMap.asJava)
   }
 
   override def onLoad(ctx: OnLoadContext): Unit = {

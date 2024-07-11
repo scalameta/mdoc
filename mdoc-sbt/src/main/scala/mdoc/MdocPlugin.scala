@@ -188,7 +188,15 @@ object MdocPlugin extends AutoPlugin {
           classpath.mkString(java.io.File.pathSeparator)
         )
         IO.write(props, "mdoc properties", out)
-        List(out)
+        val esVersion = props.clone().asInstanceOf[java.util.Properties]
+        esVersion.put("js-module-kind", "ESModule")
+        val esOut = managedResourceDirectories.in(Compile).value.head / "es.properties"
+        IO.write(
+          esVersion,
+          "mdoc esmoddule properties",
+          esOut
+        )
+        List(out, esOut)
       }
     )
 
