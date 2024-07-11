@@ -16,7 +16,7 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |  println(msg)
       |  ```
     """.stripMargin,
-    settings = baseSettings.copy(allowCodeFenceIndented = true)
+    settings = baseSettings().copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -33,7 +33,7 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    println(msg)
       |    ```
     """.stripMargin,
-    settings = baseSettings.copy(allowCodeFenceIndented = true)
+    settings = baseSettings().copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -50,7 +50,7 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       | println(msg)
       | ```
     """.stripMargin,
-    settings = baseSettings.copy(allowCodeFenceIndented = true)
+    settings = baseSettings().copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -67,7 +67,7 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    println(msg)
       |    ```
     """.stripMargin,
-    settings = baseSettings.copy(allowCodeFenceIndented = true)
+    settings = baseSettings().copy(allowCodeFenceIndented = true)
   )
 
   check(
@@ -86,6 +86,6 @@ class IndentedMarkdownSuite extends BaseMarkdownSuite {
       |    // Hello!
       |    ```
     """.stripMargin,
-    settings = baseSettings.copy(allowCodeFenceIndented = true)
+    settings = baseSettings().copy(allowCodeFenceIndented = true)
   )
 }

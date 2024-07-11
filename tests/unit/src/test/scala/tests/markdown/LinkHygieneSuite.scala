@@ -23,7 +23,7 @@ class LinkHygieneSuite extends FunSuite {
       reporter.reset()
       val root = tests.cli.StringFS.fromString(original)
       val settings = Settings
-        .default(root)
+        .default(root, "mdoc.properties")
         .copy(reportRelativePaths = true, in = List(root), out = List(root))
       val links = DocumentLinks.fromGeneratedSite(settings)
       LinkHygiene.report(asError, LinkHygiene.lint(links, verbose), reporter)

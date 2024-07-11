@@ -12,13 +12,13 @@ import mdoc.internal.cli.Context
 
 class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
-  private val base = Settings.default(PathIO.workingDirectory)
+  // private val base = Settings.default(PathIO.workingDirectory, "mdoc.properties")
 
   def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(implicit
       loc: munit.Location
   ): Unit = {
     test(name) {
-      val obtained = Settings.fromCliArgs(args, base).get
+      val obtained = Settings.fromCliArgs(args, PathIO.workingDirectory.toNIO).get
       onSuccess(obtained)
     }
   }
@@ -28,7 +28,7 @@ class CliArgsSuite extends FunSuite {
   ): Unit = {
     test(name) {
       Settings
-        .fromCliArgs(args, base)
+        .fromCliArgs(args, PathIO.workingDirectory.toNIO)
         .andThen(s => Context.fromSettings(s, reporter))
         .toEither match {
         case Left(obtained) =>
