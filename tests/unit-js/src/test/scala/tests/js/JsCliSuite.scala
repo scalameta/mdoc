@@ -114,7 +114,7 @@ class JsCliSuite extends BaseCliSuite {
   )
 
   // see the importmap.json in resources
-  test("import remap".only) {
+  test("import remap") {
     val myStdout = new ByteArrayOutputStream()
     tests.cli.StringFS.fromString(
       """|/docs/facade.md
