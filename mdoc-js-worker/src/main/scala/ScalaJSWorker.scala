@@ -19,6 +19,7 @@ import org.scalajs.logging.Level
 import org.scalajs.linker.standard.MemIRFileImpl
 import org.scalajs.linker.interface.Semantics
 import scala.collection.JavaConverters._
+import com.armanbilge.sjsimportmap.ImportMappedIRFile
 
 class ScalaJSWorker(
     config: ScalajsConfig,

@@ -109,7 +109,6 @@ object JsConfig {
         case Some(value) =>
           val importMapRaw = scala.io.Source.fromFile(value.toFile).getLines().mkString("\n")
           val importMapParsed = readFromString[ImportMap](importMapRaw)
-          println(importMapParsed)
           importMapParsed.imports
       }
     )

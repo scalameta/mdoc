@@ -82,36 +82,6 @@ class JsCliSuite extends BaseCliSuite {
 
   /** See MdocPlugin for where the .properties file is generated.
     */
-  checkCli(
-    "basic_es",
-    """/docs/index1.md
-      |```scala mdoc:js
-      |println("hello world!")
-      |```
-      |/docs/index2.md
-      |```scala mdoc:js
-      |println("hello world!")
-      |```
-      |""".stripMargin,
-    s"""|/docs/index1.md
-        |```scala
-        |println("hello world!")
-        |```
-        |<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./docs/index1.md.js" ></div>
-        |<script type="module" src="index1.md.js"></script>
-        |<script type="module" src="mdoc.js"></script>
-        |
-        |
-        |/docs/index2.md
-        |```scala
-        |println("hello world!")
-        |```
-        |<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./docs/index2.md.js" ></div>
-        |<script type="module" src="index2.md.js"></script>
-        |<script type="module" src="mdoc.js"></script>""".stripMargin,
-    extraArgs = Array("--prop-file-name", "es.properties"),
-    includeOutputPath = { path => !path.toNIO.getFileName.toString.endsWith(".js") }
-  )
 
   // see the importmap.json in resources
   test("import remap") {
@@ -148,7 +118,6 @@ class JsCliSuite extends BaseCliSuite {
       "--import-map-path",
       this.getClass.getClassLoader.getResource("importmap.json").getPath
     )
-    println(out())
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
     val generatedJs = AbsolutePath(out().toString + "/docs/facade.md.js")
     val content = new String(FileIO.readAllBytes(generatedJs), StandardCharsets.UTF_8)

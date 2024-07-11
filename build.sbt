@@ -6,6 +6,8 @@ def scala3 = "3.3.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
+
+
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -134,6 +136,7 @@ val V = new {
   val fs2 = "3.10.2"
 
   val metaconfig = "0.12.0"
+
 }
 
 lazy val interfaces = project
@@ -437,7 +440,11 @@ lazy val jsWorker =
     .settings(
       sharedSettings,
       moduleName := "mdoc-js-worker",
-      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided) cross CrossVersion.for3Use2_13
+      libraryDependencies ++= Seq(
+        "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross CrossVersion.for3Use2_13,
+        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" % Provided cross CrossVersion.for3Use2_13
+      )
+
     )
 
 lazy val js = project
