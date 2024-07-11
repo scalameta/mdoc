@@ -7,6 +7,9 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
 import mdoc.js.interfaces._
+import scala.collection.immutable.HashMap
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import mdoc.modifiers.ImportMapJsonIr.ImportMap
 
 case class JsConfig(
     moduleKind: ModuleType = ModuleType.NoModule,
@@ -20,7 +23,8 @@ case class JsConfig(
     fullOpt: Boolean = true,
     htmlPrefix: String = "",
     relativeLinkPrefix: String = "",
-    batchMode: Boolean = false
+    batchMode: Boolean = false,
+    importMap: Map[String, String] = Map.empty
 ) {
   lazy val isCommonJS: Boolean = moduleKind == ModuleType.CommonJSModule
   lazy val isEsModule: Boolean = moduleKind == ModuleType.ESModule
@@ -99,7 +103,15 @@ object JsConfig {
           }
       },
       relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix),
-      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean
+      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean,
+      importMap = ctx.settings.importMapPath match {
+        case None => new HashMap[String, String]()
+        case Some(value) =>
+          val importMapRaw = scala.io.Source.fromFile(value.toFile).getLines().mkString("\n")
+          val importMapParsed = readFromString[ImportMap](importMapRaw)
+          println(importMapParsed)
+          importMapParsed.imports
+      }
     )
   }
 }

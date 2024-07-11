@@ -75,7 +75,9 @@ js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_
 EOT
 ```
 
-Note: For scala 3, you may need `js-scalac-options=--scala-js` - this is currently untested.
+Note: For scala 3, you may need `js-scalac-options=-scalajs` - instead of the XPlugin incantation - [Doc](https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins).
+
+
 
 Next, create a basic Markdown files with an `mdoc:js` modifier:
 

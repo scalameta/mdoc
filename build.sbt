@@ -14,6 +14,11 @@ def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
+def jsoniter = List(
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.13.5.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.13.5.2"
+)
+
 val isScala212 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
 }
@@ -250,7 +255,7 @@ lazy val mdoc = project
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
-    )
+    ) ++ jsoniter
   )
   .dependsOn(parser, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
@@ -441,7 +446,8 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
-    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
+    libraryDependencies ++= jsoniter
   )
   .dependsOn(mdoc)
 
