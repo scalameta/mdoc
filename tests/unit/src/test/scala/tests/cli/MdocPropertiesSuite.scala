@@ -7,7 +7,7 @@ import tests.markdown.Compat
 
 class MdocPropertiesSuite extends FunSuite {
   test("default") {
-    val obtained = MdocProperties.default(PathIO.workingDirectory).scalacOptions
+    val obtained = MdocProperties.default(PathIO.workingDirectory, "mdoc.properties").scalacOptions
 
     if (Compat.isScala3)
       assert(obtained.contains("-language:implicitConversions"))

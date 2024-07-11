@@ -8,22 +8,26 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
 
   private val debugClassSuffix = "test"
 
-  override val baseSettings: Settings = super.baseSettings.copy(
-    stringModifiers = List(
-      new ScastieModifier(
-        debugClassSuffix = Some(debugClassSuffix)
+  override def baseSettings(resourcePropertyFileName: String): Settings = super
+    .baseSettings()
+    .copy(
+      stringModifiers = List(
+        new ScastieModifier(
+          debugClassSuffix = Some(debugClassSuffix)
+        )
       )
     )
-  )
 
-  val darkThemeSettings: Settings = super.baseSettings.copy(
-    stringModifiers = List(
-      new ScastieModifier(
-        theme = "dark",
-        debugClassSuffix = Some(debugClassSuffix)
+  val darkThemeSettings: Settings = super
+    .baseSettings()
+    .copy(
+      stringModifiers = List(
+        new ScastieModifier(
+          theme = "dark",
+          debugClassSuffix = Some(debugClassSuffix)
+        )
       )
     )
-  )
 
   check(
     "inline",
