@@ -437,7 +437,10 @@ lazy val jsWorker =
     .settings(
       sharedSettings,
       moduleName := "mdoc-js-worker",
-      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided) cross CrossVersion.for3Use2_13
+      libraryDependencies ++= Seq(
+        "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross CrossVersion.for3Use2_13,
+        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" % Provided cross CrossVersion.for3Use2_13
+      )
     )
 
 lazy val js = project
