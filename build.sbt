@@ -93,6 +93,7 @@ inThisBuild(
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
+    resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots",
     // faster publishLocal:
     packageDoc / publishArtifact := "true" == System.getenv("CI"),
     packageSrc / publishArtifact := "true" == System.getenv("CI"),
@@ -439,7 +440,7 @@ lazy val jsWorker =
       moduleName := "mdoc-js-worker",
       libraryDependencies ++= Seq(
         "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross CrossVersion.for3Use2_13,
-        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" % Provided cross CrossVersion.for3Use2_13
+        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
       )
     )
 
