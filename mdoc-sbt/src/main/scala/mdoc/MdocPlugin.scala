@@ -160,7 +160,8 @@ object MdocPlugin extends AutoPlugin {
 
           val importMapDependency = binaryVersion match {
             case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.1.1-4-cf4739e-SNAPSHOT"
-            case other => "com.armanbilge" % s"scalajs-importmap_$other" % "0.1.1-4-cf4739e-SNAPSHOT"
+            case other =>
+              "com.armanbilge" % s"scalajs-importmap_$other" % "0.1.1-4-cf4739e-SNAPSHOT"
           }
 
           val mdocJSDependency = binaryVersion match {
@@ -172,8 +173,9 @@ object MdocPlugin extends AutoPlugin {
 
           MdocJSConfiguration(
             scalacOptions = options.options,
-            compileClasspath = options.classpath ,
-            linkerClassPath = getJars(linkerDependency) ++ workerClasspath ++ getJars(importMapDependency),
+            compileClasspath = options.classpath,
+            linkerClassPath =
+              getJars(linkerDependency) ++ workerClasspath ++ getJars(importMapDependency),
             moduleKind = options.moduleKind,
             jsLibraries = libraries
           ).writeTo(props)
