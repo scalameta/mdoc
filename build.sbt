@@ -93,7 +93,6 @@ inThisBuild(
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers += Resolver.sonatypeRepo("public"),
-    resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots",
     // faster publishLocal:
     packageDoc / publishArtifact := "true" == System.getenv("CI"),
     packageSrc / publishArtifact := "true" == System.getenv("CI"),

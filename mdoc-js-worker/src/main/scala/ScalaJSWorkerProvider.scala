@@ -24,6 +24,7 @@ class ScalaJSWorkerProvider extends i.ScalajsWorkerProvider {
       def trace(ex: => Throwable) =
         logger.trace(ex)
     }
+
     new ScalaJSWorker(config, wrappedLogger)
   }
 }

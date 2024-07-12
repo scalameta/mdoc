@@ -6,7 +6,6 @@ import sbt._
 import scala.collection.mutable.ListBuffer
 
 object MdocPlugin extends AutoPlugin {
-  resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
   object autoImport {
     val mdoc =
       inputKey[Unit](
@@ -159,9 +158,9 @@ object MdocPlugin extends AutoPlugin {
           }
 
           val importMapDependency = binaryVersion match {
-            case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.1.1-4-cf4739e-SNAPSHOT"
+            case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.1.1"
             case other =>
-              "com.armanbilge" % s"scalajs-importmap_$other" % "0.1.1-4-cf4739e-SNAPSHOT"
+              "com.armanbilge" % s"scalajs-importmap_$other" % "0.1.1"
           }
 
           val mdocJSDependency = binaryVersion match {
@@ -204,7 +203,7 @@ object MdocPlugin extends AutoPlugin {
           "mdoc esmoddule properties",
           esOut
         )
-        List(out, esOut)
+        List(out, esOut) // Both of these are used in the JsCliSuite Integration tests
       }
     )
 
