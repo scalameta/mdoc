@@ -119,7 +119,7 @@ class JsCliSuite extends BaseCliSuite {
       this.getClass.getClassLoader.getResource("importmap.json").getPath
     )
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
-    val generatedJs = AbsolutePath(out().toString + "/docs/facade.md.js")
+    val generatedJs = AbsolutePath(out().toNIO.resolve("docs").resolve("facade.md.js"))
     val content = new String(FileIO.readAllBytes(generatedJs), StandardCharsets.UTF_8)
     assert(
       content.contains("https://cdn.jsdelivr.net/npm/@stdlib/blas")
