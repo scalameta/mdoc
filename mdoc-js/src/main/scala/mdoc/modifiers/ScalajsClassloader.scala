@@ -9,8 +9,6 @@ final class FilteringClassLoader(parent: ClassLoader) extends ClassLoader(parent
     "scala.",
     "org.scalajs.linker.",
     "org.scalajs.logging.",
-    "org.scalajs.",
-    "org.scalajs.ir.",
     "sun.reflect.",
     "jdk.internal.reflect.",
     "mdoc.js."
