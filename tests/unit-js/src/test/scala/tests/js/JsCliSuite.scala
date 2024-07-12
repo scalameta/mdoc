@@ -12,6 +12,7 @@ import java.io.PrintStream
 import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
 import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
 
 class JsCliSuite extends BaseCliSuite {
 
@@ -116,10 +117,11 @@ class JsCliSuite extends BaseCliSuite {
       "--prop-file-name",
       "es.properties",
       "--import-map-path",
-      this.getClass.getClassLoader.getResource("importmap.json").getPath
+      Paths.get(this.getClass.getClassLoader.getResource("importmap.json").toURI).toString()
     )
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
-    val generatedJs = AbsolutePath(out().toNIO.resolve("docs").resolve("facade.md.js"))
+    val generatedJs =
+      AbsolutePath(out().toNIO.resolve("docs").resolve("facade.md.js"))
     val content = new String(FileIO.readAllBytes(generatedJs), StandardCharsets.UTF_8)
     assert(
       content.contains("https://cdn.jsdelivr.net/npm/@stdlib/blas")
