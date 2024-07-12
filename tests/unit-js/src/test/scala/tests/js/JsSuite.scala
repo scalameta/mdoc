@@ -83,7 +83,7 @@ class JsSuite extends BaseMarkdownSuite {
         importMapPath = Some(
           AbsolutePath(
             Paths
-              .get(this.getClass.getClassLoader.getResource("importmap.json").toURI().getPath())
+              .get(this.getClass.getClassLoader.getResource("importmap.json").toURI())
               .toAbsolutePath()
           )
         )
