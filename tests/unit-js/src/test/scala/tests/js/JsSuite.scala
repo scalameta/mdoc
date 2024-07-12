@@ -80,7 +80,7 @@ class JsSuite extends BaseMarkdownSuite {
       baseSettings().copy(
         site = baseSettings().site.updated("js-module-kind", "ESModule"),
         importMapPath =
-          Some(AbsolutePath(this.getClass.getClassLoader.getResource("importmap.json").getPath))
+          Some(AbsolutePath(this.getClass.getClassLoader.getResource("importmap.json").getPath.toNIO))
       )
     }
   )
