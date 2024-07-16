@@ -47,7 +47,7 @@ class ScalaJSWorker(
     StandardImpl.clearableLinker(cfg)
   }
 
-  lazy val remapFct = config.importMap.asScala.toSeq.foldLeft((in: String) => in) {
+  lazy val esModuleRemapFunction: String => String = config.importMap.asScala.toSeq.foldLeft((in: String) => in) {
     case (fct, (s1, s2)) =>
       val fct2: (String => String) = (in => in.replace(s1, s2))
       (in => fct(fct2(in)))
@@ -82,7 +82,7 @@ class ScalaJSWorker(
           if (config.importMap.isEmpty)
             ir
           else
-            ImportMappedIRFile.fromIRFile(ir)(remapFct)
+            ImportMappedIRFile.fromIRFile(ir)(esModuleRemapFunction)
         },
         Seq.empty,
         mem,
