@@ -126,17 +126,15 @@ class JsCliSuite extends BaseCliSuite {
     val content = Source.fromFile(generatedJs.toNIO.toUri()).getLines().toList
     println(content(1))
 
-    /**       
-       SP 16.07.2024
-        assert(content(contains("https://cdn.jsdelivr.net/npm/@stdlib/blas"))
-        The line above should also be an effective test. It does not illustrate 
-        what the remap tries to achieve, so the test below is preferred. 
-
-        However, given that the names in the test below are "generated", by scalaJS 
-        there is a risk the test turns flaky / fails at some point in the futurem, should scalaJS 
-        change it's with regard to variable name generation. It this test turns "flaky"        
-        the line above could be used in that case to reduce maintenance burden.
-    **/
+    /** SP 16.07.2024 assert(content(contains("https://cdn.jsdelivr.net/npm/@stdlib/blas")) The line
+      * above should also be an effective test. It does not illustrate what the remap tries to
+      * achieve, so the test below is preferred.
+      *
+      * However, given that the names in the test below are "generated", by scalaJS there is a risk
+      * the test turns flaky / fails at some point in the futurem, should scalaJS change it's with
+      * regard to variable name generation. It this test turns "flaky" the line above could be used
+      * in that case to reduce maintenance burden.
+      */
 
     assertEquals(
       content(1),
