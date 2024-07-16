@@ -164,7 +164,7 @@ case class Settings(
     @Description(
       "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
     )
-    propFileName: String = "mdoc.properties"
+    propertyFileName: String = "mdoc.properties"
 ) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
