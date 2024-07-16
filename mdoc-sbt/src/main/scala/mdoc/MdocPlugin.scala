@@ -154,7 +154,8 @@ object MdocPlugin extends AutoPlugin {
 
           val linkerDependency = binaryVersion match {
             case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
-            case scalaBinaryVersion => "org.scala-js" % s"scalajs-linker_$scalaBinaryVersion" % sjsVersion
+            case scalaBinaryVersion =>
+              "org.scala-js" % s"scalajs-linker_$scalaBinaryVersion" % sjsVersion
           }
 
           val importMapDependency = binaryVersion match {

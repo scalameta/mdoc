@@ -11,7 +11,7 @@ import cats.instances.set
 import mdoc.internal.cli.Context
 
 class CliArgsSuite extends FunSuite {
-  private val reporter = ConsoleReporter.default  
+  private val reporter = ConsoleReporter.default
 
   def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(implicit
       loc: munit.Location
@@ -108,13 +108,13 @@ class CliArgsSuite extends FunSuite {
 
   checkOK(
     "--property-file-name",
-    List("--property-file-name", "es.properties", tmpFile.toString, tmpDirectory.toString), 
+    List("--property-file-name", "es.properties", tmpFile.toString, tmpDirectory.toString),
     onSuccess = conf => assertEquals(conf.propertyFileName, "es.properties")
   )
 
   checkOK(
     "--property-file-name default",
-    List(tmpFile.toString, tmpDirectory.toString), 
+    List(tmpFile.toString, tmpDirectory.toString),
     onSuccess = conf => assertEquals(conf.propertyFileName, "mdoc.properties")
   )
 
