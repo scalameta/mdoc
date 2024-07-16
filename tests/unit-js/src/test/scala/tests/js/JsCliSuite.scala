@@ -13,6 +13,7 @@ import scala.meta.internal.io.FileIO
 import scala.meta.io.AbsolutePath
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import scala.io.Source
 
 class JsCliSuite extends BaseCliSuite {
 
@@ -122,9 +123,24 @@ class JsCliSuite extends BaseCliSuite {
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
     val generatedJs =
       AbsolutePath(out().toNIO.resolve("docs").resolve("facade.md.js"))
-    val content = new String(FileIO.readAllBytes(generatedJs), StandardCharsets.UTF_8)
-    assert(
-      content.contains("https://cdn.jsdelivr.net/npm/@stdlib/blas")
+    val content = Source.fromFile(generatedJs.toNIO.toUri()).getLines().toList
+    println(content(1))
+
+    /**       
+       SP 16.07.2024
+        assert(content(contains("https://cdn.jsdelivr.net/npm/@stdlib/blas"))
+        The line above should also be an effective test. It does not illustrate 
+        what the remap tries to achieve, so the test below is preferred. 
+
+        However, given that the names in the test below are "generated", by scalaJS 
+        there is a risk the test turns flaky / fails at some point in the futurem, should scalaJS 
+        change it's with regard to variable name generation. It this test turns "flaky"        
+        the line above could be used in that case to reduce maintenance burden.
+    **/
+
+    assertEquals(
+      content(1),
+      """import * as $i_https$003a$002f$002fcdn$002ejsdelivr$002enet$002fnpm$002f$0040stdlib$002fblas$00400$002e2$002e1$002f$002besm$002fbase from "https://cdn.jsdelivr.net/npm/@stdlib/blas@0.2.1/+esm/base";"""
     )
     assertEquals(code, 0, clues(myStdout))
 
