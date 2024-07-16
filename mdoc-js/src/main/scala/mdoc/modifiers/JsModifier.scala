@@ -75,7 +75,7 @@ class JsModifier extends mdoc.PreModifier {
       .withBatchMode(config.batchMode)
       .withClosureCompiler(
         config.fullOpt && !(config.moduleKind == ModuleType.ESModule)
-      ) // Closure compiler dosen't work with ESModules
+      ) // Closure compiler doesn't work with ESModules
       .withImportMap(config.importMap.asJava)
   }
 
