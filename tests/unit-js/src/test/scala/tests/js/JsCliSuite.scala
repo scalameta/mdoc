@@ -77,7 +77,7 @@ class JsCliSuite extends BaseCliSuite {
         |<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./docs/index2.md.js" ></div>
         |<script type="module" src="index2.md.js"></script>
         |<script type="module" src="mdoc.js"></script>""".stripMargin,
-    extraArgs = Array("--prop-file-name", "es.properties"),
+    extraArgs = Array("--property-file-name", "es.properties"),
     includeOutputPath = { path => !path.toNIO.getFileName.toString.endsWith(".js") }
   )
 
@@ -114,7 +114,7 @@ class JsCliSuite extends BaseCliSuite {
       out().toString,
       "--cwd",
       in().syntax,
-      "--prop-file-name",
+      "--property-file-name",
       "es.properties",
       "--import-map-path",
       Paths.get(this.getClass.getClassLoader.getResource("importmap.json").toURI).toString()

@@ -310,7 +310,7 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
         val base =
           Settings.default(
             AbsolutePath(workingDirectory),
-            conf.get[String]("propFileName").getOrElse("mdoc.properties")
+            conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
           )
         val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
         conf
