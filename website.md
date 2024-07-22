@@ -3,7 +3,7 @@
 Before starting;
 
 1. Make sure the project compiles.
-2. *Ensure you are using node v16*. As of 22.07.2024 The website will not work with higher versions of node.
+2. *Ensure you are using node v16*. (As of 22.07.2024) The website will not work with higher versions of node. Consider using nvm to manage node versions.
 
 Next
 
