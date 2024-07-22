@@ -296,18 +296,15 @@ val jsdocs = project
     sharedSettings,
     publish / skip := true,
     scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.CommonJSModule)
+      _.withModuleKind(ModuleKind.ESModule)
     },
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
-    ),
-    scalaJSUseMainModuleInitializer := true,
-    Compile / npmDependencies ++= List(
-      "ms" -> "2.1.1"
-    ),
-    webpackBundlingMode := BundlingMode.LibraryOnly()
+      // "com.raquo" %%% "laminar" % "0.17.0",
+      // "com.raquo" %%% "laminar-shoelace" % "0.1.0" // once this project moves to scala 3.
+    )
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
 
 lazy val worksheets = project
   .in(file("tests/worksheets"))
@@ -473,7 +470,9 @@ lazy val docs = project
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jsdocs),
-    mdocJSLibraries := (jsdocs / Compile / fullOptJS / webpack).value,
+    // mdocJSLibraries := (jsdocs / Compile / fullOptJS).outputFiles.map { path =>
+    //   Attributed.blank(path.toFile)
+    // },
     MdocPlugin.mdocJSWorkerClasspath := {
       val _ = (jsWorker / Compile / compile).value
 
