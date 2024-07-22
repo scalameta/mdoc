@@ -415,3 +415,23 @@ mdocVariables := Map(
   "js-batch-mode" -> "true"
 )
 ```
+### Remapping imports at link time.
+
+It may be the case, that the library you wish to depend on, is a facade to some NPM dependancy. Setting up a bundler in mdoc isn't a simple operation, but there is an alternative. We can instead as mdoc to output ESModules (see `ModuleKind`) and then remap their imports to point at a CDN.
+
+To mdocs CLI, you'll need to pass this flag;
+
+```sh
+--import-map-path full/path/to/import-map.json
+```
+
+`import-map.json` should look like this;
+
+```json
+{
+  "imports": {
+    "@easepick/bundle": "https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.1",
+  }
+}
+```
+You should then have this dependancy available to you.
