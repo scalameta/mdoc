@@ -47,6 +47,11 @@ object MdocPlugin extends AutoPlugin {
         "If false, do not add mdoc as a library dependency this project. " +
           "Default value is true."
       )
+    val esModuleImportJSMapFile =
+      settingKey[Option[File]](
+        "File containing an import map for remapping ESModules at link time. " +
+          "Defaults to the toplevel docs/ directory."
+      )
   }
   val mdocInternalVariables =
     settingKey[List[(String, String)]](
@@ -82,6 +87,7 @@ object MdocPlugin extends AutoPlugin {
       mdocJSWorkerClasspath := None,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
+      esModuleImportJSMapFile := None,
       mdoc := Def.inputTaskDyn {
         validateSettings.value
         val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
