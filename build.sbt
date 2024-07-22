@@ -297,6 +297,25 @@ val jsdocs = project
     sharedSettings,
     publish / skip := true,
     scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+    },
+    libraryDependencies ++= List(
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom
+    ),
+    scalaJSUseMainModuleInitializer := true,
+    Compile / npmDependencies ++= List(
+      "ms" -> "2.1.1"
+    ),
+    webpackBundlingMode := BundlingMode.LibraryOnly()
+  )
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+
+val jswebsitedocs = project
+  .in(file("tests/websiteJs"))
+  .settings(
+    sharedSettings,
+    publish / skip := true,
+    scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
     },
     libraryDependencies ++= List(
@@ -470,7 +489,7 @@ lazy val docs = project
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
-    mdocJS := Some(jsdocs),
+    mdocJS := Some(jswebsitedocs),
     // mdocJSLibraries := (jsdocs / Compile / fullOptJS).outputFiles.map { path =>
     //   Attributed.blank(path.toFile)
     // },
