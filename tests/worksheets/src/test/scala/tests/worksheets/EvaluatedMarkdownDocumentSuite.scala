@@ -62,7 +62,9 @@ class EvaluatedMarkdownDocumentSuite extends BaseSuite {
         |```
       """.stripMargin
 
-    val variables = java.util.Map.of("HELLO", "1", "WORLD", "2")
+    val variables = new java.util.HashMap[String, String]()
+    variables.put("HELLO", "1")
+    variables.put("WORLD", "2")
 
     val evaluated = mdoc.evaluateMarkdownDocument("README.md", document, variables)
 
