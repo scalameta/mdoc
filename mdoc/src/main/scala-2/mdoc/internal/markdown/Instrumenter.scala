@@ -168,7 +168,7 @@ object Instrumenter {
 
   def stringLiteral(string: String): String = {
     import scala.meta.internal.prettyprinters._
-    DoubleQuotes(string)
+    enquote(string, DoubleQuotes)
   }
 
   def wrapBody(body: String): String = {
