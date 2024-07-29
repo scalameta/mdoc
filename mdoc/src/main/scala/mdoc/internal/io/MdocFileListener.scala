@@ -7,21 +7,19 @@ import io.methvin.watcher.DirectoryWatcher
 import java.io.InputStream
 import java.nio.file.Files
 import java.util.Scanner
-import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
-import org.slf4j.Logger
 import org.slf4j.helpers.NOPLogger
 import scala.meta.io.AbsolutePath
 import mdoc.internal.pos.PositionSyntax._
 
 final class MdocFileListener(
     executor: ExecutorService,
-    in: InputStream,
+    in: Option[InputStream],
     runAction: DirectoryChangeEvent => Unit
 ) extends DirectoryChangeListener {
   private var myIsWatching: Boolean = true
   private var watcher: DirectoryWatcher = _
-  private def blockUntilEnterKey(): Unit = {
+  private def blockUntilEnterKey(in: InputStream): Unit = {
     try {
       new Scanner(in).nextLine()
       println("Shutting down...")
@@ -29,9 +27,16 @@ final class MdocFileListener(
       case _: NoSuchElementException =>
     }
   }
+  private def blockUntilInterrupted(): Unit = {
+    try {
+      this.wait()
+    } catch {
+      case _: InterruptedException =>
+    }
+  }
   def watchUntilInterrupted(): Unit = {
     watcher.watchAsync(executor)
-    blockUntilEnterKey()
+    in.fold(blockUntilInterrupted())(blockUntilEnterKey)
     executor.shutdown()
     myIsWatching = false
     watcher.close()
@@ -51,7 +56,7 @@ final class MdocFileListener(
 }
 
 object MdocFileListener {
-  def create(inputs: List[AbsolutePath], executor: ExecutorService, in: InputStream)(
+  def create(inputs: List[AbsolutePath], executor: ExecutorService, in: Option[InputStream])(
       runAction: DirectoryChangeEvent => Unit
   ): MdocFileListener = {
     val listener = new MdocFileListener(executor, in, runAction)
