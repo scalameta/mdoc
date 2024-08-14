@@ -238,7 +238,8 @@ println(s"Loading HTML: ${node.innerHTML}")
 ```scala mdoc:js
 <p>I am a custom <code>loader</code></p>
 ---
-println(node.innerHTML)
+// Open developer console to see this printed message
+println(s"Loading HTML: ${node.innerHTML}")
 ```
 
 Replace the node's `innerHTML` to make the HTML disappear once the document has
