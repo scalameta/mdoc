@@ -320,8 +320,6 @@ val jswebsitedocs = project
     },
     libraryDependencies ++= List(
       "org.scala-js" %%% "scalajs-dom" % scalajsDom
-      // "com.raquo" %%% "laminar" % "0.17.0",
-      // "com.raquo" %%% "laminar-shoelace" % "0.1.0" // once this project moves to scala 3.
     )
   )
   .enablePlugins(ScalaJSPlugin)
