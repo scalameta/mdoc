@@ -2,18 +2,19 @@ package tests.js
 
 import mdoc.internal.cli.MdocProperties
 import mdoc.internal.cli.Settings
-import scala.meta.io.Classpath
-import tests.markdown.StringSyntax._
 import tests.cli.BaseCliSuite
-import scala.meta.internal.io.PathIO
 import tests.js.JsTests.suffix
+import tests.markdown.StringSyntax._
+
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import scala.meta.internal.io.FileIO
-import scala.meta.io.AbsolutePath
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import scala.io.Source
+import scala.meta.internal.io.FileIO
+import scala.meta.internal.io.PathIO
+import scala.meta.io.AbsolutePath
+import scala.meta.io.Classpath
 
 class JsCliSuite extends BaseCliSuite {
 
