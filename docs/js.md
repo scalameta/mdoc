@@ -408,7 +408,7 @@ To mdocs CLI, you'll need to pass this flag;
   }
 }
 ```
-You should then have this dependancy available to you.
+You should then have this dependency available to you.
 
 
 # Legacy
