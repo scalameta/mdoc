@@ -253,7 +253,7 @@ org.scalajs.dom.window.setTimeout(() => {
 
 ## Facades
 
-Let's imagine we want to document a (glorious) facade to [ms](https://www.npmjs.com/package/ms)  with mdoc.
+Let's imagine we want to document a (glorious) facade to [ms](https://www.npmjs.com/package/ms) with mdoc.
 
 
 ```scala mdoc:js:shared
