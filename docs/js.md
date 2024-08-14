@@ -114,7 +114,7 @@ Some notes:
   `-Xplugin:path/to/scalajs-compiler.jar` to enable the Scala.js compiler.
 - The `js-classpath` field in `mdoc.properties` must include a dependency on the
   library `org.scala-js:scalajs-dom`
-- There is a js-html-header field in `mdoc.properties` which can be used to inject custom HTML into the output. This can be used to inject scripts or stylesheets into the output.
+- There is a js-html-header field in `mdoc.properties` which can be used to inject custom HTML, scripts or stylesheets into the output.
 ```html
 js-html-header=<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css" /><script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"></script>
 ```
