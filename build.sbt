@@ -128,7 +128,7 @@ val V = new {
 
   val fs2 = "3.10.2"
 
-  val metaconfig = "0.12.0"
+  val metaconfig = "0.13.0"
 }
 
 lazy val interfaces = project
@@ -194,7 +194,7 @@ lazy val cli = project
       "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "com.lihaoyi" %% "pprint" % V.pprint,
-      "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig
+      "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig
     ),
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
@@ -247,7 +247,7 @@ lazy val mdoc = project
       "io.undertow" % "undertow-core" % "2.2.24.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.16.Final",
       "org.slf4j" % "slf4j-api" % "2.0.16",
-      "com.geirsson" %% "metaconfig-typesafe-config" % V.metaconfig,
+      "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
     )
