@@ -7,7 +7,7 @@ import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
 import tests.markdown.Compat
 import scala.meta.io.AbsolutePath
-import java.nio.file.Paths;
+import java.nio.file.Paths
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
