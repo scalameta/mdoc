@@ -9,6 +9,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
+import java.nio.file.Path
 import mdoc.OnLoadContext
 import mdoc.PostModifier
 import mdoc.PreModifier
@@ -32,7 +33,6 @@ import mdoc.internal.markdown.{GitHubIdGenerator, ReplVariablePrinter}
 import mdoc.internal.cli.CliEnrichments._
 import pprint.TPrint
 import pprint.TPrintColors
-import java.nio.file.Path
 
 class Section(val name: String) extends StaticAnnotation
 
@@ -154,9 +154,6 @@ case class Settings(
     @Hidden()
     @Description("The pretty printer for variables")
     variablePrinter: Variable => String = ReplVariablePrinter,
-    @Hidden()
-    @Description("The Coursier logger used to report progress bars when downloading dependencies")
-    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars(),
     @Description(
       "The absolute path to a file containing an import map file in this format; https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap"
     )
@@ -164,10 +161,15 @@ case class Settings(
     @Description(
       "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
     )
-    propertyFileName: String = "mdoc.properties"
+    propertyFileName: String = mdocProperties,
+    @Hidden()
+    @Description("The Coursier logger used to report progress bars when downloading dependencies")
+    coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
 ) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
+
+  val mdocProperties = "mdoc.properties"
 
   val outputByInput = in
     .zip(out)
@@ -310,7 +312,7 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
         val base =
           Settings.default(
             AbsolutePath(workingDirectory),
-            conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
+            conf.get[String]("propertyFileName").getOrElse(mdocProperties)
           )
         val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
         conf

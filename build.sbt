@@ -245,6 +245,7 @@ lazy val mdoc = project
           .excludeAll(excludePprint)
       )
     ),
+    libraryDependencies ++= jsoniter,
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.18.0",
@@ -255,7 +256,7 @@ lazy val mdoc = project
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig,
       "com.lihaoyi" %% "fansi" % V.fansi,
       "com.lihaoyi" %% "pprint" % V.pprint
-    ) ++ jsoniter
+    )
   )
   .dependsOn(parser, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
@@ -463,8 +464,8 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
-    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value,
-    libraryDependencies ++= jsoniter
+    libraryDependencies ++= jsoniter,
+    Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
   )
   .dependsOn(mdoc)
 
@@ -487,9 +488,6 @@ lazy val docs = project
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jswebsitedocs),
-    // mdocJSLibraries := (jsdocs / Compile / fullOptJS).outputFiles.map { path =>
-    //   Attributed.blank(path.toFile)
-    // },
     MdocPlugin.mdocJSWorkerClasspath := {
       val _ = (jsWorker / Compile / compile).value
 
