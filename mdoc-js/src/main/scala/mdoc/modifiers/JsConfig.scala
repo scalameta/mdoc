@@ -1,15 +1,16 @@
 package mdoc.modifiers
 
+import java.io.{FileInputStream, InputStreamReader, BufferedReader, IOException}
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.modifiers.ImportMapJsonIr.ImportMap
+import mdoc.js.interfaces._
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
-import mdoc.js.interfaces._
 import scala.collection.immutable.HashMap
-import com.github.plokhotnyuk.jsoniter_scala.core._
-import mdoc.modifiers.ImportMapJsonIr.ImportMap
+import com.github.plokhotnyuk.jsoniter_scala.{core => jsoniter}
 
 case class JsConfig(
     moduleKind: ModuleType = ModuleType.NoModule,
@@ -107,9 +108,24 @@ object JsConfig {
       importMap = ctx.settings.importMapPath match {
         case None => new HashMap[String, String]()
         case Some(value) =>
-          val importMapRaw = scala.io.Source.fromFile(value.toFile).getLines().mkString("\n")
-          val importMapParsed = readFromString[ImportMap](importMapRaw)
-          importMapParsed.imports
+          var fileInputStream: FileInputStream = null
+          try {
+            fileInputStream = new FileInputStream(value.toFile)
+            val importMapParsed = jsoniter.readFromStream[ImportMap](fileInputStream)
+            importMapParsed.imports
+          } catch {
+            case e: IOException =>
+              e.printStackTrace()
+              throw e
+          } finally {
+            if (fileInputStream != null) {
+              try {
+                fileInputStream.close()
+              } catch {
+                case e: IOException => e.printStackTrace()
+              }
+            }
+          }
       }
     )
   }

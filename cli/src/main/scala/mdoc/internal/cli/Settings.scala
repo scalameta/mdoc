@@ -161,15 +161,13 @@ case class Settings(
     @Description(
       "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
     )
-    propertyFileName: String = mdocProperties,
+    propertyFileName: String = "mdoc.properties",
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
     coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
 ) extends mdoc.parser.ParserSettings {
 
   val isMarkdownFileExtension = markdownExtensions.toSet
-
-  val mdocProperties = "mdoc.properties"
 
   val outputByInput = in
     .zip(out)
@@ -312,7 +310,7 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
         val base =
           Settings.default(
             AbsolutePath(workingDirectory),
-            conf.get[String]("propertyFileName").getOrElse(mdocProperties)
+            conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
           )
         val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
         conf
