@@ -79,7 +79,7 @@ js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_
 EOT
 ```
 
-Note: For scala 3, you may need `js-scalac-options=-scalajs` - instead of the XPlugin incantation - [Doc](https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins).
+Note: For scala 3, you may need `js-scalac-options=-scalajs` - instead of the `-XPlugin` flag - [Doc](https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins).
 
 
 
@@ -118,7 +118,7 @@ Some notes:
 ```html
 js-html-header=<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css" /><script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"></script>
 ```
-- There is a `--import-map` command line flag, commonly set to something like this; `--import-map-path $(pwd)/importmap.json`, which will remap ESModule imports at link time. As a reminder, `importmap.json`, could look like;
+- There's an `--import-map` command line flag, commonly set to ; `--import-map-path $(pwd)/importmap.json`, which will remap ESModule imports at link time. As a reminder `importmap.json` could look like:
 ```
 {
   "imports": {
@@ -279,7 +279,7 @@ val time2 = ms( 1000)
 node.innerHTML = s"Hello from npm package 'ms': $time , $time2 "
 ```
 
-If the `ms` function is not referenced (somehow) `jsdocs` you may get a
+If the `ms` function is not referenced from `jsdocs` you may get a
 stacktrace in the browser console like this:
 
 ```js
@@ -390,9 +390,9 @@ mdocVariables := Map(
   "js-batch-mode" -> "true"
 )
 ```
-### Remapping imports at link time.
+### Remapping imports at link time
 
-It may be the case, that the library you wish to depend on, is a facade to some NPM dependancy. Mapping the import offers an alterative to bundling, by resolving the dependancy out of a CDN. We set mdoc to output ESModules (see `ModuleKind`), and load the dependancies directly in the browser.
+It may be the case that the library you wish to depend on is a facade to some NPM dependency. Mapping the import offers an alterative to bundling, by resolving the dependency out of a CDN. We set mdoc to output ESModules (see `ModuleKind`), and load the dependancies directly in the browser.
 
 To mdocs CLI, you'll need to pass this flag;
 
@@ -415,13 +415,13 @@ You should then have this dependency available to you.
 
 # Legacy
 
-This documentation is preserved here, but it is no longer recommend to work with scalaJS bundler. If you require a bundler you should consider the excellent [vite](https://vitejs.dev) project. It is currently unsolved how to use mdoc with vite.
+This documentation is preserved here, but it is no longer recommend to work with scalaJS bundler. If you require a bundler you should consider the excellent [vite](https://vitejs.dev) project - integration with vite is a potential improvement for mdoc.
 
 
 The [scalajs-bundler](https://scalacenter.github.io/scalajs-bundler/) plugin can
 be used to install npm dependencies and bundle applications with webpack.
 
-Add the following sbt settings if you use scalajs-bundler.
+Add the following sbt settings if you use scalajs-bundler:
 
 ```diff
  lazy val jsdocs = project
