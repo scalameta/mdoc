@@ -1,4 +1,11 @@
 import scala.collection.mutable
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import scala.scalanative.build._
+
+addCommandAlias(
+  "testAllNonNative",
+  "interfaces/test;runtime/test;parser/test;cli/test;mdoc/test;testsInput/test;tests/test;jsdocs/test;worksheets/test;unit/test;unitJS/test;jsApi/test;jsWorker/test;js/test;"
+)
 
 def scala212 = "2.12.19"
 def scala213 = "2.13.14"
@@ -178,7 +185,8 @@ val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 val excludeCollection =
   ExclusionRule(organization = "org.scala-lang.modules", name = "scala-collection-compat_2.13")
 
-lazy val parser = project
+lazy val parser = crossProject(JVMPlatform, NativePlatform)
+  .withoutSuffixFor(JVMPlatform)
   .settings(
     sharedSettings,
     moduleName := "mdoc-parser"
@@ -210,7 +218,7 @@ lazy val cli = project
       )
     )
   )
-  .dependsOn(parser)
+  .dependsOn(parser.jvm)
 
 lazy val mdoc = project
   .settings(
@@ -252,7 +260,7 @@ lazy val mdoc = project
       "com.lihaoyi" %% "pprint" % V.pprint
     )
   )
-  .dependsOn(parser, runtime, cli)
+  .dependsOn(parser.jvm, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
 
 lazy val testsInput = project
@@ -348,7 +356,7 @@ lazy val unit = project
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
     )
   )
-  .dependsOn(parser, mdoc, testsInput, tests)
+  .dependsOn(parser.jvm, mdoc, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 lazy val unitJS = project
@@ -501,6 +509,7 @@ def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
 def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
   val projects = List(parser, runtime, cli, mdoc, js, jsWorker).reverse
   projects
+    .flatMap(_.componentProjects)
     .map(p => localCrossPublishProject(p, scalaV))
     .reduceLeft(_ dependsOn _)
 }
@@ -511,7 +520,7 @@ def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[
     val projects = List(parser, runtime, cli, mdoc, js, jsWorker)
     val setttings =
       (ThisBuild / version := versionValue) ::
-        projects.map(p => p / scalaVersion := scalaV)
+        projects.flatMap(_.componentProjects).map(p => p / scalaVersion := scalaV)
     val newState = Project
       .extract(state.value)
       .appendWithSession(
