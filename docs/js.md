@@ -151,7 +151,7 @@ setInterval(() => {
 ```
 ````
 
-Is a compile error, because the imports are not in the second block. But add the shared modifier...
+Is a compile error, because the imports are not in the second block. But if you add the shared modifier:
 
 ````md
 ```scala mdoc:js:shared
