@@ -189,7 +189,7 @@ org.scalajs.dom.window.setInterval(() => {
 }, 1000)
 ```
 ````
-You'd have to look at the raw markdown to see the fence below...
+You'd have to look at the raw markdown to see the fence below.
 
 ```scala mdoc:js:invisible
 Loading <code>:invisible</code> example...
