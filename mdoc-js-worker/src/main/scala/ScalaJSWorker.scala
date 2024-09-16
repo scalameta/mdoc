@@ -47,11 +47,15 @@ class ScalaJSWorker(
     StandardImpl.clearableLinker(cfg)
   }
 
-  lazy val esModuleRemapFunction: String => String =
+  def esModuleRemapFunction: String => String =
     config.importMap.asScala.toSeq.foldLeft((in: String) => in) { case (fct, (s1, s2)) =>
       val fct2: (String => String) = (in => in.replace(s1, s2))
       (in => fct(fct2(in)))
     }
+
+  val remapImportsInIRFile: IRFile => IRFile =
+    if (config.importMap.isEmpty) identity
+    else ImportMappedIRFile.fromIRFile(_)(esModuleRemapFunction)
 
   var cachedFiles = Seq.empty[org.scalajs.linker.interface.IRFile]
 
@@ -78,12 +82,7 @@ class ScalaJSWorker(
               .collect { case IFile(o) =>
                 o
               }
-        ).map { ir =>
-          if (config.importMap.isEmpty)
-            ir
-          else
-            ImportMappedIRFile.fromIRFile(ir)(esModuleRemapFunction)
-        },
+        ).map { remapImportsInIRFile },
         Seq.empty,
         mem,
         logger
