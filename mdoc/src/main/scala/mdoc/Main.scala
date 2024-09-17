@@ -36,8 +36,7 @@ trait MainProcess {
     process(args, new ConsoleReporter(out), cwd)
   }
   def process(args: Array[String], reporter: Reporter, cwd: Path): Int = {
-    val base = Settings.default(AbsolutePath(cwd))
-    val ctx = Settings.fromCliArgs(args.toList, base)
+    val ctx = Settings.fromCliArgs(args.toList, cwd)
     MainOps.process(ctx, reporter)
   }
   def process(settings: MainSettings): Int = {

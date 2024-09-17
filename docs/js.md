@@ -7,13 +7,12 @@ sidebar_label: Scala.js
 Code fences with the `scala mdoc:js` modifier are compiled with Scala.js and run
 in the browser.
 
-```scala mdoc:js:shared:invisible
-import org.scalajs.dom.window._
-import jsdocs._
-```
 
 ````md
 ```scala mdoc:js
+import org.scalajs.dom.window._
+import jsdocs._
+
 val progress = new Progress()
 setInterval({ () =>
   // `node` variable is a DOM element in scope.
@@ -22,9 +21,14 @@ setInterval({ () =>
 ```
 ````
 
-```scala mdoc:js:invisible
+Becomes
+
+```scala mdoc:js
 Loading progress bar...
 ---
+import org.scalajs.dom.window._
+import jsdocs._
+
 val progress = new Progress()
 setInterval({ () =>
   // `node` variable is a DOM element in scope.
@@ -75,7 +79,9 @@ js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_@SCALA_BINARY_
 EOT
 ```
 
-Note: For scala 3, you may need `js-scalac-options=--scala-js` - this is currently untested.
+Note: For scala 3, you may need `js-scalac-options=-scalajs` - instead of the `-XPlugin` flag - [Doc](https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins).
+
+
 
 Next, create a basic Markdown files with an `mdoc:js` modifier:
 
@@ -108,6 +114,20 @@ Some notes:
   `-Xplugin:path/to/scalajs-compiler.jar` to enable the Scala.js compiler.
 - The `js-classpath` field in `mdoc.properties` must include a dependency on the
   library `org.scala-js:scalajs-dom`
+- There is a js-html-header field in `mdoc.properties` which can be used to inject custom HTML, scripts or stylesheets into the output.
+```html
+js-html-header=<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css" /><script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"></script>
+```
+- There's an `--import-map` command line flag, commonly set to ; `--import-map-path $(pwd)/importmap.json`, which will remap ESModule imports at link time. As a reminder `importmap.json` could look like:
+```
+{
+  "imports": {
+    "@shoelace-style/shoelace/dist/": "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/"
+  }
+}
+```
+which will remap the shoelace import to resolve out of a CDN - negating the need for a bundler.
+
 
 ## Modifiers
 
@@ -119,13 +139,8 @@ the rendered output.
 By default, each code fence is isolated from other code fences. Use the
 `:shared` modifier to reuse imports or variables between code fences.
 
-```scala mdoc:js:shared:invisible
-import org.scalajs.dom.window.setInterval
-import scala.scalajs.js.Date
-```
-
-````scala mdoc:mdoc
-```scala mdoc:js:shared
+````md
+```scala mdoc:js
 import org.scalajs.dom.window.setInterval
 import scala.scalajs.js.Date
 ```
@@ -136,25 +151,28 @@ setInterval(() => {
 ```
 ````
 
+Is a compile error, because the imports are not in the second block. But if you add the shared modifier:
+
+````md
+```scala mdoc:js:shared
+import org.scalajs.dom.window.setInterval
+import scala.scalajs.js.Date
+```
+````
+
+And it works!
+
+```scala mdoc:js:shared
+import org.scalajs.dom.window.setInterval
+import scala.scalajs.js.Date
+```
+
 ```scala mdoc:js
-Loading <code>:shared</code> example...
----
 setInterval(() => {
-  val date = new Date().toString()
-  node.innerHTML = s"<p>Shared date $date</p>"
+  node.innerHTML = new Date().toString()
 }, 1000)
 ```
 
-Without `:shared`, the example above results in a compile error.
-
-````scala mdoc:mdoc:crash
-```scala mdoc:js
-import scala.scalajs.js.Date
-```
-```scala mdoc:js
-new Date()
-```
-````
 
 ### `:invisible`
 
@@ -162,7 +180,7 @@ By default, the original input code is rendered in the output page. Use
 `:invisible` to hide the code example from the output so that only the div is
 generated.
 
-````scala mdoc:mdoc
+````md
 ```scala mdoc:js:invisible
 var n = 0
 org.scalajs.dom.window.setInterval(() => {
@@ -171,6 +189,7 @@ org.scalajs.dom.window.setInterval(() => {
 }, 1000)
 ```
 ````
+You'd have to look at the raw markdown to see the fence below.
 
 ```scala mdoc:js:invisible
 Loading <code>:invisible</code> example...
@@ -181,6 +200,8 @@ setInterval(() => {
   node.innerHTML = s"Invisible tick: ${n}"
 }, 1000)
 ```
+
+
 
 ### `:compile-only`
 
@@ -205,11 +226,12 @@ By default, the `node` variable points to an empty div element. Prefix the code
 fence with custom HTML followed by a `---` separator to set the inner HTML of
 the `node` div.
 
-````scala mdoc:mdoc
+````md
 ```scala mdoc:js
 <p>I am a custom <code>loader</code></p>
 ---
-println(node.innerHTML)
+// Open developer console to see this printed message
+println(s"Loading HTML: ${node.innerHTML}")
 ```
 ````
 
@@ -231,66 +253,33 @@ org.scalajs.dom.window.setTimeout(() => {
 }, 3000)
 ```
 
-## Using scalajs-bundler
+## Facades
 
-The [scalajs-bundler](https://scalacenter.github.io/scalajs-bundler/) plugin can
-be used to install npm dependencies and bundle applications with webpack.
+Let's imagine we want to document a (glorious) facade to [ms](https://www.npmjs.com/package/ms) with mdoc.
 
-Add the following sbt settings if you use scalajs-bundler.
 
-```diff
- lazy val jsdocs = project
-   .settings(
-+    webpackBundlingMode := BundlingMode.LibraryOnly()
-+    scalaJSUseMainModuleInitializer := true,
-     npmDependencies.in(Compile) ++= List(
-       // ...
-     ),
-   )
-   .enablePlugins(ScalaJSBundlerPlugin)
+```scala mdoc:js:shared
+import scala.scalajs.js
+import scala.scalajs.js.annotation._
 
- lazy val docs = project
-   .settings(
-     mdocJS := Some(jsdocs),
-+    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value
-   )
-   .enablePlugins(MdocPlugin)
+@js.native
+@JSImport("https://cdn.jsdelivr.net/npm/ms@2.1.3/+esm", JSImport.Default)
+object ms extends js.Object {
+  def apply(s: Double): String = js.native
+  def apply(s: String): Double = js.native
+}
 ```
 
-> The `webpackBundlingMode` must be `LibraryOnly` so that the mdoc generated
-> output can depend on it.
 
-### Bundle npm dependencies
-
-It's important that the main function in `jsdocs` uses the installed npm
-dependencies. If the npm dependencies are not used from the `jsdocs` main
-function, then webpack thinks they are unused and removes them from the bundled
-output even if those dependencies are called from `mdoc:js` markdown code
-fences.
-
-For example, to use the npm [`ms` package](https://www.npmjs.com/package/ms)
-start by writing a facade using `@JSImport`
-
-```scala mdoc:file:tests/jsdocs/src/main/scala/jsdocs/ms.scala
-
-```
-
-Next, write a main function that uses the facade. Make sure that the `jsdocs`
-project contains the setting `scalaJSUseMainModuleInitializer := true`.
-
-```scala mdoc:file:tests/jsdocs/src/main/scala/jsdocs/Main.scala
-
-```
-
-The `ms` function can now be used from `mdoc:js`.
 
 ```scala mdoc:js
 val date = new scala.scalajs.js.Date()
-val time = jsdocs.ms(date.getTime())
-node.innerHTML = s"Hello from npm package 'ms': $time"
+val time = ms( "2 days")
+val time2 = ms( 1000)
+node.innerHTML = s"Hello from npm package 'ms': $time , $time2 "
 ```
 
-If the `ms` function is not referenced from the `jsdocs` main function you get a
+If the `ms` function is not referenced from `jsdocs` you may get a
 stacktrace in the browser console like this:
 
 ```js
@@ -300,25 +289,13 @@ Uncaught TypeError: $i_ms is not a function
     at mdoc.js:9
 ```
 
-### Validate library.js and loader.js
-
-Validate that the `webpack` task provides one `*-library.js` file and one
-`*-loader.js` file.
+Please note that the CDN is hardcoded here as is a simple way to get started. A "real" facade would normally be constructed as
 
 ```scala
-// sbt shell
-> show jsdocs/fullOptJS::webpack
-...
-[info] * Attributed(.../jsdocs/target/scala-2.12/scalajs-bundler/main/jsdocs-opt-loader.js)
-[info] * Attributed(.../jsdocs/target/scala-2.12/scalajs-bundler/main/jsdocs-opt-library.js)
-...
+@JSImport("ms", JSImport.Default)
 ```
 
-These files are required by mdoc in order to use the scalajs-bundler npm
-dependencies. The files may be missing if you have custom webpack or
-scalajs-bundler configuration. To fix this problem, you may want to try to
-create a new `jsdocs` Scala.js project with minimal webpack and scalajs-bundler
-configuration.
+As that is where it's found in the `node_modules`. Consider remapping this import at link time, as described in the configuration section below for a (real) use case.
 
 ## Configuration
 
@@ -413,3 +390,117 @@ mdocVariables := Map(
   "js-batch-mode" -> "true"
 )
 ```
+### Remapping imports at link time
+
+It may be the case that the library you wish to depend on is a facade to some NPM dependency. Mapping the import offers an alterative to bundling, by resolving the dependency out of a CDN. We set mdoc to output ESModules (see `ModuleKind`), and load the dependancies directly in the browser.
+
+To mdocs CLI, you'll need to pass this flag;
+
+```sh
+--import-map-path full/path/to/import-map.json
+```
+
+`import-map.json` could look like this;
+
+```json
+{
+  "imports":
+  {
+    "@shoelace-style/shoelace/dist/": "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/"
+  }
+}
+```
+You should then have this dependency available to you.
+
+
+# Legacy
+
+This documentation is preserved here, but it is no longer recommend to work with scalaJS bundler. If you require a bundler you should consider the excellent [vite](https://vitejs.dev) project - integration with vite is a potential improvement for mdoc.
+
+
+The [scalajs-bundler](https://scalacenter.github.io/scalajs-bundler/) plugin can
+be used to install npm dependencies and bundle applications with webpack.
+
+Add the following sbt settings if you use scalajs-bundler:
+
+```diff
+ lazy val jsdocs = project
+   .settings(
++    webpackBundlingMode := BundlingMode.LibraryOnly()
++    scalaJSUseMainModuleInitializer := true,
+     npmDependencies.in(Compile) ++= List(
+       // ...
+     ),
+   )
+   .enablePlugins(ScalaJSBundlerPlugin)
+
+ lazy val docs = project
+   .settings(
+     mdocJS := Some(jsdocs),
++    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value
+   )
+   .enablePlugins(MdocPlugin)
+```
+
+> The `webpackBundlingMode` must be `LibraryOnly` so that the mdoc generated
+> output can depend on it.
+
+### Bundle npm dependencies
+
+It's important that the main function in `jsdocs` uses the installed npm
+dependencies. If the npm dependencies are not used from the `jsdocs` main
+function, then webpack thinks they are unused and removes them from the bundled
+output even if those dependencies are called from `mdoc:js` markdown code
+fences.
+
+For example, to use the npm [`ms` package](https://www.npmjs.com/package/ms)
+start by writing a facade using `@JSImport`
+
+```scala mdoc:file:tests/jsdocs/src/main/scala/jsdocs/ms.scala
+
+```
+
+Next, write a main function that uses the facade. Make sure that the `jsdocs`
+project contains the setting `scalaJSUseMainModuleInitializer := true`.
+
+```scala mdoc:file:tests/jsdocs/src/main/scala/jsdocs/Main.scala
+
+```
+
+The `ms` function can now be used from `mdoc:js`.
+
+```scala
+val date = new scala.scalajs.js.Date()
+val time = jsdocs.ms(date.getTime())
+node.innerHTML = s"Hello from npm package 'ms': $time"
+```
+
+If the `ms` function is not referenced from the `jsdocs` main function you get a
+stacktrace in the browser console like this:
+
+```js
+Uncaught TypeError: $i_ms is not a function
+    at $c_Lmdocjs$.run6__Lorg_scalajs_dom_raw_Element__V (js.md.js:1180)
+    at js.md.js:3108
+    at mdoc.js:9
+```
+
+### Validate library.js and loader.js
+
+Validate that the `webpack` task provides one `*-library.js` file and one
+`*-loader.js` file.
+
+```scala
+// sbt shell
+> show jsdocs/fullOptJS::webpack
+...
+[info] * Attributed(.../jsdocs/target/scala-2.12/scalajs-bundler/main/jsdocs-opt-loader.js)
+[info] * Attributed(.../jsdocs/target/scala-2.12/scalajs-bundler/main/jsdocs-opt-library.js)
+...
+```
+
+These files are required by mdoc in order to use the scalajs-bundler npm
+dependencies. The files may be missing if you have custom webpack or
+scalajs-bundler configuration. To fix this problem, you may want to try to
+create a new `jsdocs` Scala.js project with minimal webpack and scalajs-bundler
+configuration.

@@ -47,6 +47,11 @@ object MdocPlugin extends AutoPlugin {
         "If false, do not add mdoc as a library dependency this project. " +
           "Default value is true."
       )
+    val esModuleImportJSMapFile =
+      settingKey[Option[File]](
+        "File containing an import map for remapping ESModules at link time. " +
+          "Defaults to the toplevel docs/ directory."
+      )
   }
   val mdocInternalVariables =
     settingKey[List[(String, String)]](
@@ -82,6 +87,7 @@ object MdocPlugin extends AutoPlugin {
       mdocJSWorkerClasspath := None,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
+      esModuleImportJSMapFile := None,
       mdoc := Def.inputTaskDyn {
         validateSettings.value
         val parsed = sbt.complete.DefaultParsers.spaceDelimited("<arg>").parsed
@@ -154,7 +160,14 @@ object MdocPlugin extends AutoPlugin {
 
           val linkerDependency = binaryVersion match {
             case "3" => "org.scala-js" % "scalajs-linker_2.13" % sjsVersion
-            case other => "org.scala-js" % s"scalajs-linker_$other" % sjsVersion
+            case scalaBinaryVersion =>
+              "org.scala-js" % s"scalajs-linker_$scalaBinaryVersion" % sjsVersion
+          }
+
+          val importMapDependency = binaryVersion match {
+            case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.1.1"
+            case scalaBinaryVersion =>
+              "com.armanbilge" % s"scalajs-importmap_$scalaBinaryVersion" % "0.1.1"
           }
 
           val mdocJSDependency = binaryVersion match {
@@ -167,7 +180,8 @@ object MdocPlugin extends AutoPlugin {
           MdocJSConfiguration(
             scalacOptions = options.options,
             compileClasspath = options.classpath,
-            linkerClassPath = getJars(linkerDependency) ++ workerClasspath,
+            linkerClassPath =
+              getJars(linkerDependency) ++ workerClasspath ++ getJars(importMapDependency),
             moduleKind = options.moduleKind,
             jsLibraries = libraries
           ).writeTo(props)
@@ -188,7 +202,15 @@ object MdocPlugin extends AutoPlugin {
           classpath.mkString(java.io.File.pathSeparator)
         )
         IO.write(props, "mdoc properties", out)
-        List(out)
+        val esVersion = props.clone().asInstanceOf[java.util.Properties]
+        esVersion.put("js-module-kind", "ESModule")
+        val esOut = managedResourceDirectories.in(Compile).value.head / "es.properties"
+        IO.write(
+          esVersion,
+          "mdoc esmoddule properties",
+          esOut
+        )
+        List(out, esOut) // Both of these are used in the JsCliSuite Integration tests
       }
     )
 

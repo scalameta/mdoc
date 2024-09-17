@@ -12,13 +12,12 @@ import mdoc.internal.cli.Context
 
 class CliArgsSuite extends FunSuite {
   private val reporter = ConsoleReporter.default
-  private val base = Settings.default(PathIO.workingDirectory)
 
   def checkOK(name: String, args: List[String], onSuccess: Settings => Unit = _ => ())(implicit
       loc: munit.Location
   ): Unit = {
     test(name) {
-      val obtained = Settings.fromCliArgs(args, base).get
+      val obtained = Settings.fromCliArgs(args, PathIO.workingDirectory.toNIO).get
       onSuccess(obtained)
     }
   }
@@ -28,7 +27,7 @@ class CliArgsSuite extends FunSuite {
   ): Unit = {
     test(name) {
       Settings
-        .fromCliArgs(args, base)
+        .fromCliArgs(args, PathIO.workingDirectory.toNIO)
         .andThen(s => Context.fromSettings(s, reporter))
         .toEither match {
         case Left(obtained) =>
@@ -105,6 +104,18 @@ class CliArgsSuite extends FunSuite {
   checkOK(
     "single-in-single-out",
     List("--in", tmpFile.toString, tmpDirectory.toString)
+  )
+
+  checkOK(
+    "--property-file-name",
+    List("--property-file-name", "es.properties", tmpFile.toString, tmpDirectory.toString),
+    onSuccess = conf => assertEquals(conf.propertyFileName, "es.properties")
+  )
+
+  checkOK(
+    "--property-file-name default",
+    List(tmpFile.toString, tmpDirectory.toString),
+    onSuccess = conf => assertEquals(conf.propertyFileName, "mdoc.properties")
   )
 
   checkOK(

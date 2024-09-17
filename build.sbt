@@ -21,6 +21,11 @@ def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
+def jsoniter = List(
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.13.5.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.13.5.2"
+)
+
 val isScala212 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
 }
@@ -248,6 +253,7 @@ lazy val mdoc = project
           .excludeAll(excludePprint)
       )
     ),
+    libraryDependencies ++= jsoniter,
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.18.0",
@@ -311,6 +317,20 @@ val jsdocs = project
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+
+val jswebsitedocs = project
+  .in(file("tests/websiteJs"))
+  .settings(
+    sharedSettings,
+    publish / skip := true,
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.ESModule)
+    },
+    libraryDependencies ++= List(
+      "org.scala-js" %%% "scalajs-dom" % scalajsDom
+    )
+  )
+  .enablePlugins(ScalaJSPlugin)
 
 lazy val worksheets = project
   .in(file("tests/worksheets"))
@@ -440,7 +460,10 @@ lazy val jsWorker =
     .settings(
       sharedSettings,
       moduleName := "mdoc-js-worker",
-      libraryDependencies += ("org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided) cross CrossVersion.for3Use2_13
+      libraryDependencies ++= Seq(
+        "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross CrossVersion.for3Use2_13,
+        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
+      )
     )
 
 lazy val js = project
@@ -449,6 +472,7 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
+    libraryDependencies ++= jsoniter,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
   )
   .dependsOn(mdoc)
@@ -471,8 +495,7 @@ lazy val docs = project
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
-    mdocJS := Some(jsdocs),
-    mdocJSLibraries := (jsdocs / Compile / fullOptJS / webpack).value,
+    mdocJS := Some(jswebsitedocs),
     MdocPlugin.mdocJSWorkerClasspath := {
       val _ = (jsWorker / Compile / compile).value
 

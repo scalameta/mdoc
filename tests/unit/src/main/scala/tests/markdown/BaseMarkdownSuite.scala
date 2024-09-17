@@ -32,16 +32,16 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     file.write("")
     file
   }
-  protected def baseSettings: Settings =
+  protected def baseSettings(resourcePropertyFileName: String = "mdoc.properties"): Settings =
     Settings
-      .default(createTempDirectory())
+      .default(createTempDirectory(), resourcePropertyFileName)
       .copy(
         site = Map(
           "version" -> "1.0",
           "boom" -> "$boom"
         )
       )
-      .withProperties(MdocProperties.default(PathIO.workingDirectory))
+      .withProperties(MdocProperties.default(PathIO.workingDirectory, resourcePropertyFileName))
 
   private val myStdout = new ByteArrayOutputStream()
   private def newReporter(): ConsoleReporter = {
@@ -60,7 +60,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       name: TestOptions,
       original: String,
       expected: String,
-      settings: Settings = baseSettings,
+      settings: Settings = baseSettings(),
       compat: Map[Compat.ScalaVersion, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     test(name) {
@@ -68,7 +68,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       val context = newContext(settings, reporter)
       val input = Input.VirtualFile(name.name.replace(':', '-') + ".md", original)
       val file = InputFile.fromRelativeFilename(input.path, settings)
-      Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
+      Markdown.toMarkdown(input, context, file, baseSettings().site, reporter, settings)
       assert(reporter.hasErrors, "Expected errors but reporter.hasErrors=false")
       val obtainedErrors = Compat.postProcess(
         fansi.Str(myStdout.toString).plainText.trimLineEnds,
@@ -85,7 +85,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
   def checkCompiles(
       name: TestOptions,
       original: String,
-      settings: Settings = baseSettings,
+      settings: Settings = baseSettings(),
       onOutput: String => Unit = _ => ()
   ): Unit = {
     test(name) {
@@ -94,7 +94,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       val input = Input.VirtualFile(name.name.replace(":", "-") + ".md", original)
       val file = InputFile.fromRelativeFilename(input.path, settings)
       val obtained =
-        Markdown.toMarkdown(input, context, file, baseSettings.site, reporter, settings)
+        Markdown.toMarkdown(input, context, file, baseSettings().site, reporter, settings)
       val colorOut = myStdout.toString()
       print(colorOut)
       val stdout = fansi.Str(colorOut).plainText
@@ -108,7 +108,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       name: TestOptions,
       original: String,
       expected: String,
-      settings: Settings = baseSettings,
+      settings: Settings = baseSettings(),
       compat: Map[Compat.ScalaVersion, String] = Map.empty
   )(implicit loc: munit.Location): Unit = {
     checkCompiles(

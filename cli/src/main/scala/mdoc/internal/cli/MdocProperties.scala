@@ -36,8 +36,7 @@ object MdocProperties {
       out = getPath("out")
     )
   }
-  def default(cwd: AbsolutePath): MdocProperties = {
-    val path = "mdoc.properties"
+  def default(cwd: AbsolutePath, path: String): MdocProperties = {
     Option(this.getClass.getClassLoader.getResourceAsStream(path)) match {
       case Some(resource) =>
         val props = new java.util.Properties()

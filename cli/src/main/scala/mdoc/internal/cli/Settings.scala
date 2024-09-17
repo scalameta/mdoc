@@ -9,6 +9,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.PathMatcher
+import java.nio.file.Path
 import mdoc.OnLoadContext
 import mdoc.PostModifier
 import mdoc.PreModifier
@@ -153,6 +154,14 @@ case class Settings(
     @Hidden()
     @Description("The pretty printer for variables")
     variablePrinter: Variable => String = ReplVariablePrinter,
+    @Description(
+      "The absolute path to a file containing an import map file in this format; https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap"
+    )
+    importMapPath: Option[AbsolutePath] = None,
+    @Description(
+      "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
+    )
+    propertyFileName: String = "mdoc.properties",
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
     coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
@@ -261,9 +270,9 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
       cwd = cwd
     )
   }
-  def default(cwd: AbsolutePath): Settings = {
+  def default(cwd: AbsolutePath, filename: String): Settings = {
     val base = baseDefault(cwd)
-    val props = MdocProperties.default(cwd)
+    val props = MdocProperties.default(cwd, filename)
     base.withProperties(props)
   }
 
@@ -294,14 +303,20 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
     generic.deriveDecoder[Settings](base)
   }
 
-  def fromCliArgs(args: List[String], base: Settings): Configured[Settings] = {
+  def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
       .andThen(conf => {
+        val base =
+          Settings.default(
+            AbsolutePath(workingDirectory),
+            conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
+          )
         val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
-        conf.as[Settings](decoder(base.copy(cwd = cwd)))
+        conf
+          .as[Settings](decoder(base.copy(cwd = cwd)))
+          .map(_.addSite(base.site))
       })
-      .map(_.addSite(base.site))
   }
 
   def write(set: Settings) = ConfEncoder[Settings].write(set)

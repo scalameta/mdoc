@@ -20,7 +20,7 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
        |// b: Int = 2
        |```
     """.stripMargin,
-    baseSettings
+    baseSettings()
   )
 
   check(
@@ -38,10 +38,10 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
        |val c = 30
        |```
     """.stripMargin,
-    baseSettings
+    baseSettings()
   )
 
-  val trailingComment = baseSettings.copy(variablePrinter = { variable =>
+  val trailingComment = baseSettings().copy(variablePrinter = { variable =>
     variable.runtimeValue match {
       case n: Int if variable.totalVariablesInStatement == 1 => s" // Number($n)"
       case _ => variable.toString
@@ -69,7 +69,7 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     trailingComment
   )
 
-  val lastStatementOnly = baseSettings.copy(variablePrinter = { variable =>
+  val lastStatementOnly = baseSettings().copy(variablePrinter = { variable =>
     if (variable.indexOfStatementInCodeFence + 1 == variable.totalStatementsInCodeFence) {
       variable.toString
     } else {
@@ -97,7 +97,7 @@ class VariablePrinterSuite extends BaseMarkdownSuite {
     lastStatementOnly
   )
 
-  val initialOffset = baseSettings.copy(
+  val initialOffset = baseSettings().copy(
     variablePrinter =
       new ReplVariablePrinter(leadingNewline = true, width = 25, height = 20, indent = 2)
   )

@@ -1,12 +1,16 @@
 package mdoc.modifiers
 
+import java.io.{FileInputStream, InputStreamReader, BufferedReader, IOException}
 import mdoc.OnLoadContext
 import mdoc.PostProcessContext
 import mdoc.internal.pos.PositionSyntax._
+import mdoc.modifiers.ImportMapJsonIr.ImportMap
+import mdoc.js.interfaces._
 import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.Classpath
-import mdoc.js.interfaces._
+import scala.collection.immutable.HashMap
+import com.github.plokhotnyuk.jsoniter_scala.{core => jsoniter}
 
 case class JsConfig(
     moduleKind: ModuleType = ModuleType.NoModule,
@@ -20,7 +24,8 @@ case class JsConfig(
     fullOpt: Boolean = true,
     htmlPrefix: String = "",
     relativeLinkPrefix: String = "",
-    batchMode: Boolean = false
+    batchMode: Boolean = false,
+    importMap: Map[String, String] = Map.empty
 ) {
   lazy val isCommonJS: Boolean = moduleKind == ModuleType.CommonJSModule
   lazy val isEsModule: Boolean = moduleKind == ModuleType.ESModule
@@ -99,7 +104,29 @@ object JsConfig {
           }
       },
       relativeLinkPrefix = ctx.site.getOrElse("js-relative-link-prefix", base.relativeLinkPrefix),
-      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean
+      batchMode = ctx.site.getOrElse("js-batch-mode", "false").toBoolean,
+      importMap = ctx.settings.importMapPath match {
+        case None => new HashMap[String, String]()
+        case Some(value) =>
+          var fileInputStream: FileInputStream = null
+          try {
+            fileInputStream = new FileInputStream(value.toFile)
+            val importMapParsed = jsoniter.readFromStream[ImportMap](fileInputStream)
+            importMapParsed.imports
+          } catch {
+            case e: IOException =>
+              e.printStackTrace()
+              throw e
+          } finally {
+            if (fileInputStream != null) {
+              try {
+                fileInputStream.close()
+              } catch {
+                case e: IOException => e.printStackTrace()
+              }
+            }
+          }
+      }
     )
   }
 }
