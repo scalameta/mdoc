@@ -57,6 +57,9 @@
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/scalameta/mdoc/edit/main/docs/js.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Scala.js Modifiers</h1></header><article><div><span><p>Code fences with the <code>scala mdoc:js</code> modifier are compiled with Scala.js and run
 in the browser.</p>
 <pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc:js
+import org.scalajs.dom.window._
+import jsdocs._
+
 val progress = new Progress()
 setInterval({ () =&gt;
   // <span class="hljs-code">`node`</span> variable is a DOM element in scope.
@@ -64,7 +67,17 @@ setInterval({ () =&gt;
 }, 100)
 <span class="hljs-code">```
 </span></code></pre>
-<div id="mdoc-html-run1" data-mdoc-js>Loading progress bar...</div>
+<p>Becomes</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.window._
+<span class="hljs-keyword">import</span> jsdocs._
+
+<span class="hljs-keyword">val</span> progress = <span class="hljs-keyword">new</span> <span class="hljs-type">Progress</span>()
+setInterval({ () =&gt;
+  <span class="hljs-comment">// `node` variable is a DOM element in scope.</span>
+  node.innerHTML = progress.tick(<span class="hljs-number">5</span>)
+}, <span class="hljs-number">100</span>)
+</code></pre>
+<div id="mdoc-html-run0" data-mdoc-js data-mdoc-module-name="./js.md.js" >Loading progress bar...</div>
 <h2><a class="anchor" aria-hidden="true" id="installation"></a><a href="#installation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h2>
 <p>The <code>mdoc:js</code> modifier requires custom installation steps.</p>
 <h3><a class="anchor" aria-hidden="true" id="sbt-mdoc"></a><a href="#sbt-mdoc" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>sbt-mdoc</h3>
@@ -95,7 +108,7 @@ js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-
 js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_2.12:2.6.0 org.scala-js:scalajs-linker_2.12:1.16.0 -p)
 EOT
 </code></pre>
-<p>Note: For scala 3, you may need <code>js-scalac-options=--scala-js</code> - this is currently untested.</p>
+<p>Note: For scala 3, you may need <code>js-scalac-options=-scalajs</code> - instead of the <code>-XPlugin</code> flag - <a href="https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins">Doc</a>.</p>
 <p>Next, create a basic Markdown files with an <code>mdoc:js</code> modifier:</p>
 <pre><code class="hljs css language-sh">mkdir docs
 cat &lt;&lt;EOT &gt; docs/index.md
@@ -120,81 +133,65 @@ configuration.</li>
 <code>-Xplugin:path/to/scalajs-compiler.jar</code> to enable the Scala.js compiler.</li>
 <li>The <code>js-classpath</code> field in <code>mdoc.properties</code> must include a dependency on the
 library <code>org.scala-js:scalajs-dom</code></li>
+<li>There is a js-html-header field in <code>mdoc.properties</code> which can be used to inject custom HTML, scripts or stylesheets into the output.</li>
 </ul>
+<pre><code class="hljs css language-html">js-html-header=<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css"</span> /&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"module"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<ul>
+<li>There's an <code>--import-map</code> command line flag, commonly set to ; <code>--import-map-path $(pwd)/importmap.json</code>, which will remap ESModule imports at link time. As a reminder <code>importmap.json</code> could look like:</li>
+</ul>
+<pre><code class="hljs">{
+  <span class="hljs-attr">"imports"</span>: {
+    <span class="hljs-attr">"@shoelace-style/shoelace/dist/"</span>: <span class="hljs-string">"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/"</span>
+  }
+}
+</code></pre>
+<p>which will remap the shoelace import to resolve out of a CDN - negating the need for a bundler.</p>
 <h2><a class="anchor" aria-hidden="true" id="modifiers"></a><a href="#modifiers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifiers</h2>
 <p>The following modifiers can be combined with <code>mdoc:js</code> code fences to customize
 the rendered output.</p>
 <h3><a class="anchor" aria-hidden="true" id="shared"></a><a href="#shared" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>:shared</code></h3>
 <p>By default, each code fence is isolated from other code fences. Use the
 <code>:shared</code> modifier to reuse imports or variables between code fences.</p>
-<p>Before:</p>
-<pre><code class="hljs">```scala mdoc:js:shared
-import org<span class="hljs-selector-class">.scalajs</span><span class="hljs-selector-class">.dom</span><span class="hljs-selector-class">.window</span><span class="hljs-selector-class">.setInterval</span>
-import scala<span class="hljs-selector-class">.scalajs</span><span class="hljs-selector-class">.js</span><span class="hljs-selector-class">.Date</span>
-```
-```scala mdoc:js
-<span class="hljs-function"><span class="hljs-title">setInterval</span><span class="hljs-params">(()</span></span> =&gt; {
-  node<span class="hljs-selector-class">.innerHTML</span> = new Date().toString()
-}, <span class="hljs-number">1000</span>)
-```
-</code></pre>
-<p>After:</p>
-<pre><code class="hljs"><span class="xml">```scala
+<pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc:js
 import org.scalajs.dom.window.setInterval
 import scala.scalajs.js.Date
-```
-```scala
-setInterval(() =&gt; </span><span class="hljs-template-variable">{
+<span class="hljs-code">```
+```scala mdoc:js
+setInterval(() =&gt; {
   node.innerHTML = new Date().toString()
-}</span><span class="xml">, 1000)
-```
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"mdoc-html-run1"</span> <span class="hljs-attr">data-mdoc-js</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-library.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-loader.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/js.md.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/mdoc.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+}, 1000)
+```</span>
+</code></pre>
+<p>Is a compile error, because the imports are not in the second block. But if you add the shared modifier:</p>
+<pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc:js:shared
+import org.scalajs.dom.window.setInterval
+import scala.scalajs.js.Date
+<span class="hljs-code">```
 </span></code></pre>
+<p>And it works!</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.window.setInterval
+<span class="hljs-keyword">import</span> scala.scalajs.js.<span class="hljs-type">Date</span>
+</code></pre>
 <pre><code class="hljs css language-scala">setInterval(() =&gt; {
-  <span class="hljs-keyword">val</span> date = <span class="hljs-keyword">new</span> <span class="hljs-type">Date</span>().toString()
-  node.innerHTML = <span class="hljs-string">s"&lt;p&gt;Shared date <span class="hljs-subst">$date</span>&lt;/p&gt;"</span>
+  node.innerHTML = <span class="hljs-keyword">new</span> <span class="hljs-type">Date</span>().toString()
 }, <span class="hljs-number">1000</span>)
 </code></pre>
-<div id="mdoc-html-run3" data-mdoc-js>Loading <code>:shared</code> example...</div>
-<p>Without <code>:shared</code>, the example above results in a compile error.</p>
-<p>Before:</p>
-<pre><code class="hljs">```scala mdoc:js
-import scala.scalajs.js.Date
-```
-```scala mdoc:js
-<span class="hljs-keyword">new</span> Date()
-```
-</code></pre>
-<p>Error:</p>
-<pre><code class="hljs">error: js.md:5:5: <span class="hljs-keyword">not</span> found:<span class="hljs-built_in"> type </span>Date
-new Date()
-    ^^^^
-</code></pre>
+<div id="mdoc-html-run2" data-mdoc-js data-mdoc-module-name="./js.md.js" ></div>
 <h3><a class="anchor" aria-hidden="true" id="invisible"></a><a href="#invisible" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>:invisible</code></h3>
 <p>By default, the original input code is rendered in the output page. Use
 <code>:invisible</code> to hide the code example from the output so that only the div is
 generated.</p>
-<p>Before:</p>
-<pre><code class="hljs">```scala mdoc:js:invisible
-<span class="hljs-selector-tag">var</span> n = <span class="hljs-number">0</span>
-org<span class="hljs-selector-class">.scalajs</span><span class="hljs-selector-class">.dom</span><span class="hljs-selector-class">.window</span>.setInterval(() =&gt; {
-  n += <span class="hljs-number">1</span>
-  node<span class="hljs-selector-class">.innerHTML</span> = s<span class="hljs-string">"Invisible tick: $n"</span>
-}, <span class="hljs-number">1000</span>)
-```
-</code></pre>
-<p>After:</p>
-<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"mdoc-html-run0"</span> <span class="hljs-attr">data-mdoc-js</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-library.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-loader.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/js.md.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/mdoc.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-</code></pre>
-<div id="mdoc-html-run4" data-mdoc-js>Loading <code>:invisible</code> example...</div>
+<pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc:js:invisible
+var n = 0
+org.scalajs.dom.window.setInterval(() =&gt; {
+  n += 1
+  node.innerHTML = s"Invisible tick: $n"
+}, 1000)
+<span class="hljs-code">```
+</span></code></pre>
+<p>You'd have to look at the raw markdown to see the fence below.</p>
+<div id="mdoc-html-run3" data-mdoc-js data-mdoc-module-name="./js.md.js" >Loading <code>:invisible</code> example...</div>
 <h3><a class="anchor" aria-hidden="true" id="compile-only"></a><a href="#compile-only" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>:compile-only</code></h3>
 <p>Use <code>:compile-only</code> to validate that a code example compiles successfully
 without evaluating it at runtime.</p>
@@ -211,121 +208,53 @@ element. Create a leading code fence with <code>shared:invisible</code> to expos
 <p>By default, the <code>node</code> variable points to an empty div element. Prefix the code
 fence with custom HTML followed by a <code>---</code> separator to set the inner HTML of
 the <code>node</code> div.</p>
-<p>Before:</p>
-<pre><code class="hljs"><span class="hljs-code">```</span>scala mdoc:js
+<pre><code class="hljs css language-md"><span class="hljs-code">```</span>scala mdoc:js
 <span class="hljs-section">&lt;p&gt;I am a custom &lt;code&gt;loader&lt;/code&gt;&lt;/p&gt;
 ---</span>
-println(node.innerHTML)
-<span class="hljs-code">```</span>
-</code></pre>
-<p>After:</p>
-<pre><code class="hljs">```scala
-println(node.innerHTML)
-```
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"mdoc-html-run0"</span> <span class="hljs-attr">data-mdoc-js</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>I am a custom <span class="hljs-tag">&lt;<span class="hljs-name">code</span>&gt;</span>loader<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-library.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/jsdocs-opt-loader.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/js.md.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"assets/mdoc.js"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-</code></pre>
+// Open developer console to see this printed message
+println(s"Loading HTML: ${node.innerHTML}")
+<span class="hljs-code">```
+</span></code></pre>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// Open developer console to see this printed message</span>
 println(<span class="hljs-string">s"Loading HTML: <span class="hljs-subst">${node.innerHTML}</span>"</span>)
 </code></pre>
-<div id="mdoc-html-run5" data-mdoc-js><p>I am a custom <code>loader</code></p></div>
+<div id="mdoc-html-run4" data-mdoc-js data-mdoc-module-name="./js.md.js" ><p>I am a custom <code>loader</code></p></div>
 <p>Replace the node's <code>innerHTML</code> to make the HTML disappear once the document has
 loaded.</p>
 <pre><code class="hljs css language-scala">org.scalajs.dom.window.setTimeout(() =&gt; {
  node.innerHTML = <span class="hljs-string">"I am loaded. Refresh the page to load me again."</span>
 }, <span class="hljs-number">3000</span>)
 </code></pre>
-<div id="mdoc-html-run6" data-mdoc-js>I disappear in 3 seconds...</div>
-<h2><a class="anchor" aria-hidden="true" id="using-scalajs-bundler"></a><a href="#using-scalajs-bundler" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using scalajs-bundler</h2>
-<p>The <a href="https://scalacenter.github.io/scalajs-bundler/">scalajs-bundler</a> plugin can
-be used to install npm dependencies and bundle applications with webpack.</p>
-<p>Add the following sbt settings if you use scalajs-bundler.</p>
-<pre><code class="hljs css language-diff"> lazy val jsdocs = project
-   .settings(
-<span class="hljs-addition">+    webpackBundlingMode := BundlingMode.LibraryOnly()</span>
-<span class="hljs-addition">+    scalaJSUseMainModuleInitializer := true,</span>
-     npmDependencies.in(Compile) ++= List(
-       // ...
-     ),
-   )
-   .enablePlugins(ScalaJSBundlerPlugin)
-
- lazy val docs = project
-   .settings(
-     mdocJS := Some(jsdocs),
-<span class="hljs-addition">+    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value</span>
-   )
-   .enablePlugins(MdocPlugin)
-</code></pre>
-<blockquote>
-<p>The <code>webpackBundlingMode</code> must be <code>LibraryOnly</code> so that the mdoc generated
-output can depend on it.</p>
-</blockquote>
-<h3><a class="anchor" aria-hidden="true" id="bundle-npm-dependencies"></a><a href="#bundle-npm-dependencies" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bundle npm dependencies</h3>
-<p>It's important that the main function in <code>jsdocs</code> uses the installed npm
-dependencies. If the npm dependencies are not used from the <code>jsdocs</code> main
-function, then webpack thinks they are unused and removes them from the bundled
-output even if those dependencies are called from <code>mdoc:js</code> markdown code
-fences.</p>
-<p>For example, to use the npm <a href="https://www.npmjs.com/package/ms"><code>ms</code> package</a>
-start by writing a facade using <code>@JSImport</code></p>
-<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/tests/jsdocs/src/main/scala/jsdocs/ms.scala">ms.scala</a></p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">package</span> jsdocs
-
-<span class="hljs-keyword">import</span> scala.scalajs.js
-<span class="hljs-keyword">import</span> scala.scalajs.js.annotation.<span class="hljs-type">JSImport</span>
+<div id="mdoc-html-run5" data-mdoc-js data-mdoc-module-name="./js.md.js" >I disappear in 3 seconds...</div>
+<h2><a class="anchor" aria-hidden="true" id="facades"></a><a href="#facades" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Facades</h2>
+<p>Let's imagine we want to document a (glorious) facade to <a href="https://www.npmjs.com/package/ms">ms</a> with mdoc.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> scala.scalajs.js
+<span class="hljs-keyword">import</span> scala.scalajs.js.annotation._
 
 <span class="hljs-meta">@js</span>.native
-<span class="hljs-meta">@JSImport</span>(<span class="hljs-string">"ms"</span>, <span class="hljs-type">JSImport</span>.<span class="hljs-type">Namespace</span>)
+<span class="hljs-meta">@JSImport</span>(<span class="hljs-string">"https://cdn.jsdelivr.net/npm/ms@2.1.3/+esm"</span>, <span class="hljs-type">JSImport</span>.<span class="hljs-type">Default</span>)
 <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ms</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">js</span>.<span class="hljs-title">Object</span> </span>{
-  <span class="hljs-comment">// Facade for the npm package `ms` https://www.npmjs.com/package/ms</span>
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(n: <span class="hljs-type">Double</span>): <span class="hljs-type">String</span> = js.native
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(s: <span class="hljs-type">Double</span>): <span class="hljs-type">String</span> = js.native
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(s: <span class="hljs-type">String</span>): <span class="hljs-type">Double</span> = js.native
 }
 </code></pre>
-<p>Next, write a main function that uses the facade. Make sure that the <code>jsdocs</code>
-project contains the setting <code>scalaJSUseMainModuleInitializer := true</code>.</p>
-<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/tests/jsdocs/src/main/scala/jsdocs/Main.scala">Main.scala</a></p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">package</span> jsdocs
-
-<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Main</span> </span>{
-  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span></span>(args: <span class="hljs-type">Array</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Unit</span> = {
-    <span class="hljs-comment">// Important, the main function must use the Scala.js facade in order for</span>
-    <span class="hljs-comment">// the `ms` npm library to be available from mdoc:js code fences.</span>
-    ms(<span class="hljs-number">6000</span>)
-  }
-}
-</code></pre>
-<p>The <code>ms</code> function can now be used from <code>mdoc:js</code>.</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> date = <span class="hljs-keyword">new</span> scala.scalajs.js.<span class="hljs-type">Date</span>()
-<span class="hljs-keyword">val</span> time = jsdocs.ms(date.getTime())
-node.innerHTML = <span class="hljs-string">s"Hello from npm package 'ms': <span class="hljs-subst">$time</span>"</span>
+<span class="hljs-keyword">val</span> time = ms( <span class="hljs-string">"2 days"</span>)
+<span class="hljs-keyword">val</span> time2 = ms( <span class="hljs-number">1000</span>)
+node.innerHTML = <span class="hljs-string">s"Hello from npm package 'ms': <span class="hljs-subst">$time</span> , <span class="hljs-subst">$time2</span> "</span>
 </code></pre>
-<div id="mdoc-html-run7" data-mdoc-js></div>
-<p>If the <code>ms</code> function is not referenced from the <code>jsdocs</code> main function you get a
+<div id="mdoc-html-run7" data-mdoc-js data-mdoc-module-name="./js.md.js" ></div>
+<p>If the <code>ms</code> function is not referenced from <code>jsdocs</code> you may get a
 stacktrace in the browser console like this:</p>
 <pre><code class="hljs css language-js">Uncaught <span class="hljs-built_in">TypeError</span>: $i_ms is not a <span class="hljs-function"><span class="hljs-keyword">function</span>
     <span class="hljs-title">at</span> <span class="hljs-title">$c_Lmdocjs$</span>.<span class="hljs-title">run6__Lorg_scalajs_dom_raw_Element__V</span> (<span class="hljs-params">js.md.js:<span class="hljs-number">1180</span></span>)
     <span class="hljs-title">at</span> <span class="hljs-title">js</span>.<span class="hljs-title">md</span>.<span class="hljs-title">js</span>:3108
     <span class="hljs-title">at</span> <span class="hljs-title">mdoc</span>.<span class="hljs-title">js</span>:9
 </span></code></pre>
-<h3><a class="anchor" aria-hidden="true" id="validate-libraryjs-and-loaderjs"></a><a href="#validate-libraryjs-and-loaderjs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Validate library.js and loader.js</h3>
-<p>Validate that the <code>webpack</code> task provides one <code>*-library.js</code> file and one
-<code>*-loader.js</code> file.</p>
-<pre><code class="hljs css language-scala"><span class="hljs-comment">// sbt shell</span>
-&gt; show jsdocs/fullOptJS::webpack
-...
-[info] * <span class="hljs-type">Attributed</span>(.../jsdocs/target/scala<span class="hljs-number">-2.12</span>/scalajs-bundler/main/jsdocs-opt-loader.js)
-[info] * <span class="hljs-type">Attributed</span>(.../jsdocs/target/scala<span class="hljs-number">-2.12</span>/scalajs-bundler/main/jsdocs-opt-library.js)
-...
+<p>Please note that the CDN is hardcoded here as is a simple way to get started. A &quot;real&quot; facade would normally be constructed as</p>
+<pre><code class="hljs css language-scala"><span class="hljs-meta">@JSImport</span>(<span class="hljs-string">"ms"</span>, <span class="hljs-type">JSImport</span>.<span class="hljs-type">Default</span>)
 </code></pre>
-<p>These files are required by mdoc in order to use the scalajs-bundler npm
-dependencies. The files may be missing if you have custom webpack or
-scalajs-bundler configuration. To fix this problem, you may want to try to
-create a new <code>jsdocs</code> Scala.js project with minimal webpack and scalajs-bundler
-configuration.</p>
+<p>As that is where it's found in the <code>node_modules</code>. Consider remapping this import at link time, as described in the configuration section below for a (real) use case.</p>
 <h2><a class="anchor" aria-hidden="true" id="configuration"></a><a href="#configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuration</h2>
 <p>The <code>mdoc:js</code> modifier supports several site variable options to customize the
 rendered output of <code>mdoc:js</code>.</p>
@@ -396,11 +325,109 @@ after processing each file):</p>
   <span class="hljs-string">"js-batch-mode"</span> -&gt; <span class="hljs-string">"true"</span>
 )
 </code></pre>
-<script type="text/javascript" src="assets/jsdocs-opt-library.js" defer></script>
-<script type="text/javascript" src="assets/jsdocs-opt-loader.js" defer></script>
-<script type="text/javascript" src="assets/js.md.js" defer></script>
-<script type="text/javascript" src="assets/mdoc.js" defer></script>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mdoc/docs/modifiers.html"><span class="arrow-prev">← </span><span>JVM</span></a><a class="docs-next button" href="/mdoc/docs/docusaurus.html"><span>Docusaurus</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#installation">Installation</a><ul class="toc-headings"><li><a href="#sbt-mdoc">sbt-mdoc</a></li><li><a href="#command-line">Command-line</a></li></ul></li><li><a href="#modifiers">Modifiers</a><ul class="toc-headings"><li><a href="#shared"><code>:shared</code></a></li><li><a href="#invisible"><code>:invisible</code></a></li><li><a href="#compile-only"><code>:compile-only</code></a></li></ul></li><li><a href="#loading-html">Loading HTML</a></li><li><a href="#using-scalajs-bundler">Using scalajs-bundler</a><ul class="toc-headings"><li><a href="#bundle-npm-dependencies">Bundle npm dependencies</a></li><li><a href="#validate-libraryjs-and-loaderjs">Validate library.js and loader.js</a></li></ul></li><li><a href="#configuration">Configuration</a><ul class="toc-headings"><li><a href="#add-custom-html-header">Add custom HTML header</a></li><li><a href="#generate-optimized-page">Generate optimized page</a></li><li><a href="#customize-node-variable-name">Customize <code>node</code> variable name</a></li><li><a href="#customize-output-js-directory">Customize output js directory</a></li><li><a href="#customize-module-kind">Customize module kind</a></li><li><a href="#add-local-javascript-libraries">Add local JavaScript libraries</a></li><li><a href="#batch-mode-linking">Batch mode linking</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2024 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+<h3><a class="anchor" aria-hidden="true" id="remapping-imports-at-link-time"></a><a href="#remapping-imports-at-link-time" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Remapping imports at link time</h3>
+<p>It may be the case that the library you wish to depend on is a facade to some NPM dependency. Mapping the import offers an alterative to bundling, by resolving the dependency out of a CDN. We set mdoc to output ESModules (see <code>ModuleKind</code>), and load the dependancies directly in the browser.</p>
+<p>To mdocs CLI, you'll need to pass this flag;</p>
+<pre><code class="hljs css language-sh">--import-map-path full/path/to/import-map.json
+</code></pre>
+<p><code>import-map.json</code> could look like this;</p>
+<pre><code class="hljs css language-json">{
+  <span class="hljs-attr">"imports"</span>:
+  {
+    <span class="hljs-attr">"@shoelace-style/shoelace/dist/"</span>: <span class="hljs-string">"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/"</span>
+  }
+}
+</code></pre>
+<p>You should then have this dependency available to you.</p>
+<h1><a class="anchor" aria-hidden="true" id="legacy"></a><a href="#legacy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Legacy</h1>
+<p>This documentation is preserved here, but it is no longer recommend to work with scalaJS bundler. If you require a bundler you should consider the excellent <a href="https://vitejs.dev">vite</a> project - integration with vite is a potential improvement for mdoc.</p>
+<p>The <a href="https://scalacenter.github.io/scalajs-bundler/">scalajs-bundler</a> plugin can
+be used to install npm dependencies and bundle applications with webpack.</p>
+<p>Add the following sbt settings if you use scalajs-bundler:</p>
+<pre><code class="hljs css language-diff"> lazy val jsdocs = project
+   .settings(
+<span class="hljs-addition">+    webpackBundlingMode := BundlingMode.LibraryOnly()</span>
+<span class="hljs-addition">+    scalaJSUseMainModuleInitializer := true,</span>
+     npmDependencies.in(Compile) ++= List(
+       // ...
+     ),
+   )
+   .enablePlugins(ScalaJSBundlerPlugin)
+
+ lazy val docs = project
+   .settings(
+     mdocJS := Some(jsdocs),
+<span class="hljs-addition">+    mdocJSLibraries := webpack.in(jsdocs, Compile, fullOptJS).value</span>
+   )
+   .enablePlugins(MdocPlugin)
+</code></pre>
+<blockquote>
+<p>The <code>webpackBundlingMode</code> must be <code>LibraryOnly</code> so that the mdoc generated
+output can depend on it.</p>
+</blockquote>
+<h3><a class="anchor" aria-hidden="true" id="bundle-npm-dependencies"></a><a href="#bundle-npm-dependencies" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bundle npm dependencies</h3>
+<p>It's important that the main function in <code>jsdocs</code> uses the installed npm
+dependencies. If the npm dependencies are not used from the <code>jsdocs</code> main
+function, then webpack thinks they are unused and removes them from the bundled
+output even if those dependencies are called from <code>mdoc:js</code> markdown code
+fences.</p>
+<p>For example, to use the npm <a href="https://www.npmjs.com/package/ms"><code>ms</code> package</a>
+start by writing a facade using <code>@JSImport</code></p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/tests/jsdocs/src/main/scala/jsdocs/ms.scala">ms.scala</a></p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">package</span> jsdocs
+
+<span class="hljs-keyword">import</span> scala.scalajs.js
+<span class="hljs-keyword">import</span> scala.scalajs.js.annotation.<span class="hljs-type">JSImport</span>
+
+<span class="hljs-meta">@js</span>.native
+<span class="hljs-meta">@JSImport</span>(<span class="hljs-string">"ms"</span>, <span class="hljs-type">JSImport</span>.<span class="hljs-type">Namespace</span>)
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ms</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">js</span>.<span class="hljs-title">Object</span> </span>{
+  <span class="hljs-comment">// Facade for the npm package `ms` https://www.npmjs.com/package/ms</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(n: <span class="hljs-type">Double</span>): <span class="hljs-type">String</span> = js.native
+}
+</code></pre>
+<p>Next, write a main function that uses the facade. Make sure that the <code>jsdocs</code>
+project contains the setting <code>scalaJSUseMainModuleInitializer := true</code>.</p>
+<p>File: <a href="https://github.com/scalameta/mdoc/blob/main/tests/jsdocs/src/main/scala/jsdocs/Main.scala">Main.scala</a></p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">package</span> jsdocs
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Main</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span></span>(args: <span class="hljs-type">Array</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Unit</span> = {
+    <span class="hljs-comment">// Important, the main function must use the Scala.js facade in order for</span>
+    <span class="hljs-comment">// the `ms` npm library to be available from mdoc:js code fences.</span>
+    ms(<span class="hljs-number">6000</span>)
+  }
+}
+</code></pre>
+<p>The <code>ms</code> function can now be used from <code>mdoc:js</code>.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> date = <span class="hljs-keyword">new</span> scala.scalajs.js.<span class="hljs-type">Date</span>()
+<span class="hljs-keyword">val</span> time = jsdocs.ms(date.getTime())
+node.innerHTML = <span class="hljs-string">s"Hello from npm package 'ms': <span class="hljs-subst">$time</span>"</span>
+</code></pre>
+<p>If the <code>ms</code> function is not referenced from the <code>jsdocs</code> main function you get a
+stacktrace in the browser console like this:</p>
+<pre><code class="hljs css language-js">Uncaught <span class="hljs-built_in">TypeError</span>: $i_ms is not a <span class="hljs-function"><span class="hljs-keyword">function</span>
+    <span class="hljs-title">at</span> <span class="hljs-title">$c_Lmdocjs$</span>.<span class="hljs-title">run6__Lorg_scalajs_dom_raw_Element__V</span> (<span class="hljs-params">js.md.js:<span class="hljs-number">1180</span></span>)
+    <span class="hljs-title">at</span> <span class="hljs-title">js</span>.<span class="hljs-title">md</span>.<span class="hljs-title">js</span>:3108
+    <span class="hljs-title">at</span> <span class="hljs-title">mdoc</span>.<span class="hljs-title">js</span>:9
+</span></code></pre>
+<h3><a class="anchor" aria-hidden="true" id="validate-libraryjs-and-loaderjs"></a><a href="#validate-libraryjs-and-loaderjs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Validate library.js and loader.js</h3>
+<p>Validate that the <code>webpack</code> task provides one <code>*-library.js</code> file and one
+<code>*-loader.js</code> file.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// sbt shell</span>
+&gt; show jsdocs/fullOptJS::webpack
+...
+[info] * <span class="hljs-type">Attributed</span>(.../jsdocs/target/scala<span class="hljs-number">-2.12</span>/scalajs-bundler/main/jsdocs-opt-loader.js)
+[info] * <span class="hljs-type">Attributed</span>(.../jsdocs/target/scala<span class="hljs-number">-2.12</span>/scalajs-bundler/main/jsdocs-opt-library.js)
+...
+</code></pre>
+<p>These files are required by mdoc in order to use the scalajs-bundler npm
+dependencies. The files may be missing if you have custom webpack or
+scalajs-bundler configuration. To fix this problem, you may want to try to
+create a new <code>jsdocs</code> Scala.js project with minimal webpack and scalajs-bundler
+configuration.<script type="module" src="assets/js.md.js"></script></p>
+<script type="module" src="assets/mdoc.js"></script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mdoc/docs/modifiers.html"><span class="arrow-prev">← </span><span>JVM</span></a><a class="docs-next button" href="/mdoc/docs/docusaurus.html"><span>Docusaurus</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#installation">Installation</a><ul class="toc-headings"><li><a href="#sbt-mdoc">sbt-mdoc</a></li><li><a href="#command-line">Command-line</a></li></ul></li><li><a href="#modifiers">Modifiers</a><ul class="toc-headings"><li><a href="#shared"><code>:shared</code></a></li><li><a href="#invisible"><code>:invisible</code></a></li><li><a href="#compile-only"><code>:compile-only</code></a></li></ul></li><li><a href="#loading-html">Loading HTML</a></li><li><a href="#facades">Facades</a></li><li><a href="#configuration">Configuration</a><ul class="toc-headings"><li><a href="#add-custom-html-header">Add custom HTML header</a></li><li><a href="#generate-optimized-page">Generate optimized page</a></li><li><a href="#customize-node-variable-name">Customize <code>node</code> variable name</a></li><li><a href="#customize-output-js-directory">Customize output js directory</a></li><li><a href="#customize-module-kind">Customize module kind</a></li><li><a href="#add-local-javascript-libraries">Add local JavaScript libraries</a></li><li><a href="#batch-mode-linking">Batch mode linking</a></li><li><a href="#remapping-imports-at-link-time">Remapping imports at link time</a></li><li><a href="#bundle-npm-dependencies">Bundle npm dependencies</a></li><li><a href="#validate-libraryjs-and-loaderjs">Validate library.js and loader.js</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer" style="background-color:#7F4623"><section class="sitemap"><a href="/mdoc/" class="nav-home"><img src="/mdoc/img/mdoc-logo.png" alt="mdoc" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mdoc/docs/installation.html">Get started</a></div><div><h5>Community</h5><a href="https://gitter.im/scalameta/mdoc" target="_blank">Chat on Gitter</a></div><div><h5>More</h5><a href="https://github.com/scalameta/mdoc" target="_blank">GitHub</a></div></section><section class="copyright">Copyright © 2024 mdoc developers</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
