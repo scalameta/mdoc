@@ -132,7 +132,7 @@ val V = new {
 
   val coursier = "1.0.19"
 
-  val scalacheck = "1.18.0"
+  val scalacheck = "1.18.1"
 
   val pprint = "0.9.0"
 
