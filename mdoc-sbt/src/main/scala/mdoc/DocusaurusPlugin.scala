@@ -27,7 +27,7 @@ object DocusaurusPlugin extends AutoPlugin {
   import autoImport._
   def website: Def.Initialize[File] =
     Def.setting {
-      baseDirectory.in(ThisBuild).value / "website"
+      (ThisBuild / baseDirectory).value / "website"
     }
 
   def listJarFiles(root: Path): List[(File, String)] = {
@@ -95,8 +95,8 @@ object DocusaurusPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
-      aggregate.in(docusaurusPublishGhpages) := false,
-      aggregate.in(docusaurusCreateSite) := false,
+      (docusaurusPublishGhpages / aggregate) := false,
+      (docusaurusCreateSite / aggregate) := false,
       docusaurusProjectName := moduleName.value.stripSuffix("-docs"),
       MdocPlugin.mdocInternalVariables ++= List(
         "js-out-prefix" -> "assets"
@@ -146,7 +146,7 @@ object DocusaurusPlugin extends AutoPlugin {
         Relativize.htmlSite(out.toPath)
         out
       },
-      packageDoc.in(Compile) := {
+      (Compile / packageDoc) := {
         val directory = doc.value
         val jar = target.value / "docusaurus.jar"
         val files = listJarFiles(directory.toPath)

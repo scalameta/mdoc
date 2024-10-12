@@ -78,8 +78,8 @@ object MdocPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
-      mdocIn := baseDirectory.in(ThisBuild).value / "docs",
-      mdocOut := target.in(Compile).value / "mdoc",
+      mdocIn := (ThisBuild / baseDirectory).value / "docs",
+      mdocOut := (Compile / target).value / "mdoc",
       mdocVariables := Map.empty,
       mdocExtraArguments := Nil,
       mdocJS := None,
@@ -96,7 +96,7 @@ object MdocPlugin extends AutoPlugin {
           parsed
         ).flatten.mkString(" ")
         Def.taskDyn {
-          runMain.in(Compile).toTask(s" mdoc.SbtMain $args")
+          (Compile / runMain).toTask(s" mdoc.SbtMain $args")
         }
       }.evaluated,
       dependencyOverrides ++= List(
@@ -114,9 +114,9 @@ object MdocPlugin extends AutoPlugin {
           List()
         }
       },
-      resourceGenerators.in(Compile) += Def.task {
+      (Compile / resourceGenerators) += Def.task {
         val out =
-          managedResourceDirectories.in(Compile).value.head / "mdoc.properties"
+          (Compile / managedResourceDirectories).value.head / "mdoc.properties"
         val props = new java.util.Properties()
         mdocVariables.value.foreach { case (key, value) =>
           props.put(key, value)
@@ -126,9 +126,9 @@ object MdocPlugin extends AutoPlugin {
         }
         def getJars(mid: ModuleID) = {
 
-          val depRes = dependencyResolution.in(update).value
-          val updc = updateConfiguration.in(update).value
-          val uwconfig = unresolvedWarningConfiguration.in(update).value
+          val depRes = (update / dependencyResolution).value
+          val updc = (update / updateConfiguration).value
+          val uwconfig = (update / unresolvedWarningConfiguration).value
           val modDescr = depRes.wrapDependencyInModule(mid)
 
           depRes
@@ -190,13 +190,13 @@ object MdocPlugin extends AutoPlugin {
         props.put("out", mdocOut.value.toString)
         props.put(
           "scalacOptions",
-          scalacOptions.in(Compile).value.mkString(" ")
+          (Compile / scalacOptions).value.mkString(" ")
         )
         val classpath = ListBuffer.empty[File]
         // Can't use fullClasspath.value because it introduces cyclic dependency between
         // compilation and resource generation.
-        classpath ++= dependencyClasspath.in(Compile).value.iterator.map(_.data)
-        classpath += classDirectory.in(Compile).value
+        classpath ++= (Compile / dependencyClasspath).value.iterator.map(_.data)
+        classpath += (Compile / classDirectory).value
         props.put(
           "classpath",
           classpath.mkString(java.io.File.pathSeparator)
@@ -204,7 +204,7 @@ object MdocPlugin extends AutoPlugin {
         IO.write(props, "mdoc properties", out)
         val esVersion = props.clone().asInstanceOf[java.util.Properties]
         esVersion.put("js-module-kind", "ESModule")
-        val esOut = managedResourceDirectories.in(Compile).value.head / "es.properties"
+        val esOut = (Compile / managedResourceDirectories).value.head / "es.properties"
         IO.write(
           esVersion,
           "mdoc esmoddule properties",
