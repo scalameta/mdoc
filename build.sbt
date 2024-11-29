@@ -77,6 +77,14 @@ def crossSetting[A](
 
 inThisBuild(
   List(
+    version ~= { dynVer =>
+      if (System.getenv("CI") != null) dynVer
+      else {
+        import scala.sys.process._
+        // drop `v` prefix
+        "git describe --abbrev=0 --tags".!!.drop(1).trim + "-SNAPSHOT"
+      }
+    },
     scalaVersion := scala213,
     crossScalaVersions := allScalaVersions,
     organization := "org.scalameta",
