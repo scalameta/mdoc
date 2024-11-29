@@ -193,9 +193,8 @@ object Instrumenter {
       pat.collect { case m: Member => m.name }
     def unapply(tree: Tree): Option[List[Name]] =
       tree match {
-        case Defn.Val(mods, _, _, _) if mods.exists(_.isInstanceOf[Lazy]) => Some(Nil)
-        case Defn.Val(_, pats, _, _) => Some(pats.flatMap(binders))
-        case Defn.Var(_, pats, _, _) => Some(pats.flatMap(binders))
+        case t: Defn.Val if t.mods.exists(_.isInstanceOf[Lazy]) => Some(Nil)
+        case t: Tree.WithPats with Defn => Some(t.pats.flatMap(binders))
         case _: Defn => Some(Nil)
         case _: Import => Some(Nil)
         case _ => None
