@@ -148,7 +148,7 @@ val V = new {
 
   val fs2 = "3.11.0"
 
-  val metaconfig = "0.13.0"
+  val metaconfig = "0.14.0"
 }
 
 lazy val interfaces = project
