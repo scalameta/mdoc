@@ -269,7 +269,7 @@ object MdocPlugin extends AutoPlugin {
       def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
         val cls = Class.forName(fullyQualifiedClassName)
         val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
-        SettingKey(attributeName)(stageManifest, anyWriter).in(ref).?
+        (ref / SettingKey(attributeName)(stageManifest, anyWriter)).?
       }
       try {
         val stageSetting = proxyForSetting()
@@ -283,8 +283,8 @@ object MdocPlugin extends AutoPlugin {
   private def mdocCompileOptions(ref: Project): Def.Initialize[Task[CompileOptions]] =
     Def.task {
       CompileOptions(
-        scalacOptions.in(ref, Compile).value,
-        fullClasspath.in(ref, Compile).value.map(_.data),
+        (ref / Compile / scalacOptions).value,
+        (ref / Compile / fullClasspath).value.map(_.data),
         classloadedSetting(
           ref,
           "org.scalajs.linker.interface.StandardConfig",
