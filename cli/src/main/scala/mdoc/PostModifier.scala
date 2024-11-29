@@ -23,7 +23,7 @@ object PostModifier {
     ServiceLoader.load(classOf[PostModifier], classLoader).iterator().asScala.toList
   implicit val surface: Surface[Settings] = new Surface(Nil)
   implicit val decoder: ConfDecoder[PostModifier] =
-    ConfDecoder.instanceF[PostModifier](_ => ConfError.message("unsupported").notOk)
+    ConfDecoder.from[PostModifier](_ => ConfError.message("unsupported").notOk)
   implicit val encoder: ConfEncoder[PostModifier] =
     ConfEncoder.StringEncoder.contramap(mod => s"<${mod.name}>")
 }

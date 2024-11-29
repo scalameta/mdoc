@@ -52,8 +52,7 @@ object PositionSyntax extends CliEnrichments with CollectionEnrichments {
       mpos.toUnslicedPosition
     }
     def toOriginal(edit: TokenEditDistance): Position = {
-      val Right(x) = edit.toOriginal(pos.startLine, pos.startColumn)
-      x.toUnslicedPosition
+      edit.toOriginal(pos.startLine, pos.startColumn).toOption.get.toUnslicedPosition
     }
   }
   implicit class XtensionPositionMdoc2(pos: Position) {
