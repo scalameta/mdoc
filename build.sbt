@@ -99,7 +99,7 @@ inThisBuild(
       )
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
-    resolvers += Resolver.sonatypeRepo("public"),
+    resolvers ++= Resolver.sonatypeOssRepos("public"),
     // faster publishLocal:
     packageDoc / publishArtifact := "true" == System.getenv("CI"),
     packageSrc / publishArtifact := "true" == System.getenv("CI"),

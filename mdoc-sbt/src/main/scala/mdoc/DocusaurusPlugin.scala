@@ -124,7 +124,7 @@ object DocusaurusPlugin extends AutoPlugin {
         ).execute()
       },
       docusaurusCreateSite := {
-        m.mdoc.in(Compile).toTask(" ").value
+        (Compile / m.mdoc).toTask(" ").value
         Process(List(yarnBin, "install"), cwd = website.value).execute()
         Process(List(yarnBin, "run", "build"), cwd = website.value).execute()
         val redirectUrl = docusaurusProjectName.value + "/index.html"
