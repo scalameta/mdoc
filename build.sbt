@@ -16,6 +16,8 @@ def allScalaVersions = scala2Versions :+ scala3
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
+def isCI = System.getenv("CI") != null
+
 def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
 def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
 def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
@@ -78,7 +80,7 @@ def crossSetting[A](
 inThisBuild(
   List(
     version ~= { dynVer =>
-      if (System.getenv("CI") != null) dynVer
+      if (isCI) dynVer
       else {
         import scala.sys.process._
         // drop `v` prefix
@@ -108,9 +110,11 @@ inThisBuild(
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
     resolvers ++= Resolver.sonatypeOssRepos("public"),
+    resolvers ++= Resolver.sonatypeOssRepos("releases"),
+    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
     // faster publishLocal:
-    packageDoc / publishArtifact := "true" == System.getenv("CI"),
-    packageSrc / publishArtifact := "true" == System.getenv("CI"),
+    packageDoc / publishArtifact := isCI,
+    packageSrc / publishArtifact := isCI,
     turbo := true,
     useSuperShell := false // overlaps with MUnit test failure reports.
   )
