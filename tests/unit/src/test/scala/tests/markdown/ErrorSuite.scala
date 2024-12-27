@@ -104,7 +104,7 @@ class ErrorSuite extends BaseMarkdownSuite {
       |```
     """.stripMargin,
     """|error: not-member-scala3.md:3:1:
-       |value len is not a member of List[Int] - did you mean List[Int].min?
+       |value len is not a member of List[Int]
        |List(1).len
        |^^^^^^^^^^^
     """.stripMargin
