@@ -202,7 +202,7 @@ val excludePprint = ExclusionRule(organization = "com.lihaoyi")
 val excludeCollection =
   ExclusionRule(organization = "org.scala-lang.modules", name = "scala-collection-compat_2.13")
 
-lazy val parser = crossProject(JVMPlatform, NativePlatform)
+lazy val parser = crossProject(JVMPlatform, NativePlatform, JSPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     sharedSettings,
