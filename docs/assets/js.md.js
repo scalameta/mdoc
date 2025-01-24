@@ -1,12 +1,6 @@
 'use strict';
 import * as $i_https$003a$002f$002fcdn$002ejsdelivr$002enet$002fnpm$002fms$00402$002e1$002e3$002f$002besm from "https://cdn.jsdelivr.net/npm/ms@2.1.3/+esm";
-var $linkingInfo = Object.freeze(({
-  "esVersion": 6,
-  "assumingES6": true,
-  "productionMode": true,
-  "linkerVersion": "1.16.0",
-  "fileLevelThis": this
-}));
+var $fileLevelThis = this;
 var $getOwnPropertyDescriptors = (Object.getOwnPropertyDescriptors || (() => {
   var ownKeysFun;
   if ((((typeof Reflect) !== "undefined") && Reflect.ownKeys)) {
@@ -43,21 +37,6 @@ $Char.prototype.toString = (function() {
 function $noIsInstance(arg0) {
   throw new TypeError("Cannot call isInstance() on a Class representing a JS trait/object");
 }
-function $newArrayObject(arg0, arg1) {
-  return $newArrayObjectInternal(arg0, arg1, 0);
-}
-function $newArrayObjectInternal(arg0, arg1, arg2) {
-  var result = new arg0.constr(arg1[arg2]);
-  if ((arg2 < (arg1.length - 1))) {
-    var subArrayClassData = arg0.componentData;
-    var subLengthIndex = (arg2 + 1);
-    var underlying = result.u;
-    for (var i = 0; (i < underlying.length); (i++)) {
-      underlying[i] = $newArrayObjectInternal(subArrayClassData, arg1, subLengthIndex);
-    }
-  }
-  return result;
-}
 function $objectClone(arg0) {
   return Object.create(Object.getPrototypeOf(arg0), $getOwnPropertyDescriptors(arg0));
 }
@@ -91,9 +70,7 @@ function $objectClassName(arg0) {
       return "java.lang.Void";
     }
     default: {
-      if ((arg0 === null)) {
-        return arg0.getClass__jl_Class();
-      } else if ((arg0 instanceof $c_RTLong)) {
+      if ((arg0 instanceof $c_RTLong)) {
         return "java.lang.Long";
       } else if ((arg0 instanceof $Char)) {
         return "java.lang.Character";
@@ -609,6 +586,8 @@ function $c_jl_FloatingPointBits$() {
   this.jl_FloatingPointBits$__f_int32Array = null;
   this.jl_FloatingPointBits$__f_float64Array = null;
   this.jl_FloatingPointBits$__f_areTypedArraysBigEndian = false;
+  this.jl_FloatingPointBits$__f_highOffset = 0;
+  this.jl_FloatingPointBits$__f_lowOffset = 0;
   this.jl_FloatingPointBits$__f_java$lang$FloatingPointBits$$doublePowsOf2 = null;
   $n_jl_FloatingPointBits$ = this;
   this.jl_FloatingPointBits$__f_java$lang$FloatingPointBits$$_areTypedArraysSupported = true;
@@ -618,6 +597,8 @@ function $c_jl_FloatingPointBits$() {
   this.jl_FloatingPointBits$__f_float64Array = new Float64Array(this.jl_FloatingPointBits$__f_arrayBuffer, 0, 1);
   this.jl_FloatingPointBits$__f_int32Array[0] = 16909060;
   this.jl_FloatingPointBits$__f_areTypedArraysBigEndian = ((new Int8Array(this.jl_FloatingPointBits$__f_arrayBuffer, 0, 8)[0] | 0) === 1);
+  this.jl_FloatingPointBits$__f_highOffset = (this.jl_FloatingPointBits$__f_areTypedArraysBigEndian ? 0 : 1);
+  this.jl_FloatingPointBits$__f_lowOffset = (this.jl_FloatingPointBits$__f_areTypedArraysBigEndian ? 1 : 0);
   this.jl_FloatingPointBits$__f_java$lang$FloatingPointBits$$doublePowsOf2 = null;
 }
 $c_jl_FloatingPointBits$.prototype = new $h_O();
@@ -773,12 +754,7 @@ function $h_RTLong() {
 }
 $h_RTLong.prototype = $c_RTLong.prototype;
 $c_RTLong.prototype.equals__O__Z = (function(that) {
-  if ((that instanceof $c_RTLong)) {
-    var x2 = that;
-    return ((this.RTLong__f_lo === x2.RTLong__f_lo) && (this.RTLong__f_hi === x2.RTLong__f_hi));
-  } else {
-    return false;
-  }
+  return ((that instanceof $c_RTLong) && ((this.RTLong__f_lo === that.RTLong__f_lo) && (this.RTLong__f_hi === that.RTLong__f_hi)));
 });
 $c_RTLong.prototype.hashCode__I = (function() {
   return (this.RTLong__f_lo ^ this.RTLong__f_hi);
@@ -805,7 +781,7 @@ $c_RTLong.prototype.intValue__I = (function() {
   return this.RTLong__f_lo;
 });
 $c_RTLong.prototype.longValue__J = (function() {
-  return $uJ(this);
+  return this;
 });
 $c_RTLong.prototype.floatValue__F = (function() {
   return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$toFloat__I__I__F(this.RTLong__f_lo, this.RTLong__f_hi);
@@ -814,8 +790,7 @@ $c_RTLong.prototype.doubleValue__D = (function() {
   return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$toDouble__I__I__D(this.RTLong__f_lo, this.RTLong__f_hi);
 });
 $c_RTLong.prototype.compareTo__O__I = (function(that) {
-  var b = that;
-  return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I(this.RTLong__f_lo, this.RTLong__f_hi, b.RTLong__f_lo, b.RTLong__f_hi);
+  return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I(this.RTLong__f_lo, this.RTLong__f_hi, that.RTLong__f_lo, that.RTLong__f_hi);
 });
 $c_RTLong.prototype.compareTo__jl_Long__I = (function(that) {
   return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I(this.RTLong__f_lo, this.RTLong__f_hi, that.RTLong__f_lo, that.RTLong__f_hi);
@@ -1285,11 +1260,10 @@ class $c_jl_Throwable extends Error {
     return this.jl_Throwable__f_s;
   }
   fillInStackTrace__jl_Throwable() {
-    var $x_1 = this;
-    var reference = (false ? $x_1.sjs_js_JavaScriptException__f_exception : $x_1);
+    var reference = (false ? this.sjs_js_JavaScriptException__f_exception : this);
     var identifyingString = Object.prototype.toString.call(reference);
     if ((identifyingString !== "[object Error]")) {
-      if ((Error.captureStackTrace === (void 0))) {
+      if (((Error.captureStackTrace === (void 0)) || (!(!Object.isSealed(this))))) {
         new Error();
       } else {
         Error.captureStackTrace(this);
@@ -1521,7 +1495,8 @@ var $d_jl_Double = new $TypeData().initClass(0, "java.lang.Double", ({
   jl_constant_ConstantDesc: 1
 }), ((x) => ((typeof x) === "number")));
 function $f_jl_Float__hashCode__I($thiz) {
-  return $m_jl_FloatingPointBits$().numberHashCode__D__I($thiz);
+  var value = $thiz;
+  return $m_jl_FloatingPointBits$().numberHashCode__D__I(value);
 }
 function $f_jl_Float__toString__T($thiz) {
   return ("" + $thiz);
@@ -1580,9 +1555,6 @@ function $f_T__hashCode__I($thiz) {
 function $f_T__toString__T($thiz) {
   return $thiz;
 }
-function $isArrayOf_T(obj, depth) {
-  return (!(!(((obj && obj.$classData) && (obj.$classData.arrayDepth === depth)) && obj.$classData.arrayBase.ancestors.T)));
-}
 var $d_T = new $TypeData().initClass(0, "java.lang.String", ({
   T: 1,
   Ljava_io_Serializable: 1,
@@ -1604,9 +1576,6 @@ $c_Ljava_io_PrintStream.prototype.constructor = $c_Ljava_io_PrintStream;
 function $h_Ljava_io_PrintStream() {
 }
 $h_Ljava_io_PrintStream.prototype = $c_Ljava_io_PrintStream.prototype;
-function $isArrayOf_Ljava_io_PrintStream(obj, depth) {
-  return (!(!(((obj && obj.$classData) && (obj.$classData.arrayDepth === depth)) && obj.$classData.arrayBase.ancestors.Ljava_io_PrintStream)));
-}
 function $p_jl_JSConsoleBasedPrintStream__doWriteLine__T__V($thiz, line) {
   if (((typeof console) !== "undefined")) {
     if (($thiz.jl_JSConsoleBasedPrintStream__f_isErr && (!(!(!(!console.error)))))) {
