@@ -142,7 +142,7 @@ val V = new {
 
   val munit = "1.0.3"
 
-  val coursier = "1.0.26"
+  val coursier = "1.0.27"
 
   val scalacheck = "1.18.1"
 
