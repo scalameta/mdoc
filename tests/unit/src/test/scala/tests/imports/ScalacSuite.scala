@@ -1,6 +1,7 @@
 package tests.imports
 
 import tests.markdown.BaseMarkdownSuite
+import tests.markdown.Compat
 
 class ScalacSuite extends BaseMarkdownSuite {
 
@@ -17,7 +18,15 @@ class ScalacSuite extends BaseMarkdownSuite {
        |warning: import.md:4:1: Unused import
        |import scala.util.Try
        |^^^^^^^^^^^^^^^^^^^^^
-       |""".stripMargin
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala213 ->
+        """|error: No warnings can be incurred under -Werror.
+           |warning: import.md:4:19: Unused import
+           |import scala.util.Try
+           |                  ^^^
+           |""".stripMargin
+    )
   )
 
   check(
