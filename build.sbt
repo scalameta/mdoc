@@ -23,10 +23,9 @@ def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
-def jsoniter = List(
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.33.0",
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.33.0"
-)
+def jsoniter = List("core", "macros").map { pkg =>
+  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.33.0"
+}
 
 val isScala212 = Def.setting {
   VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
