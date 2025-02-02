@@ -2,13 +2,15 @@ package tests
 
 import munit.FunSuite
 import munit.Location
+import munit.diff.DiffOptions
 import tests.markdown.Compat
 
 class BaseSuite extends FunSuite {
   def postProcessObtained: Map[Compat.ScalaVersion, String => String] = Map.empty
   def postProcessExpected: Map[Compat.ScalaVersion, String => String] = Map.empty
   override def assertNoDiff(obtained: String, expected: String, clue: => Any)(implicit
-      loc: Location
+      loc: Location,
+      diffOptions: DiffOptions
   ): Unit = {
     super.assertNoDiff(
       Compat(processOutput(obtained), Map.empty, postProcessObtained),
