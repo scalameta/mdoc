@@ -137,7 +137,7 @@ val V = new {
 
   val fs2 = "3.11.0"
 
-  val metaconfig = "0.14.0"
+  val metaconfig = "0.15.0"
 }
 
 lazy val depCoursierInterfaces = Def.settings(
