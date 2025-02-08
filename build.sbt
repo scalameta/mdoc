@@ -269,7 +269,7 @@ lazy val mdoc = project
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.18.0",
       // live reload
-      "io.undertow" % "undertow-core" % "2.2.24.Final",
+      "io.undertow" % "undertow-core" % "2.2.30.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.16.Final",
       "org.slf4j" % "slf4j-api" % "2.0.16",
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig,
