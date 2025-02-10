@@ -141,8 +141,6 @@ val V = new {
 
   val munit = "1.1.0"
 
-  val coursier = "1.0.27"
-
   val scalacheck = "1.18.1"
 
   val pprint = "0.9.0"
@@ -154,14 +152,16 @@ val V = new {
   val metaconfig = "0.14.0"
 }
 
+lazy val depCoursierInterfaces = Def.settings(
+  libraryDependencies += "io.get-coursier" % "interface" % "1.0.28"
+)
+
 lazy val interfaces = project
   .in(file("mdoc-interfaces"))
   .settings(
     moduleName := "mdoc-interfaces",
     autoScalaLibrary := false,
-    libraryDependencies ++= List(
-      "io.get-coursier" % "interface" % V.coursier
-    ),
+    depCoursierInterfaces,
     // @note needed to deal with issues with dottyDoc
     Compile / doc / sources := {
       if (isScala3.value) {
@@ -214,8 +214,8 @@ lazy val cli = project
     moduleName := "mdoc-cli",
     scalaVersion := scala213,
     crossScalaVersions := allScalaVersions,
+    depCoursierInterfaces,
     libraryDependencies ++= List(
-      "io.get-coursier" % "interface" % V.coursier,
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "com.lihaoyi" %% "pprint" % V.pprint,
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig
