@@ -185,9 +185,16 @@ lazy val runtime = project
   )
   .dependsOn(interfaces)
 
-val excludePprint = ExclusionRule(organization = "com.lihaoyi")
-val excludeCollection =
-  ExclusionRule(organization = "org.scala-lang.modules", name = "scala-collection-compat_2.13")
+lazy val depScalameta = Def.settings(
+  libraryDependencies += {
+    val sm = ("org.scalameta" %% "scalameta" % V.scalameta).excludeAll("com.lihaoyi")
+    if (isScala3.value)
+      sm.excludeAll(
+        "org.scala-lang.modules" % s"scala-collection-compat_${scalaBinaryVersion.value}"
+      ).cross(CrossVersion.for3Use2_13)
+    else sm
+  }
+)
 
 lazy val parser = crossProject(JVMPlatform, NativePlatform, JSPlatform)
   .withoutSuffixFor(JVMPlatform)
@@ -208,19 +215,7 @@ lazy val cli = project
       "com.lihaoyi" %% "pprint" % V.pprint,
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig
     ),
-    libraryDependencies ++= crossSetting(
-      scalaVersion.value,
-      if2 = List(
-        ("org.scalameta" %% "scalameta" % V.scalameta)
-          .excludeAll(excludePprint)
-      ),
-      if3 = List(
-        ("org.scalameta" %% "scalameta" % V.scalameta)
-          .excludeAll(excludePprint)
-          .excludeAll(excludeCollection)
-          .cross(CrossVersion.for3Use2_13)
-      )
-    )
+    depScalameta
   )
   .dependsOn(parser.jvm)
 
@@ -237,21 +232,13 @@ lazy val mdoc = project
       scalaVersion,
       scalaBinaryVersion
     ),
-    libraryDependencies ++= crossSetting(
-      scalaVersion.value,
-      if3 = List(
-        "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
-        ("org.scalameta" %% "scalameta" % V.scalameta)
-          .excludeAll(excludePprint)
-          .excludeAll(excludeCollection)
-          .cross(CrossVersion.for3Use2_13)
-      ),
-      if2 = List(
-        "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-        ("org.scalameta" %% "scalameta" % V.scalameta)
-          .excludeAll(excludePprint)
-      )
-    ),
+    depScalameta,
+    libraryDependencies += {
+      if (isScala3.value)
+        "org.scala-lang" %% "scala3-compiler" % scalaVersion.value
+      else
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value
+    },
     libraryDependencies ++= jsoniter,
     libraryDependencies ++= List(
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
@@ -287,9 +274,7 @@ val tests = project
   .settings(
     sharedSettings,
     publish / skip := true,
-    libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit
-    ),
+    libraryDependencies += depMunit,
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
       scalaVersion,
@@ -306,9 +291,7 @@ val jsdocs = project
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
-    libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % scalajsDom
-    ),
+    depJsDom,
     scalaJSUseMainModuleInitializer := true,
     Compile / npmDependencies ++= List(
       "ms" -> "2.1.1"
@@ -325,9 +308,7 @@ val jswebsitedocs = project
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
     },
-    libraryDependencies ++= List(
-      "org.scala-js" %%% "scalajs-dom" % scalajsDom
-    )
+    depJsDom
   )
   .enablePlugins(ScalaJSPlugin)
 
@@ -336,9 +317,7 @@ lazy val worksheets = project
   .settings(
     sharedSettings,
     publish / skip := true,
-    libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit % Test
-    )
+    libraryDependencies += depMunit % Test
   )
   .dependsOn(mdoc, tests)
 
@@ -357,19 +336,11 @@ lazy val unit = project
         "io.github.cibotech" %% "evilplot" % "0.9.2"
       )
     ),
-    libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit % Test
-    ),
-    libraryDependencies ++= crossSetting(
-      scalaVersion.value,
-      if3 = List(
-        ("co.fs2" %% "fs2-core" % V.fs2)
-          .cross(CrossVersion.for3Use2_13)
-      ),
-      if2 = List(
-        "co.fs2" %% "fs2-core" % V.fs2
-      )
-    ),
+    libraryDependencies += depMunit % Test,
+    libraryDependencies += {
+      val dep = "co.fs2" %% "fs2-core" % V.fs2
+      if (isScala3.value) dep.cross(CrossVersion.for3Use2_13) else dep
+    },
     buildInfoPackage := "tests.cli",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
@@ -384,9 +355,7 @@ lazy val unitJS = project
     sharedSettings,
     publish / skip := true,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
-    libraryDependencies ++= List(
-      "org.scalameta" %% "munit" % V.munit % Test
-    ),
+    libraryDependencies += depMunit % Test,
     buildInfoPackage := "tests.js",
     buildInfoKeys := Seq[BuildInfoKey](
       "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
@@ -417,7 +386,7 @@ lazy val plugin = project
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
       "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
-      "org.scalameta" %% "munit" % V.munit % Test,
+      depMunit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     Compile / resourceGenerators += Def.task {
@@ -551,3 +520,9 @@ def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[
       )
     val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
   }
+
+val depMunit = "org.scalameta" %% "munit" % V.munit
+
+lazy val depJsDom = Def.settings(
+  libraryDependencies += "org.scala-js" %%% "scalajs-dom" % scalajsDom
+)
