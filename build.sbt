@@ -42,23 +42,11 @@ val isScalaJs1 = Def.setting {
 
 def multiScalaDirectories(projectName: String) =
   Def.setting {
-    val root = (ThisBuild / baseDirectory).value / projectName
-    val base = root / "src" / "main"
-    val result = mutable.ListBuffer.empty[File]
+    val base = (ThisBuild / baseDirectory).value / projectName / "src" / "main"
+    def path(ver: String) = base / s"scala-$ver"
+    val paths = path(scalaVersion.value) :: path(if (isScala3.value) "3" else "2") :: Nil
     val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
-    partialVersion.collect { case (major, minor) =>
-      result += base / s"scala-$major.$minor"
-    }
-
-    result += base / s"scala-${scalaVersion.value}"
-    if (isScala3.value) {
-      result += base / "scala-3"
-    }
-
-    if (!isScala3.value) {
-      result += base / "scala-2"
-    }
-    result.toList
+    partialVersion.collect { case (major, minor) => path(s"$major.$minor") }.fold(paths)(_ :: paths)
   }
 
 def crossSetting[A](
