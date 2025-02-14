@@ -5,16 +5,16 @@ pull_request_rules:
       - check-success=Scalafmt
       - check-success=Website
       - check-success=Windows
-      - check-success="'++2.12.12! test' adopt@1.11"
-      - check-success="'++2.12.19 test' adopt@1.11"
-      - check-success="'++2.13.16 test' adopt@1.11"
-      - check-success="'++3.3.4 test' adopt@1.11"
-      - check-success="scripted adopt@1.11"
-      - check-success="'++2.12.12! test' 17"
+      - check-success="'++2.12.12! testAllNonNative' 11"
+      - check-success="'++2.12.19 test' 11"
+      - check-success="'++2.13.16 test' 11"
+      - check-success="'++3.3.5 test' 11"
+      - check-success="scripted 11"
+      - check-success="'++2.12.12! testAllNonNative' 17"
       - check-success="'++2.12.19 test' 17"
       - check-success="'++2.13.16 test' 17"
-      - check-success="'++3.3.4 test' 17"
-      - check-success=scripted 17
+      - check-success="'++3.3.5 test' 17"
+      - check-success="scripted 17"
     actions:
       merge:
         method: merge
