@@ -600,6 +600,14 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  checkDecorations(
+    "metals-i7248",
+    "val myNullVal = null",
+    """|<val myNullVal = null> // : Null = null
+       |myNullVal: Null = null
+       |""".stripMargin
+  )
+
   def checkDiagnostics(
       options: TestOptions,
       original: String,

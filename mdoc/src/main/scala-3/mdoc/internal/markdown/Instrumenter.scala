@@ -97,7 +97,7 @@ class Instrumenter(
   }
 
   private def printBinder(name: String, pos: Position): Unit = {
-    sb.println(s"$$doc.binder($name, ${position(pos)});")
+    sb.println(s"$$doc.binder(mdoc.internal.sourcecode.SourceStatement($name), ${position(pos)});")
   }
   private def printStatement(stat: Tree, m: Modifier, sb: CodePrinter): Unit = {
     if (!m.isCrash) {

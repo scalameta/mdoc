@@ -4,7 +4,6 @@ import scala.language.implicitConversions
 import scala.quoted._
 
 trait StatementMacro {
-  inline implicit def generate[T](v: => T): SourceStatement[T] = ${ Macros.text('v) }
   inline def apply[T](v: => T): SourceStatement[T] = ${ Macros.text('v) }
 }
 
