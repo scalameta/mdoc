@@ -100,7 +100,7 @@ class Instrumenter(
   }
 
   private def printBinder(name: String, pos: Position): Unit = {
-    sb.print(s"; $$doc.binder($name, ${position(pos)})")
+    sb.print(s"; $$doc.binder(mdoc.internal.sourcecode.SourceStatement($name), ${position(pos)})")
   }
   private def printStatement(stat: Tree, m: Modifier, sb: PrintStream): Unit = {
     if (!m.isCrash) {

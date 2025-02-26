@@ -3,9 +3,7 @@ package mdoc.internal.sourcecode
 import language.experimental.macros
 
 trait StatementMacro {
-  implicit def generate[T](v: T): SourceStatement[T] = macro Macros.text[T]
   def apply[T](v: T): SourceStatement[T] = macro Macros.text[T]
-
 }
 
 object Macros {
