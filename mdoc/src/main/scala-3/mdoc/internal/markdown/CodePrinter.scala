@@ -14,7 +14,7 @@ class CodePrinter(ps: PrintStream, baseIndent: Int = 0, baseNest: Int = 0) {
   }
 
   def definition(header: String)(cb: CodePrinter => Unit): CodePrinter = {
-    val newCB = new CodePrinter(ps, baseIndent + 1, nestCount)
+    val newCB = new CodePrinter(ps, baseIndent, nestCount)
 
     this.println(header + " {")
     cb(newCB)
