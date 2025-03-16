@@ -50,6 +50,40 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
+    "whitespace-indent",
+    """
+      |val result: Array[String] = '''a
+      |b'''
+      |  .split('\n')
+      |println(result sameElements Array("a", "b"))
+      |println(result sameElements Array("a", "    b"))
+      |""".stripMargin.replaceAll("'''", "\"\"\""),
+    """
+      |<val result: Array[String] = '''a
+      |b'''
+      |  .split('\n')> // : Array[String] = Ar...
+      |result: Array[String] = Array("a", "b")
+      |<println(result sameElements Array("a", "b"))> // true
+      |// true
+      |<println(result sameElements Array("a", "    b"))> // false
+      |// false
+      |""".stripMargin.replaceAll("'''", "\"\"\""),
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |<val result: Array[String] = '''a
+          |b'''
+          |  .split('\n')> // : Array[String] = Ar...
+          |result: Array[String] = Array(a, b)
+          |<println(result sameElements Array("a", "b"))> // true
+          |// true
+          |<println(result sameElements Array("a", "    b"))> // false
+          |// false
+          |""".stripMargin.replaceAll("'''", "\"\"\"")
+    )
+  )
+
+  checkDecorations(
     "updates",
     """
       |import scala.collection.mutable.ArrayBuffer
