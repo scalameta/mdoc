@@ -6,7 +6,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.18.2")
 
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.1")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.6")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.7")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
 
