@@ -19,17 +19,21 @@ import scala.meta._
 
 final case class FileImport(
     path: AbsolutePath,
-    qualifier: Term,
-    importName: Name.Indeterminate,
+    importName: MagicImport,
     objectName: String,
-    packageName: String,
+    packageName: Option[String],
     source: String,
     dependencies: List[FileImport],
     renames: List[Rename]
 ) {
   val fullyQualifiedName = s"$packageName.$objectName"
   val prefix: String =
-    s"package $packageName; object $objectName {"
+    packageName match {
+      case None => s"object $objectName {"
+      case Some(name) =>
+        s"package $name; object $objectName {"
+
+    }
   val toInput: Input = {
     val out = new java.lang.StringBuilder().append(prefix)
     var i = 0
@@ -48,7 +52,7 @@ final case class FileImport(
   def toInterface: ImportedScriptFile = {
     mdoc.internal.worksheets.ImportedScriptFile(
       path.toNIO,
-      packageName,
+      packageName.getOrElse(""),
       objectName,
       toInput.text,
       source,
@@ -105,6 +109,39 @@ object FileImport {
         None
     }
   }
+
+  def fromUsing(
+      base: AbsolutePath,
+      fileImport: MagicImport,
+      reporter: Reporter
+  ) = {
+    val pathToFile = base.parent.resolve(fileImport.value)
+    val scriptPath =
+      if (fileImport.value.endsWith(".sc")) {
+        pathToFile
+      } else {
+        pathToFile.resolveSibling(_ + ".sc")
+      }
+    val absolute = AbsolutePath(scriptPath.toNIO.normalize())
+    if (absolute.isFile) {
+      val text = absolute.readText
+      Some(
+        FileImport(
+          path = absolute,
+          importName = fileImport,
+          objectName = absolute.filename.stripSuffix(".sc"),
+          packageName = None,
+          source = text,
+          dependencies = Nil,
+          renames = Nil
+        )
+      )
+    } else {
+      reporter.error(fileImport.pos, s"no such file $scriptPath")
+      None
+    }
+  }
+
   private def fromImport(
       base: AbsolutePath,
       qual: Term,
@@ -131,7 +168,17 @@ object FileImport {
     val scriptPath = AbsolutePath(importedPath).resolveSibling(_ + ".sc")
     if (scriptPath.isFile) {
       val text = scriptPath.readText
-      Some(FileImport(scriptPath, qual, fileImport, objectName, packageName, text, Nil, Nil))
+      Some(
+        FileImport(
+          path = scriptPath,
+          importName = MagicImport(fileImport.value, fileImport.pos),
+          objectName = objectName,
+          packageName = Some(packageName),
+          source = text,
+          dependencies = Nil,
+          renames = Nil
+        )
+      )
     } else {
       reporter.error(fileImport.pos, s"no such file $scriptPath")
       None

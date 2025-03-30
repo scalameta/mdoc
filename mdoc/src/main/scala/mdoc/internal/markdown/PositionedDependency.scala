@@ -16,7 +16,7 @@ object PositionedDependency {
   val Full: Regex = "(.+):::(.+):(.+)".r
   val Half: Regex = "(.+)::(.+):(.+)".r
   val Java: Regex = "(.+):(.+):(.+)".r
-  def fromName(i: Name.Indeterminate, reporter: Reporter): Option[PositionedDependency] = {
+  def fromMagicImport(i: MagicImport, reporter: Reporter): Option[PositionedDependency] = {
     def create(
         org: String,
         artifact: String,

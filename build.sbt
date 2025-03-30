@@ -241,6 +241,7 @@ lazy val mdoc = project
     },
     libraryDependencies ++= jsoniter,
     libraryDependencies ++= List(
+      "org.virtuslab" % "using_directives" % "1.1.4",
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
       "io.methvin" % "directory-watcher" % "0.18.0",
       // live reload

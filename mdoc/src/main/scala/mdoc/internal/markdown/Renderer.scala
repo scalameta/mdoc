@@ -104,7 +104,7 @@ object Renderer {
     val stats = section.source.stats.lift
     val input = section.source.pos.input
     val totalStats = section.source.stats.length
-    if (section.mod.isFailOrWarn) {
+    if (section.mod.isFailOrWarn || section.section.statements.isEmpty) {
       sb.print(section.input.text)
     }
     section.section.statements.zip(section.source.stats).zipWithIndex.foreach {

@@ -181,56 +181,78 @@ class WorksheetSuite extends BaseSuite {
   )
 
   checkDecorations(
-    "scalatags",
-    """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+    "multi-using",
+    """|//> using dep com.lihaoyi::scalatags:0.13.1 com.lihaoyi::ujson:4.1.0
        |import scalatags.Text.all._
-       |val htmlFile = html(
-       |  body(
-       |    p("This is a big paragraph of text")
-       |  )
-       |)
+       |import ujson._
+       |
+       |println("hello")
        |""".stripMargin,
-    """|import $dep.`com.lihaoyi::scalatags:0.13.1`
+    """|//> using dep com.lihaoyi::scalatags:0.13.1 com.lihaoyi::ujson:4.1.0
        |import scalatags.Text.all._
-       |<val htmlFile = html(
-       |  body(
-       |    p("This is a big paragraph of text")
-       |  )
-       |)> // : scalatags.Text.TypedTag[String] = TypedTag( tag = "html", modifiers = List( ArraySeq( TypedTag( t...
-       |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
-       |  tag = "html",
-       |  modifiers = List(
-       |    ArraySeq(
-       |...
-       |""".stripMargin,
-    compat = Map(
-      Compat.Scala3 ->
-        """|import $dep.`com.lihaoyi::scalatags:0.13.1`
-           |import scalatags.Text.all._
-           |<val htmlFile = html(
-           |  body(
-           |    p("This is a big paragraph of text")
-           |  )
-           |)> // : TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
-           |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
-           |""".stripMargin,
-      Compat.Scala212 ->
-        """|import $dep.`com.lihaoyi::scalatags:0.13.1`
-           |import scalatags.Text.all._
-           |<val htmlFile = html(
-           |  body(
-           |    p("This is a big paragraph of text")
-           |  )
-           |)> // : scalatags.Text.TypedTag[String] = TypedTag( "html", List( WrappedArray( TypedTag( "body", List( W...
-           |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
-           |  "html",
-           |  List(
-           |    WrappedArray(
-           |...
-           |""".stripMargin
-    ),
-    width = 100
+       |import ujson._
+       |
+       |<println("hello")> // hello
+       |// hello
+       |""".stripMargin
   )
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $dep.`com.lihaoyi::scalatags:0.13.1`",
+      "using" -> "//> using dep com.lihaoyi::scalatags:0.13.1"
+    )
+  )
+    checkDecorations(
+      s"scalatags-$name",
+      s"""|$importStyle
+          |import scalatags.Text.all._
+          |val htmlFile = html(
+          |  body(
+          |    p("This is a big paragraph of text")
+          |  )
+          |)
+          |""".stripMargin,
+      s"""|$importStyle
+          |import scalatags.Text.all._
+          |<val htmlFile = html(
+          |  body(
+          |    p("This is a big paragraph of text")
+          |  )
+          |)> // : scalatags.Text.TypedTag[String] = TypedTag( tag = "html", modifiers = List( ArraySeq( TypedTag( t...
+          |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
+          |  tag = "html",
+          |  modifiers = List(
+          |    ArraySeq(
+          |...
+          |""".stripMargin,
+      compat = Map(
+        Compat.Scala3 ->
+          s"""|$importStyle
+              |import scalatags.Text.all._
+              |<val htmlFile = html(
+              |  body(
+              |    p("This is a big paragraph of text")
+              |  )
+              |)> // : TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+              |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+              |""".stripMargin,
+        Compat.Scala212 ->
+          s"""|$importStyle
+              |import scalatags.Text.all._
+              |<val htmlFile = html(
+              |  body(
+              |    p("This is a big paragraph of text")
+              |  )
+              |)> // : scalatags.Text.TypedTag[String] = TypedTag( "html", List( WrappedArray( TypedTag( "body", List( W...
+              |htmlFile: scalatags.Text.TypedTag[String] = TypedTag(
+              |  "html",
+              |  List(
+              |    WrappedArray(
+              |...
+              |""".stripMargin
+      ),
+      width = 100
+    )
 
   checkDecorations(
     "multi-mods",
@@ -483,29 +505,35 @@ class WorksheetSuite extends BaseSuite {
     )
   )
 
-  checkDecorations(
-    "fastparse".tag(SkipScala3).tag(SkipScala211),
-    """
-      |import $dep.`com.lihaoyi::fastparse:2.3.0`
-      |import fastparse._, MultiLineWhitespace._
-      |def p[_:P] = P("a")
-      |parse("a", p(_))
-      |""".stripMargin,
-    """|import $dep.`com.lihaoyi::fastparse:2.3.0`
-       |import fastparse._, MultiLineWhitespace._
-       |def p[_:P] = P("a")
-       |<parse("a", p(_))> // : Parsed[Unit] = Suc...
-       |res0: Parsed[Unit] = Success((), 1)
-       |""".stripMargin,
-    compat = Map(
-      Compat.Scala213 -> """|import $dep.`com.lihaoyi::fastparse:2.3.0`
-                            |import fastparse._, MultiLineWhitespace._
-                            |def p[_:P] = P("a")
-                            |<parse("a", p(_))> // : Parsed[Unit] = Suc...
-                            |res0: Parsed[Unit] = Success(value = (), index = 1)
-                            |""".stripMargin
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $dep.`com.lihaoyi::fastparse:2.3.0`",
+      "using" -> "//> using dependency com.lihaoyi::fastparse:2.3.0"
     )
   )
+    checkDecorations(
+      s"fastparse-$name".tag(SkipScala3).tag(SkipScala211),
+      s"""
+         |$importStyle
+         |import fastparse._, MultiLineWhitespace._
+         |def p[_:P] = P("a")
+         |parse("a", p(_))
+         |""".stripMargin,
+      s"""|$importStyle
+          |import fastparse._, MultiLineWhitespace._
+          |def p[_:P] = P("a")
+          |<parse("a", p(_))> // : Parsed[Unit] = Suc...
+          |res0: Parsed[Unit] = Success((), 1)
+          |""".stripMargin,
+      compat = Map(
+        Compat.Scala213 -> s"""|$importStyle
+                               |import fastparse._, MultiLineWhitespace._
+                               |def p[_:P] = P("a")
+                               |<parse("a", p(_))> // : Parsed[Unit] = Suc...
+                               |res0: Parsed[Unit] = Success(value = (), index = 1)
+                               |""".stripMargin
+      )
+    )
 
   checkDecorations(
     "dotty-extension-methods".tag(OnlyScala3),
@@ -565,29 +593,35 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
-  checkDecorations(
-    "dotty-imports".tag(OnlyScala3),
-    """|import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`
-       |import scalatags.Text.all._
-       |val htmlFile = html(
-       |  body(
-       |    p("This is a big paragraph of text")
-       |  )
-       |)
-       |htmlFile.render
-       |""".stripMargin,
-    """|import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`
-       |import scalatags.Text.all._
-       |<val htmlFile = html(
-       |  body(
-       |    p("This is a big paragraph of text")
-       |  )
-       |)> // : TypedTag[String] = <html><b...
-       |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
-       |<htmlFile.render> // : String = <html><bo...
-       |res0: String = <html><body><p>This is a big paragraph of text</p></body></html>
-       |""".stripMargin
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $dep.`com.lihaoyi:scalatags_2.13:0.9.1`",
+      "using" -> "//> using dependency com.lihaoyi:scalatags_2.13:0.9.1"
+    )
   )
+    checkDecorations(
+      s"dotty-imports-$name".tag(OnlyScala3),
+      s"""|$importStyle
+          |import scalatags.Text.all._
+          |val htmlFile = html(
+          |  body(
+          |    p("This is a big paragraph of text")
+          |  )
+          |)
+          |htmlFile.render
+          |""".stripMargin,
+      s"""|$importStyle
+          |import scalatags.Text.all._
+          |<val htmlFile = html(
+          |  body(
+          |    p("This is a big paragraph of text")
+          |  )
+          |)> // : TypedTag[String] = <html><b...
+          |htmlFile: TypedTag[String] = <html><body><p>This is a big paragraph of text</p></body></html>
+          |<htmlFile.render> // : String = <html><bo...
+          |res0: String = <html><body><p>This is a big paragraph of text</p></body></html>
+          |""".stripMargin
+    )
 
   checkDecorations(
     "end-markers".tag(OnlyScala3),
@@ -607,21 +641,27 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
-  checkDecorations(
-    "akka".tag(SkipScala3).tag(SkipScala211),
-    """|import $dep.`com.typesafe.akka::akka-actor:2.6.13`
-       |import akka.actor.ActorSystem
-       |
-       |implicit val system = ActorSystem("worksheet")
-       |
-       |""".stripMargin,
-    """|import $dep.`com.typesafe.akka::akka-actor:2.6.13`
-       |import akka.actor.ActorSystem
-       |
-       |<implicit val system = ActorSystem("worksheet")> // : ActorSystem = akka...
-       |system: ActorSystem = akka://worksheet
-       |""".stripMargin
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $dep.`com.typesafe.akka::akka-actor:2.6.13`",
+      "using" -> "//> using dependency com.typesafe.akka::akka-actor:2.6.13"
+    )
   )
+    checkDecorations(
+      s"akka-$name".tag(SkipScala3).tag(SkipScala211),
+      s"""|$importStyle
+          |import akka.actor.ActorSystem
+          |
+          |implicit val system = ActorSystem("worksheet")
+          |
+          |""".stripMargin,
+      s"""|$importStyle
+          |import akka.actor.ActorSystem
+          |
+          |<implicit val system = ActorSystem("worksheet")> // : ActorSystem = akka...
+          |system: ActorSystem = akka://worksheet
+          |""".stripMargin
+    )
 
   checkDecorations(
     "placeholder",

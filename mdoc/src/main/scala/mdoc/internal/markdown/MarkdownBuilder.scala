@@ -91,6 +91,7 @@ object MarkdownBuilder {
           pathString.contains("fansi") ||
           pathString.contains("pprint") ||
           pathString.contains("mdoc-interfaces") ||
+          pathString.contains("using_directives") ||
           (pathString.contains("mdoc") && pathString.contains("runtime")) ||
           (pathString.contains("mdoc") && pathString.contains("printing"))
         })

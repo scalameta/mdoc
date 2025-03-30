@@ -4,53 +4,68 @@ import tests.markdown.BaseMarkdownSuite
 import tests.cli.BaseCliSuite
 import scala.meta.io.RelativePath
 import java.io.File
+import tests.markdown.Compat
 
 class FileSuite extends BaseCliSuite {
 
   val includeOutputPath: RelativePath => Boolean = { path => path.toNIO.endsWith("readme.md") }
-  checkCli(
-    "basic".tag(SkipScala3),
-    """
-      |/hello.sc
-      |val message = "Hello world!"
-      |/readme.md
-      |```scala mdoc
-      |import $file.hello
-      |println(hello.message)
-      |```
-      |""".stripMargin,
-    """
-      |/readme.md
-      |```scala
-      |import $file.hello
-      |println(hello.message)
-      |// Hello world!
-      |```
-      |""".stripMargin,
-    includeOutputPath = includeOutputPath
-  )
 
-  checkCli(
-    "outer".tag(SkipScala3),
-    """
-      |/inner/hello.sc
-      |val message = "hello world"
-      |/readme.md
-      |```scala mdoc
-      |import $file.inner.hello
-      |println(hello.message)
-      |```
-      |""".stripMargin,
-    """
-      |/readme.md
-      |```scala
-      |import $file.inner.hello
-      |println(hello.message)
-      |// hello world
-      |```
-      |""".stripMargin,
-    includeOutputPath = includeOutputPath
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $file.hello",
+      "using" -> "//> using file hello"
+    )
   )
+    checkCli(
+      ("file-import-" + name).tag(SkipScala3),
+      s"""
+         |/hello.sc
+         |val message = "Hello world!"
+         |/readme.md
+         |```scala mdoc
+         |$importStyle
+         |println(hello.message)
+         |```
+         |""".stripMargin,
+      s"""
+         |/readme.md
+         |```scala
+         |$importStyle
+         |println(hello.message)
+         |// Hello world!
+         |```
+         |""".stripMargin,
+      includeOutputPath = includeOutputPath
+    )
+
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $file.inner.hello",
+      "using" -> "//> using file inner/hello",
+      "using-fullyQualifiedName" -> "//> using file inner/hello.sc"
+    )
+  )
+    checkCli(
+      s"outer-$name".tag(SkipScala3),
+      s"""
+         |/inner/hello.sc
+         |val message = "hello world"
+         |/readme.md
+         |```scala mdoc
+         |$importStyle
+         |println(hello.message)
+         |```
+         |""".stripMargin,
+      s"""
+         |/readme.md
+         |```scala
+         |$importStyle
+         |println(hello.message)
+         |// hello world
+         |```
+         |""".stripMargin,
+      includeOutputPath = includeOutputPath
+    )
 
   1.to(3).foreach { i =>
     val caret = "^" * i
@@ -69,6 +84,31 @@ class FileSuite extends BaseCliSuite {
       s"""|/$inner/readme.md
           |```scala
           |import $$file.$caret.hello
+          |println(hello.message)
+          |// hello world
+          |```
+          |""".stripMargin,
+      includeOutputPath = includeOutputPath
+    )
+  }
+
+  1.to(3).foreach { i =>
+    val up = "../" * i
+    val inner = 1.to(i).map(_ => "inner").mkString("/")
+    checkCli(
+      (inner + "-using").tag(SkipScala3),
+      s"""
+         |/hello.sc
+         |val message = "hello world"
+         |/$inner/readme.md
+         |```scala mdoc
+         |//> using file ${up}hello
+         |println(hello.message)
+         |```
+         |""".stripMargin,
+      s"""|/$inner/readme.md
+          |```scala
+          |//> using file ${up}hello
           |println(hello.message)
           |// hello world
           |```
@@ -98,6 +138,34 @@ class FileSuite extends BaseCliSuite {
     """|/readme.md
        |```scala
        |import $file.hello2, $file.hello3
+       |println(s"${hello2.first} ${hello3.second}")
+       |// hello world
+       |```
+       |""".stripMargin,
+    includeOutputPath = includeOutputPath
+  )
+
+  checkCli(
+    "nested-using".tag(SkipScala3),
+    """
+      |/hello1.sc
+      |val first = "hello"
+      |val second = "world"
+      |/hello2.sc
+      |//> using file hello1
+      |val first = hello1.first
+      |/hello3.sc
+      |//> using file hello1
+      |val second = hello1.second
+      |/readme.md
+      |```scala mdoc
+      |//> using file hello2 hello3
+      |println(s"${hello2.first} ${hello3.second}")
+      |```
+      |""".stripMargin,
+    """|/readme.md
+       |```scala
+       |//> using file hello2 hello3
        |println(s"${hello2.first} ${hello3.second}")
        |// hello world
        |```
@@ -140,18 +208,18 @@ class FileSuite extends BaseCliSuite {
   )
 
   checkCli(
-    "compile-error".tag(SkipScala3),
+    "cycles-using",
     """
       |/hello1.sc
-      |val message: String = 42
+      |//> using file hello2.sc
+      |val first = hello2.first
       |/hello2.sc
-      |import $file.hello1
-      |val number: Int = ""
+      |//> using file hello1.sc
+      |val first = hello1.first
       |/readme.md
       |```scala mdoc
-      |import $file.hello2
-      |val something: Int = ""
-      |println(hello2.number)
+      |//> using file hello1.sc
+      |println(s"${hello1.first} world")
       |```
       |""".stripMargin,
     "",
@@ -159,27 +227,75 @@ class FileSuite extends BaseCliSuite {
     includeOutputPath = includeOutputPath,
     onStdout = { stdout =>
       assertNoDiff(
-        stdout,
-        """|info: Compiling 3 files to <output>
-           |error: <input>/hello1.sc:1:23: type mismatch;
-           | found   : Int(42)
-           | required: String
-           |val message: String = 42
-           |                      ^^
-           |error: <input>/hello2.sc:2:19: type mismatch;
-           | found   : String("")
-           | required: Int
-           |val number: Int = ""
-           |                  ^^
-           |error: readme.md:3:22: type mismatch;
-           | found   : String("")
-           | required: Int
-           |val something: Int = ""
-           |                     ^^
-           |""".stripMargin
+        Compat(stdout, Map.empty, postProcessObtained),
+        Compat(
+          """|info: Compiling 3 files to <output>
+             |error: <input>/hello2.sc:2:13: recursive value first needs type
+             |val first = hello1.first
+             |            ^^^^^^^^^^^^
+             |""".stripMargin,
+          Map(
+            Compat.Scala3 ->
+              """|info: Compiling 3 files to <output>
+                 |error: readme.md:3:13: 
+                 |Not found: hello1
+                 |println(s"${hello1.first} world")
+                 |            ^^^^^^
+                 |""".stripMargin
+          ),
+          postProcessExpected
+        )
       )
     }
   )
+
+  for (
+    (name, importStyle) <- Seq(
+      "ammonite" -> "import $file.",
+      "using" -> "//> using file "
+    )
+  )
+    checkCli(
+      s"compile-error-$name".tag(SkipScala3),
+      s"""
+         |/hello1.sc
+         |val message: String = 42
+         |/hello2.sc
+         |${importStyle}hello1
+         |val number: Int = ""
+         |/readme.md
+         |```scala mdoc
+         |${importStyle}hello2
+         |val something: Int = ""
+         |println(hello2.number)
+         |```
+         |""".stripMargin,
+      "",
+      expectedExitCode = 1,
+      includeOutputPath = includeOutputPath,
+      onStdout = { stdout =>
+        assertNoDiff(
+          stdout,
+          """|info: Compiling 3 files to <output>
+             |error: <input>/hello1.sc:1:23: type mismatch;
+             | found   : Int(42)
+             | required: String
+             |val message: String = 42
+             |                      ^^
+             |error: <input>/hello2.sc:2:19: type mismatch;
+             | found   : String("")
+             | required: Int
+             |val number: Int = ""
+             |                  ^^
+             |error: readme.md:3:22: type mismatch;
+             | found   : String("")
+             | required: Int
+             |val something: Int = ""
+             |                     ^^
+             |""".stripMargin
+        )
+      }
+    )
 
   checkCli(
     "conflicting-package".tag(SkipScala3),
@@ -206,6 +322,38 @@ class FileSuite extends BaseCliSuite {
     """|/readme.md
        |```scala
        |import $file.hello3
+       |println(hello3.three)
+       |// 3
+       |```
+       |""".stripMargin,
+    includeOutputPath = includeOutputPath
+  )
+
+  checkCli(
+    "conflicting-package-using".tag(SkipScala3),
+    """
+      |/hello0.sc
+      |val zero = 0
+      |/inner/hello1.sc
+      |val one = 1
+      |/inner/hello2.sc
+      |//> using file hello1.sc
+      |//> using file ../hello0.sc
+      |val two = hello1.one + 1 + hello0.zero
+      |/hello3.sc
+      |//> using file hello0.sc
+      |//> using file inner/hello1.sc
+      |//> using file inner/hello2.sc
+      |val three = hello0.zero + hello1.one + hello2.two
+      |/readme.md
+      |```scala mdoc
+      |//> using file hello3.sc
+      |println(hello3.three)
+      |```
+      |""".stripMargin,
+    """|/readme.md
+       |```scala
+       |//> using file hello3.sc
        |println(hello3.three)
        |// 3
        |```

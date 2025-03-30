@@ -39,7 +39,7 @@ object StringFS {
       charset: Charset = StandardCharsets.UTF_8
   ): AbsolutePath = {
     if (!layout.trim.isEmpty) {
-      layout.split("(?=\n/)").foreach { row =>
+      layout.split("(?=\n/(?!/))").foreach { row =>
         row.stripPrefix("\n").split("\n", 2).toList match {
           case path :: contents :: Nil =>
             val file = root.resolve(path.stripPrefix("/"))
