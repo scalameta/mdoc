@@ -15,9 +15,9 @@ import coursierapi.error.CoursierError
 
 case class Instrumented(
     source: String,
-    scalacOptionImports: List[Name.Indeterminate],
-    dependencyImports: List[Name.Indeterminate],
-    repositoryImports: List[Name.Indeterminate],
+    scalacOptionImports: List[MagicImport],
+    dependencyImports: List[MagicImport],
+    repositoryImports: List[MagicImport],
     fileImports: List[FileImport],
     positionedDependencies: List[PositionedDependency],
     dependencies: Set[Dependency],
@@ -27,13 +27,14 @@ case class Instrumented(
 object Instrumented {
   def fromSource(
       source: String,
-      scalacOptionImports: List[Name.Indeterminate],
-      dependencyImports: List[Name.Indeterminate],
-      repositoryImports: List[Name.Indeterminate],
+      scalacOptionImports: List[MagicImport],
+      dependencyImports: List[MagicImport],
+      repositoryImports: List[MagicImport],
       fileImports: List[FileImport],
       reporter: Reporter
   ): Instrumented = {
-    val positioned = dependencyImports.flatMap(i => PositionedDependency.fromName(i, reporter))
+    val positioned =
+      dependencyImports.flatMap(i => PositionedDependency.fromMagicImport(i, reporter))
     val dependencies = positioned.map(_.dep).toSet
     val repositories =
       for {

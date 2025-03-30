@@ -1,27 +1,37 @@
 package mdoc.internal.markdown
 
-import scala.collection.mutable
-import scala.meta.Name
-import scala.meta.io.AbsolutePath
+import com.virtuslab.using_directives.UsingDirectivesProcessor
+import com.virtuslab.using_directives.custom.utils.ast._
+import com.virtuslab.{using_directives => using}
+import mdoc.Reporter
 import mdoc.internal.cli.InputFile
 import mdoc.internal.cli.Settings
-import scala.meta.Importer
-import mdoc.Reporter
-import scala.meta.Importee
-import scala.meta.Term
-import scala.meta.inputs.Input
-import scala.meta.parsers.Parsed.Success
-import scala.meta.Source
-import scala.meta.Import
 import mdoc.internal.pos.PositionSyntax._
-import scala.meta.inputs.Position
+
+import scala.collection.mutable
+import scala.meta.Import
+import scala.meta.Importee
+import scala.meta.Importer
+import scala.meta.Name
+import scala.meta.Source
+import scala.meta.Term
 import scala.meta._
+import scala.meta.inputs.Input
+import scala.meta.inputs.Position
+import scala.meta.io.AbsolutePath
+import scala.meta.parsers.Parsed.Success
+import java.nio.file.Paths
+import scala.util.control.NonFatal
+
+case class MagicImport(value: String, pos: Position)
 
 class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
 
-  val scalacOptions = mutable.ListBuffer.empty[Name.Indeterminate]
-  val dependencies = mutable.ListBuffer.empty[Name.Indeterminate]
-  val repositories = mutable.ListBuffer.empty[Name.Indeterminate]
+  import MagicImports._
+
+  val scalacOptions = mutable.ListBuffer.empty[MagicImport]
+  val dependencies = mutable.ListBuffer.empty[MagicImport]
+  val repositories = mutable.ListBuffer.empty[MagicImport]
   val files = mutable.Map.empty[AbsolutePath, FileImport]
 
   class Printable(inputFile: InputFile, parents: List[FileImport]) {
@@ -46,13 +56,13 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
             ) if Instrumenter.magicImports(qualifier) =>
           qualifier match {
             case "$ivy" | "$dep" =>
-              dependencies += name
+              dependencies += MagicImport(name.value, name.pos)
               true
             case "$repo" =>
-              repositories += name
+              repositories += MagicImport(name.value, name.pos)
               true
             case "$scalac" =>
-              scalacOptions += name
+              scalacOptions += MagicImport(name.value, name.pos)
               true
             case _ =>
               false
@@ -62,6 +72,7 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
   }
 
   private def visitFile(fileImport: FileImport, parents: List[FileImport]): FileImport = {
+
     if (parents.exists(_.path == fileImport.path)) {
       val all = (parents.reverse :+ fileImport).map(_.importName.pos.toUnslicedPosition)
       val cycle = all
@@ -83,6 +94,7 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
     }
   }
   private def visitFileUncached(fileImport: FileImport, parents: List[FileImport]): FileImport = {
+
     val input = Input.VirtualFile(fileImport.path.toString(), fileImport.source)
     val FilePrintable = new Printable(
       InputFile.fromRelativeFilename(
@@ -92,6 +104,7 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
       fileImport :: parents
     )
     val fileDependencies = mutable.ListBuffer.empty[FileImport]
+
     val renames = mutable.ListBuffer.empty[Rename]
     (input, MdocDialect.scala).parse[Source] match {
       case e: scala.meta.parsers.Parsed.Error =>
@@ -102,8 +115,10 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
             i.importers.foreach {
               case importer @ FilePrintable(deps) =>
                 deps.foreach { dep =>
-                  if (importer.ref.syntax != dep.packageName) {
-                    renames += Rename(importer.ref.pos, dep.packageName)
+                  dep.packageName match {
+                    case Some(packageName) if packageName != importer.ref.syntax =>
+                      renames += Rename(importer.ref.pos, packageName)
+                    case _ =>
                   }
                   fileDependencies += dep
                 }
@@ -117,5 +132,107 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
       dependencies = fileDependencies.toList,
       renames = renames.toList
     )
+  }
+
+  def visitUsingFile(input: Input, visited: Set[AbsolutePath] = Set.empty): Unit = {
+
+    val relativePath =
+      try {
+        input match {
+          case Input.VirtualFile(path, _) =>
+            file.inputFile.parent.resolve(path)
+          case Input.Slice(input: Input.VirtualFile, _, _) =>
+            file.inputFile.parent.resolve(input.path)
+          case _ => file.inputFile
+        }
+      } catch {
+        case NonFatal(_) => file.inputFile
+      }
+
+    val path = AbsolutePath(relativePath.toNIO.normalize())
+    if (!visited.contains(path)) {
+      val fileDependencies = mutable.ListBuffer.empty[FileImport]
+
+      findUsingDirectivesWith(input) { (ud: UsingDef) =>
+        ud.getKey() match {
+          case "file" | "files" =>
+            val imports = toStringValue(ud.getValue()).flatMap { usingImport =>
+              FileImport.fromUsing(
+                path,
+                MagicImport(usingImport, toMetaPosition(input, ud.getPosition())),
+                reporter
+              )
+            }
+            fileDependencies ++= imports
+          case _ =>
+        }
+      }
+      val toVisit = fileDependencies.toList
+      toVisit.foreach { fileImport =>
+        files(fileImport.path) = fileImport
+        visitUsingFile(
+          Input.VirtualFile(fileImport.path.toString(), fileImport.source),
+          visited + path
+        )
+      }
+    }
+  }
+
+  def findUsingDirectives(input: Input) = findUsingDirectivesWith(input) { (ud: UsingDef) =>
+    ud.getKey() match {
+      case "dep" | "dependency" | "lib" | "library" =>
+        toStringValue(ud.getValue()).foreach {
+          dependencies += MagicImport(_, toMetaPosition(input, ud.getPosition()))
+        }
+
+      case "option" | "options" | "scalac" =>
+        toStringValue(ud.getValue()).foreach {
+          scalacOptions += MagicImport(_, toMetaPosition(input, ud.getPosition()))
+        }
+
+      case "file" | "files" =>
+      case "repo" | "repository" =>
+        toStringValue(ud.getValue()).foreach {
+          repositories += MagicImport(_, toMetaPosition(input, ud.getPosition()))
+        }
+      case _: String =>
+        reporter.warning(
+          toMetaPosition(input, ud.getPosition()),
+          s"Unknown directive: ${ud.getKey()}"
+        )
+
+    }
+
+  }
+
+  private def findUsingDirectivesWith(input: Input)(
+      convert: UsingDef => Unit
+  ) = {
+
+    val usingReporter = new UsingReporter(input, reporter)
+    val processor = new UsingDirectivesProcessor(usingReporter)
+    val allDirectives = processor.extract(input.chars).asScala
+
+    allDirectives.foreach { directives =>
+      directives.getAst match {
+        case uds: UsingDefs => uds.getUsingDefs.asScala.toSeq.foreach(convert)
+        case ud: UsingDef => convert(ud)
+        case _ =>
+
+      }
+    }
+  }
+
+  private def toStringValue(value: UsingValue): List[String] = value match {
+    case sl: StringLiteral => List(sl.getValue())
+    case values: UsingValues => values.getValues().asScala.toList.flatMap(toStringValue)
+    case _ => Nil
+  }
+
+}
+
+object MagicImports {
+  def toMetaPosition(input: Input, position: using.custom.utils.Position) = {
+    scala.meta.inputs.Position.Range(input, position.getOffset(), position.getOffset())
   }
 }

@@ -33,6 +33,10 @@ class Instrumenter(
     )
   }
   val magic = new MagicImports(settings, reporter, file)
+  sections.foreach { section =>
+    magic.findUsingDirectives(section.input)
+    magic.visitUsingFile(section.input)
+  }
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
   val gensym = new Gensym()
