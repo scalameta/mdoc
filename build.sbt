@@ -454,9 +454,6 @@ lazy val docs = project
     publish / skip := true,
     scalaVersion := scala212,
     crossScalaVersions := List(scala212),
-    publish / skip :=
-      !scalaVersion.value.startsWith("2.12") ||
-        (ThisBuild / version).value.endsWith("-SNAPSHOT"),
     mdocAutoDependency := false,
     libraryDependencies ++= List(
       "org.scala-sbt" % "sbt" % sbtVersion.value,
