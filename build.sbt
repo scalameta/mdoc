@@ -451,6 +451,7 @@ lazy val docs = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-docs",
+    publish / skip := true,
     scalaVersion := scala212,
     crossScalaVersions := List(scala212),
     publish / skip :=
