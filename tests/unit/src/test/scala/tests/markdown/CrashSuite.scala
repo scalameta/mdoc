@@ -101,6 +101,23 @@ class CrashSuite extends BaseMarkdownSuite {
   )
 
   check(
+    "wrong-dep",
+    """
+      |```scala mdoc
+      |//> using dep org.scalameta::mdoc:333.333.333
+      |123
+      |```
+    """.stripMargin,
+    """|```scala
+       |//> using dep org.scalameta::mdoc:333.333.333
+       |123
+       |// res0: Int = 123
+       |```
+    """.stripMargin,
+    settings = baseSettings().copy(disableUsingDirectives = true)
+  )
+
+  check(
     "path/to/relative",
     """
       |```scala mdoc:crash

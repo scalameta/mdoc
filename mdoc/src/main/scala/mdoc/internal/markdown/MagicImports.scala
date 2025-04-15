@@ -207,7 +207,7 @@ class MagicImports(settings: Settings, reporter: Reporter, file: InputFile) {
 
   private def findUsingDirectivesWith(input: Input)(
       convert: UsingDef => Unit
-  ) = {
+  ) = if (!settings.disableUsingDirectives) {
 
     val usingReporter = new UsingReporter(input, reporter)
     val processor = new UsingDirectivesProcessor(usingReporter)
