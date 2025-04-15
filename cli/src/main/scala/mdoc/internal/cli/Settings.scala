@@ -62,6 +62,8 @@ case class Settings(
     check: Boolean = false,
     @Description("Disable link hygiene analysis so that no warnings are reported for dead links.")
     noLinkHygiene: Boolean = false,
+    @Description("Disable using directives syntax.")
+    disableUsingDirectives: Boolean = false,
     @Description(
       "Link hygiene analysis reports dead links as errors. Useful for asserting in CI that the site contains no dead links. This setting has no effect in watch mode. It is also mutually exclusive with --no-link-hygiene, if both are set, link hygiene is disabled."
     )
