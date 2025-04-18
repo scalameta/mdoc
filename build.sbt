@@ -135,7 +135,7 @@ val V = new {
 
   val fansi = "0.5.0"
 
-  val fs2 = "3.11.0"
+  val fs2 = "3.12.0"
 
   val metaconfig = "0.15.0"
 }
