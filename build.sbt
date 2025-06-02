@@ -473,7 +473,7 @@ lazy val docs = project
       Some(folders)
     },
     dependencyOverrides += {
-      "org.scala-lang.modules" %%% "scala-xml" % "2.3.0"
+      "org.scala-lang.modules" %%% "scala-xml" % "2.4.0"
     },
     mdocVariables := {
       val stableVersion: String =
