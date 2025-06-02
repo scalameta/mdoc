@@ -103,7 +103,7 @@ object MdocPlugin extends AutoPlugin {
         "org.scala-lang" %% "scala3-library" % scalaVersion.value,
         "org.scala-lang" %% "scala3-compiler" % scalaVersion.value,
         "org.scala-lang" %% "tasty-core" % scalaVersion.value,
-        "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
+        "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
       ),
       libraryDependencies ++= {
         val isJS = mdocJS.value.isDefined
