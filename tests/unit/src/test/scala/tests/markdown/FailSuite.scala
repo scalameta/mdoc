@@ -509,6 +509,32 @@ class FailSuite extends BaseMarkdownSuite {
            |// fs2.Stream.eval(println("Do
            |//  not ever do this"))
            |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          """.stripMargin,
+      Compat.Scala213 -> """|```scala
+                            |fs2.Stream.eval(println("Do not ever do this"))
+                            |// error: no type parameters
+                            |//  for method eval: (fo:
+                            |//  F[O]): fs2.Stream[F,O]
+                            |//  exist so that it can
+                            |//  be applied to arguments
+                            |//  (Unit)
+                            |//  --- because ---
+                            |// argument expression's
+                            |//  type is not compatible
+                            |//  with formal parameter
+                            |//  type;
+                            |//  found   : Unit
+                            |//  required: ?F[?O]
+                            |// fs2.Stream.eval(println("Do
+                            |//  not ever do this"))
+                            |// ^^^^^^^^^^^^^^^
+                            |// error: type mismatch;
+                            |//  found   : Unit
+                            |//  required: F[O]
+                            |// fs2.Stream.eval(println("Do
+                            |//  not ever do this"))
+                            |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            |```
           """.stripMargin
     )
   )
@@ -520,7 +546,6 @@ class FailSuite extends BaseMarkdownSuite {
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
-    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters
@@ -541,7 +566,17 @@ class FailSuite extends BaseMarkdownSuite {
            |//  Any)[Any]
            |// Note that implicit conversions
            |// ...
-        """.stripMargin
+        """.stripMargin,
+      Compat.Scala213 -> """|```scala
+                            |fs2.Stream.eval(println("Do not ever do this"))
+                            |// error: no type parameters
+                            |//  for method eval: (fo:
+                            |//  F[O])fs2.Stream[F,O]
+                            |//  exist so that it can
+                            |//  be applied to arguments
+                            |// ...
+                            |```
+    """.stripMargin
     )
   )
 
