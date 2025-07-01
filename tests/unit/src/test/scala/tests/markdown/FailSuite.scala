@@ -494,7 +494,6 @@ class FailSuite extends BaseMarkdownSuite {
        |//
        |```
     """.stripMargin
-    
   )
 
   check(
@@ -514,7 +513,6 @@ class FailSuite extends BaseMarkdownSuite {
        |// ...
        |```
     """.stripMargin
-    
   )
 
 }
