@@ -192,7 +192,6 @@ class FailSuite extends BaseMarkdownSuite {
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
-    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters for method eval: (fo: F[O])fs2.Stream[F,O] exist so that it can be applied to arguments (Unit)
