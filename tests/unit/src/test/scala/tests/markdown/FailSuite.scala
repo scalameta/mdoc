@@ -433,7 +433,7 @@ class FailSuite extends BaseMarkdownSuite {
   check(
     "max-heigth-error",
     """
-      |```scala mdoc:fail:height=3
+      |```scala mdoc:fail:height=2
       |val x = 1
       |println(notfound)
       |```
@@ -451,8 +451,8 @@ class FailSuite extends BaseMarkdownSuite {
         """|```scala
            |val x = 1
            |println(notfound)
-           |// error:
-           |// Not found: notfound
+           |// error: not found: value notfound
+           |// println(notfound)
            |// ...
            |```
     """.stripMargin
@@ -471,7 +471,7 @@ class FailSuite extends BaseMarkdownSuite {
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters
        |//  for method eval: (fo:
-       |//  F[O]): fs2.Stream[F,O]
+       |//  F[O])fs2.Stream[F,O]
        |//  exist so that it can
        |//  be applied to arguments
        |//  (Unit)
@@ -491,9 +491,27 @@ class FailSuite extends BaseMarkdownSuite {
        |// fs2.Stream.eval(println("Do
        |//  not ever do this"))
        |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       |//
        |```
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |fs2.Stream.eval(println("Do not ever do this"))
+           |// error:
+           |// Found:    Unit
+           |// Required: ([_$$17] =>>
+           |//  Any)[Any]
+           |// Note that implicit conversions
+           |//  were not tried because
+           |//  the result of an implicit
+           |//  conversion
+           |// must be more specific
+           |//  than ([_$$17] =>> Any)[Any]
+           |// fs2.Stream.eval(println("Do
+           |//  not ever do this"))
+           |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          """.stripMargin
+    )
   )
 
   check(
@@ -508,11 +526,24 @@ class FailSuite extends BaseMarkdownSuite {
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters
        |//  for method eval: (fo:
-       |//  F[O]): fs2.Stream[F,O]
+       |//  F[O])fs2.Stream[F,O]
        |//  exist so that it can
+       |//  be applied to arguments
        |// ...
        |```
-    """.stripMargin
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |fs2.Stream.eval(println("Do not ever do this"))
+           |// error:
+           |// Found:    Unit
+           |// Required: ([_$$17] =>>
+           |//  Any)[Any]
+           |// Note that implicit conversions
+           |// ...
+        """.stripMargin
+    )
   )
 
 }

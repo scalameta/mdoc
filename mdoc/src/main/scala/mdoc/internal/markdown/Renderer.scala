@@ -90,7 +90,7 @@ object Renderer {
   ): Option[Int] = {
     if (accWidth > width) {
       Some(currentIdx)
-    } else if (currentIdx == tokens.length - 1 || tokens.length == 1)
+    } else if (currentIdx == tokens.length - 1 || tokens.length <= 1)
       None
     else {
       val currentTokenLength = tokens(currentIdx).length
@@ -107,6 +107,7 @@ object Renderer {
         List(firstLine) ++ {
           splitLine(secondLine, width)
         }
+
       }
     }
   }
@@ -117,26 +118,34 @@ object Renderer {
       heightOpt: Option[Int] = None,
       widthOpt: Option[Int] = None
   ): Unit = {
+
     val N = string.length - (if (string.endsWith("\n")) 1 else 0)
+    if (string.isEmpty())
+      sb.appendMultiline(string, N)
+    else {
 
-    val lines = string.split("\n")
-    val width = widthOpt.getOrElse(lines.map(_.length).max)
-    val height = heightOpt.getOrElse(lines.length)
-    val linesTokenized = lines.map { _.split("(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)").filter(_.nonEmpty) }
-
-    val linesTruncatedToWidth = linesTokenized
-      .map { lineTokenized =>
-        splitLine(lineTokenized.toList, width)
+      val lines = string.split("\n")
+      val width = widthOpt.getOrElse(lines.map(_.length).max)
+      val height = heightOpt.getOrElse(lines.length)
+      val linesTokenized = lines.map {
+        _.split("(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)").filter(_.nonEmpty)
       }
-      .flatten
-      .map(_.mkString)
 
-    val linesTruncatedToHeigth = linesTruncatedToWidth.take(
-      height - 1
-    ) ++ (if (linesTruncatedToWidth.length >= height) List("...") else List(""))
+      val linesTruncatedToWidth = linesTokenized
+        .map { lineTokenized =>
+          splitLine(lineTokenized.toList, width)
+        }
+        .flatten
+        .map(_.mkString)
 
-    sb.append("// ")
-    sb.appendMultiline(linesTruncatedToHeigth.mkString("\n"))
+      val linesTruncatedToHeigth = linesTruncatedToWidth.take(
+        height
+      ) ++ (if (linesTruncatedToWidth.length > height) List("...") else List.empty[String])
+
+      sb.append("// ")
+      sb.appendMultiline(linesTruncatedToHeigth.mkString("\n"))
+
+    }
   }
 
   // Beneath each binding statement, we insert the evaluated variable, e.g., `x: Int = 1`
