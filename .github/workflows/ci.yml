@@ -36,6 +36,43 @@ jobs:
     name: "Windows"
     runs-on: windows-latest
     steps:
+      - name: Install LLVM
+        shell: pwsh
+        run: |
+          $retryCount = 3
+          $retryDelay = 5  # seconds
+
+          function InstallLLVM {
+              Write-Host "Attempting to install LLVM (try $($retryCount + 1 - $global:retryAttempt) of $($retryCount + 1))..."
+              choco install llvm --version="20.1.4" --allow-downgrade --force
+          }
+
+          # Attempt to install LLVM with retries
+          for ($global:retryAttempt = 1; $global:retryAttempt -le $retryCount; $global:retryAttempt++) {
+              try {
+                  InstallLLVM
+                  Write-Host "LLVM installation successful!"
+                  break  # Exit the loop if installation is successful
+              } catch {
+                  Write-Host "Error installing LLVM: $_"
+                  if ($global:retryAttempt -lt $retryCount) {
+                      Write-Host "Retrying in $retryDelay seconds..."
+                      Start-Sleep -Seconds $retryDelay
+                  } else {
+                      Write-Host "Maximum retry attempts reached. Exiting."
+                      exit 1
+                  }
+              }
+          }
+
+      - name: Add LLVM on Path
+        shell: pwsh
+        run: echo "${env:ProgramFiles}\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Assert clang installed and on path
+        shell: pwsh
+        run: clang --version
+        
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
