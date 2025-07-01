@@ -377,6 +377,7 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
     )
   )
+
   check(
     "two-errors",
     """
@@ -428,4 +429,92 @@ class FailSuite extends BaseMarkdownSuite {
            |""".stripMargin
     )
   )
+
+  check(
+    "max-heigth-error",
+    """
+      |```scala mdoc:fail:height=3
+      |val x = 1
+      |println(notfound)
+      |```
+    """.stripMargin,
+    """|```scala
+       |val x = 1
+       |println(notfound)
+       |// error: not found: value notfound
+       |// println(notfound)
+       |// ...
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |val x = 1
+           |println(notfound)
+           |// error:
+           |// Not found: notfound
+           |// ...
+           |```
+    """.stripMargin
+    )
+  )
+
+  check(
+    "max-width-error",
+    """
+      |```scala mdoc:fail:width=20:height=300
+      |fs2.Stream.eval(println("Do not ever do this"))
+      |```
+    """.stripMargin,
+    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
+    """|```scala
+       |fs2.Stream.eval(println("Do not ever do this"))
+       |// error: no type parameters
+       |//  for method eval: (fo:
+       |//  F[O]): fs2.Stream[F,O]
+       |//  exist so that it can
+       |//  be applied to arguments
+       |//  (Unit)
+       |//  --- because ---
+       |// argument expression's
+       |//  type is not compatible
+       |//  with formal parameter
+       |//  type;
+       |//  found   : Unit
+       |//  required: ?F[?O]
+       |// fs2.Stream.eval(println("Do
+       |//  not ever do this"))
+       |// ^^^^^^^^^^^^^^^
+       |// error: type mismatch;
+       |//  found   : Unit
+       |//  required: F[O]
+       |// fs2.Stream.eval(println("Do
+       |//  not ever do this"))
+       |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       |//
+       |```
+    """.stripMargin
+    
+  )
+
+  check(
+    "max-width-and-heigth-error",
+    """
+      |```scala mdoc:fail:width=20:height=5
+      |fs2.Stream.eval(println("Do not ever do this"))
+      |```
+    """.stripMargin,
+    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
+    """|```scala
+       |fs2.Stream.eval(println("Do not ever do this"))
+       |// error: no type parameters
+       |//  for method eval: (fo:
+       |//  F[O]): fs2.Stream[F,O]
+       |//  exist so that it can
+       |// ...
+       |```
+    """.stripMargin
+    
+  )
+
 }

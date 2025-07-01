@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import scala.meta._
 import scala.meta.inputs.Position
+import mdoc.internal.markdown.Mod.Width
+import mdoc.internal.markdown.Mod.Height
 
 object Renderer {
 
@@ -80,15 +82,47 @@ object Renderer {
     out.toString()
   }
 
-  @deprecated("this method will be removed", "2020-06-01")
-  def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
-    sb.appendMultiline(string, N)
+  def findPositionToSplit(tokens: List[String], width: Int, accWidth: Int = 0, currentIdx: Int = 0): Option[Int] = {
+    if (accWidth > width) {
+      Some(currentIdx)
+    }
+    else if (currentIdx == tokens.length - 1 || tokens.length == 1)
+      None
+    else {
+      val currentTokenLength = tokens(currentIdx).length
+      findPositionToSplit(tokens, width, accWidth + currentTokenLength, currentIdx + 1)
+    }
   }
 
-  def appendFreshMultiline(sb: PrintStream, string: String): Unit = {
+  def splitLine(line: List[String], width: Int): List[List[String]] = {
+    findPositionToSplit(line, width) match {
+      case None => List(line)
+      case Some(idx) => {
+        val (firstLine, secondLine) = line.splitAt(idx)
+        val rest = splitLine(secondLine, width)
+        List(firstLine) ++ {
+          splitLine(secondLine, width)
+        }
+      }
+    }
+  }
+
+  def appendFreshMultiline(sb: PrintStream, string: String, heightOpt: Option[Int] = None, widthOpt: Option[Int] = None): Unit = {
     val N = string.length - (if (string.endsWith("\n")) 1 else 0)
+
+    val lines = string.split("\n")
+    val width = widthOpt.getOrElse(lines.map(_.length).max)
+    val height = heightOpt.getOrElse(lines.length)
+    val linesTokenized = lines.map {_.split("(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)").filter(_.nonEmpty)}
+
+    val linesTruncatedToWidth = linesTokenized.map { lineTokenized =>
+      splitLine(lineTokenized.toList, width)
+    }.flatten.map(_.mkString)
+
+    val linesTruncatedToHeigth = linesTruncatedToWidth.take(height - 1) ++ (if (linesTruncatedToWidth.length >= height) List("...") else List(""))
+
     sb.append("// ")
-    sb.appendMultiline(string, N)
+    sb.appendMultiline(linesTruncatedToHeigth.mkString("\n"))
   }
 
   // Beneath each binding statement, we insert the evaluated variable, e.g., `x: Int = 1`
@@ -148,13 +182,15 @@ object Renderer {
             case Modifier.Fail() | Modifier.Warn() =>
               sb.append('\n')
               binder.value match {
-                case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
+                  case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
                   val input = Input.String(instrumented)
                   val edit =
                     TokenEditDistance.fromTrees(Seq(section.source.source), input)
                   val compiled = compiler.fail(edit, input, section.source.pos)
                   val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                   val pos = tpos.toMeta(section)
+                  val widthOpt = section.mod.mods.collectFirst {case Width(width) => width}
+                  val heightOpt = section.mod.mods.collectFirst {case Height(height) => height}
                   if (section.mod.isWarn && compiler.hasErrors) {
                     reporter.error(
                       pos,
@@ -171,7 +207,8 @@ object Renderer {
                       s"Expected compile errors but program compiled successfully without errors"
                     )
                   }
-                  appendFreshMultiline(sb, compiled)
+
+                  appendFreshMultiline(sb, compiled, heightOpt, widthOpt)
                 case _ =>
                   val obtained = binder.stringValue
                   throw new IllegalArgumentException(
