@@ -430,7 +430,7 @@ class FailSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "max-heigth-error",
+    "error-max-height",
     """
       |```scala mdoc:fail:height=2
       |val x = 1
@@ -459,37 +459,26 @@ class FailSuite extends BaseMarkdownSuite {
   )
 
   check(
-    "max-width-error",
+    "error-max-width",
     """
-      |```scala mdoc:fail:width=20:height=300
+      |```scala mdoc:fail:width=30
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
-    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
-       |// error: no type parameters
-       |//  for method eval: (fo:
-       |//  F[O])fs2.Stream[F,O]
-       |//  exist so that it can
-       |//  be applied to arguments
-       |//  (Unit)
+       |// error: no type parameters for ...
        |//  --- because ---
-       |// argument expression's
-       |//  type is not compatible
-       |//  with formal parameter
-       |//  type;
+       |// argument expression's type is ...
        |//  found   : Unit
        |//  required: ?F[?O]
-       |// fs2.Stream.eval(println("Do
-       |//  not ever do this"))
+       |// fs2.Stream.eval(println("Do no...
        |// ^^^^^^^^^^^^^^^
        |// error: type mismatch;
        |//  found   : Unit
        |//  required: F[O]
-       |// fs2.Stream.eval(println("Do
-       |//  not ever do this"))
-       |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       |// fs2.Stream.eval(println("Do no...
+       |//                 ^^^^^^^^^^^^^^...
        |```
     """.stripMargin,
     compat = Map(
@@ -498,61 +487,32 @@ class FailSuite extends BaseMarkdownSuite {
            |fs2.Stream.eval(println("Do not ever do this"))
            |// error:
            |// Found:    Unit
-           |// Required: ([_$$17] =>>
-           |//  Any)[Any]
-           |// Note that implicit conversions
-           |//  were not tried because
-           |//  the result of an implicit
-           |//  conversion
-           |// must be more specific
-           |//  than ([_$$17] =>> Any)[Any]
-           |// fs2.Stream.eval(println("Do
-           |//  not ever do this"))
-           |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          """.stripMargin,
-      Compat.Scala213 -> """|```scala
-                            |fs2.Stream.eval(println("Do not ever do this"))
-                            |// error: no type parameters
-                            |//  for method eval: (fo:
-                            |//  F[O]): fs2.Stream[F,O]
-                            |//  exist so that it can
-                            |//  be applied to arguments
-                            |//  (Unit)
-                            |//  --- because ---
-                            |// argument expression's
-                            |//  type is not compatible
-                            |//  with formal parameter
-                            |//  type;
-                            |//  found   : Unit
-                            |//  required: ?F[?O]
-                            |// fs2.Stream.eval(println("Do
-                            |//  not ever do this"))
-                            |// ^^^^^^^^^^^^^^^
-                            |// error: type mismatch;
-                            |//  found   : Unit
-                            |//  required: F[O]
-                            |// fs2.Stream.eval(println("Do
-                            |//  not ever do this"))
-                            |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                            |```
-          """.stripMargin
+           |// Required: F[O]
+           |// ∙
+           |// where:    F is a type variable...
+           |//           O is a type variable...
+           |// ∙
+           |// Note that implicit conversions...
+           |// both method ArrowAssoc in obje...
+           |```
+    """.stripMargin
     )
   )
 
   check(
-    "max-width-and-heigth-error",
+    "error-max-width-and-height",
     """
-      |```scala mdoc:fail:width=20:height=5
+      |```scala mdoc:fail:width=30:height=5
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
-       |// error: no type parameters
-       |//  for method eval: (fo:
-       |//  F[O])fs2.Stream[F,O]
-       |//  exist so that it can
-       |//  be applied to arguments
+       |// error: no type parameters for ...
+       |//  --- because ---
+       |// argument expression's type is ...
+       |//  found   : Unit
+       |//  required: ?F[?O]
        |// ...
        |```
     """.stripMargin,
@@ -562,20 +522,11 @@ class FailSuite extends BaseMarkdownSuite {
            |fs2.Stream.eval(println("Do not ever do this"))
            |// error:
            |// Found:    Unit
-           |// Required: ([_$$17] =>>
-           |//  Any)[Any]
-           |// Note that implicit conversions
+           |// Required: F[O]
+           |// ∙
+           |// where:    F is a type variable...
            |// ...
-        """.stripMargin,
-      Compat.Scala213 -> """|```scala
-                            |fs2.Stream.eval(println("Do not ever do this"))
-                            |// error: no type parameters
-                            |//  for method eval: (fo:
-                            |//  F[O])fs2.Stream[F,O]
-                            |//  exist so that it can
-                            |//  be applied to arguments
-                            |// ...
-                            |```
+           |```
     """.stripMargin
     )
   )

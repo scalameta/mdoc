@@ -82,35 +82,9 @@ object Renderer {
     out.toString()
   }
 
-  def findPositionToSplit(
-      tokens: List[String],
-      width: Int,
-      accWidth: Int = 0,
-      currentIdx: Int = 0
-  ): Option[Int] = {
-    if (accWidth > width) {
-      Some(currentIdx)
-    } else if (currentIdx == tokens.length - 1 || tokens.length <= 1)
-      None
-    else {
-      val currentTokenLength = tokens(currentIdx).length
-      findPositionToSplit(tokens, width, accWidth + currentTokenLength, currentIdx + 1)
-    }
-  }
-
-  def splitLine(line: List[String], width: Int): List[List[String]] = {
-    findPositionToSplit(line, width) match {
-      case None => List(line)
-      case Some(idx) => {
-        val (firstLine, secondLine) = line.splitAt(idx)
-        val rest = splitLine(secondLine, width)
-        List(firstLine) ++ {
-          splitLine(secondLine, width)
-        }
-
-      }
-    }
-  }
+  @deprecated("this method will be removed", "2020-06-01")
+  def appendMultiline(sb: PrintStream, string: String, N: Int): Unit =
+    sb.appendMultiline(string, N)
 
   def appendFreshMultiline(
       sb: PrintStream,
@@ -118,25 +92,16 @@ object Renderer {
       heightOpt: Option[Int] = None,
       widthOpt: Option[Int] = None
   ): Unit = {
-
-    val N = string.length - (if (string.endsWith("\n")) 1 else 0)
-    if (string.isEmpty())
-      sb.appendMultiline(string, N)
-    else {
-
+    if (heightOpt.isDefined || widthOpt.isDefined || !string.isEmpty) {
       val lines = string.split("\n")
       val width = widthOpt.getOrElse(lines.map(_.length).max)
       val height = heightOpt.getOrElse(lines.length)
-      val linesTokenized = lines.map {
-        _.split("(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)").filter(_.nonEmpty)
-      }
 
-      val linesTruncatedToWidth = linesTokenized
-        .map { lineTokenized =>
-          splitLine(lineTokenized.toList, width)
+
+      val linesTruncatedToWidth = lines
+        .map { line =>
+          line.take(width) + (if (line.length > width) "..." else "")
         }
-        .flatten
-        .map(_.mkString)
 
       val linesTruncatedToHeigth = linesTruncatedToWidth.take(
         height
@@ -144,7 +109,10 @@ object Renderer {
 
       sb.append("// ")
       sb.appendMultiline(linesTruncatedToHeigth.mkString("\n"))
-
+    } else {
+      val N = string.length - (if (string.endsWith("\n")) 1 else 0)
+      sb.append("// ")
+      sb.appendMultiline(string, N)
     }
   }
 

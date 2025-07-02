@@ -55,4 +55,82 @@ class WarnSuite extends BaseMarkdownSuite {
        |^^^^^^^^^^^^^^^
        |""".stripMargin
   )
+
+  check(
+    "warn-max-height",
+    """
+      |```scala mdoc:warn:height=3
+      |List(1) match { case Nil => }
+      |```
+    """.stripMargin,
+    """|```scala
+       |List(1) match { case Nil => }
+       |// warning: match may not be exhaustive.
+       |// It would fail on the following input: List(_)
+       |// List(1) match { case Nil => }
+       |// ...
+       |```
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |
+          | warn:
+          | match may not be exhaustive.
+          | ...
+        """.stripMargin
+    )
+  )
+
+  check(
+    "warn-max-width",
+    """
+      |```scala mdoc:warn:width=20
+      |List(1) match { case Nil => }
+      |```
+    """.stripMargin,
+    """|```scala
+       |List(1) match { case Nil => }
+       |// warning: match may n...
+       |// It would fail on the...
+       |// List(1) match { case...
+       |// ^^^^^^^
+       |```
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |
+          | warn:
+          | match may not be exh...
+          | 
+          | It would fail on pat...
+          | 
+        """.stripMargin
+    )
+  )
+
+  check(
+    "warn-max-width-and-height",
+    """
+      |```scala mdoc:warn:width=20:height=2
+      |List(1) match { case Nil => }
+      |```
+    """.stripMargin,
+    """|```scala
+       |List(1) match { case Nil => }
+       |// warning: match may n...
+       |// It would fail on the...
+       |// ...
+       |```
+       |""".stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """
+          |
+          | warn:
+          | ...
+        """.stripMargin
+    )
+  )
 }
