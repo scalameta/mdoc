@@ -97,7 +97,6 @@ object Renderer {
       val width = widthOpt.getOrElse(lines.map(_.length).max)
       val height = heightOpt.getOrElse(lines.length)
 
-
       val linesTruncatedToWidth = lines
         .map { line =>
           line.take(width) + (if (line.length > width) "..." else "")

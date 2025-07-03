@@ -87,8 +87,9 @@ class MarkdownCompiler(
       val msg = nullableMessage(msgOrNull)
       val mpos = toMetaPosition(edit, pos)
 
-      // workout why sreporter.WARNING is not enough, why the fuck is there sectionPos.contains(mpos)
-      if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
+      if (
+        sectionPos.contains(mpos) || gseverity == sreporter.ERROR || gseverity == sreporter.WARNING
+      ) {
         val severity = gseverity.toString.toLowerCase
         val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
         ps.println(formatted)
