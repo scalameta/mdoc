@@ -192,7 +192,6 @@ class FailSuite extends BaseMarkdownSuite {
       |fs2.Stream.eval(println("Do not ever do this"))
       |```
     """.stripMargin,
-    // See https://github.com/scalameta/mdoc/issues/95#issuecomment-426993507
     """|```scala
        |fs2.Stream.eval(println("Do not ever do this"))
        |// error: no type parameters for method eval: (fo: F[O])fs2.Stream[F,O] exist so that it can be applied to arguments (Unit)
@@ -377,6 +376,7 @@ class FailSuite extends BaseMarkdownSuite {
     """.stripMargin
     )
   )
+
   check(
     "two-errors",
     """
@@ -428,4 +428,107 @@ class FailSuite extends BaseMarkdownSuite {
            |""".stripMargin
     )
   )
+
+  check(
+    "error-max-height",
+    """
+      |```scala mdoc:fail:height=2
+      |val x = 1
+      |println(notfound)
+      |```
+    """.stripMargin,
+    """|```scala
+       |val x = 1
+       |println(notfound)
+       |// error: not found: value notfound
+       |// println(notfound)
+       |// ...
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |val x = 1
+           |println(notfound)
+           |// error: not found: value notfound
+           |// println(notfound)
+           |// ...
+           |```
+    """.stripMargin
+    )
+  )
+
+  check(
+    "error-max-width",
+    """
+      |```scala mdoc:fail:width=30
+      |fs2.Stream.eval(println("Do not ever do this"))
+      |```
+    """.stripMargin,
+    """|```scala
+       |fs2.Stream.eval(println("Do not ever do this"))
+       |// error: no type parameters for ...
+       |//  --- because ---
+       |// argument expression's type is ...
+       |//  found   : Unit
+       |//  required: ?F[?O]
+       |// fs2.Stream.eval(println("Do no...
+       |// ^^^^^^^^^^^^^^^
+       |// error: type mismatch;
+       |//  found   : Unit
+       |//  required: F[O]
+       |// fs2.Stream.eval(println("Do no...
+       |//                 ^^^^^^^^^^^^^^...
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |fs2.Stream.eval(println("Do not ever do this"))
+           |// error:
+           |// Found:    Unit
+           |// Required: F[O]
+           |// ∙
+           |// where:    F is a type variable...
+           |//           O is a type variable...
+           |// ∙
+           |// Note that implicit conversions...
+           |// both method ArrowAssoc in obje...
+           |```
+    """.stripMargin
+    )
+  )
+
+  check(
+    "error-max-width-and-height",
+    """
+      |```scala mdoc:fail:width=30:height=5
+      |fs2.Stream.eval(println("Do not ever do this"))
+      |```
+    """.stripMargin,
+    """|```scala
+       |fs2.Stream.eval(println("Do not ever do this"))
+       |// error: no type parameters for ...
+       |//  --- because ---
+       |// argument expression's type is ...
+       |//  found   : Unit
+       |//  required: ?F[?O]
+       |// ...
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |fs2.Stream.eval(println("Do not ever do this"))
+           |// error:
+           |// Found:    Unit
+           |// Required: F[O]
+           |// ∙
+           |// where:    F is a type variable...
+           |// ...
+           |```
+    """.stripMargin
+    )
+  )
+
 }
