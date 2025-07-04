@@ -92,7 +92,7 @@ object Renderer {
       heightOpt: Option[Int] = None,
       widthOpt: Option[Int] = None
   ): Unit = {
-    if (heightOpt.isDefined || widthOpt.isDefined || !string.isEmpty) {
+    if (heightOpt.isDefined || widthOpt.isDefined) {
       val lines = string.split("\n")
       val width = widthOpt.getOrElse(lines.map(_.length).max)
       val height = heightOpt.getOrElse(lines.length)
