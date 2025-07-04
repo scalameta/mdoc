@@ -83,14 +83,14 @@ class MarkdownCompiler(
     run.compileSources(List(toSource(input)))
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
-    val areWarningAllevated = (sreporter.infos.map(_.msg).exists(_.contains("-Werror")))
+    val areWarningAggravated = (sreporter.infos.map(_.msg).exists(_.contains("-Werror")))
 
     sreporter.infos.foreach { case sreporter.Info(pos, msgOrNull, gseverity) =>
       val msg = nullableMessage(msgOrNull)
       val mpos = toMetaPosition(edit, pos)
 
       if (
-        (!areWarningAllevated && gseverity == sreporter.WARNING) || gseverity == sreporter.ERROR
+        (!areWarningAggravated && gseverity == sreporter.WARNING) || gseverity == sreporter.ERROR
       ) {
         val severity = gseverity.toString.toLowerCase
         val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)
