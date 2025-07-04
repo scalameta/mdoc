@@ -24,7 +24,7 @@ def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
 def jsoniter = List("core", "macros").map { pkg =>
-  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.35.3"
+  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.36.6"
 }
 
 val isScala212 = Def.setting {
