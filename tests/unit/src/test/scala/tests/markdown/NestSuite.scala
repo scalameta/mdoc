@@ -457,8 +457,17 @@ class NestSuite extends BaseMarkdownSuite {
     compat = Map(
       Compat.Scala3 ->
         """
-          |error:
-          |Not found: y 
+          |```scala
+          |case class Foo(i: Int)
+          |```
+          |
+          |```scala
+          |case class Foo(i: Int) { val x = y }
+          |// error:
+          |// Not found: y
+          |// case class Foo(i: Int) { val x = y }
+          |//                                  ^
+          |```
     """.stripMargin
     )
   )

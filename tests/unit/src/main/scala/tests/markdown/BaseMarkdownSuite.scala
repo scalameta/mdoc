@@ -117,7 +117,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       settings,
       obtained => {
         assertNoDiff(
-          Compat(obtained, compat, postProcessObtained),
+          Compat(obtained, Map.empty, postProcessObtained),
           Compat(expected, compat, postProcessExpected)
         )
       }

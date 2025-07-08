@@ -20,12 +20,16 @@ class WarnSuite extends BaseMarkdownSuite {
     compat = Map(
       Compat.Scala3 ->
         """
-          |
-          | warn:
-          | match may not be exhaustive.
-          | 
-          | It would fail on pattern case: List(_, _*)
-          | 
+          |```scala
+          |List(1) match { case Nil => }
+          |// warn:
+          |// match may not be exhaustive.
+          |// 
+          |// It would fail on pattern case: List(_, _*)
+          |// 
+          |// List(1) match { case Nil => }
+          |// ^^^^^^^
+          |```
         """.stripMargin
     )
   )
