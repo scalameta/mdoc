@@ -86,6 +86,7 @@ class MarkdownCompiler(
     sreporter.infos.foreach { case sreporter.Info(pos, msgOrNull, gseverity) =>
       val msg = nullableMessage(msgOrNull)
       val mpos = toMetaPosition(edit, pos)
+
       if (sectionPos.contains(mpos) || gseverity == sreporter.ERROR) {
         val severity = gseverity.toString.toLowerCase
         val formatted = PositionSyntax.formatMessage(mpos, severity, msg, includePath = false)

@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import scala.meta._
 import scala.meta.inputs.Position
+import mdoc.internal.markdown.Mod.Width
+import mdoc.internal.markdown.Mod.Height
 import scala.meta.inputs.Input.Slice
 
 object Renderer {
@@ -82,14 +84,36 @@ object Renderer {
   }
 
   @deprecated("this method will be removed", "2020-06-01")
-  def appendMultiline(sb: PrintStream, string: String, N: Int): Unit = {
+  def appendMultiline(sb: PrintStream, string: String, N: Int): Unit =
     sb.appendMultiline(string, N)
-  }
 
-  def appendFreshMultiline(sb: PrintStream, string: String): Unit = {
-    val N = string.length - (if (string.endsWith("\n")) 1 else 0)
-    sb.append("// ")
-    sb.appendMultiline(string, N)
+  def appendFreshMultiline(
+      sb: PrintStream,
+      string: String,
+      heightOpt: Option[Int] = None,
+      widthOpt: Option[Int] = None
+  ): Unit = {
+    if (heightOpt.isDefined || widthOpt.isDefined) {
+      val lines = string.split("\n")
+      val width = widthOpt.getOrElse(lines.map(_.length).max)
+      val height = heightOpt.getOrElse(lines.length)
+
+      val linesTruncatedToWidth = lines
+        .map { line =>
+          line.take(width) + (if (line.length > width) "..." else "")
+        }
+
+      val linesTruncatedToHeigth = linesTruncatedToWidth.take(
+        height
+      ) ++ (if (linesTruncatedToWidth.length > height) List("...") else List.empty[String])
+
+      sb.append("// ")
+      sb.appendMultiline(linesTruncatedToHeigth.mkString("\n"))
+    } else {
+      val N = string.length - (if (string.endsWith("\n")) 1 else 0)
+      sb.append("// ")
+      sb.appendMultiline(string, N)
+    }
   }
 
   // Beneath each binding statement, we insert the evaluated variable, e.g., `x: Int = 1`
@@ -162,6 +186,8 @@ object Renderer {
                   val compiled = compiler.fail(edit, input, originalPos)
                   val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                   val pos = tpos.toMeta(section)
+                  val widthOpt = section.mod.mods.collectFirst { case Width(width) => width }
+                  val heightOpt = section.mod.mods.collectFirst { case Height(height) => height }
                   if (section.mod.isWarn && compiler.hasErrors) {
                     reporter.error(
                       pos,
@@ -178,7 +204,8 @@ object Renderer {
                       s"Expected compile errors but program compiled successfully without errors"
                     )
                   }
-                  appendFreshMultiline(sb, compiled)
+
+                  appendFreshMultiline(sb, compiled, heightOpt, widthOpt)
                 case _ =>
                   val obtained = binder.stringValue
                   throw new IllegalArgumentException(
