@@ -76,6 +76,9 @@ class ScalacSuite extends BaseMarkdownSuite {
           |```scala
           |import scala.util.Try
           |println(42)
+          |// warning: Unused import
+          |// import scala.util.Try
+          |//                   ^^^
           |// error: No warnings can be incurred under -Werror.
           |```
           |""".stripMargin

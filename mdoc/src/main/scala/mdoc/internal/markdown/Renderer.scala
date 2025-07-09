@@ -21,6 +21,7 @@ import scala.meta._
 import scala.meta.inputs.Position
 import mdoc.internal.markdown.Mod.Width
 import mdoc.internal.markdown.Mod.Height
+import scala.meta.inputs.Input.Slice
 
 object Renderer {
 
@@ -176,7 +177,13 @@ object Renderer {
                   val input = Input.String(instrumented)
                   val edit =
                     TokenEditDistance.fromTrees(Seq(section.source.source), input)
-                  val compiled = compiler.fail(edit, input, section.source.pos)
+                  val originalPos = section.source.pos.input match {
+                    // get the original input from the input containing the slice
+                    case slc @ Slice(input, start, end) =>
+                      Position.Range(input, start, end)
+                    case _ => section.source.pos
+                  }
+                  val compiled = compiler.fail(edit, input, originalPos)
                   val tpos = new RangePosition(startLine, startColumn, endLine, endColumn)
                   val pos = tpos.toMeta(section)
                   val widthOpt = section.mod.mods.collectFirst { case Width(width) => width }

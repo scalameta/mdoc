@@ -1,12 +1,12 @@
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.13.1")
 
-addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.11.0")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.11.1")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.18.2")
 
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.1")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.7")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.8")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
 

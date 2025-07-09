@@ -24,7 +24,7 @@ def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exis
 def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
 
 def jsoniter = List("core", "macros").map { pkg =>
-  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.35.3"
+  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.36.6"
 }
 
 val isScala212 = Def.setting {
@@ -125,7 +125,7 @@ lazy val sharedJavaSettings = List(
 )
 
 val V = new {
-  val scalameta = "4.13.6"
+  val scalameta = "4.13.8"
 
   val munit = "1.1.1"
 
@@ -243,7 +243,7 @@ lazy val mdoc = project
     libraryDependencies ++= List(
       "org.virtuslab" % "using_directives" % "1.1.4",
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "io.methvin" % "directory-watcher" % "0.19.0",
+      "io.methvin" % "directory-watcher" % "0.19.1",
       // live reload
       "io.undertow" % "undertow-core" % "2.2.30.Final",
       "org.jboss.xnio" % "xnio-nio" % "3.8.16.Final",

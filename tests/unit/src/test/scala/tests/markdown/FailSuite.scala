@@ -1,7 +1,6 @@
 package tests.markdown
 
 import tests.markdown.StringSyntax._
-import tests.markdown.Compat
 
 class FailSuite extends BaseMarkdownSuite {
 
@@ -32,8 +31,8 @@ class FailSuite extends BaseMarkdownSuite {
       Compat.Scala3 ->
         """|```scala
            |val x: Int = "String"
-           |// error: 
-           |// Found:    String("String")
+           |// error:
+           |// Found:    ("String" : String)
            |// Required: Int
            |// val x: Int = "String"
            |//              ^^^^^^^^
@@ -71,7 +70,7 @@ class FailSuite extends BaseMarkdownSuite {
           |newlines
           |'''
           |// error:
-          |// Found:    String("Triplequote\nnewlines\n")
+          |// Found:    ("Triplequote\nnewlines\n" : String)
           |// Required: Int
           |// val y: Int = '''Triplequote
           |//              ^
@@ -175,8 +174,8 @@ class FailSuite extends BaseMarkdownSuite {
            |```
            |```scala
            |val x: Int = "String"
-           |// error: 
-           |// Found:    String("String")
+           |// error:
+           |// Found:    ("String" : String)
            |// Required: Int
            |// val x: Int = "String"
            |//              ^^^^^^^^
@@ -214,13 +213,11 @@ class FailSuite extends BaseMarkdownSuite {
            |fs2.Stream.eval(println("Do not ever do this"))
            |// error:
            |// Found:    Unit
-           |// Required: F[O]
-           |// ∙
-           |// where:    F is a type variable with constraint <: [_$95] =>> Any
-           |//           O is a type variable with constraint ∙
-           |// ∙
-           |// Note that implicit conversions cannot be applied because they are ambiguous;
-           |// both method ArrowAssoc in object Predef and method StringFormat in object Predef convert from Unit to F[O]
+           |// Required: ([_$$17] =>> Any)[Any]
+           |// Note that implicit conversions were not tried because the result of an implicit conversion
+           |// must be more specific than ([_$$17] =>> Any)[Any]
+           |// fs2.Stream.eval(println("Do not ever do this"))
+           |//                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
            |```
     """.stripMargin
     )
@@ -251,13 +248,13 @@ class FailSuite extends BaseMarkdownSuite {
            |println(notfound)
            |println(b)
            |// error:
-           |// Not found: b
-           |// println(b)
-           |//         ^
-           |// error: 
            |// Not found: notfound
            |// println(notfound)
            |//         ^^^^^^^^
+           |// error:
+           |// Not found: b
+           |// println(b)
+           |//         ^
            |```
     """.stripMargin
     )
@@ -312,7 +309,7 @@ class FailSuite extends BaseMarkdownSuite {
            |// Not found: notfound
            |// println(notfound)
            |//         ^^^^^^^^
-           |// error: 
+           |// error:
            |// Not found: b
            |// println(b)
            |//         ^
@@ -322,10 +319,12 @@ class FailSuite extends BaseMarkdownSuite {
            |val x = 1
            |println(c)
            |println(d)
-           |// error: not found: value c
+           |// error:
+           |// Not found: c
            |// println(c)
            |//         ^
-           |// error: not found: value d
+           |// error:
+           |// Not found: d
            |// println(d)
            |//         ^
            |```
@@ -368,7 +367,7 @@ class FailSuite extends BaseMarkdownSuite {
            |```scala
            |"abc": Int
            |// error:
-           |// Found:    String("abc")
+           |// Found:    ("abc" : String)
            |// Required: Int
            |// "abc": Int
            |// ^^^^^
