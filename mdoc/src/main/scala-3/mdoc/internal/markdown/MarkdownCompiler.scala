@@ -75,15 +75,18 @@ class MarkdownCompiler(
   private def newContext: FreshContext = {
     def removeDuplicatedOptions(options: List[String]): List[String] =
       options match
-        case head :: next :: tail if defaultFlagSet(head) && !next.startsWith("-") =>
+        case head :: next :: tail
+            if defaultFlagSet.exists(flag => head.startsWith(flag)) && !next.startsWith("-") =>
           removeDuplicatedOptions(tail)
-        case head :: tail if defaultFlagSet(head) => head :: removeDuplicatedOptions(tail)
+        case head :: tail if defaultFlagSet.exists(flag => head.startsWith(flag)) =>
+          removeDuplicatedOptions(tail)
         case head :: tail => head :: removeDuplicatedOptions(tail)
-        case Nil => options
+        case Nil => Nil
 
     val options = removeDuplicatedOptions(scalacOptions.split("\\s+").filter(_.nonEmpty).toList)
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
+
     val driver = new MarkdownDriver(settings)
 
     val ctx = driver.currentCtx.fresh
