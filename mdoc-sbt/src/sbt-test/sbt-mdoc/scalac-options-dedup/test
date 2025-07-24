@@ -1,0 +1,3 @@
+# Test that duplicate scalacOptions (-deprecation, -unchecked) don't cause errors in Scala 3
+> mdoc
+> check
