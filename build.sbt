@@ -133,7 +133,7 @@ val V = new {
 
   val pprint = "0.9.0"
 
-  val fansi = "0.5.0"
+  val fansi = "0.5.1"
 
   val fs2 = "3.12.0"
 
