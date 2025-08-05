@@ -67,17 +67,18 @@ class DependencySuite extends BaseMarkdownSuite {
         |""".stripMargin
   )
 
+  // The test is unrelabile because it depends on the snapshots repository
   check(
-    "repo".tag(OnlyScala213),
+    "repo".ignore,
     """
       |```scala mdoc
-      |import $repo.`https://oss.sonatype.org/content/repositories/snapshots`
+      |import $repo.`https://central.sonatype.com/repository/maven-snapshots/`
       |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
       |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
       |```
       | """.stripMargin,
     """|```scala
-       |import $repo.`https://oss.sonatype.org/content/repositories/snapshots`
+       |import $repo.`https://central.sonatype.com/repository/maven-snapshots/`
        |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
        |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
        |// res0: Boolean = false
