@@ -93,7 +93,7 @@ object DocusaurusPlugin extends AutoPlugin {
     if (scala.util.Properties.isWin) "yarn.cmd"
     else "yarn"
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     List(
       (docusaurusPublishGhpages / aggregate) := false,
       (docusaurusCreateSite / aggregate) := false,

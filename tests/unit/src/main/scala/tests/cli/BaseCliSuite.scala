@@ -39,7 +39,7 @@ abstract class BaseCliSuite extends BaseSuite {
         }
       }
     )
-  override def munitFixtures: Seq[Fixture[_]] = List(in, out)
+  override def munitFixtures: Seq[Fixture[?]] = List(in, out)
   private val myStdout = new ByteArrayOutputStream()
   def checkCli(
       name: TestOptions,
