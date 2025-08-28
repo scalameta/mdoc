@@ -269,7 +269,7 @@ object MdocPlugin extends AutoPlugin {
       def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
         val cls = Class.forName(fullyQualifiedClassName)
         val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
-        (ref / SettingKey(attributeName)(stageManifest, anyWriter)).?
+        (ref / SettingKey(attributeName)(using stageManifest, anyWriter)).?
       }
       try {
         val stageSetting = proxyForSetting()
