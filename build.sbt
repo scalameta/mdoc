@@ -129,7 +129,7 @@ val V = new {
 
   val munit = "1.1.1"
 
-  val scalacheck = "1.18.1"
+  val scalacheck = "1.19.0"
 
   val pprint = "0.9.0"
 
