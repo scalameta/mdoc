@@ -33,9 +33,8 @@ want to use a dependency that is not in the default maven central repository.
 
 ````scala mdoc:mdoc
 ```scala mdoc
-//> using repo https://oss.sonatype.org/content/repositories/snapshots
-//> using dep org.scalameta:mtags_2.12.20:1.5.2+8-c4181af3-SNAPSHOT
-scala.meta.internal.mtags.BuildInfo.scalaCompilerVersion
+//> using repo https://repo.scala-lang.org/artifactory/maven-nightlies
+//> using dep annogen:annogen:0.1.0
 ```
 ````
 

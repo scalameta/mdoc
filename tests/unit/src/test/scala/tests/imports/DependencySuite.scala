@@ -67,22 +67,22 @@ class DependencySuite extends BaseMarkdownSuite {
         |""".stripMargin
   )
 
-  // The test is unrelabile because it depends on the snapshots repository
   check(
-    "repo".ignore,
+    "repo",
     """
       |```scala mdoc
-      |import $repo.`https://central.sonatype.com/repository/maven-snapshots/`
-      |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
-      |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
+      |import $repo.`https://repo.scala-lang.org/artifactory/maven-nightlies`
+      |import $dep.`annogen:annogen:0.1.0`
+      |"true" == "true"
       |```
       | """.stripMargin,
     """|```scala
-       |import $repo.`https://central.sonatype.com/repository/maven-snapshots/`
-       |import $dep.`org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT`
-       |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
-       |// res0: Boolean = false
+       |import $repo.`https://repo.scala-lang.org/artifactory/maven-nightlies`
+       |import $dep.`annogen:annogen:0.1.0`
+       |"true" == "true"
+       |// res0: Boolean = true
        |```
+       | 
        |""".stripMargin
   )
 
@@ -90,16 +90,16 @@ class DependencySuite extends BaseMarkdownSuite {
     "repo-using".tag(OnlyScala213),
     """
       |```scala mdoc
-      |//> using repo https://oss.sonatype.org/content/repositories/snapshots
-      |//> using dep org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT
-      |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
+      |//> using repo https://repo.scala-lang.org/artifactory/maven-nightlies
+      |//> using dep annogen:annogen:0.1.0
+      |"true" == "true"
       |```
       | """.stripMargin,
     """|```scala
-       |//> using repo https://oss.sonatype.org/content/repositories/snapshots
-       |//> using dep org.scalameta:metals_2.13:0.11.10+1-4aa438b0-SNAPSHOT
-       |scala.meta.internal.metals.ScalaVersions.isScala3Milestone("3.0.0")
-       |// res0: Boolean = false
+       |//> using repo https://repo.scala-lang.org/artifactory/maven-nightlies
+       |//> using dep annogen:annogen:0.1.0
+       |"true" == "true"
+       |// res0: Boolean = true
        |```
        |""".stripMargin
   )
