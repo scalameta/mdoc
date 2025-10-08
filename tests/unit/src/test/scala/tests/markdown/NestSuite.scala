@@ -91,14 +91,14 @@ class NestSuite extends BaseMarkdownSuite {
         """|```scala
            |case class User(name: String)
            |val susan = User("Susan")
-           |// susan: User = User(name = "Susan")
+           |// susan: User = User("Susan")
            |```
            |```scala
            |case class User(name: String, age: Int)
            |val hakon = User("Hakon", 42)
            |// hakon: User = User(name = "Hakon", age = 42)
            |susan
-           |// res0: User = User(name = "Susan")
+           |// res0: User = User("Susan")
            |```
            |""".stripMargin
     )
