@@ -48,7 +48,7 @@ class SemanticsSuite extends BaseMarkdownSuite {
            |  implicit val ordering: Ordering[User] = Ordering.by(_.name)
            |}
            |List(User("Susan"), User("John")).sorted
-           |// res0: List[User] = List(User(name = "John"), User(name = "Susan"))
+           |// res0: List[User] = List(User("John"), User("Susan"))
            |```
            |""".stripMargin,
       Compat.Scala213 ->

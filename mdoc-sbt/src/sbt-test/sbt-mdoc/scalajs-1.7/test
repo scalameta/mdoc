@@ -2,7 +2,7 @@
 > check
 > ++2.13.12 mdoc
 > check
-> ++3.3.5 mdoc
+> ++3.3.6 mdoc
 > check
 > set mdocIn := (ThisBuild / baseDirectory).value
 -> mdoc
