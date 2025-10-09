@@ -252,10 +252,11 @@ class MarkdownCompiler(
   ): Unit = {
 
     val infos = context.reporter.pendingMessages(using context).toSeq.sortBy(_.pos.source.path)
-    infos.foreach {
-      case diagnostic if diagnostic.position.isPresent =>
+    infos.foreach { diagnostic =>
+      val msg = nullableMessage(diagnostic.message)
+
+      if (diagnostic.position.isPresent) {
         val pos = diagnostic.position.get
-        val msg = nullableMessage(diagnostic.message)
 
         val mpos = toMetaPosition(edit, pos)
         val actualMessage =
@@ -270,7 +271,8 @@ class MarkdownCompiler(
             msg
           }
         reportMessage(vreporter, diagnostic, mpos, "\n" + actualMessage)
-      case _ =>
+      } else
+        reportMessage(vreporter, diagnostic, Position.None, "\n" + msg)
     }
   }
 
