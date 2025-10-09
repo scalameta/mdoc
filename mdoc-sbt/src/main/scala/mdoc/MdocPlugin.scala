@@ -4,6 +4,7 @@ import java.io.File
 import sbt.Keys._
 import sbt._
 import scala.collection.mutable.ListBuffer
+import xsbti.VirtualFileRef
 
 object MdocPlugin extends AutoPlugin {
   object autoImport {
@@ -188,9 +189,17 @@ object MdocPlugin extends AutoPlugin {
         }
         props.put("in", mdocIn.value.toString)
         props.put("out", mdocOut.value.toString)
+        val converter = fileConverter.value
+        val pluginPrefix = "-Xplugin:"
         props.put(
           "scalacOptions",
-          (Compile / scalacOptions).value.mkString(" ")
+          (Compile / scalacOptions).value
+            .map { o =>
+              val withoutPrefix = o.stripPrefix(pluginPrefix)
+              if (withoutPrefix eq o) o
+              else pluginPrefix + converter.toPath(VirtualFileRef.of(withoutPrefix))
+            }
+            .mkString(" ")
         )
         val classpath = ListBuffer.empty[File]
         // Can't use fullClasspath.value because it introduces cyclic dependency between
