@@ -10,6 +10,7 @@ addCommandAlias(
 def scala212 = "2.12.20"
 def scala213 = "2.13.16"
 def scala3 = "3.3.6"
+def scala3ForSbt = "3.7.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
@@ -381,8 +382,11 @@ lazy val plugin = project
     sharedSettings,
     sbtPlugin := true,
     scalaVersion := scala212,
-    pluginCrossBuild / sbtVersion := "1.5.0",
-    crossScalaVersions := List(scala212),
+    pluginCrossBuild / sbtVersion := (scalaBinaryVersion.value match {
+      case "2.12" => "1.5.0"
+      case _ => "2.0.0-RC6"
+    }),
+    crossScalaVersions := List(scala212, scala3ForSbt),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.12.1",
