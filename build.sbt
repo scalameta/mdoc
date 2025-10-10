@@ -381,7 +381,7 @@ lazy val plugin = project
     sharedSettings,
     sbtPlugin := true,
     scalaVersion := scala212,
-    pluginCrossBuild / sbtVersion := "1.1.6",
+    pluginCrossBuild / sbtVersion := "1.5.0",
     crossScalaVersions := List(scala212),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
