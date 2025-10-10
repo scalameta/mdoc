@@ -99,7 +99,9 @@ jobs:
           - "'++2.13.16 test'"
           # Minimal supported version
           - "'++3.3.6 test'"
-          - "scripted"
+          - "'++3.7.3 plugin/test'"
+          - "'++2.12.20 scripted'"
+          - "'++3.7.3 scripted'"
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

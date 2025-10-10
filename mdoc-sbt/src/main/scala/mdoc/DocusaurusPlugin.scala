@@ -14,7 +14,7 @@ import scala.sys.process.ProcessBuilder
 import mdoc.MdocPlugin.{autoImport => m}
 import scala.util.Try
 
-object DocusaurusPlugin extends AutoPlugin {
+object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
   override def requires: Plugins = JvmPlugin && MdocPlugin
   object autoImport {
     val docusaurusProjectName =
@@ -146,13 +146,13 @@ object DocusaurusPlugin extends AutoPlugin {
         Relativize.htmlSite(out.toPath)
         out
       },
-      (Compile / packageDoc) := {
+      (Compile / packageDoc) := fileToFileRef(Def.task {
         val directory = doc.value
         val jar = target.value / "docusaurus.jar"
         val files = listJarFiles(directory.toPath)
         IO.jar(files, jar, new java.util.jar.Manifest())
         jar
-      }
+      }).value
     )
 
   private implicit class XtensionListStringProcess(command: List[String]) {

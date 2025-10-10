@@ -2,11 +2,11 @@ package mdoc
 
 import java.io.File
 import sbt.Keys._
-import sbt._
+import sbt.{_, given}
 import scala.collection.mutable.ListBuffer
 import xsbti.VirtualFileRef
 
-object MdocPlugin extends AutoPlugin {
+object MdocPlugin extends AutoPlugin with MdocPluginCompat {
   object autoImport {
     val mdoc =
       inputKey[Unit](
@@ -204,7 +204,7 @@ object MdocPlugin extends AutoPlugin {
         val classpath = ListBuffer.empty[File]
         // Can't use fullClasspath.value because it introduces cyclic dependency between
         // compilation and resource generation.
-        classpath ++= (Compile / dependencyClasspath).value.iterator.map(_.data)
+        classpath ++= getClasspathFiles(Compile / dependencyClasspath).value
         classpath += (Compile / classDirectory).value
         props.put(
           "classpath",
@@ -219,7 +219,7 @@ object MdocPlugin extends AutoPlugin {
           "mdoc esmoddule properties",
           esOut
         )
-        List(out, esOut) // Both of these are used in the JsCliSuite Integration tests
+        Seq(out, esOut) // Both of these are used in the JsCliSuite Integration tests
       }
     )
 
@@ -293,7 +293,7 @@ object MdocPlugin extends AutoPlugin {
     Def.task {
       CompileOptions(
         (ref / Compile / scalacOptions).value,
-        (ref / Compile / fullClasspath).value.map(_.data),
+        getClasspathFiles(ref / Compile / fullClasspath).value,
         classloadedSetting(
           ref,
           "org.scalajs.linker.interface.StandardConfig",
