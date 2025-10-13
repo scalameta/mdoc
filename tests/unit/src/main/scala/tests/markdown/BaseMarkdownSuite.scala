@@ -61,7 +61,8 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
       original: String,
       expected: String,
       settings: Settings = baseSettings(),
-      compat: Map[Compat.ScalaVersion, String] = Map.empty
+      compat: Map[Compat.ScalaVersion, String] = Map.empty,
+      expectedContains: Seq[String] = Seq.empty
   )(implicit loc: munit.Location): Unit = {
     test(name) {
       val reporter = newReporter()
@@ -75,10 +76,22 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
         postProcessObtained
       )
 
-      assertNoDiff(
-        Compat(obtainedErrors, Map.empty, postProcessObtained),
-        Compat(expected, compat, postProcessExpected)
-      )
+      val obtained = Compat(obtainedErrors, Map.empty, postProcessObtained)
+      if (expected.nonEmpty || expectedContains.isEmpty)
+        assertNoDiff(
+          obtained,
+          Compat(expected, compat, postProcessExpected)
+        )
+      expectedContains.foreach { x =>
+        val exp = Compat(x, Map.empty, postProcessExpected)
+        assert(
+          obtained.contains(exp),
+          s"""|>>>>>>>> Expected:
+              |$obtained
+              |<<<<<<<< to contain:
+              |$exp""".stripMargin
+        )
+      }
     }
   }
 
