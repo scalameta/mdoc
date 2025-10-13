@@ -68,7 +68,7 @@ class ScastieModifier(theme: String = "light", debugClassSuffix: Option[String] 
       s"   theme: '$theme',",
       "    isWorksheetMode: true,",
       "    targetType: 'jvm',",
-      "    scalaVersion: '2.12.6'",
+      "    scalaVersion: '2.12.20'",
       "  })"
     ).mkString("\n")
 

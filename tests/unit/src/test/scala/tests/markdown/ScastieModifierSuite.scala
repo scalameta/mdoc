@@ -45,7 +45,7 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
        |   theme: 'light',
        |    isWorksheetMode: true,
        |    targetType: 'jvm',
-       |    scalaVersion: '2.12.6'
+       |    scalaVersion: '2.12.20'
        |  })
        |})</script>
     """.stripMargin
@@ -67,7 +67,7 @@ class ScastieModifierSuite extends BaseMarkdownSuite {
        |   theme: 'dark',
        |    isWorksheetMode: true,
        |    targetType: 'jvm',
-       |    scalaVersion: '2.12.6'
+       |    scalaVersion: '2.12.20'
        |  })
        |})</script>
     """.stripMargin,
