@@ -98,7 +98,7 @@ jobs:
           - "'++2.12.20 test'"
           - "'++2.13.17 test'"
           # Minimal supported version
-          - "'++3.3.6 test'"
+          - "'++3.3.7 test'"
           - "'++3.7.3 plugin/test'"
           - "'++2.12.20 scripted'"
           - "'++3.7.3 scripted'"

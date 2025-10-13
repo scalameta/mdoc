@@ -9,7 +9,7 @@ addCommandAlias(
 
 def scala212 = "2.12.20"
 def scala213 = "2.13.17"
-def scala3 = "3.3.6"
+def scala3 = "3.3.7"
 def scala3ForSbt = "3.7.3"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3

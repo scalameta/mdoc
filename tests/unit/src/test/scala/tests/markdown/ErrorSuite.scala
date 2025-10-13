@@ -139,7 +139,18 @@ class ErrorSuite extends BaseMarkdownSuite {
        |
        |val x = 2
        |    ^
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|error: already-defined-scala3.md:4:5:
+           |Conflicting definitions:
+           |val x: Int in class MdocApp at line 7 and
+           |val x: Int in class MdocApp at line 11
+           |
+           |val x = 2
+           |    ^
     """.stripMargin
+    )
   )
 
   checkError(
