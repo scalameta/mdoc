@@ -9,6 +9,6 @@ Next
 
 1. Switch to the "website" folder. run `npm install`
 2. Copy the blog folder into the `website` folder (don't commit that)
-3. Back in the project root, run `sbt '++2.12.19; docs/mdoc'` in a terminal - this will run mdoc.
+3. Back in the project root, run `sbt '++2.12.20; docs/mdoc'` in a terminal - this will run mdoc.
 4. probably in a new terminal in the "website" folder , run `npm start`
 
