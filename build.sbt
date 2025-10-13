@@ -67,13 +67,19 @@ def crossSetting[A](
 
 inThisBuild(
   List(
-    version ~= { dynVer =>
-      if (isCI) dynVer
-      else {
-        import scala.sys.process._
-        // drop `v` prefix
-        "git describe --abbrev=0 --tags".!!.drop(1).trim + "-SNAPSHOT"
+    // version is set dynamically by sbt-dynver, but let's adjust it
+    version := {
+      val curVersion = version.value
+      def dynVer(out: sbtdynver.GitDescribeOutput): String = {
+        def tagVersion = out.ref.dropPrefix
+        if (out.isCleanAfterTag) tagVersion
+        else if (System.getProperty("CI") == null)
+          s"$tagVersion-next-SNAPSHOT" // modified for local builds
+        else if (out.commitSuffix.distance == 0) tagVersion
+        else if (sys.props.contains("backport.release")) tagVersion
+        else curVersion
       }
+      dynverGitDescribeOutput.value.mkVersion(dynVer, curVersion)
     },
     scalaVersion := scala213,
     crossScalaVersions := allScalaVersions,
