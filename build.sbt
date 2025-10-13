@@ -97,9 +97,7 @@ inThisBuild(
       )
     ),
     testFrameworks := List(new TestFramework("munit.Framework")),
-    resolvers ++= Resolver.sonatypeOssRepos("public"),
-    resolvers ++= Resolver.sonatypeOssRepos("releases"),
-    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
+    resolvers += Resolver.sonatypeCentralSnapshots,
     // faster publishLocal:
     packageDoc / publishArtifact := isCI,
     packageSrc / publishArtifact := isCI,
