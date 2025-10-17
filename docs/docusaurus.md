@@ -126,7 +126,7 @@ https://github.com/scalameta/mdoc/settings/keys. Press "Add deploy key".
 
 Your screen should look like this
 
-![Add GitHub deploy key](https://i.imgur.com/hm3MpUK.png)
+![Add GitHub deploy key](https://github.com/scalameta/gh-pages-images/blob/master/mdoc/docusaurus/hm3MpUK.png?raw=true)
 
 ### Environment variables
 
