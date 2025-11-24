@@ -99,6 +99,7 @@ jobs:
           - "'++2.13.17 test'"
           # Minimal supported version
           - "'++3.3.7 test'"
+          - "'++3.7.4!; unit/test; worksheets/test'"
           - "'++3.7.3 plugin/test'"
           - "'++2.12.20 scripted'"
           - "'++3.7.3 scripted'"
