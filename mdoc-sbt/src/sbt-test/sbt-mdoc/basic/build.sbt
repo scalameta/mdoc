@@ -1,10 +1,14 @@
 ThisBuild / scalaVersion := "2.12.20"
-ThisBuild / crossScalaVersions := List(
-  "2.12.20",
-  "2.13.18",
-  "3.3.7",
-  "3.7.4"
-)
+ThisBuild / crossScalaVersions := {
+  val baseVersions = List(
+    "2.12.20",
+    "2.13.18",
+    "3.3.7"
+  )
+  val javaVersion = sys.props("java.specification.version").toDouble
+  if (javaVersion >= 17) baseVersions :+ "3.8.0-RC3"
+  else baseVersions
+}
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)

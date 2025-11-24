@@ -99,10 +99,12 @@ jobs:
           - "'++2.13.18 test'"
           # Minimal supported version
           - "'++3.3.7 test'"
-          - "'++3.7.4!; unit/test; worksheets/test'"
           - "'++3.7.3 plugin/test'"
           - "'++2.12.20 scripted'"
           - "'++3.7.3 scripted'"
+        include:
+          - java: 17
+            command: "'++3.8.0-RC3!; unit/test; worksheets/test'"
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

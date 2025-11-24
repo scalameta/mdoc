@@ -9,6 +9,7 @@ object Compat {
   case object Scala212 extends ScalaVersion
   case object Scala213 extends ScalaVersion
   case object Scala3 extends ScalaVersion
+  case object ScalaNext extends ScalaVersion
   case class Full(ver: String) extends ScalaVersion
   case object All extends ScalaVersion
 
@@ -21,6 +22,7 @@ object Compat {
       case Scala211 => full.startsWith("2.11")
       case Scala212 => full.startsWith("2.12")
       case Scala213 => full.startsWith("2.13")
+      case ScalaNext => binary == "3" && full.split("\\.").drop(1).head.toInt >= 8
       case Scala3 => full.startsWith("3.0") || binary == "3"
       case Full(v) => v == full
       case All => true
