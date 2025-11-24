@@ -221,6 +221,7 @@ lazy val cli = project
       "org.scalameta" %% "metaconfig-typesafe-config" % V.metaconfig
     ),
     depScalameta
+
   )
   .dependsOn(parser.jvm)
 

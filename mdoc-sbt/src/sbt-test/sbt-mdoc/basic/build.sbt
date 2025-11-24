@@ -2,7 +2,8 @@ ThisBuild / scalaVersion := "2.12.20"
 ThisBuild / crossScalaVersions := List(
   "2.12.20",
   "2.13.17",
-  "3.3.7"
+  "3.3.7",
+  "3.8.0-RC1"
 )
 
 enablePlugins(MdocPlugin)
