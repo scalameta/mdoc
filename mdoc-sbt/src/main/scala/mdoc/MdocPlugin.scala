@@ -107,6 +107,15 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
       ),
       libraryDependencies ++= {
+        if (SemanticSelector(">3.7.4").matches(VersionNumber(scalaVersion.value))) {
+          println(s"scalaVersion.value: ${scalaVersion.value}")
+          List("org.scala-lang" %% "scala3-repl" % scalaVersion.value)
+        } else {
+          println(s"other scalaVersion.value: ${scalaVersion.value}")
+          List()
+        }
+      },
+      libraryDependencies ++= {
         val isJS = mdocJS.value.isDefined
         if (mdocAutoDependency.value) {
           val suffix = if (isJS) "-js" else ""
