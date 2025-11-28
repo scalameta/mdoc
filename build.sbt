@@ -136,7 +136,7 @@ val V = new {
 
   val scalacheck = "1.19.0"
 
-  val pprint = "0.9.4"
+  val pprint = "0.9.5"
 
   val fansi = "0.5.1"
 
