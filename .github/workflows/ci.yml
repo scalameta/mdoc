@@ -83,7 +83,7 @@ jobs:
           distribution: temurin
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - run: sbt '++2.13.17 test'
+      - run: sbt '++2.13.18 test'
         shell: bash
   test:
     name: ${{ matrix.command }} ${{ matrix.java }}
@@ -96,7 +96,7 @@ jobs:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! testAllNonNative'" # compiler version too old for Scala Native
           - "'++2.12.20 test'"
-          - "'++2.13.17 test'"
+          - "'++2.13.18 test'"
           # Minimal supported version
           - "'++3.3.7 test'"
           - "'++3.7.4!; unit/test; worksheets/test'"
