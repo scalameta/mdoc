@@ -1,8 +1,9 @@
-ThisBuild / scalaVersion := "2.12.18"
+ThisBuild / scalaVersion := "2.12.20"
 ThisBuild / crossScalaVersions := List("2.12.18", "2.13.12", "3.3.6")
 
 enablePlugins(MdocPlugin)
 mdocJS := Some(jsapp)
+mdocIn := (ThisBuild / baseDirectory).value / "docs"
 
 TaskKey[Unit]("check") := {
   val file = mdocOut.value / "readme.md"
