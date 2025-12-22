@@ -102,7 +102,7 @@ code fence has been evaluated.</p>
 enables <code>mdoc.MdocPlugin</code>.</p>
 <p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// project/plugins.sbt</span>
-addSbtPlugin(<span class="hljs-string">"org.scalameta"</span> % <span class="hljs-string">"sbt-mdoc"</span> % <span class="hljs-string">"2.8.2"</span> )
+addSbtPlugin(<span class="hljs-string">"org.scalameta"</span> % <span class="hljs-string">"sbt-mdoc"</span> % <span class="hljs-string">"2.8.1-next-SNAPSHOT"</span> )
 <span class="hljs-comment">// build.sbt</span>
 <span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> myproject = project  <span class="hljs-comment">// your existing library</span>
   .settings(...)
@@ -186,51 +186,51 @@ mdoc outside of a build tool.</p>
 <p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
 <pre><code class="hljs css language-sh">curl -L -o coursier https://git.io/coursier
 chmod +x coursier
-coursier launch org.scalameta:mdoc_2.12:2.8.2 -- --site.VERSION 1.0.0
+coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- --site.VERSION 1.0.0
 info: Compiling 1 file to website/target/docs
 info: Compiled <span class="hljs-keyword">in</span> 1.2s (0 errors)
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="add-library-dependencies-to-classpath"></a><a href="#add-library-dependencies-to-classpath" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Add library dependencies to classpath</h3>
 <p>Use the <code>--classpath</code> argument to change the classpath used for compilation:</p>
 <pre><code class="hljs css language-diff"> coursier launch \
-   org.scalameta:mdoc_2.12:2.8.2 -- \
+   org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --classpath $(coursier fetch -p org.typelevel:cats-core_2.12:1.5.0)</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="customize-input-directory"></a><a href="#customize-input-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Customize input directory</h3>
 <p>By default the <code>docs/</code> directory is processed as input. Use <code>--in</code> to customize
 the input directory where markdown sources are contained,</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --in mydocs</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="process-single-markdown-file"></a><a href="#process-single-markdown-file" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Process single markdown file</h3>
 <p>The <code>--in</code> flag doesn't have to be a directory, it also supports individual
 files.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --in mydocs/readme.md</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="configure-site-variables-like-version"></a><a href="#configure-site-variables-like-version" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configure site variables like <code>@VERSION@</code></h3>
 <p>Use <code>--site.VARIABLE=value</code> to add site variables that can be referenced from
 markdown as <code>@VARIABLE@</code>.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --site.SCALA_VERSION 2.12.20</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="customize-output-directory"></a><a href="#customize-output-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Customize output directory</h3>
 <p>Use <code>--out</code> to customize where your markdown sources are generated, by default
 the <code>out/</code> directory is used.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --out target/docs</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="generate-single-output-file-instead-of-directory"></a><a href="#generate-single-output-file-instead-of-directory" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Generate single output file instead of directory</h3>
 <p>The <code>--out</code> flag doesn't have to be a directory when the <code>--in</code> argument is a
 regular file, it can also be an individual file.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --in readme.template.md \</span>
 <span class="hljs-addition">+  --out readme.md</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="process-multiple-input-directories-and-files"></a><a href="#process-multiple-input-directories-and-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Process multiple input directories and files</h3>
 <p>Repeat the <code>--in</code> and <code>--out</code> arguments to process multiple directories and
 regular files.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --in readme.template.md \</span>
 <span class="hljs-addition">+  --out readme.md \</span>
 <span class="hljs-addition">+  --in changelog.template.md \</span>
@@ -242,12 +242,12 @@ regular files.</p>
 <p>Use <code>--watch</code> to start the file watcher with livereload. It's recommended to use
 <code>--watch</code> while writing documentation to enjoy 3-4x faster compilation
 performance.</p>
-<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.2 -- \
+<pre><code class="hljs css language-diff"> coursier launch org.scalameta:mdoc_2.12:2.8.1-next-SNAPSHOT -- \
 <span class="hljs-addition">+  --watch</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="help"></a><a href="#help" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Help</h3>
 <p>Use <code>--help</code> to learn more how to use the command-line interface.</p>
-<pre><code class="hljs css language-txt">mdoc v2.<span class="hljs-number">8.2</span>
+<pre><code class="hljs css language-txt">mdoc v2.<span class="hljs-number">8.1</span>-<span class="hljs-keyword">next</span>-SNAPSHOT
 Usage:   mdoc [&lt;option&gt; ...]
 Example: mdoc <span class="hljs-comment">--in mydocs --out _site  (custom input/output directories)</span>
          mdoc <span class="hljs-comment">--watch                  (watch for file changes)</span>
@@ -384,7 +384,7 @@ Less common options:
 <p><a href="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12"><img src="https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_2.12/badge.svg" alt="Maven Central"></a></p>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// build.sbt</span>
 scalaVersion := <span class="hljs-string">"2.12.20"</span> <span class="hljs-comment">// Any version in 2.12.x works.</span>
-libraryDependencies += <span class="hljs-string">"org.scalameta"</span> %% <span class="hljs-string">"mdoc"</span> % <span class="hljs-string">"2.8.2"</span>
+libraryDependencies += <span class="hljs-string">"org.scalameta"</span> %% <span class="hljs-string">"mdoc"</span> % <span class="hljs-string">"2.8.1-next-SNAPSHOT"</span>
 </code></pre>
 <p>Then write a main function that invokes mdoc as a library</p>
 <p>It's recommended to use <code>--watch</code> while writing documentation to enjoy 3-4x
@@ -415,7 +415,7 @@ lazy val docs = project
 </code></pre>
 <p>Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-<a href="https://www.javadoc.io/doc/org.scalameta/mdoc_2.12/2.8.2">here</a>
+<a href="https://www.javadoc.io/doc/org.scalameta/mdoc_2.12/2.8.1-next-SNAPSHOT">here</a>
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package <code>mdoc.internal</code> is subject to binary and source
 breaking changes between any release, including PATCH versions.</p>
