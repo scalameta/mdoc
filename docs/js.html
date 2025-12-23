@@ -105,7 +105,7 @@ configuration</p>
 <pre><code class="hljs css language-sh">cat &lt;&lt;EOT &gt; mdoc.properties
 js-classpath=$(coursier fetch org.scala-js:scalajs-library_2.12:1.20.1 org.scala-js:scalajs-dom_sjs1_2.12:2.0.0 -p)
 js-scalac-options=-Xplugin:$(coursier fetch --intransitive org.scala-js:scalajs-compiler_2.12.20:1.20.1)
-js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_2.12:2.8.2 org.scala-js:scalajs-linker_2.12:1.20.1 -p)
+js-linker-classpath=$(coursier fetch org.scalameta:mdoc-js-worker_2.12:2.8.2-next-SNAPSHOT org.scala-js:scalajs-linker_2.12:1.20.1 -p)
 EOT
 </code></pre>
 <p>Note: For scala 3, you may need <code>js-scalac-options=-scalajs</code> - instead of the <code>-XPlugin</code> flag - <a href="https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html#compiler-plugins">Doc</a>.</p>
@@ -121,7 +121,7 @@ EOT
 </code></pre>
 <p>Next, launch mdoc with the <code>org.scalameta:mdoc-js</code> module instead of
 <code>org.scalameta:mdoc</code>:</p>
-<pre><code class="hljs css language-sh">coursier launch org.scalameta:mdoc-js_2.12:2.8.2 --extra-jars $(<span class="hljs-built_in">pwd</span>) -- --watch
+<pre><code class="hljs css language-sh">coursier launch org.scalameta:mdoc-js_2.12:2.8.2-next-SNAPSHOT --extra-jars $(<span class="hljs-built_in">pwd</span>) -- --watch
 </code></pre>
 <p>Open the URL <a href="http://localhost:4001/index.md">http://localhost:4001/index.md</a> to see a live preview of the
 generated Markdown.</p>
