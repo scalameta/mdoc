@@ -23,9 +23,10 @@ class DependencySuite extends BaseMarkdownSuite {
   List(
     "$dep" -> "import $dep.`org.dhallj::dhall-scala:0.3.0`, org.dhallj.syntax._",
     "$ivy" -> "import $ivy.`org.dhallj::dhall-scala:0.3.0`, org.dhallj.syntax._",
-    "using-dep" -> """|//> using dep org.dhallj::dhall-scala:0.3.0
-                      |import org.dhallj.syntax._
-                      |""".stripMargin
+    "using-dep" ->
+      """|//> using dep org.dhallj::dhall-scala:0.3.0
+         |import org.dhallj.syntax._
+         |""".stripMargin
   ).foreach { case (name, dep) =>
     check(
       name.tag(OnlyScala213),

@@ -304,9 +304,10 @@ class WorksheetSuite extends BaseSuite {
        |...
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> """|<Stream.from(10)> // : Stream[Int] = Stre...
-                          |res0: Stream[Int] = Stream(10, <not computed>)
-                          |""".stripMargin
+      Compat.Scala3 ->
+        """|<Stream.from(10)> // : Stream[Int] = Stre...
+           |res0: Stream[Int] = Stream(10, <not computed>)
+           |""".stripMargin
     )
   )
 
@@ -401,14 +402,16 @@ class WorksheetSuite extends BaseSuite {
        |n: User = User(name = "Susan")
        |""".stripMargin,
     compat = Map(
-      Compat.Scala3 -> """|case class User(name: String)
-                          |<val n = User("Susan")> // : User = User(Susan)
-                          |n: User = User(Susan)
-                          |""".stripMargin,
-      Compat.Scala212 -> """|case class User(name: String)
-                            |<val n = User("Susan")> // : User = User("Susan...
-                            |n: User = User("Susan")
-                            |""".stripMargin
+      Compat.Scala3 ->
+        """|case class User(name: String)
+           |<val n = User("Susan")> // : User = User(Susan)
+           |n: User = User(Susan)
+           |""".stripMargin,
+      Compat.Scala212 ->
+        """|case class User(name: String)
+           |<val n = User("Susan")> // : User = User("Susan...
+           |n: User = User("Susan")
+           |""".stripMargin
     )
   )
 
@@ -526,12 +529,13 @@ class WorksheetSuite extends BaseSuite {
           |res0: Parsed[Unit] = Success((), 1)
           |""".stripMargin,
       compat = Map(
-        Compat.Scala213 -> s"""|$importStyle
-                               |import fastparse._, MultiLineWhitespace._
-                               |def p[_:P] = P("a")
-                               |<parse("a", p(_))> // : Parsed[Unit] = Suc...
-                               |res0: Parsed[Unit] = Success(value = (), index = 1)
-                               |""".stripMargin
+        Compat.Scala213 ->
+          s"""|$importStyle
+              |import fastparse._, MultiLineWhitespace._
+              |def p[_:P] = P("a")
+              |<parse("a", p(_))> // : Parsed[Unit] = Suc...
+              |res0: Parsed[Unit] = Success(value = (), index = 1)
+              |""".stripMargin
       )
     )
 
