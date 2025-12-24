@@ -17,8 +17,10 @@ import dotty.tools.io.AbstractFile
 import java.net.{URL, URLConnection, URLStreamHandler}
 import java.util.Collections
 
-class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader) extends ClassLoader(parent):
-  private def findAbstractFile(name: String) = root.lookupPath(name.split('/').toIndexedSeq, directory = false)
+class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
+    extends ClassLoader(parent):
+  private def findAbstractFile(name: String) =
+    root.lookupPath(name.split('/').toIndexedSeq, directory = false)
 
   // on JDK 20 the URL constructor we're using is deprecated,
   // but the recommended replacement, URL.of, doesn't exist on JDK 8
@@ -26,16 +28,21 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader) exten
   override protected def findResource(name: String): URL | Null =
     findAbstractFile(name) match
       case null => null
-      case file => new URL(null, s"memory:${file.path}", new URLStreamHandler {
-        override def openConnection(url: URL): URLConnection = new URLConnection(url) {
-          override def connect() = ()
-          override def getInputStream = file.input
-        }
-      })
+      case file => new URL(
+          null,
+          s"memory:${file.path}",
+          new URLStreamHandler {
+            override def openConnection(url: URL): URLConnection = new URLConnection(url) {
+              override def connect() = ()
+              override def getInputStream = file.input
+            }
+          }
+        )
   override protected def findResources(name: String): java.util.Enumeration[URL] =
     findResource(name) match
-      case null => Collections.enumeration(Collections.emptyList[URL])  //Collections.emptyEnumeration[URL]
-      case url  => Collections.enumeration(Collections.singleton(url))
+      case null =>
+        Collections.enumeration(Collections.emptyList[URL]) // Collections.emptyEnumeration[URL]
+      case url => Collections.enumeration(Collections.singleton(url))
 
   override def findClass(name: String): Class[?] = {
     var file: AbstractFile | Null = root
@@ -46,7 +53,7 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader) exten
         throw new ClassNotFoundException(name)
       }
     }
-    file = file.lookupName(pathParts.last+".class", false)
+    file = file.lookupName(pathParts.last + ".class", false)
     if (file == null) {
       throw new ClassNotFoundException(name)
     }
@@ -54,5 +61,7 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader) exten
     defineClass(name, bytes, 0, bytes.length)
   }
 
-  override def loadClass(name: String): Class[?] = try findClass(name) catch case _: ClassNotFoundException => super.loadClass(name)
+  override def loadClass(name: String): Class[?] =
+    try findClass(name)
+    catch case _: ClassNotFoundException => super.loadClass(name)
 end AbstractFileClassLoader
