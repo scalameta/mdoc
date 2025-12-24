@@ -13,7 +13,8 @@ TaskKey[Unit]("check") := {
   println(obtained)
   println()
   assert(
-    obtained.trim == """
+    obtained.trim ==
+      """
 # Test
 ```scala
 val x = 1

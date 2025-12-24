@@ -21,7 +21,8 @@ TaskKey[Unit]("check") := {
   println(obtained)
   println()
   assert(
-    obtained.trim == """
+    obtained.trim ==
+      """
 ```scala
 println(example.Example.greeting)
 // Hello world!

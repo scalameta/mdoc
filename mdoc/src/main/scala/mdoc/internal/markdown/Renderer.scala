@@ -47,9 +47,11 @@ object Renderer {
         filename
       )
     doc.sections
-      .map(s => s"""```scala
-                   |${Renderer.renderEvaluatedSection(doc, s, reporter, printer, compiler)}
-                   |```""".stripMargin)
+      .map(s =>
+        s"""```scala
+           |${Renderer.renderEvaluatedSection(doc, s, reporter, printer, compiler)}
+           |```""".stripMargin
+      )
       .mkString("\n")
   }
 
