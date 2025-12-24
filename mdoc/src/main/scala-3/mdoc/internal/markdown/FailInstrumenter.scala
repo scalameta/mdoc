@@ -17,7 +17,6 @@ final class FailInstrumenter(sections: List[SectionInput], i: Int) {
     snip.println("package repl")
     snip.definition("object MdocSession") {
       _.definition("object MdocApp") { sb =>
-
         sections.zipWithIndex.foreach { case (section, j) =>
           if (j > i) ()
           else {
