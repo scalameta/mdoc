@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "2.12.20"
+ThisBuild / scalaVersion := "2.12.21"
 ThisBuild / crossScalaVersions := {
   val baseVersions = List(
     "2.12.20",

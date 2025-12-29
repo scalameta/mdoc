@@ -7,7 +7,7 @@ addCommandAlias(
   "interfaces/test;runtime/test;parser/test;cli/test;mdoc/test;testsInput/test;tests/test;jsdocs/test;worksheets/test;unit/test;unitJS/test;jsApi/test;jsWorker/test;js/test;"
 )
 
-def scala212 = "2.12.20"
+def scala212 = "2.12.21"
 def scala213 = "2.13.18"
 def scala3 = "3.3.7"
 def scala3ForSbt = "3.7.3"
