@@ -201,7 +201,7 @@ jobs:
           distribution: temurin
       - uses: sbt/setup-sbt@v1
       - uses: olafurpg/setup-gpg@v3
-      - run: sbt '++2.12.20; docs/docusaurusPublishGhpages'
+      - run: sbt '++2.12.21; docs/docusaurusPublishGhpages'
         env:
           GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
       - name: Check git diff

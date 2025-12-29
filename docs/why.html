@@ -226,14 +226,14 @@ res0: scala.concurrent.<span class="hljs-type">Future</span>[<span class="hljs-t
 <p>mdoc renders variables like <code>@VERSION@</code> into <code>2.8.2-next-SNAPSHOT</code>. This makes it easy to
 keep documentation up-to-date as new releases are published. Variables can be
 passed from the command-line interface with the syntax <code>--site.VARIABLE=value</code>.</p>
-<pre><code class="hljs"><span class="hljs-selector-tag">mdoc</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.VERSION</span> 1<span class="hljs-selector-class">.0</span><span class="hljs-selector-class">.0</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.SCALA_VERSION</span> 2<span class="hljs-selector-class">.12</span><span class="hljs-selector-class">.20</span>
+<pre><code class="hljs"><span class="hljs-selector-tag">mdoc</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.VERSION</span> 1<span class="hljs-selector-class">.0</span><span class="hljs-selector-class">.0</span> <span class="hljs-selector-tag">--site</span><span class="hljs-selector-class">.SCALA_VERSION</span> 2<span class="hljs-selector-class">.12</span><span class="hljs-selector-class">.21</span>
 </code></pre>
 <p>When using the library API, variables are passed with the
 <code>MainSettings.withSiteVariables(Map[String, String])</code> method</p>
 <pre><code class="hljs css language-diff"> val settings = mdoc.MainSettings()
 <span class="hljs-addition">+  .withSiteVariables(Map(</span>
 <span class="hljs-addition">+    "VERSION" -&gt; "1.0.0",</span>
-<span class="hljs-addition">+    "SCALA_VERSION" -&gt; "2.12.20"</span>
+<span class="hljs-addition">+    "SCALA_VERSION" -&gt; "2.12.21"</span>
 <span class="hljs-addition">+  ))</span>
 </code></pre>
 <p>When using sbt-mdoc, variables are defined with the <code>mdocVariables</code> setting.</p>
