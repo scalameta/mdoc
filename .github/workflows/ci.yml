@@ -31,7 +31,7 @@ jobs:
           distribution: temurin
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - run: sbt '++2.12.20; docs/mdoc'
+      - run: sbt '++2.12.21; docs/mdoc'
   test-windows:
     name: "Windows"
     runs-on: windows-latest
@@ -95,12 +95,12 @@ jobs:
         command:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! testAllNonNative'" # compiler version too old for Scala Native
-          - "'++2.12.20 test'"
+          - "'++2.12.21 test'"
           - "'++2.13.18 test'"
           # Minimal supported version
           - "'++3.3.7 test'"
           - "'++3.7.3 plugin/test'"
-          - "'++2.12.20 scripted'"
+          - "'++2.12.21 scripted'"
           - "'++3.7.3 scripted'"
         include:
           - java: 17
