@@ -21,12 +21,21 @@ class ScalacOptionsSuite extends BaseCliSuite {
       ),
       expectedExitCode = 1,
       onStdout = { out =>
-        val expected =
+        val expected = if (tests.BuildInfo.scalaVersion == "2.12.12")
           """
+            |info: Compiling 1 file to <output>
+            |error: No warnings can be incurred under -Xfatal-warnings.
             |warning: index.md:3:1: Unused import
             |import scala.concurrent.Future
             |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^""".stripMargin
-        assert(out.contains(expected))
+        else
+          """
+            |info: Compiling 1 file to <output>
+            |error: No warnings can be incurred under -Xfatal-warnings.
+            |warning: index.md:3:25: Unused import
+            |import scala.concurrent.Future
+            |                        ^^^^^^""".stripMargin
+        assertNoDiff(out, expected)
       }
     )
 
