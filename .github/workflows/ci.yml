@@ -104,7 +104,7 @@ jobs:
           - "'++3.7.3 scripted'"
         include:
           - java: 17
-            command: "'++3.8.0-RC5!; unit/test; worksheets/test'"
+            command: "'++3.8.0-RC6!; unit/test; worksheets/test'"
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
