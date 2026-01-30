@@ -27,8 +27,9 @@ class WorksheetSuite extends BaseSuite {
         .getURLs(this.getClass().getClassLoader())
         .collect {
           case url
-              if url.toString.contains("scala3-library") || url.toString
-                .contains("scala-library") =>
+              if url.toString.contains("scala3-library") ||
+                url.toString
+                  .contains("scala-library") =>
             Paths.get(url.toURI())
         }
         .asJava

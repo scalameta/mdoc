@@ -116,8 +116,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         }
       },
       (Compile / resourceGenerators) += Def.task {
-        val out =
-          (Compile / managedResourceDirectories).value.head / "mdoc.properties"
+        val out = (Compile / managedResourceDirectories).value.head / "mdoc.properties"
         val props = new java.util.Properties()
         mdocVariables.value.foreach { case (key, value) =>
           props.put(key, value)

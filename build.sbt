@@ -386,10 +386,11 @@ lazy val plugin = project
     sharedSettings,
     sbtPlugin := true,
     scalaVersion := scala212,
-    pluginCrossBuild / sbtVersion := (scalaBinaryVersion.value match {
-      case "2.12" => "1.5.0"
-      case _ => "2.0.0-RC6"
-    }),
+    pluginCrossBuild / sbtVersion :=
+      (scalaBinaryVersion.value match {
+        case "2.12" => "1.5.0"
+        case _ => "2.0.0-RC6"
+      }),
     crossScalaVersions := List(scala212, scala3ForSbt),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
@@ -399,8 +400,7 @@ lazy val plugin = project
       "org.scalameta" %% "testkit" % V.scalameta % Test
     ),
     Compile / resourceGenerators += Def.task {
-      val out =
-        (Compile / managedResourceDirectories).value.head / "sbt-mdoc.properties"
+      val out = (Compile / managedResourceDirectories).value.head / "sbt-mdoc.properties"
       val props = new java.util.Properties()
       props.put("version", version.value)
       props.put("scalaJSVersion", scalaJSVersion)
@@ -438,7 +438,8 @@ lazy val jsWorker =
       sharedSettings,
       moduleName := "mdoc-js-worker",
       libraryDependencies ++= Seq(
-        "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross CrossVersion.for3Use2_13,
+        "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross
+          CrossVersion.for3Use2_13,
         "com.armanbilge" %% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
       )
     )
@@ -516,9 +517,8 @@ def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[
   Def.task {
     val versionValue = (ThisBuild / version).value
     val projects = List(parser, runtime, cli, mdoc, js, jsWorker)
-    val setttings =
-      (ThisBuild / version := versionValue) ::
-        projects.flatMap(_.componentProjects).map(p => p / scalaVersion := scalaV)
+    val setttings = (ThisBuild / version := versionValue) ::
+      projects.flatMap(_.componentProjects).map(p => p / scalaVersion := scalaV)
     val newState = Project
       .extract(state.value)
       .appendWithSession(
