@@ -71,6 +71,47 @@ class MarkdownCompiler(
     List("-color:never", "-unchecked", "-deprecation", "-Ximport-suggestion-timeout", "0")
   private val defaultFlagSet = defaultFlags.filter(_.startsWith("-")).toSet
 
+  /**
+   * Parse command-line arguments from a string, respecting quotes and escapes.
+   * This handles spaces within quoted arguments, e.g., "-Wconf:cat=deprecation:s"
+   * or "-Xplugin:path with spaces.jar", as well as escaped characters outside quotes.
+   */
+  private def parseArguments(s: String): List[String] = {
+    if (s.trim.isEmpty) return Nil
+    
+    val result = scala.collection.mutable.ListBuffer.empty[String]
+    val current = new StringBuilder
+    var inSingleQuote = false
+    var inDoubleQuote = false
+    var escaped = false
+    
+    s.foreach { c =>
+      if (escaped) {
+        current.append(c)
+        escaped = false
+      } else if (c == '\\') {
+        escaped = true
+      } else if (c == '\'' && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote
+      } else if (c == '"' && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote
+      } else if (c.isWhitespace && !inSingleQuote && !inDoubleQuote) {
+        if (current.nonEmpty) {
+          result += current.toString
+          current.clear()
+        }
+      } else {
+        current.append(c)
+      }
+    }
+    
+    if (current.nonEmpty) {
+      result += current.toString
+    }
+    
+    result.toList
+  }
+
   private def newContext: FreshContext = {
     def removeDuplicatedOptions(options: List[String]): List[String] =
       options match
@@ -82,7 +123,7 @@ class MarkdownCompiler(
         case head :: tail => head :: removeDuplicatedOptions(tail)
         case Nil => Nil
 
-    val options = removeDuplicatedOptions(scalacOptions.split("\\s+").filter(_.nonEmpty).toList)
+    val options = removeDuplicatedOptions(parseArguments(scalacOptions))
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
 

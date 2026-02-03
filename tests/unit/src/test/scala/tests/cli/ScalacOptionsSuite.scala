@@ -227,4 +227,53 @@ class ScalacOptionsSuite extends BaseCliSuite {
     )
   )
 
+  // Test for scalacOptions with spaces in values
+  // Verify that scalacOptions with spaces in values work correctly
+  checkCli(
+    "scalac-options-with-spaces".tag(OnlyScala3),
+    """
+      |/index.md
+      |```scala mdoc
+      |import $scalac.`-Wconf:cat=deprecation:s -Xfatal-warnings`
+      |@deprecated("test", "1.0")
+      |def foo = 42
+      |foo
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |import $scalac.`-Wconf:cat=deprecation:s -Xfatal-warnings`
+       |@deprecated("test", "1.0")
+       |def foo = 42
+       |foo
+       |// res0: Int = 42
+       |```
+       |""".stripMargin
+  )
+
+  // Test CLI --scalac-options with spaces in values
+  checkCli(
+    "cli-scalac-options-with-spaces".tag(OnlyScala3),
+    """
+      |/index.md
+      |```scala mdoc
+      |@deprecated("test", "1.0")
+      |def bar = 42
+      |bar
+      |```
+      |""".stripMargin,
+    """|/index.md
+       |```scala
+       |@deprecated("test", "1.0")
+       |def bar = 42
+       |bar
+       |// res0: Int = 42
+       |```
+       |""".stripMargin,
+    extraArgs = Array(
+      "--scalac-options",
+      "-Wconf:cat=deprecation:s -Xfatal-warnings"
+    )
+  )
+
 }
