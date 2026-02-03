@@ -227,7 +227,7 @@ class ScalacOptionsSuite extends BaseCliSuite {
     )
   )
 
-  // Test for https://github.com/scalameta/mdoc/issues/XXX
+  // Test for scalacOptions with spaces in values
   // Verify that scalacOptions with spaces in values work correctly
   checkCli(
     "scalac-options-with-spaces".tag(OnlyScala3),

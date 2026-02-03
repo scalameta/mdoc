@@ -72,9 +72,9 @@ class MarkdownCompiler(
   private val defaultFlagSet = defaultFlags.filter(_.startsWith("-")).toSet
 
   /**
-   * Parse command-line arguments from a string, respecting quotes.
+   * Parse command-line arguments from a string, respecting quotes and escapes.
    * This handles spaces within quoted arguments, e.g., "-Wconf:cat=deprecation:s"
-   * or "-Xplugin:path with spaces.jar".
+   * or "-Xplugin:path with spaces.jar", as well as escaped characters outside quotes.
    */
   private def parseArguments(s: String): List[String] = {
     if (s.trim.isEmpty) return Nil
@@ -89,7 +89,7 @@ class MarkdownCompiler(
       if (escaped) {
         current.append(c)
         escaped = false
-      } else if (c == '\\' && (inSingleQuote || inDoubleQuote)) {
+      } else if (c == '\\') {
         escaped = true
       } else if (c == '\'' && !inDoubleQuote) {
         inSingleQuote = !inSingleQuote
