@@ -1,0 +1,3 @@
+# Test that scalacOptions containing spaces (e.g. -Wconf with regex patterns) work correctly
+> mdoc
+> check

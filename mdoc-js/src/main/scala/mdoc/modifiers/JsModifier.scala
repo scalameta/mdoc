@@ -2,6 +2,7 @@ package mdoc.modifiers
 
 import mdoc.{OnLoadContext, PostProcessContext, PreModifierContext}
 import mdoc.internal.cli.InputFile
+import mdoc.internal.cli.ScalacOptions
 import mdoc.internal.io.ConsoleReporter
 import mdoc.internal.livereload.Resources
 import mdoc.internal.markdown.{CodeBuilder, Gensym, MarkdownCompiler}
@@ -91,6 +92,7 @@ class JsModifier extends mdoc.PreModifier {
         reporter = ctx.reporter
         val compileClasspath = Classpath(classpath)
         val linkerClasspath = Classpath(config.classpath)
+        val parsedScalacOptions = ScalacOptions.parse(scalacOptions)
 
         val newClasspathHash =
           (classpath, linkerClasspath, scalacOptions, config.fullOpt).hashCode()
@@ -98,7 +100,7 @@ class JsModifier extends mdoc.PreModifier {
         // to speed up unit tests by nearly 2x.
         if (classpathHash != newClasspathHash) {
           classpathHash = newClasspathHash
-          maybeCompiler = Some(new MarkdownCompiler(classpath, scalacOptions, target))
+          maybeCompiler = Some(new MarkdownCompiler(classpath, parsedScalacOptions, target))
 
           val loader =
             ScalaJSClassloader.create(linkerClasspath.entries.map(_.toURI.toURL()).toArray)

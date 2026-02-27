@@ -63,7 +63,7 @@ class MarkdownDriver(val settings: List[String]) extends Driver {
 
 class MarkdownCompiler(
     classpath: String,
-    val scalacOptions: String,
+    val scalacOptions: List[String],
     target: AbstractFile = new VirtualDirectory("(memory)")
 ) {
 
@@ -82,7 +82,7 @@ class MarkdownCompiler(
         case head :: tail => head :: removeDuplicatedOptions(tail)
         case Nil => Nil
 
-    val options = removeDuplicatedOptions(scalacOptions.split("\\s+").filter(_.nonEmpty).toList)
+    val options = removeDuplicatedOptions(scalacOptions.filter(_.nonEmpty))
     val settings =
       options ::: defaultFlags ::: "-classpath" :: classpath :: Nil
 

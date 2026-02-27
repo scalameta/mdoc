@@ -198,7 +198,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
               if (withoutPrefix eq o) o
               else pluginPrefix + converter.toPath(VirtualFileRef.of(withoutPrefix))
             }
-            .mkString(" ")
+            .mkString("\n")
         )
         val classpath = ListBuffer.empty[File]
         // Can't use fullClasspath.value because it introduces cyclic dependency between
@@ -233,7 +233,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
 
       props.put(
         s"js-scalac-options",
-        scalacOptions.mkString(" ")
+        scalacOptions.mkString("\n")
       )
       props.put(
         s"js-classpath",

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 object MarkdownBuilder {
 
-  def default(): MarkdownCompiler = fromClasspath(classpath = "", scalacOptions = "")
+  def default(): MarkdownCompiler = fromClasspath(classpath = "", scalacOptions = Nil)
 
   def buildDocument(
       compiler: MarkdownCompiler,
@@ -78,7 +78,7 @@ object MarkdownBuilder {
     EvaluatedDocument(doc, sectionInputs)
   }
 
-  def fromClasspath(classpath: String, scalacOptions: String): MarkdownCompiler = {
+  def fromClasspath(classpath: String, scalacOptions: List[String]): MarkdownCompiler = {
     val fullClasspath =
       if (classpath.isEmpty) defaultClasspath(_ => true)
       else {
