@@ -48,7 +48,7 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     myStdout.reset()
     new ConsoleReporter(new PrintStream(myStdout))
   }
-  protected def scalacOptions: String = ""
+  protected def scalacOptions: List[String] = Nil
   private val compiler = MarkdownBuilder.fromClasspath("", scalacOptions)
   private def newContext(settings: Settings, reporter: ConsoleReporter) = {
     Context.fromSettings(settings, reporter)

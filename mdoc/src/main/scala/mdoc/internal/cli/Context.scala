@@ -87,7 +87,8 @@ object Context {
     new Context(options, reporter, compiler)
   }
   def fromOptions(options: Settings, reporter: Reporter = ConsoleReporter.default): Context = {
-    val compiler = MarkdownBuilder.fromClasspath(options.classpath, options.scalacOptions)
+    val compiler =
+      MarkdownBuilder.fromClasspath(options.classpath, ScalacOptions.parse(options.scalacOptions))
     fromCompiler(options, reporter, compiler)
   }
 }

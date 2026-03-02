@@ -7,7 +7,9 @@ class ScalacSuite extends BaseMarkdownSuite {
 
   for (
     (name, importStyle) <- Seq(
-      "ammonite" -> "import $scalac.`-Wunused:imports -Xfatal-warnings`",
+      "ammonite" ->
+        """|import $scalac.`-Wunused:imports`
+           |import $scalac.`-Xfatal-warnings`""".stripMargin,
       "using" -> "//> using option -Wunused:imports -Xfatal-warnings"
     )
   )
@@ -20,19 +22,20 @@ class ScalacSuite extends BaseMarkdownSuite {
          |println(42)
          |```
          |""".stripMargin,
-      s"""|error: No warnings can be incurred under -Werror.
-          |warning: import-$name.md:4:1: Unused import
-          |import scala.util.Try
-          |^^^^^^^^^^^^^^^^^^^^^
-          |""".stripMargin,
-      compat = Map(
-        Compat.Scala213 ->
+      name match {
+        case "ammonite" =>
+          s"""|error: No warnings can be incurred under -Werror.
+              |warning: import-$name.md:5:19: Unused import
+              |import scala.util.Try
+              |                  ^^^
+              |""".stripMargin
+        case "using" =>
           s"""|error: No warnings can be incurred under -Werror.
               |warning: import-$name.md:4:19: Unused import
               |import scala.util.Try
               |                  ^^^
               |""".stripMargin
-      )
+      }
     )
 
   check(
@@ -53,7 +56,9 @@ class ScalacSuite extends BaseMarkdownSuite {
 
   for (
     (name, importStyle) <- Seq(
-      "ammonite" -> "import $scalac.`-Wunused:imports -Xfatal-warnings`",
+      "ammonite" ->
+        """|import $scalac.`-Wunused:imports`
+           |import $scalac.`-Xfatal-warnings`""".stripMargin,
       "using" -> "//> using option -Wunused:imports -Xfatal-warnings"
     )
   )

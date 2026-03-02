@@ -31,7 +31,7 @@ import mdoc.internal.worksheets.Compat._
 
 class MarkdownCompiler(
     classpath: String,
-    val scalacOptions: String,
+    val scalacOptions: List[String],
     target: AbstractFile = new VirtualDirectory("(memory)", None)
 ) {
   private val settings = new Settings()
@@ -45,7 +45,7 @@ class MarkdownCompiler(
   //   https://github.com/scala/bug/issues/9824
   //   https://github.com/scalameta/mdoc/issues/124
   settings.Ydelambdafy.value = "inline"
-  settings.processArgumentString(scalacOptions)
+  settings.processArguments(scalacOptions.filter(_.nonEmpty), processAll = true)
 
   def classpathEntries: Seq[Path] = global.classPath.asURLs.map(url => Paths.get(url.toURI()))
 

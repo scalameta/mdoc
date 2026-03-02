@@ -4,6 +4,7 @@ import scala.meta.io.Classpath
 import coursierapi.Dependency
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.MarkdownBuilder
+import mdoc.internal.cli.ScalacOptions
 import scala.meta.io.AbsolutePath
 import coursierapi.Repository
 import mdoc.internal.markdown.Instrumented
@@ -30,9 +31,9 @@ object Dependencies {
       Classpath(Classpath(settings.classpath).entries ++ jars.map(AbsolutePath(_)))
     val scalacOptions = instrumented.scalacOptionImports match {
       case Nil =>
-        settings.scalacOptions
+        ScalacOptions.parse(settings.scalacOptions)
       case options =>
-        s"${settings.scalacOptions} ${options.map(_.value).mkString(" ")}"
+        ScalacOptions.parse(settings.scalacOptions) ++ options.map(_.value)
     }
     MarkdownBuilder.fromClasspath(classpath.syntax, scalacOptions)
   }
