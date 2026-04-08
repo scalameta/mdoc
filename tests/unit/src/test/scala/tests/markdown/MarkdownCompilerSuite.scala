@@ -3,7 +3,6 @@ package tests.markdown
 import munit.FunSuite
 import scala.meta._
 import mdoc.internal.io.ConsoleReporter
-import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.MarkdownBuilder
 import mdoc.internal.markdown.Renderer
 import mdoc.internal.markdown.ReplVariablePrinter
@@ -16,7 +15,7 @@ class MarkdownCompilerSuite extends FunSuite {
 
   private val compiler = MarkdownBuilder.default()
   private val reporter = ConsoleReporter.default
-  private val settings = Settings.default(PathIO.workingDirectory, "mdoc.properties")
+  private val settings = Settings(PathIO.workingDirectory, "mdoc.properties")
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     test(name.ignore) {}

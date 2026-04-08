@@ -33,14 +33,8 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     file
   }
   protected def baseSettings(resourcePropertyFileName: String = "mdoc.properties"): Settings =
-    Settings
-      .default(createTempDirectory(), resourcePropertyFileName)
-      .copy(
-        site = Map(
-          "version" -> "1.0",
-          "boom" -> "$boom"
-        )
-      )
+    Settings(createTempDirectory())
+      .addSite(Map("version" -> "1.0", "boom" -> "$boom"))
       .withProperties(MdocProperties.default(PathIO.workingDirectory, resourcePropertyFileName))
 
   private val myStdout = new ByteArrayOutputStream()

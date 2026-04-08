@@ -81,7 +81,7 @@ class MdocLanguageServer(
     try jprops.load(in)
     finally in.close()
     val mprops = MdocProperties.fromProps(jprops, workspace)
-    val settings = Settings.baseDefault(workspace).withProperties(mprops)
+    val settings = Settings(workspace, mprops)
     val context = settings.validate(reporter).get
     contexts(settings.in) = context
   }
@@ -107,7 +107,7 @@ class MdocLanguageServer(
 
   def newSettings(): Settings = {
     val candidates = mdocPropertyCandidates()
-    val base = Settings.default(workspace).copy(in = workspace, out = tmp)
+    val base = Settings(cwd = workspace, in = workspace, out = tmp)
     candidates match {
       case Nil =>
         base

@@ -194,6 +194,10 @@ case class Settings(
       out = props.out.getOrElse(out)
     )
 
+  @inline
+  def withPropertiesFromFile(filename: String): Settings =
+    withProperties(MdocProperties.default(cwd, filename))
+
   override def toString: String = Settings.write(this).toString()
 
   def isFileWatching: Boolean = watch && !check
@@ -265,22 +269,19 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
          |""".stripMargin
     )
 
-  def baseDefault(cwd: AbsolutePath): Settings = {
-    new Settings(
-      in = List(cwd.resolve("docs")),
-      out = List(cwd.resolve("out")),
-      cwd = cwd
-    )
-  }
-  def default(cwd: AbsolutePath, filename: String): Settings = {
-    val base = baseDefault(cwd)
-    val props = MdocProperties.default(cwd, filename)
-    base.withProperties(props)
-  }
+  def apply(cwd: AbsolutePath): Settings = new Settings(
+    cwd = cwd,
+    in = List(cwd.resolve("docs")),
+    out = List(cwd.resolve("out"))
+  )
+  def apply(cwd: AbsolutePath, props: MdocProperties): Settings =
+    apply(cwd).withProperties(props)
+  def apply(cwd: AbsolutePath, filename: String): Settings =
+    apply(cwd).withPropertiesFromFile(filename)
 
   def help(displayVersion: String, width: Int): String =
     new HelpMessage[Settings](
-      baseDefault(PathIO.workingDirectory),
+      apply(PathIO.workingDirectory),
       version(displayVersion),
       usage,
       description
@@ -305,21 +306,23 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
     generic.deriveDecoder[Settings](base)
   }
 
-  def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] = {
+  def fromCliArgs(args: List[String], workingDirectory: => AbsolutePath): Configured[Settings] = {
     Conf
       .parseCliArgs[Settings](args)
-      .andThen(conf => {
-        val base =
-          Settings.default(
-            AbsolutePath(workingDirectory),
-            conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
-          )
-        val cwd = conf.get[String]("cwd").map(AbsolutePath(_)(base.cwd)).getOrElse(base.cwd)
+      .andThen { conf =>
+        implicit val defaultCwd: AbsolutePath = workingDirectory
+        val base = Settings(
+          conf.get[String]("cwd").map(AbsolutePath(_)).getOrElse(defaultCwd),
+          conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
+        )
         conf
-          .as[Settings](decoder(base.copy(cwd = cwd)))
+          .as[Settings](decoder(base))
           .map(_.addSite(base.site))
-      })
+      }
   }
+
+  def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] =
+    fromCliArgs(args, AbsolutePath(workingDirectory))
 
   def write(set: Settings) = ConfEncoder[Settings].write(set)
 
