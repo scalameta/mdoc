@@ -8,7 +8,11 @@ import scala.meta.inputs.Position
 final case class DeadLinkInfo(ref: Position, msg: String)
 
 object LinkHygiene {
-  def lint(docs: List[DocumentLinks], verbose: Boolean): List[DeadLinkInfo] = {
+  def lint(
+      docs: List[DocumentLinks],
+      verbose: Boolean,
+      site: Map[String, String] = Map.empty
+  ): List[DeadLinkInfo] = {
     val isValidHeading = docs.iterator.flatMap(_.absoluteDefinitions).toSet
     lazy val (candidates, debug) = {
       val candidates = isValidHeading.map(_.toString()).toSeq
@@ -25,6 +29,7 @@ object LinkHygiene {
       doc <- docs
       enclosingDocument = doc.relpath.toURI(false)
       reference <- doc.references
+      if !site.contains(reference.url)
       uri <- resolve(enclosingDocument, reference.url)
       if uri.getScheme == null && uri.getHost == null
       if !isValidHeading(uri)

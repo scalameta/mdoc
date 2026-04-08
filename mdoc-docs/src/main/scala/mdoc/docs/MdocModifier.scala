@@ -35,7 +35,7 @@ class MdocModifier(context: Context) extends StringModifier {
       myContext.settings
     )
     val links = DocumentLinks.fromMarkdown(GitHubIdGenerator, file.relpath, cleanInput)
-    val results = LinkHygiene.lint(List(links), verbose = false)
+    val results = LinkHygiene.lint(List(links), verbose = false, myContext.settings.site)
     LinkHygiene.report(asError = false, results, reporter)
     val stdout = fansi.Str(myStdout.toString()).plainText
     if (myReporter.hasErrors || myReporter.hasWarnings) {
