@@ -30,7 +30,6 @@ class MdocModifier(context: Context) extends StringModifier {
       cleanInput,
       myContext,
       file,
-      myContext.settings.site,
       myReporter,
       myContext.settings
     )

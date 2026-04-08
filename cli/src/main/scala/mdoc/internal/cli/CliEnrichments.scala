@@ -39,9 +39,11 @@ trait CliEnrichments {
         case _ =>
           AbsolutePath(input.syntax).toRelative(sourceroot)
       }
-    def toFilename(settings: Settings): String =
-      if (settings.reportRelativePaths) Paths.get(input.filename).getFileName.toString
+    def toFilename(reportRelativePaths: Boolean): String =
+      if (reportRelativePaths) Paths.get(filename).getFileName.toString
       else filename
+    def toFilename(settings: Settings): String =
+      toFilename(settings.reportRelativePaths)
     def toPosition: Position.Range = {
       Position.Range(input, 0, input.chars.length)
     }
