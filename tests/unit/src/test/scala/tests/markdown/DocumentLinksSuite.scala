@@ -1,6 +1,5 @@
 package tests.markdown
 
-import mdoc.internal.cli.Settings
 import munit.FunSuite
 import scala.meta.inputs.Input
 import scala.meta.io.RelativePath

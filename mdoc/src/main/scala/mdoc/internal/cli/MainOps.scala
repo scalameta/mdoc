@@ -91,7 +91,7 @@ final class MainOps(
       val timer = new Timer
       val source = FileIO.slurp(file.inputFile, settings.charset)
       val input = Input.VirtualFile(file.inputFile.toString(), source)
-      val md = Markdown.toMarkdown(input, context, file, settings.site, reporter, settings)
+      val md = Markdown.toMarkdown(input, context, file, reporter, settings)
       val fileHasErrors = reporter.errorCount > originalErrors
       if (!fileHasErrors) {
         writePath(file, md)

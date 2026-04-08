@@ -74,7 +74,8 @@ object Markdown {
       case _ =>
     }
     val variables = SiteVariables.get(markdownSettings).getOrElse(Map.empty)
-    val textWithVariables = VariableRegex.replaceVariables(input, variables, reporter, settings)
+    val textWithVariables =
+      VariableRegex.replaceVariables(input, variables, reporter, settings.reportRelativePaths)
     markdownSettings.set(InputKey, Some(textWithVariables))
     val parser = Parser.builder(markdownSettings).build
     val ast = parser.parse(textWithVariables.text)
@@ -105,7 +106,6 @@ object Markdown {
       input: Input,
       context: Context,
       relativePath: RelativePath,
-      siteVariables: Map[String, String],
       reporter: Reporter,
       settings: Settings
   ): String = {
@@ -124,7 +124,7 @@ object Markdown {
       input,
       siteVariables,
       reporter,
-      settings
+      settings.reportRelativePaths
     )
     val file = MarkdownFile.parse(
       textWithVariables,
@@ -134,6 +134,16 @@ object Markdown {
     val processor = new Processor()(context)
     processor.processDocument(file)
     file.renderToString
+  }
+
+  def toMarkdown(
+      input: Input,
+      context: Context,
+      inputFile: InputFile,
+      reporter: Reporter,
+      settings: Settings
+  ): String = {
+    toMarkdown(input, context, inputFile, settings.site, reporter, settings)
   }
 
   def toMarkdown(
