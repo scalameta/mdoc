@@ -121,12 +121,13 @@ final class MainSettings private (
 }
 
 object MainSettings {
-  def apply(workingDirectory: Path, propertiesFileName: String): MainSettings = {
-    val settings = Settings.default(AbsolutePath(workingDirectory), propertiesFileName)
+  def apply(workingDirectory: AbsolutePath, propertiesFileName: String): MainSettings = {
+    val settings = Settings(workingDirectory, propertiesFileName)
     val reporter = ConsoleReporter.default
     new MainSettings(settings, reporter)
   }
-  def apply(): MainSettings = {
-    MainSettings(PathIO.workingDirectory.toNIO, "mdoc.properties")
-  }
+  def apply(workingDirectory: Path, propertiesFileName: String): MainSettings =
+    apply(AbsolutePath(workingDirectory), propertiesFileName)
+  def apply(): MainSettings =
+    apply(PathIO.workingDirectory, "mdoc.properties")
 }
