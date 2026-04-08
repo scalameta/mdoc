@@ -247,6 +247,19 @@ case class Settings(
       cwd = dir
     )
   }
+
+  def withCliArgs(args: List[String]): Configured[Settings] = {
+    Conf.parseCliArgs[Settings](args).andThen { conf =>
+      val withCwd = conf.get[String]("cwd").map { x =>
+        implicit val defaultCwd: AbsolutePath = this.cwd
+        withWorkingDirectory(AbsolutePath(x))
+      }.getOrElse(this)
+      val base = conf.get[String]("propertyFileName")
+        .map(withCwd.withPropertiesFromFile).getOrElse(withCwd)
+      conf.as[Settings](Settings.decoder(base)).map(_.addSite(base.site))
+    }
+  }
+
 }
 
 object Settings { // extends MetaconfigScalametaImplicits with Decoders with SettingsGeneric {
@@ -306,20 +319,8 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
     generic.deriveDecoder[Settings](base)
   }
 
-  def fromCliArgs(args: List[String], workingDirectory: => AbsolutePath): Configured[Settings] = {
-    Conf
-      .parseCliArgs[Settings](args)
-      .andThen { conf =>
-        implicit val defaultCwd: AbsolutePath = workingDirectory
-        val base = Settings(
-          conf.get[String]("cwd").map(AbsolutePath(_)).getOrElse(defaultCwd),
-          conf.get[String]("propertyFileName").getOrElse("mdoc.properties")
-        )
-        conf
-          .as[Settings](decoder(base))
-          .map(_.addSite(base.site))
-      }
-  }
+  def fromCliArgs(args: List[String], workingDirectory: AbsolutePath): Configured[Settings] =
+    Settings(workingDirectory, "mdoc.properties").withCliArgs(args)
 
   def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] =
     fromCliArgs(args, AbsolutePath(workingDirectory))
