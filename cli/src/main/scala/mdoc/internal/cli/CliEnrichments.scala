@@ -88,7 +88,8 @@ trait CliEnrichments {
         case _ =>
           pos
       }
-    def toUnslicedPosition: Position =
+    @annotation.tailrec
+    final def toUnslicedPosition: Position =
       pos.input match {
         case Input.Slice(underlying, a, _) =>
           Position.Range(underlying, a + pos.start, a + pos.end).toUnslicedPosition
