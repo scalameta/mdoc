@@ -32,7 +32,8 @@ abstract class BaseMarkdownSuite extends tests.BaseSuite {
     file.write("")
     file
   }
-  protected def baseSettings(resourcePropertyFileName: String = "mdoc.properties"): Settings =
+  protected def baseSettings(resourcePropertyFileName: String =
+    Settings.defaultPropertyFileName): Settings =
     Settings(createTempDirectory())
       .addSite(Map("version" -> "1.0", "boom" -> "$boom"))
       .withProperties(MdocProperties.default(PathIO.workingDirectory, resourcePropertyFileName))

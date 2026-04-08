@@ -129,5 +129,5 @@ object MainSettings {
   def apply(workingDirectory: Path, propertiesFileName: String): MainSettings =
     apply(AbsolutePath(workingDirectory), propertiesFileName)
   def apply(): MainSettings =
-    apply(PathIO.workingDirectory, "mdoc.properties")
+    apply(PathIO.workingDirectory, Settings.defaultPropertyFileName)
 }
