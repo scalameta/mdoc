@@ -23,9 +23,9 @@ final class MainSettings private (
   def withArgs(args: List[String]): MainSettings = {
     if (args.isEmpty) this
     else {
-      Settings.fromCliArgs(args, settings.cwd.toNIO) match {
+      settings.withCliArgs(args) match {
         case Configured.Ok(newSettings) =>
-          copy(settings = newSettings)
+          if (newSettings eq settings) this else copy(settings = newSettings)
         case Configured.NotOk(error) =>
           throw new IllegalArgumentException(error.toString())
       }
