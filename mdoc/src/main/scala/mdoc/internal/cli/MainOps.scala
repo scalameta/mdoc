@@ -68,7 +68,7 @@ final class MainOps(
     settings.out.foldLeft(Exit.success) { case (acc, out) =>
       if (out.isDirectory && !settings.noLinkHygiene) {
         val docs = DocumentLinks.fromGeneratedSite(settings)
-        val results = LinkHygiene.lint(docs, settings.verbose)
+        val results = LinkHygiene.lint(docs, settings.verbose, settings.site)
         LinkHygiene.report(settings.checkLinkHygiene, results, reporter)
 
         if (settings.checkLinkHygiene && results.nonEmpty) {
