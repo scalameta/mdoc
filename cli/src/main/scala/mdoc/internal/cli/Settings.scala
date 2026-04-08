@@ -163,7 +163,7 @@ case class Settings(
     @Description(
       "Defaults to mdoc.properties. This is the name of the properties file the CLI will read. It is assumed to be a resource on the classpath. Use the --extra-jars flag to customise the directory it is found in"
     )
-    propertyFileName: String = "mdoc.properties",
+    propertyFileName: String = Settings.defaultPropertyFileName,
     @Hidden()
     @Description("The Coursier logger used to report progress bars when downloading dependencies")
     coursierLogger: coursierapi.Logger = coursierapi.Logger.progressBars()
@@ -185,18 +185,21 @@ case class Settings(
     }
     .toMap
 
-  def withProperties(props: MdocProperties): Settings =
+  def withProperties(props: MdocProperties, filename: String): Settings =
     copy(
+      propertyFileName = filename,
       scalacOptions = props.scalacOptions,
       classpath = props.classpath,
       site = site ++ props.site,
       in = props.in.getOrElse(in),
       out = props.out.getOrElse(out)
     )
+  def withProperties(props: MdocProperties): Settings =
+    withProperties(props, propertyFileName)
 
   @inline
   def withPropertiesFromFile(filename: String): Settings =
-    withProperties(MdocProperties.default(cwd, filename))
+    withProperties(MdocProperties.default(cwd, filename), filename)
 
   override def toString: String = Settings.write(this).toString()
 
@@ -263,6 +266,9 @@ case class Settings(
 }
 
 object Settings { // extends MetaconfigScalametaImplicits with Decoders with SettingsGeneric {
+
+  val defaultPropertyFileName = "mdoc.properties"
+
   def version(displayVersion: String) =
     s"mdoc v$displayVersion"
   def usage: String =
@@ -320,7 +326,7 @@ object Settings { // extends MetaconfigScalametaImplicits with Decoders with Set
   }
 
   def fromCliArgs(args: List[String], workingDirectory: AbsolutePath): Configured[Settings] =
-    Settings(workingDirectory, "mdoc.properties").withCliArgs(args)
+    Settings(workingDirectory, defaultPropertyFileName).withCliArgs(args)
 
   def fromCliArgs(args: List[String], workingDirectory: Path): Configured[Settings] =
     fromCliArgs(args, AbsolutePath(workingDirectory))

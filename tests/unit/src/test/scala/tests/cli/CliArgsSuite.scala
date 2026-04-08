@@ -115,7 +115,7 @@ class CliArgsSuite extends FunSuite {
   checkOK(
     "--property-file-name default",
     List(tmpFile.toString, tmpDirectory.toString),
-    onSuccess = conf => assertEquals(conf.propertyFileName, "mdoc.properties")
+    onSuccess = conf => assertEquals(conf.propertyFileName, Settings.defaultPropertyFileName)
   )
 
   checkOK(

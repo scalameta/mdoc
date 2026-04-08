@@ -15,7 +15,7 @@ class MarkdownCompilerSuite extends FunSuite {
 
   private val compiler = MarkdownBuilder.default()
   private val reporter = ConsoleReporter.default
-  private val settings = Settings(PathIO.workingDirectory, "mdoc.properties")
+  private val settings = Settings(PathIO.workingDirectory, Settings.defaultPropertyFileName)
 
   def checkIgnore(name: String, original: String, expected: String): Unit =
     test(name.ignore) {}
