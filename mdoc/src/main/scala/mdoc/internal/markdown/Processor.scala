@@ -1,18 +1,9 @@
 package mdoc.internal.markdown
 
-import com.vladsch.flexmark.ast.FencedCodeBlock
-import com.vladsch.flexmark.util.ast
-import com.vladsch.flexmark.parser.block.DocumentPostProcessor
-import com.vladsch.flexmark.parser.block.DocumentPostProcessorFactory
-import com.vladsch.flexmark.util.sequence.BasedSequence
-import com.vladsch.flexmark.util.sequence.CharSubSequence
 import scala.meta._
-import java.util
 import mdoc.PostModifierContext
 import mdoc.PostProcessContext
 import mdoc.PreModifierContext
-import scala.meta.inputs.Input
-import scala.meta.inputs.Position
 import scala.meta.dialects.{Scala213, Scala3}
 import scala.util.control.NonFatal
 import mdoc.internal.cli.Context
@@ -21,12 +12,10 @@ import mdoc.internal.document.Printing
 import mdoc.internal.markdown.Modifier._
 import mdoc.internal.pos.PositionSyntax._
 import scala.meta.io.RelativePath
-import coursierapi.error.SimpleResolutionError
 import coursierapi.error.CoursierError
 import coursierapi.error.MultipleResolutionError
 import scala.meta.io.AbsolutePath
 import scala.meta.parsers.Parsed
-import scala.meta.Source
 import mdoc.internal.BuildInfo
 import mdoc.parser.CodeFence
 

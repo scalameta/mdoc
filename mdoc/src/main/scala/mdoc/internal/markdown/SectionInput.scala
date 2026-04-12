@@ -1,12 +1,8 @@
 package mdoc.internal.markdown
 
-import scala.meta.Source
 import scala.meta._
-import scala.meta.inputs.Input
-import scala.meta.Mod.Lazy
 import mdoc.internal.pos.TokenEditDistance
 import mdoc.internal.cli.{Context => MContext}
-import scala.meta.parsers.Parsed.Success
 import mdoc.internal.pos.PositionSyntax._
 
 case class SectionInput(input: Input, source: ParsedSource, mod: Modifier)

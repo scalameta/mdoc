@@ -1,7 +1,5 @@
 package mdoc.internal.cli
 
-import coursierapi.Dependency
-
 import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -14,7 +12,6 @@ import scala.meta.internal.io.PathIO
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
 import scala.util.Try
-import scala.util.control.NonFatal
 
 trait CliEnrichments {
   implicit class XtensionInputMdoc(input: Input) {

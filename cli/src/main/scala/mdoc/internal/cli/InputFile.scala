@@ -2,9 +2,6 @@ package mdoc.internal.cli
 
 import scala.meta.io.AbsolutePath
 import scala.meta.io.RelativePath
-import scala.meta.internal.io.PathIO
-import metaconfig.Input
-import java.nio.file.Files
 
 /** @param relpath
   *   the input filename relativized by its input directory.

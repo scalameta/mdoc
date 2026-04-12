@@ -9,18 +9,8 @@ import mdoc.internal.cli.Settings
 import mdoc.internal.pos.PositionSyntax._
 
 import scala.collection.mutable
-import scala.meta.Import
-import scala.meta.Importee
-import scala.meta.Importer
-import scala.meta.Name
-import scala.meta.Source
-import scala.meta.Term
 import scala.meta._
-import scala.meta.inputs.Input
-import scala.meta.inputs.Position
 import scala.meta.io.AbsolutePath
-import scala.meta.parsers.Parsed.Success
-import java.nio.file.Paths
 import scala.util.control.NonFatal
 
 case class MagicImport(value: String, pos: Position)
