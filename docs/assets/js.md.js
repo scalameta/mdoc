@@ -27,12 +27,18 @@ var $getOwnPropertyDescriptors = (Object.getOwnPropertyDescriptors || (() => {
     return descriptors;
   });
 })());
-var $L0;
 function $Char(c) {
   this.c = c;
 }
 $Char.prototype.toString = (function() {
   return String.fromCharCode(this.c);
+});
+function $Long(lo, hi) {
+  this.l = lo;
+  this.h = hi;
+}
+$Long.prototype.toString = (function() {
+  return $s_RTLong__toString__I__I__T(this.l, this.h);
 });
 function $noIsInstance(arg0) {
   throw new TypeError("Cannot call isInstance() on a Class representing a JS trait/object");
@@ -70,7 +76,7 @@ function $objectClassName(arg0) {
       return "java.lang.Void";
     }
     default: {
-      if ((arg0 instanceof $c_RTLong)) {
+      if ((arg0 instanceof $Long)) {
         return "java.lang.Long";
       } else if ((arg0 instanceof $Char)) {
         return "java.lang.Character";
@@ -99,10 +105,10 @@ function $dp_hashCode__I(instance) {
     default: {
       if (((!(!(instance && instance.$classData))) || (instance === null))) {
         return instance.hashCode__I();
-      } else if ((instance instanceof $c_RTLong)) {
-        return $f_jl_Long__hashCode__I(instance);
+      } else if ((instance instanceof $Long)) {
+        return $f_jl_Long__hashCode__I(instance.l, instance.h);
       } else if ((instance instanceof $Char)) {
-        return $f_jl_Character__hashCode__I($uC(instance));
+        return $f_jl_Character__hashCode__I(instance.c);
       } else {
         return $c_O.prototype.hashCode__I.call(instance);
       }
@@ -138,11 +144,11 @@ function $floatFromBits(arg0) {
 }
 function $doubleToBits(arg0) {
   var dataView = $fpBitsDataView;
-  return $s_RTLong__fromDoubleBits__D__O__RTLong(arg0, dataView);
+  return $s_RTLong__fromDoubleBits__D__O__J(arg0, dataView);
 }
 function $doubleFromBits(arg0) {
   var dataView = $fpBitsDataView;
-  return $s_RTLong__bitsToDouble__RTLong__O__D(arg0, dataView);
+  return $s_RTLong__bitsToDouble__I__I__O__D(arg0.l, arg0.h, dataView);
 }
 function $resolveSuperRef(arg0, arg1) {
   var getPrototypeOf = Object.getPrototyeOf;
@@ -175,7 +181,7 @@ function $superSet(arg0, arg1, arg2, arg3) {
   throw new TypeError((("super has no setter '" + arg2) + "'."));
 }
 function $arraycopyGeneric(arg0, arg1, arg2, arg3, arg4) {
-  if ((((arg0 !== arg2) || (arg3 < arg1)) || (((arg1 + arg4) | 0) < arg3))) {
+  if (((arg0 !== arg2) || (((arg3 - arg1) >>> 0) > (arg4 >>> 0)))) {
     for (var i = 0; (i < arg4); i = ((i + 1) | 0)) {
       arg2[((arg3 + i) | 0)] = arg0[((arg1 + i) | 0)];
     }
@@ -247,11 +253,15 @@ function $bC(arg0) {
   return new $Char(arg0);
 }
 var $bC0 = $bC(0);
+function $bL(arg0, arg1) {
+  return new $Long(arg0, arg1);
+}
+var $bL0 = $bL(0, 0);
 function $uC(arg0) {
   return ((arg0 === null) ? 0 : arg0.c);
 }
 function $uJ(arg0) {
-  return ((arg0 === null) ? $L0 : arg0);
+  return ((arg0 === null) ? $bL0 : arg0);
 }
 /** @constructor */
 function $c_O() {
@@ -372,10 +382,8 @@ $ac_I.prototype.clone__O = (function() {
 });
 function $ac_J(arg) {
   if (((typeof arg) === "number")) {
-    this.u = new Array(arg);
-    for (var i = 0; (i < arg); (i++)) {
-      this.u[i] = $L0;
-    }
+    arg = (arg << 1);
+    this.u = new Int32Array(arg);
   } else {
     this.u = arg;
   }
@@ -383,7 +391,7 @@ function $ac_J(arg) {
 $ac_J.prototype = new $h_O();
 $ac_J.prototype.constructor = $ac_J;
 $ac_J.prototype.copyTo = (function(srcPos, dest, destPos, length) {
-  $arraycopyGeneric(this.u, srcPos, dest.u, destPos, length);
+  dest.u.set(this.u.subarray((srcPos << 1), (((srcPos + length) | 0) << 1)), (destPos << 1));
 });
 $ac_J.prototype.clone__O = (function() {
   return new $ac_J(this.u.slice());
@@ -447,7 +455,7 @@ $TypeData.prototype.initPrim = (function(zero, arrayEncodedName, displayName, ar
   this.isPrimitive = true;
   this.isInstance = ((obj) => false);
   if ((arrayClass !== (void 0))) {
-    this._arrayOf = new $TypeData().initSpecializedArray(this, arrayClass, typedArrayClass);
+    this._arrayOf = new $TypeData().initSpecializedArray(this, arrayClass, typedArrayClass, (arrayEncodedName === "J"));
   }
   return this;
 });
@@ -465,7 +473,7 @@ $TypeData.prototype.initClass = (function(kindOrCtor, fullName, ancestors, isIns
   }
   return this;
 });
-$TypeData.prototype.initSpecializedArray = (function(componentData, arrayClass, typedArrayClass, isAssignableFromFun) {
+$TypeData.prototype.initSpecializedArray = (function(componentData, arrayClass, typedArrayClass, isLongArray, isAssignableFromFun) {
   arrayClass.prototype.$classData = this;
   var name = ("[" + componentData.arrayEncodedName);
   this.constr = arrayClass;
@@ -481,7 +489,17 @@ $TypeData.prototype.initSpecializedArray = (function(componentData, arrayClass, 
   this.isArrayClass = true;
   var self = this;
   this.isAssignableFromFun = (isAssignableFromFun || ((that) => (self === that)));
-  this.wrapArray = (typedArrayClass ? ((array) => new arrayClass(new typedArrayClass(array))) : ((array) => new arrayClass(array)));
+  this.wrapArray = (isLongArray ? ((array) => {
+    var len = (array.length | 0);
+    var result = new arrayClass(len);
+    var u = result.u;
+    for (var i = 0; (i < len); i = ((i + 1) | 0)) {
+      var srcElem = array[i];
+      u[(i << 1)] = srcElem.l;
+      u[(((i << 1) + 1) | 0)] = srcElem.h;
+    }
+    return result;
+  }) : (typedArrayClass ? ((array) => new arrayClass(new typedArrayClass(array))) : ((array) => new arrayClass(array))));
   this.isInstance = ((obj) => (obj instanceof arrayClass));
   return this;
 });
@@ -577,7 +595,7 @@ $d_O.arrayEncodedName = "Ljava.lang.Object;";
 $d_O.isAssignableFromFun = ((that) => (!that.isPrimitive));
 $d_O.name = "java.lang.Object";
 $d_O.isInstance = ((obj) => (obj !== null));
-$d_O._arrayOf = new $TypeData().initSpecializedArray($d_O, $ac_O, (void 0), ((that) => {
+$d_O._arrayOf = new $TypeData().initSpecializedArray($d_O, $ac_O, (void 0), false, ((that) => {
   var thatDepth = that.arrayDepth;
   return ((thatDepth === 1) ? (!that.arrayBase.isPrimitive) : (thatDepth > 1));
 }));
@@ -588,7 +606,7 @@ var $d_C = new $TypeData().initPrim(0, "C", "char", $ac_C, Uint16Array);
 var $d_B = new $TypeData().initPrim(0, "B", "byte", $ac_B, Int8Array);
 var $d_S = new $TypeData().initPrim(0, "S", "short", $ac_S, Int16Array);
 var $d_I = new $TypeData().initPrim(0, "I", "int", $ac_I, Int32Array);
-var $d_J = new $TypeData().initPrim(null, "J", "long", $ac_J, (void 0));
+var $d_J = new $TypeData().initPrim($bL0, "J", "long", $ac_J, Int32Array);
 var $d_F = new $TypeData().initPrim(0.0, "F", "float", $ac_F, Float32Array);
 var $d_D = new $TypeData().initPrim(0.0, "D", "double", $ac_D, Float64Array);
 /** @constructor */
@@ -705,72 +723,58 @@ function $m_Lmdocjs$() {
   }
   return $n_Lmdocjs$;
 }
-function $s_RTLong__remainderUnsigned__RTLong__RTLong__RTLong(a, b) {
+function $s_RTLong__remainderUnsigned__I__I__I__I__J(alo, ahi, blo, bhi) {
   var this$1 = $m_RTLong$();
-  var lo = this$1.remainderUnsignedImpl__I__I__I__I__I(a.RTLong__f_lo, a.RTLong__f_hi, b.RTLong__f_lo, b.RTLong__f_hi);
-  return new $c_RTLong(lo, this$1.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn);
+  return this$1.remainderUnsignedImpl__I__I__I__I__J(alo, ahi, blo, bhi);
 }
-function $s_RTLong__remainder__RTLong__RTLong__RTLong(a, b) {
+function $s_RTLong__remainder__I__I__I__I__J(alo, ahi, blo, bhi) {
+  return $m_RTLong$().remainder__I__I__I__I__J(alo, ahi, blo, bhi);
+}
+function $s_RTLong__divideUnsigned__I__I__I__I__J(alo, ahi, blo, bhi) {
   var this$1 = $m_RTLong$();
-  var lo = this$1.remainderImpl__I__I__I__I__I(a.RTLong__f_lo, a.RTLong__f_hi, b.RTLong__f_lo, b.RTLong__f_hi);
-  return new $c_RTLong(lo, this$1.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn);
+  return this$1.divideUnsignedImpl__I__I__I__I__J(alo, ahi, blo, bhi);
 }
-function $s_RTLong__divideUnsigned__RTLong__RTLong__RTLong(a, b) {
-  var this$1 = $m_RTLong$();
-  var lo = this$1.divideUnsignedImpl__I__I__I__I__I(a.RTLong__f_lo, a.RTLong__f_hi, b.RTLong__f_lo, b.RTLong__f_hi);
-  return new $c_RTLong(lo, this$1.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn);
+function $s_RTLong__divide__I__I__I__I__J(alo, ahi, blo, bhi) {
+  return $m_RTLong$().divide__I__I__I__I__J(alo, ahi, blo, bhi);
 }
-function $s_RTLong__divide__RTLong__RTLong__RTLong(a, b) {
-  var this$1 = $m_RTLong$();
-  var lo = this$1.divideImpl__I__I__I__I__I(a.RTLong__f_lo, a.RTLong__f_hi, b.RTLong__f_lo, b.RTLong__f_hi);
-  return new $c_RTLong(lo, this$1.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn);
-}
-function $s_RTLong__fromDoubleBits__D__O__RTLong(value, fpBitsDataView) {
+function $s_RTLong__fromDoubleBits__D__O__J(value, fpBitsDataView) {
   fpBitsDataView.setFloat64(0, value, true);
-  return new $c_RTLong((fpBitsDataView.getInt32(0, true) | 0), (fpBitsDataView.getInt32(4, true) | 0));
+  var lo = (fpBitsDataView.getInt32(0, true) | 0);
+  var hi = (fpBitsDataView.getInt32(4, true) | 0);
+  return $bL(lo, hi);
 }
-function $s_RTLong__fromDouble__D__RTLong(value) {
-  var this$1 = $m_RTLong$();
-  var lo = this$1.org$scalajs$linker$runtime$RuntimeLong$$fromDoubleImpl__D__I(value);
-  return new $c_RTLong(lo, this$1.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn);
+function $s_RTLong__fromDouble__D__J(value) {
+  return $m_RTLong$().fromDouble__D__J(value);
 }
-function $s_RTLong__fromUnsignedInt__I__RTLong(value) {
-  return new $c_RTLong(value, 0);
+function $s_RTLong__fromUnsignedInt__I__J(value) {
+  return $bL(value, 0);
 }
-function $s_RTLong__fromInt__I__RTLong(value) {
-  return new $c_RTLong(value, (value >> 31));
+function $s_RTLong__fromInt__I__J(value) {
+  var hi = (value >> 31);
+  return $bL(value, hi);
 }
-function $s_RTLong__clz__RTLong__I(a) {
-  var hi = a.RTLong__f_hi;
-  if ((hi !== 0)) {
-    return Math.clz32(hi);
-  } else {
-    var i = a.RTLong__f_lo;
-    return ((32 + Math.clz32(i)) | 0);
-  }
+function $s_RTLong__clz__I__I__I(lo, hi) {
+  return ((hi !== 0) ? Math.clz32(hi) : ((32 + Math.clz32(lo)) | 0));
 }
-function $s_RTLong__toFloat__RTLong__F(a) {
-  var lo = a.RTLong__f_lo;
-  var hi = a.RTLong__f_hi;
+function $s_RTLong__toFloat__I__I__F(lo, hi) {
   var compressedLo = (((((-2097152) & (hi ^ (hi >> 10))) === 0) || ((65535 & lo) === 0)) ? lo : (32768 | ((-32768) & lo)));
   return Math.fround(((4.294967296E9 * hi) + (compressedLo >>> 0.0)));
 }
-function $s_RTLong__toDouble__RTLong__D(a) {
-  var lo = a.RTLong__f_lo;
-  var hi = a.RTLong__f_hi;
+function $s_RTLong__toDouble__I__I__D(lo, hi) {
   return ((4.294967296E9 * hi) + (lo >>> 0.0));
 }
-function $s_RTLong__toInt__RTLong__I(a) {
-  return a.RTLong__f_lo;
+function $s_RTLong__toInt__I__I__I(lo, hi) {
+  return lo;
 }
-function $s_RTLong__bitsToDouble__RTLong__O__D(a, fpBitsDataView) {
-  fpBitsDataView.setInt32(0, a.RTLong__f_lo, true);
-  fpBitsDataView.setInt32(4, a.RTLong__f_hi, true);
+function $s_RTLong__toString__I__I__T(lo, hi) {
+  return $m_RTLong$().toString__I__I__T(lo, hi);
+}
+function $s_RTLong__bitsToDouble__I__I__O__D(lo, hi, fpBitsDataView) {
+  fpBitsDataView.setInt32(0, lo, true);
+  fpBitsDataView.setInt32(4, hi, true);
   return (+fpBitsDataView.getFloat64(0, true));
 }
-function $s_RTLong__mul__RTLong__RTLong__RTLong(a, b) {
-  var alo = a.RTLong__f_lo;
-  var blo = b.RTLong__f_lo;
+function $s_RTLong__mul__I__I__I__I__J(alo, ahi, blo, bhi) {
   var a0 = (65535 & alo);
   var a1 = ((alo >>> 16) | 0);
   var b0 = (65535 & blo);
@@ -780,268 +784,81 @@ function $s_RTLong__mul__RTLong__RTLong__RTLong(a, b) {
   var a0b1 = Math.imul(a0, b1);
   var lo = ((a0b0 + (((a1b0 + a0b1) | 0) << 16)) | 0);
   var c1part = ((((a0b0 >>> 16) | 0) + a0b1) | 0);
-  var hi = ((((((((Math.imul(alo, b.RTLong__f_hi) + Math.imul(a.RTLong__f_hi, blo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
-  return new $c_RTLong(lo, hi);
+  var hi = ((((((((Math.imul(alo, bhi) + Math.imul(ahi, blo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
+  return $bL(lo, hi);
 }
-function $s_RTLong__sub__RTLong__RTLong__RTLong(a, b) {
-  var alo = a.RTLong__f_lo;
-  var blo = b.RTLong__f_lo;
+function $s_RTLong__sub__I__I__I__I__J(alo, ahi, blo, bhi) {
   var lo = ((alo - blo) | 0);
-  return new $c_RTLong(lo, ((((a.RTLong__f_hi - b.RTLong__f_hi) | 0) + ((((~alo) & blo) | ((~(alo ^ blo)) & lo)) >> 31)) | 0));
+  var hi = ((((ahi - bhi) | 0) + ((((~alo) & blo) | ((~(alo ^ blo)) & lo)) >> 31)) | 0);
+  return $bL(lo, hi);
 }
-function $s_RTLong__add__RTLong__RTLong__RTLong(a, b) {
-  var alo = a.RTLong__f_lo;
-  var blo = b.RTLong__f_lo;
+function $s_RTLong__add__I__I__I__I__J(alo, ahi, blo, bhi) {
   var lo = ((alo + blo) | 0);
-  return new $c_RTLong(lo, ((((a.RTLong__f_hi + b.RTLong__f_hi) | 0) + ((((alo & blo) | ((alo | blo) & (~lo))) >>> 31) | 0)) | 0));
+  var hi = ((((ahi + bhi) | 0) + ((((alo & blo) | ((alo | blo) & (~lo))) >>> 31) | 0)) | 0);
+  return $bL(lo, hi);
 }
-function $s_RTLong__sar__RTLong__I__RTLong(a, n) {
-  var hi = a.RTLong__f_hi;
-  return new $c_RTLong((((32 & n) === 0) ? (((a.RTLong__f_lo >>> n) | 0) | ((hi << 1) << ((31 - n) | 0))) : (hi >> n)), (((32 & n) === 0) ? (hi >> n) : (hi >> 31)));
+function $s_RTLong__sar__I__I__I__J(lo, hi, n) {
+  var lo$1 = (((32 & n) === 0) ? (((lo >>> n) | 0) | ((hi << 1) << (~n))) : (hi >> n));
+  var hi$1 = (((32 & n) === 0) ? (hi >> n) : (hi >> 31));
+  return $bL(lo$1, hi$1);
 }
-function $s_RTLong__shr__RTLong__I__RTLong(a, n) {
-  var hi = a.RTLong__f_hi;
-  return new $c_RTLong((((32 & n) === 0) ? (((a.RTLong__f_lo >>> n) | 0) | ((hi << 1) << ((31 - n) | 0))) : ((hi >>> n) | 0)), (((32 & n) === 0) ? ((hi >>> n) | 0) : 0));
+function $s_RTLong__shr__I__I__I__J(lo, hi, n) {
+  var lo$1 = (((32 & n) === 0) ? (((lo >>> n) | 0) | ((hi << 1) << (~n))) : ((hi >>> n) | 0));
+  var hi$1 = (((32 & n) === 0) ? ((hi >>> n) | 0) : 0);
+  return $bL(lo$1, hi$1);
 }
-function $s_RTLong__shl__RTLong__I__RTLong(a, n) {
-  var lo = a.RTLong__f_lo;
-  return new $c_RTLong((((32 & n) === 0) ? (lo << n) : 0), (((32 & n) === 0) ? (((((lo >>> 1) | 0) >>> ((31 - n) | 0)) | 0) | (a.RTLong__f_hi << n)) : (lo << n)));
+function $s_RTLong__shl__I__I__I__J(lo, hi, n) {
+  var lo$1 = (((32 & n) === 0) ? (lo << n) : 0);
+  var hi$1 = (((32 & n) === 0) ? (((((lo >>> 1) | 0) >>> (~n)) | 0) | (hi << n)) : (lo << n));
+  return $bL(lo$1, hi$1);
 }
-function $s_RTLong__xor__RTLong__RTLong__RTLong(a, b) {
-  return new $c_RTLong((a.RTLong__f_lo ^ b.RTLong__f_lo), (a.RTLong__f_hi ^ b.RTLong__f_hi));
+function $s_RTLong__xor__I__I__I__I__J(alo, ahi, blo, bhi) {
+  var lo = (alo ^ blo);
+  var hi = (ahi ^ bhi);
+  return $bL(lo, hi);
 }
-function $s_RTLong__and__RTLong__RTLong__RTLong(a, b) {
-  return new $c_RTLong((a.RTLong__f_lo & b.RTLong__f_lo), (a.RTLong__f_hi & b.RTLong__f_hi));
+function $s_RTLong__and__I__I__I__I__J(alo, ahi, blo, bhi) {
+  var lo = (alo & blo);
+  var hi = (ahi & bhi);
+  return $bL(lo, hi);
 }
-function $s_RTLong__or__RTLong__RTLong__RTLong(a, b) {
-  return new $c_RTLong((a.RTLong__f_lo | b.RTLong__f_lo), (a.RTLong__f_hi | b.RTLong__f_hi));
+function $s_RTLong__or__I__I__I__I__J(alo, ahi, blo, bhi) {
+  var lo = (alo | blo);
+  var hi = (ahi | bhi);
+  return $bL(lo, hi);
 }
-function $s_RTLong__geu__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) >= (b.RTLong__f_lo >>> 0)) : ((ahi >>> 0) >= (bhi >>> 0)));
+function $s_RTLong__geu__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) >= (blo >>> 0)) : ((ahi >>> 0) > (bhi >>> 0)));
 }
-function $s_RTLong__gtu__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) > (b.RTLong__f_lo >>> 0)) : ((ahi >>> 0) > (bhi >>> 0)));
+function $s_RTLong__gtu__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) > (blo >>> 0)) : ((ahi >>> 0) > (bhi >>> 0)));
 }
-function $s_RTLong__leu__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) <= (b.RTLong__f_lo >>> 0)) : ((ahi >>> 0) <= (bhi >>> 0)));
+function $s_RTLong__leu__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) <= (blo >>> 0)) : ((ahi >>> 0) < (bhi >>> 0)));
 }
-function $s_RTLong__ltu__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) < (b.RTLong__f_lo >>> 0)) : ((ahi >>> 0) < (bhi >>> 0)));
+function $s_RTLong__ltu__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) < (blo >>> 0)) : ((ahi >>> 0) < (bhi >>> 0)));
 }
-function $s_RTLong__ge__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) >= (b.RTLong__f_lo >>> 0)) : (ahi > bhi));
+function $s_RTLong__ge__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) >= (blo >>> 0)) : (ahi > bhi));
 }
-function $s_RTLong__gt__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) > (b.RTLong__f_lo >>> 0)) : (ahi > bhi));
+function $s_RTLong__gt__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) > (blo >>> 0)) : (ahi > bhi));
 }
-function $s_RTLong__le__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) <= (b.RTLong__f_lo >>> 0)) : (ahi < bhi));
+function $s_RTLong__le__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) <= (blo >>> 0)) : (ahi < bhi));
 }
-function $s_RTLong__lt__RTLong__RTLong__Z(a, b) {
-  var ahi = a.RTLong__f_hi;
-  var bhi = b.RTLong__f_hi;
-  return ((ahi === bhi) ? ((a.RTLong__f_lo >>> 0) < (b.RTLong__f_lo >>> 0)) : (ahi < bhi));
+function $s_RTLong__lt__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return ((ahi === bhi) ? ((alo >>> 0) < (blo >>> 0)) : (ahi < bhi));
 }
-function $s_RTLong__notEquals__RTLong__RTLong__Z(a, b) {
-  return (!((a.RTLong__f_lo === b.RTLong__f_lo) && (a.RTLong__f_hi === b.RTLong__f_hi)));
+function $s_RTLong__notEquals__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return (((alo ^ blo) | (ahi ^ bhi)) !== 0);
 }
-function $s_RTLong__equals__RTLong__RTLong__Z(a, b) {
-  return ((a.RTLong__f_lo === b.RTLong__f_lo) && (a.RTLong__f_hi === b.RTLong__f_hi));
-}
-/** @constructor */
-function $c_RTLong(lo, hi) {
-  this.RTLong__f_lo = 0;
-  this.RTLong__f_hi = 0;
-  this.RTLong__f_lo = lo;
-  this.RTLong__f_hi = hi;
-}
-$c_RTLong.prototype = new $h_O();
-$c_RTLong.prototype.constructor = $c_RTLong;
-/** @constructor */
-function $h_RTLong() {
-}
-$h_RTLong.prototype = $c_RTLong.prototype;
-$c_RTLong.prototype.equals__O__Z = (function(that) {
-  return ((that instanceof $c_RTLong) && ((this.RTLong__f_lo === that.RTLong__f_lo) && (this.RTLong__f_hi === that.RTLong__f_hi)));
-});
-$c_RTLong.prototype.hashCode__I = (function() {
-  return (this.RTLong__f_lo ^ this.RTLong__f_hi);
-});
-$c_RTLong.prototype.toString__T = (function() {
-  var this$1 = $m_RTLong$();
-  return this$1.org$scalajs$linker$runtime$RuntimeLong$$toString__I__I__T(this.RTLong__f_lo, this.RTLong__f_hi);
-});
-$c_RTLong.prototype.byteValue__B = (function() {
-  return ((this.RTLong__f_lo << 24) >> 24);
-});
-$c_RTLong.prototype.shortValue__S = (function() {
-  return ((this.RTLong__f_lo << 16) >> 16);
-});
-$c_RTLong.prototype.intValue__I = (function() {
-  return this.RTLong__f_lo;
-});
-$c_RTLong.prototype.longValue__J = (function() {
-  return this;
-});
-$c_RTLong.prototype.floatValue__F = (function() {
-  var lo = this.RTLong__f_lo;
-  var hi = this.RTLong__f_hi;
-  var compressedLo = (((((-2097152) & (hi ^ (hi >> 10))) === 0) || ((65535 & lo) === 0)) ? lo : (32768 | ((-32768) & lo)));
-  return Math.fround(((4.294967296E9 * hi) + (compressedLo >>> 0.0)));
-});
-$c_RTLong.prototype.doubleValue__D = (function() {
-  var lo = this.RTLong__f_lo;
-  var hi = this.RTLong__f_hi;
-  return ((4.294967296E9 * hi) + (lo >>> 0.0));
-});
-$c_RTLong.prototype.compareTo__O__I = (function(that) {
-  return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I(this.RTLong__f_lo, this.RTLong__f_hi, that.RTLong__f_lo, that.RTLong__f_hi);
-});
-$c_RTLong.prototype.compareTo__jl_Long__I = (function(that) {
-  return $m_RTLong$().org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I(this.RTLong__f_lo, this.RTLong__f_hi, that.RTLong__f_lo, that.RTLong__f_hi);
-});
-function $isArrayOf_RTLong(obj, depth) {
-  return (!(!(((obj && obj.$classData) && (obj.$classData.arrayDepth === depth)) && obj.$classData.arrayBase.ancestors.RTLong)));
-}
-var $d_RTLong = new $TypeData().initClass($c_RTLong, "org.scalajs.linker.runtime.RuntimeLong", ({
-  RTLong: 1
-}));
-function $p_RTLong$__unsigned_$div__I__I__I__I__I($thiz, alo, ahi, blo, bhi) {
-  if ((((-2097152) & ahi) === 0)) {
-    if ((((-2097152) & bhi) === 0)) {
-      var aDouble = ((4.294967296E9 * ahi) + (alo >>> 0.0));
-      var bDouble = ((4.294967296E9 * bhi) + (blo >>> 0.0));
-      var rDouble = (aDouble / bDouble);
-      var x = (rDouble / 4.294967296E9);
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (x | 0.0);
-      return (rDouble | 0.0);
-    } else {
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return 0;
-    }
-  } else if (((bhi === 0) && ((blo & (((-1) + blo) | 0)) === 0))) {
-    var pow = ((31 - Math.clz32(blo)) | 0);
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = ((ahi >>> pow) | 0);
-    return (((alo >>> pow) | 0) | ((ahi << 1) << ((31 - pow) | 0)));
-  } else if (((blo === 0) && ((bhi & (((-1) + bhi) | 0)) === 0))) {
-    var pow$2 = ((31 - Math.clz32(bhi)) | 0);
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-    return ((ahi >>> pow$2) | 0);
-  } else {
-    return $p_RTLong$__unsignedDivModHelper__I__I__I__I__Z__I($thiz, alo, ahi, blo, bhi, true);
-  }
-}
-function $p_RTLong$__unsigned_$percent__I__I__I__I__I($thiz, alo, ahi, blo, bhi) {
-  if ((((-2097152) & ahi) === 0)) {
-    if ((((-2097152) & bhi) === 0)) {
-      var aDouble = ((4.294967296E9 * ahi) + (alo >>> 0.0));
-      var bDouble = ((4.294967296E9 * bhi) + (blo >>> 0.0));
-      var rDouble = (aDouble % bDouble);
-      var x = (rDouble / 4.294967296E9);
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (x | 0.0);
-      return (rDouble | 0.0);
-    } else {
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = ahi;
-      return alo;
-    }
-  } else if (((bhi === 0) && ((blo & (((-1) + blo) | 0)) === 0))) {
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-    return (alo & (((-1) + blo) | 0));
-  } else if (((blo === 0) && ((bhi & (((-1) + bhi) | 0)) === 0))) {
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (ahi & (((-1) + bhi) | 0));
-    return alo;
-  } else {
-    return $p_RTLong$__unsignedDivModHelper__I__I__I__I__Z__I($thiz, alo, ahi, blo, bhi, false);
-  }
-}
-function $p_RTLong$__unsignedDivModHelper__I__I__I__I__Z__I($thiz, alo, ahi, blo, bhi, askQuotient) {
-  var shift = ((((bhi !== 0) ? Math.clz32(bhi) : ((32 + Math.clz32(blo)) | 0)) - ((ahi !== 0) ? Math.clz32(ahi) : ((32 + Math.clz32(alo)) | 0))) | 0);
-  var b = shift;
-  var lo = (((32 & b) === 0) ? (blo << b) : 0);
-  var hi = (((32 & b) === 0) ? (((((blo >>> 1) | 0) >>> ((31 - b) | 0)) | 0) | (bhi << b)) : (blo << b));
-  var bShiftLo = lo;
-  var bShiftHi = hi;
-  var remLo = alo;
-  var remHi = ahi;
-  var quotLo = 0;
-  var quotHi = 0;
-  while (((shift >= 0) && (((-2097152) & remHi) !== 0))) {
-    var alo$1 = remLo;
-    var ahi$1 = remHi;
-    var blo$1 = bShiftLo;
-    var bhi$1 = bShiftHi;
-    if (((ahi$1 === bhi$1) ? ((alo$1 >>> 0) >= (blo$1 >>> 0)) : ((ahi$1 >>> 0) >= (bhi$1 >>> 0)))) {
-      var lo$1 = remLo;
-      var hi$1 = remHi;
-      var lo$2 = bShiftLo;
-      var hi$2 = bShiftHi;
-      var lo$3 = ((lo$1 - lo$2) | 0);
-      var hi$3 = ((((hi$1 - hi$2) | 0) + ((((~lo$1) & lo$2) | ((~(lo$1 ^ lo$2)) & lo$3)) >> 31)) | 0);
-      remLo = lo$3;
-      remHi = hi$3;
-      if ((shift < 32)) {
-        quotLo = (quotLo | (1 << shift));
-      } else {
-        quotHi = (quotHi | (1 << shift));
-      }
-    }
-    shift = (((-1) + shift) | 0);
-    var lo$4 = bShiftLo;
-    var hi$4 = bShiftHi;
-    var lo$5 = (((lo$4 >>> 1) | 0) | (hi$4 << 31));
-    var hi$5 = ((hi$4 >>> 1) | 0);
-    bShiftLo = lo$5;
-    bShiftHi = hi$5;
-  }
-  var alo$2 = remLo;
-  var ahi$2 = remHi;
-  if (((ahi$2 === bhi) ? ((alo$2 >>> 0) >= (blo >>> 0)) : ((ahi$2 >>> 0) >= (bhi >>> 0)))) {
-    var lo$6 = remLo;
-    var hi$6 = remHi;
-    var remDouble = ((4.294967296E9 * hi$6) + (lo$6 >>> 0.0));
-    var bDouble = ((4.294967296E9 * bhi) + (blo >>> 0.0));
-    if (askQuotient) {
-      var x = (remDouble / bDouble);
-      var lo$7 = (x | 0.0);
-      var x$1 = (x / 4.294967296E9);
-      var hi$7 = (x$1 | 0.0);
-      var lo$8 = quotLo;
-      var hi$8 = quotHi;
-      var lo$9 = ((lo$8 + lo$7) | 0);
-      var hi$9 = ((((hi$8 + hi$7) | 0) + ((((lo$8 & lo$7) | ((lo$8 | lo$7) & (~lo$9))) >>> 31) | 0)) | 0);
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = hi$9;
-      return lo$9;
-    } else {
-      var rem_mod_bDouble = (remDouble % bDouble);
-      var x$2 = (rem_mod_bDouble / 4.294967296E9);
-      $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (x$2 | 0.0);
-      return (rem_mod_bDouble | 0.0);
-    }
-  } else if (askQuotient) {
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = quotHi;
-    return quotLo;
-  } else {
-    $thiz.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = remHi;
-    return remLo;
-  }
+function $s_RTLong__equals__I__I__I__I__Z(alo, ahi, blo, bhi) {
+  return (((alo ^ blo) | (ahi ^ bhi)) === 0);
 }
 /** @constructor */
 function $c_RTLong$() {
-  this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
 }
 $c_RTLong$.prototype = new $h_O();
 $c_RTLong$.prototype.constructor = $c_RTLong$;
@@ -1049,7 +866,7 @@ $c_RTLong$.prototype.constructor = $c_RTLong$;
 function $h_RTLong$() {
 }
 $h_RTLong$.prototype = $c_RTLong$.prototype;
-$c_RTLong$.prototype.org$scalajs$linker$runtime$RuntimeLong$$toString__I__I__T = (function(lo, hi) {
+$c_RTLong$.prototype.toString__I__I__T = (function(lo, hi) {
   if ((hi === (lo >> 31))) {
     return ("" + lo);
   } else if ((((-2097152) & (hi ^ (hi >> 10))) === 0)) {
@@ -1069,143 +886,273 @@ $c_RTLong$.prototype.org$scalajs$linker$runtime$RuntimeLong$$toString__I__I__T =
       approxRem = ((1000000000 + approxRem) | 0);
     } else if ((approxRem >= 1000000000)) {
       approxQuot = (approxQuot + 1.0);
-      approxRem = (((-1000000000) + approxRem) | 0);
+      approxRem = ((approxRem - 1000000000) | 0);
     }
-    var this$4 = approxRem;
-    var remStr = ("" + this$4);
-    var this$6 = approxQuot;
+    var this$7 = approxRem;
+    var remStr = ("" + this$7);
+    var this$9 = approxQuot;
     var start = remStr.length;
-    var s = ((("" + this$6) + "000000000".substring(start)) + remStr);
+    var s = ((("" + this$9) + "000000000".substring(start)) + remStr);
     return ((hi < 0) ? ("-" + s) : s);
   }
 });
-$c_RTLong$.prototype.org$scalajs$linker$runtime$RuntimeLong$$fromDoubleImpl__D__I = (function(value) {
+$c_RTLong$.prototype.fromDouble__D__J = (function(value) {
   if ((value < (-9.223372036854776E18))) {
-    this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (-2147483648);
-    return 0;
+    return $bL(0, (-2147483648));
   } else if ((value >= 9.223372036854776E18)) {
-    this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 2147483647;
-    return (-1);
+    return $bL((-1), 2147483647);
   } else {
     var rawLo = (value | 0.0);
-    var x = (value / 4.294967296E9);
+    var x = (2.3283064365386963E-10 * value);
     var rawHi = (x | 0.0);
-    this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (((value < 0.0) && (rawLo !== 0)) ? (((-1) + rawHi) | 0) : rawHi);
-    return rawLo;
+    var hi = (((value < 0.0) && (rawLo !== 0)) ? ((rawHi - 1) | 0) : rawHi);
+    return $bL(rawLo, hi);
   }
 });
-$c_RTLong$.prototype.org$scalajs$linker$runtime$RuntimeLong$$compare__I__I__I__I__I = (function(alo, ahi, blo, bhi) {
-  return ((ahi === bhi) ? ((alo === blo) ? 0 : (((alo >>> 0) < (blo >>> 0)) ? (-1) : 1)) : ((ahi < bhi) ? (-1) : 1));
-});
-$c_RTLong$.prototype.divideImpl__I__I__I__I__I = (function(alo, ahi, blo, bhi) {
-  if (((blo | bhi) === 0)) {
-    throw new $c_jl_ArithmeticException("/ by zero");
-  }
-  if ((ahi === (alo >> 31))) {
-    if ((bhi === (blo >> 31))) {
-      if (((alo === (-2147483648)) && (blo === (-1)))) {
-        this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-        return (-2147483648);
-      } else {
-        var lo = ((alo / $checkIntDivisor(blo)) | 0);
-        this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (lo >> 31);
-        return lo;
-      }
-    } else if (((alo === (-2147483648)) && ((blo === (-2147483648)) && (bhi === 0)))) {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (-1);
-      return (-1);
+$c_RTLong$.prototype.divide__I__I__I__I__J = (function(alo, ahi, blo, bhi) {
+  var sign = (ahi >> 31);
+  var xlo = (alo ^ sign);
+  var rlo = ((xlo - sign) | 0);
+  var rhi = (((ahi ^ sign) + (((xlo & (~rlo)) >>> 31) | 0)) | 0);
+  var sign$1 = (bhi >> 31);
+  var xlo$1 = (blo ^ sign$1);
+  var rlo$1 = ((xlo$1 - sign$1) | 0);
+  var rhi$1 = (((bhi ^ sign$1) + (((xlo$1 & (~rlo$1)) >>> 31) | 0)) | 0);
+  var b = ((-2097152) & rlo$1);
+  if (((rhi$1 | b) === 0)) {
+    var quotHi = (((rhi >>> 0) / ($checkIntDivisor(rlo$1) >>> 0)) | 0);
+    var k = ((rhi - Math.imul(rlo$1, quotHi)) | 0);
+    var x = (((4.294967296E9 * k) + (rlo >>> 0.0)) / rlo$1);
+    var quotLo = (x | 0.0);
+    var absR_$_lo = quotLo;
+    var absR_$_hi = quotHi;
+  } else if ((((-1073741824) & rhi$1) === 0)) {
+    var aHat = ((4.294967296E9 * (rhi >>> 0.0)) + (rlo >>> 0.0));
+    var bHat = ((4.294967296E9 * (rhi$1 >>> 0.0)) + (rlo$1 >>> 0.0));
+    var x$1 = (aHat / bHat);
+    var lo = (x$1 | 0.0);
+    var x$2 = (2.3283064365386963E-10 * x$1);
+    var hi = (x$2 | 0.0);
+    var a0 = (65535 & rlo$1);
+    var a1 = ((rlo$1 >>> 16) | 0);
+    var b0 = (65535 & lo);
+    var b1 = ((lo >>> 16) | 0);
+    var a0b0 = Math.imul(a0, b0);
+    var a1b0 = Math.imul(a1, b0);
+    var a0b1 = Math.imul(a0, b1);
+    var lo$1 = ((a0b0 + (((a1b0 + a0b1) | 0) << 16)) | 0);
+    var c1part = ((((a0b0 >>> 16) | 0) + a0b1) | 0);
+    var hi$1 = ((((((((Math.imul(rlo$1, hi) + Math.imul(rhi$1, lo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
+    var lo$2 = ((rlo - lo$1) | 0);
+    var hi$2 = ((((rhi - hi$1) | 0) + ((((~rlo) & lo$1) | ((~(rlo ^ lo$1)) & lo$2)) >> 31)) | 0);
+    if ((hi$2 < 0)) {
+      var lo$3 = ((lo - 1) | 0);
+      var hi$3 = ((((hi - 1) | 0) + (((lo | (~lo$3)) >>> 31) | 0)) | 0);
+      var absR_$_lo = lo$3;
+      var absR_$_hi = hi$3;
+    } else if (((hi$2 === rhi$1) ? ((lo$2 >>> 0) >= (rlo$1 >>> 0)) : ((hi$2 >>> 0) > (rhi$1 >>> 0)))) {
+      var lo$4 = ((1 + lo) | 0);
+      var hi$4 = ((hi + (((lo & (~lo$4)) >>> 31) | 0)) | 0);
+      var absR_$_lo = lo$4;
+      var absR_$_hi = hi$4;
     } else {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return 0;
+      var absR_$_lo = lo;
+      var absR_$_hi = hi;
     }
   } else {
-    var sign = (ahi >> 31);
-    var xlo = (alo ^ sign);
-    var rlo = ((xlo - sign) | 0);
-    var rhi = (((ahi ^ sign) + (((xlo & (~rlo)) >>> 31) | 0)) | 0);
-    var sign$1 = (bhi >> 31);
-    var xlo$1 = (blo ^ sign$1);
-    var rlo$1 = ((xlo$1 - sign$1) | 0);
-    var rhi$1 = (((bhi ^ sign$1) + (((xlo$1 & (~rlo$1)) >>> 31) | 0)) | 0);
-    var absRLo = $p_RTLong$__unsigned_$div__I__I__I__I__I(this, rlo, rhi, rlo$1, rhi$1);
-    if (((ahi ^ bhi) >= 0)) {
-      return absRLo;
-    } else {
-      var hi = this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn;
-      var lo$1 = ((-absRLo) | 0);
-      var hi$1 = ((((-hi) | 0) + ((absRLo | lo$1) >> 31)) | 0);
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = hi$1;
-      return lo$1;
-    }
+    var $x_1 = this.org$scalajs$linker$runtime$RuntimeLong$$unsignedDivModHugeDivisor__I__I__I__I__Z__J(rlo, rhi, rlo$1, rhi$1, true);
+    var absR_$_lo = $x_1.l;
+    var absR_$_hi = $x_1.h;
+  }
+  if (((ahi ^ bhi) >= 0)) {
+    return $bL(absR_$_lo, absR_$_hi);
+  } else {
+    var lo$5 = ((-absR_$_lo) | 0);
+    var hi$5 = ((((-absR_$_hi) | 0) + ((absR_$_lo | lo$5) >> 31)) | 0);
+    return $bL(lo$5, hi$5);
   }
 });
-$c_RTLong$.prototype.divideUnsignedImpl__I__I__I__I__I = (function(alo, ahi, blo, bhi) {
-  if (((blo | bhi) === 0)) {
-    throw new $c_jl_ArithmeticException("/ by zero");
-  }
-  if ((ahi === 0)) {
-    if ((bhi === 0)) {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return (((alo >>> 0) / ($checkIntDivisor(blo) >>> 0)) | 0);
+$c_RTLong$.prototype.divideUnsignedImpl__I__I__I__I__J = (function(alo, ahi, blo, bhi) {
+  var b = ((-2097152) & blo);
+  if (((bhi | b) === 0)) {
+    var quotHi = (((ahi >>> 0) / ($checkIntDivisor(blo) >>> 0)) | 0);
+    var k = ((ahi - Math.imul(blo, quotHi)) | 0);
+    var x = (((4.294967296E9 * k) + (alo >>> 0.0)) / blo);
+    var quotLo = (x | 0.0);
+    return $bL(quotLo, quotHi);
+  } else if ((((-1073741824) & bhi) === 0)) {
+    var aHat = ((4.294967296E9 * (ahi >>> 0.0)) + (alo >>> 0.0));
+    var bHat = ((4.294967296E9 * (bhi >>> 0.0)) + (blo >>> 0.0));
+    var x$1 = (aHat / bHat);
+    var lo = (x$1 | 0.0);
+    var x$2 = (2.3283064365386963E-10 * x$1);
+    var hi = (x$2 | 0.0);
+    var a0 = (65535 & blo);
+    var a1 = ((blo >>> 16) | 0);
+    var b0 = (65535 & lo);
+    var b1 = ((lo >>> 16) | 0);
+    var a0b0 = Math.imul(a0, b0);
+    var a1b0 = Math.imul(a1, b0);
+    var a0b1 = Math.imul(a0, b1);
+    var lo$1 = ((a0b0 + (((a1b0 + a0b1) | 0) << 16)) | 0);
+    var c1part = ((((a0b0 >>> 16) | 0) + a0b1) | 0);
+    var hi$1 = ((((((((Math.imul(blo, hi) + Math.imul(bhi, lo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
+    var lo$2 = ((alo - lo$1) | 0);
+    var hi$2 = ((((ahi - hi$1) | 0) + ((((~alo) & lo$1) | ((~(alo ^ lo$1)) & lo$2)) >> 31)) | 0);
+    if ((hi$2 < 0)) {
+      var lo$3 = ((lo - 1) | 0);
+      var hi$3 = ((((hi - 1) | 0) + (((lo | (~lo$3)) >>> 31) | 0)) | 0);
+      return $bL(lo$3, hi$3);
+    } else if (((hi$2 === bhi) ? ((lo$2 >>> 0) >= (blo >>> 0)) : ((hi$2 >>> 0) > (bhi >>> 0)))) {
+      var lo$4 = ((1 + lo) | 0);
+      var hi$4 = ((hi + (((lo & (~lo$4)) >>> 31) | 0)) | 0);
+      return $bL(lo$4, hi$4);
     } else {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return 0;
+      return $bL(lo, hi);
     }
   } else {
-    return $p_RTLong$__unsigned_$div__I__I__I__I__I(this, alo, ahi, blo, bhi);
+    return this.org$scalajs$linker$runtime$RuntimeLong$$unsignedDivModHugeDivisor__I__I__I__I__Z__J(alo, ahi, blo, bhi, true);
   }
 });
-$c_RTLong$.prototype.remainderImpl__I__I__I__I__I = (function(alo, ahi, blo, bhi) {
-  if (((blo | bhi) === 0)) {
-    throw new $c_jl_ArithmeticException("/ by zero");
-  }
-  if ((ahi === (alo >> 31))) {
-    if ((bhi === (blo >> 31))) {
-      var lo = ((alo % $checkIntDivisor(blo)) | 0);
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = (lo >> 31);
-      return lo;
-    } else if (((alo === (-2147483648)) && ((blo === (-2147483648)) && (bhi === 0)))) {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return 0;
+$c_RTLong$.prototype.remainder__I__I__I__I__J = (function(alo, ahi, blo, bhi) {
+  var sign = (ahi >> 31);
+  var xlo = (alo ^ sign);
+  var rlo = ((xlo - sign) | 0);
+  var rhi = (((ahi ^ sign) + (((xlo & (~rlo)) >>> 31) | 0)) | 0);
+  var sign$1 = (bhi >> 31);
+  var xlo$1 = (blo ^ sign$1);
+  var rlo$1 = ((xlo$1 - sign$1) | 0);
+  var rhi$1 = (((bhi ^ sign$1) + (((xlo$1 & (~rlo$1)) >>> 31) | 0)) | 0);
+  var b = ((-2097152) & rlo$1);
+  if (((rhi$1 | b) === 0)) {
+    var k$2 = (((rhi >>> 0) % ($checkIntDivisor(rlo$1) >>> 0)) | 0);
+    var x = (((4.294967296E9 * k$2) + (rlo >>> 0.0)) / rlo$1);
+    var quotLo$2 = (x | 0.0);
+    var remLo = ((rlo - Math.imul(rlo$1, quotLo$2)) | 0);
+    var absR_$_lo = remLo;
+    var absR_$_hi = 0;
+  } else if ((((-1073741824) & rhi$1) === 0)) {
+    var aHat = ((4.294967296E9 * (rhi >>> 0.0)) + (rlo >>> 0.0));
+    var bHat = ((4.294967296E9 * (rhi$1 >>> 0.0)) + (rlo$1 >>> 0.0));
+    var x$1 = (aHat / bHat);
+    var lo = (x$1 | 0.0);
+    var x$2 = (2.3283064365386963E-10 * x$1);
+    var hi = (x$2 | 0.0);
+    var a0 = (65535 & rlo$1);
+    var a1 = ((rlo$1 >>> 16) | 0);
+    var b0 = (65535 & lo);
+    var b1 = ((lo >>> 16) | 0);
+    var a0b0 = Math.imul(a0, b0);
+    var a1b0 = Math.imul(a1, b0);
+    var a0b1 = Math.imul(a0, b1);
+    var lo$1 = ((a0b0 + (((a1b0 + a0b1) | 0) << 16)) | 0);
+    var c1part = ((((a0b0 >>> 16) | 0) + a0b1) | 0);
+    var hi$1 = ((((((((Math.imul(rlo$1, hi) + Math.imul(rhi$1, lo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
+    var lo$2 = ((rlo - lo$1) | 0);
+    var hi$2 = ((((rhi - hi$1) | 0) + ((((~rlo) & lo$1) | ((~(rlo ^ lo$1)) & lo$2)) >> 31)) | 0);
+    if ((hi$2 < 0)) {
+      var lo$3 = ((lo$2 + rlo$1) | 0);
+      var hi$3 = ((((hi$2 + rhi$1) | 0) + ((((lo$2 & rlo$1) | ((lo$2 | rlo$1) & (~lo$3))) >>> 31) | 0)) | 0);
+      var absR_$_lo = lo$3;
+      var absR_$_hi = hi$3;
+    } else if (((hi$2 === rhi$1) ? ((lo$2 >>> 0) >= (rlo$1 >>> 0)) : ((hi$2 >>> 0) > (rhi$1 >>> 0)))) {
+      var lo$4 = ((lo$2 - rlo$1) | 0);
+      var hi$4 = ((((hi$2 - rhi$1) | 0) + ((((~lo$2) & rlo$1) | ((~(lo$2 ^ rlo$1)) & lo$4)) >> 31)) | 0);
+      var absR_$_lo = lo$4;
+      var absR_$_hi = hi$4;
     } else {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = ahi;
-      return alo;
+      var absR_$_lo = lo$2;
+      var absR_$_hi = hi$2;
     }
   } else {
-    var sign = (ahi >> 31);
-    var xlo = (alo ^ sign);
-    var rlo = ((xlo - sign) | 0);
-    var rhi = (((ahi ^ sign) + (((xlo & (~rlo)) >>> 31) | 0)) | 0);
-    var sign$1 = (bhi >> 31);
-    var xlo$1 = (blo ^ sign$1);
-    var rlo$1 = ((xlo$1 - sign$1) | 0);
-    var rhi$1 = (((bhi ^ sign$1) + (((xlo$1 & (~rlo$1)) >>> 31) | 0)) | 0);
-    var absRLo = $p_RTLong$__unsigned_$percent__I__I__I__I__I(this, rlo, rhi, rlo$1, rhi$1);
-    if ((ahi < 0)) {
-      var hi = this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn;
-      var lo$1 = ((-absRLo) | 0);
-      var hi$1 = ((((-hi) | 0) + ((absRLo | lo$1) >> 31)) | 0);
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = hi$1;
-      return lo$1;
-    } else {
-      return absRLo;
-    }
+    var $x_1 = this.org$scalajs$linker$runtime$RuntimeLong$$unsignedDivModHugeDivisor__I__I__I__I__Z__J(rlo, rhi, rlo$1, rhi$1, false);
+    var absR_$_lo = $x_1.l;
+    var absR_$_hi = $x_1.h;
+  }
+  if ((ahi < 0)) {
+    var lo$5 = ((-absR_$_lo) | 0);
+    var hi$5 = ((((-absR_$_hi) | 0) + ((absR_$_lo | lo$5) >> 31)) | 0);
+    return $bL(lo$5, hi$5);
+  } else {
+    return $bL(absR_$_lo, absR_$_hi);
   }
 });
-$c_RTLong$.prototype.remainderUnsignedImpl__I__I__I__I__I = (function(alo, ahi, blo, bhi) {
-  if (((blo | bhi) === 0)) {
-    throw new $c_jl_ArithmeticException("/ by zero");
-  }
-  if ((ahi === 0)) {
-    if ((bhi === 0)) {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = 0;
-      return (((alo >>> 0) % ($checkIntDivisor(blo) >>> 0)) | 0);
+$c_RTLong$.prototype.remainderUnsignedImpl__I__I__I__I__J = (function(alo, ahi, blo, bhi) {
+  var b = ((-2097152) & blo);
+  if (((bhi | b) === 0)) {
+    var k$2 = (((ahi >>> 0) % ($checkIntDivisor(blo) >>> 0)) | 0);
+    var x = (((4.294967296E9 * k$2) + (alo >>> 0.0)) / blo);
+    var quotLo$2 = (x | 0.0);
+    var remLo = ((alo - Math.imul(blo, quotLo$2)) | 0);
+    return $bL(remLo, 0);
+  } else if ((((-1073741824) & bhi) === 0)) {
+    var aHat = ((4.294967296E9 * (ahi >>> 0.0)) + (alo >>> 0.0));
+    var bHat = ((4.294967296E9 * (bhi >>> 0.0)) + (blo >>> 0.0));
+    var x$1 = (aHat / bHat);
+    var lo = (x$1 | 0.0);
+    var x$2 = (2.3283064365386963E-10 * x$1);
+    var hi = (x$2 | 0.0);
+    var a0 = (65535 & blo);
+    var a1 = ((blo >>> 16) | 0);
+    var b0 = (65535 & lo);
+    var b1 = ((lo >>> 16) | 0);
+    var a0b0 = Math.imul(a0, b0);
+    var a1b0 = Math.imul(a1, b0);
+    var a0b1 = Math.imul(a0, b1);
+    var lo$1 = ((a0b0 + (((a1b0 + a0b1) | 0) << 16)) | 0);
+    var c1part = ((((a0b0 >>> 16) | 0) + a0b1) | 0);
+    var hi$1 = ((((((((Math.imul(blo, hi) + Math.imul(bhi, lo)) | 0) + Math.imul(a1, b1)) | 0) + ((c1part >>> 16) | 0)) | 0) + (((((65535 & c1part) + a1b0) | 0) >>> 16) | 0)) | 0);
+    var lo$2 = ((alo - lo$1) | 0);
+    var hi$2 = ((((ahi - hi$1) | 0) + ((((~alo) & lo$1) | ((~(alo ^ lo$1)) & lo$2)) >> 31)) | 0);
+    if ((hi$2 < 0)) {
+      var lo$3 = ((lo$2 + blo) | 0);
+      var hi$3 = ((((hi$2 + bhi) | 0) + ((((lo$2 & blo) | ((lo$2 | blo) & (~lo$3))) >>> 31) | 0)) | 0);
+      return $bL(lo$3, hi$3);
+    } else if (((hi$2 === bhi) ? ((lo$2 >>> 0) >= (blo >>> 0)) : ((hi$2 >>> 0) > (bhi >>> 0)))) {
+      var lo$4 = ((lo$2 - blo) | 0);
+      var hi$4 = ((((hi$2 - bhi) | 0) + ((((~lo$2) & blo) | ((~(lo$2 ^ blo)) & lo$4)) >> 31)) | 0);
+      return $bL(lo$4, hi$4);
     } else {
-      this.RTLong$__f_org$scalajs$linker$runtime$RuntimeLong$$hiReturn = ahi;
-      return alo;
+      return $bL(lo$2, hi$2);
     }
   } else {
-    return $p_RTLong$__unsigned_$percent__I__I__I__I__I(this, alo, ahi, blo, bhi);
+    return this.org$scalajs$linker$runtime$RuntimeLong$$unsignedDivModHugeDivisor__I__I__I__I__Z__J(alo, ahi, blo, bhi, false);
+  }
+});
+$c_RTLong$.prototype.org$scalajs$linker$runtime$RuntimeLong$$unsignedDivModHugeDivisor__I__I__I__I__Z__J = (function(alo, ahi, blo, bhi, askQuotient) {
+  var quot1 = 0;
+  if ((bhi >= 0)) {
+    var lo = (blo << 1);
+    var hi = (((blo >>> 31) | 0) | (bhi << 1));
+    if (((ahi === hi) ? ((alo >>> 0) >= (lo >>> 0)) : ((ahi >>> 0) > (hi >>> 0)))) {
+      quot1 = 2;
+      var lo$1 = ((alo - lo) | 0);
+      var hi$1 = ((((ahi - hi) | 0) + ((((~alo) & lo) | ((~(alo ^ lo)) & lo$1)) >> 31)) | 0);
+      var rem1_$_lo = lo$1;
+      var rem1_$_hi = hi$1;
+    } else {
+      var rem1_$_lo = alo;
+      var rem1_$_hi = ahi;
+    }
+  } else {
+    var rem1_$_lo = alo;
+    var rem1_$_hi = ahi;
+  }
+  var rem1LTUb = ((rem1_$_hi === bhi) ? ((rem1_$_lo >>> 0) < (blo >>> 0)) : ((rem1_$_hi >>> 0) < (bhi >>> 0)));
+  if (askQuotient) {
+    if (rem1LTUb) {
+      var lo$2 = quot1;
+      return $bL(lo$2, 0);
+    } else {
+      var lo$3 = ((1 + quot1) | 0);
+      return $bL(lo$3, 0);
+    }
+  } else if (rem1LTUb) {
+    return $bL(rem1_$_lo, rem1_$_hi);
+  } else {
+    var lo$4 = ((rem1_$_lo - blo) | 0);
+    var hi$2 = ((((rem1_$_hi - bhi) | 0) + ((((~rem1_$_lo) & blo) | ((~(rem1_$_lo ^ blo)) & lo$4)) >> 31)) | 0);
+    return $bL(lo$4, hi$2);
   }
 });
 var $d_RTLong$ = new $TypeData().initClass($c_RTLong$, "org.scalajs.linker.runtime.RuntimeLong$", ({
@@ -1385,9 +1332,6 @@ function $ct_jl_StringBuilder__($thiz) {
 }
 function $ct_jl_StringBuilder__I__($thiz, initialCapacity) {
   $ct_jl_StringBuilder__($thiz);
-  if ((initialCapacity < 0)) {
-    throw new $c_jl_NegativeArraySizeException();
-  }
   return $thiz;
 }
 /** @constructor */
@@ -1462,19 +1406,6 @@ var $d_jl_JSConsoleBasedPrintStream$DummyOutputStream = new $TypeData().initClas
   Ljava_io_Closeable: 1,
   jl_AutoCloseable: 1,
   Ljava_io_Flushable: 1
-}));
-class $c_jl_NegativeArraySizeException extends $c_jl_RuntimeException {
-  constructor() {
-    super();
-    $ct_jl_Throwable__T__jl_Throwable__Z__Z__(this, null, null, true, true);
-  }
-}
-var $d_jl_NegativeArraySizeException = new $TypeData().initClass($c_jl_NegativeArraySizeException, "java.lang.NegativeArraySizeException", ({
-  jl_NegativeArraySizeException: 1,
-  jl_RuntimeException: 1,
-  jl_Exception: 1,
-  jl_Throwable: 1,
-  Ljava_io_Serializable: 1
 }));
 function $f_jl_Short__hashCode__I($thiz) {
   return $thiz;
@@ -1554,14 +1485,11 @@ var $d_jl_Integer = new $TypeData().initClass(0, "java.lang.Integer", ({
   jl_constant_Constable: 1,
   jl_constant_ConstantDesc: 1
 }), ((x) => $isInt(x)));
-function $f_jl_Long__hashCode__I($thiz) {
-  var $x_1 = $thiz.RTLong__f_lo;
-  var hi = $thiz.RTLong__f_hi;
-  return ($x_1 ^ hi);
+function $f_jl_Long__hashCode__I($thiz, $thizhi) {
+  return ($thiz ^ $thizhi);
 }
-function $f_jl_Long__toString__T($thiz) {
-  var this$1 = $m_RTLong$();
-  return this$1.org$scalajs$linker$runtime$RuntimeLong$$toString__I__I__T($thiz.RTLong__f_lo, $thiz.RTLong__f_hi);
+function $f_jl_Long__toString__T($thiz, $thizhi) {
+  return $m_RTLong$().toString__I__I__T($thiz, $thizhi);
 }
 var $d_jl_Long = new $TypeData().initClass(0, "java.lang.Long", ({
   jl_Long: 1,
@@ -1570,7 +1498,7 @@ var $d_jl_Long = new $TypeData().initClass(0, "java.lang.Long", ({
   jl_Comparable: 1,
   jl_constant_Constable: 1,
   jl_constant_ConstantDesc: 1
-}), ((x) => (x instanceof $c_RTLong)));
+}), ((x) => (x instanceof $Long)));
 function $f_T__hashCode__I($thiz) {
   var n = $thiz.length;
   var h = 0;
@@ -1670,7 +1598,7 @@ function $f_sci_StringLike__$times__I__T($thiz, n) {
   var sb = $ct_jl_StringBuilder__I__(new $c_jl_StringBuilder(), Math.imul(s0.length, ci));
   while ((ci > 0)) {
     sb.jl_StringBuilder__f_java$lang$StringBuilder$$content = (("" + sb.jl_StringBuilder__f_java$lang$StringBuilder$$content) + s0);
-    ci = (((-1) + ci) | 0);
+    ci = ((ci - 1) | 0);
   }
   return sb.jl_StringBuilder__f_java$lang$StringBuilder$$content;
 }
@@ -1713,8 +1641,6 @@ var $d_sci_StringOps = new $TypeData().initClass($c_sci_StringOps, "scala.collec
   s_math_Ordered: 1,
   jl_Comparable: 1
 }));
-$L0 = new $c_RTLong(0, 0);
-$d_J.zero = $L0;
 let $e_mdoc_js_run7 = (function(arg) {
   $m_Lmdocjs$().run7__Lorg_scalajs_dom_HTMLElement__V(arg);
 });
