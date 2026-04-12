@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.collection.Seq
 import scala.meta._
 import mdoc.internal.pos.PositionSyntax._
-import mdoc.internal.BuildInfo
 
 /** Helper to map between position between two similar strings. */
 final class TokenEditDistance private (matching: Array[MatchingToken]) {
