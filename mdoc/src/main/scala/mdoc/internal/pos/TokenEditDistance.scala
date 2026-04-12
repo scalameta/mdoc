@@ -72,6 +72,8 @@ final class TokenEditDistance private (matching: Array[MatchingToken]) {
 
 object TokenEditDistance {
 
+  scala.meta.internal.tokenizers.ScalametaTokenizer.register()
+
   implicit val dialect: scala.meta.Dialect = mdoc.internal.markdown.MdocDialect.scala
 
   lazy val empty: TokenEditDistance = new TokenEditDistance(Array.empty)

@@ -2,9 +2,6 @@ package mdoc.internal.cli
 
 import scala.collection.mutable
 import scala.meta.inputs._
-import scala.meta.Dialect
-import scala.meta.tokens.Tokens
-import scala.meta.internal.tokenizers.Compat
 
 // Copied over from scalameta/scalameta
 abstract class InternalInput(input: Input) {
