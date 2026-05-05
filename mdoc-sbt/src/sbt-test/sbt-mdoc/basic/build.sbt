@@ -3,7 +3,7 @@ ThisBuild / crossScalaVersions := {
   val baseVersions = List(
     "2.12.21",
     "2.13.18",
-    "3.3.7"
+    "3.3.8-RC1"
   )
   val javaVersion = sys.props("java.specification.version").toDouble
   if (javaVersion >= 17) baseVersions :+ "3.8.3"
