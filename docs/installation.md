@@ -58,7 +58,7 @@ code fence has been evaluated.
 Install the `sbt-mdoc` plugin and create a `docs` project in build.sbt that
 enables `mdoc.MdocPlugin`.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```scala
 // project/plugins.sbt
@@ -124,7 +124,7 @@ The sbt-mdoc plugin supports the following settings.
 Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
 mdoc outside of a build tool.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```sh
 curl -L -o coursier https://git.io/coursier
@@ -235,7 +235,7 @@ println("```")
 
 Add the following dependency to your build
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
 
 ```scala
 // build.sbt
