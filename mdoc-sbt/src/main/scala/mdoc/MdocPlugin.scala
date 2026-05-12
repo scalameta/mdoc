@@ -38,6 +38,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         "Optional Scala.js classpath and compiler options to use for the mdoc:js modifier. " +
           "To use this setting, set the value to `mdocJS := Some(jsproject)` where `jsproject` must be a Scala.js project."
       )
+    @transient
     val mdocJSLibraries =
       taskKey[Seq[Attributed[File]]](
         "Additional local JavaScript files to load before loading the mdoc compiled Scala.js bundle. " +
@@ -72,6 +73,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
     }
   }
 
+  @transient
   lazy val mdocJSWorkerClasspath = taskKey[Option[Seq[File]]](
     "Optional classpath to use for Mdoc.js worker - " +
       "if not provided, the classpath will be formed by resolving the worker dependency"
