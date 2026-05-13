@@ -19,6 +19,7 @@ object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
   object autoImport {
     val docusaurusProjectName =
       taskKey[String]("The siteConfig.js `projectName` setting value")
+    @transient
     val docusaurusCreateSite =
       taskKey[File]("Create static build of docusaurus site")
     val docusaurusPublishGhpages =
