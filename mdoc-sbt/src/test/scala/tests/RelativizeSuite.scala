@@ -112,8 +112,7 @@ class RelativizeSuite extends FunSuite {
       |""".stripMargin,
     """
       |/index.html
-      |<a href="index.html#header"></a>
-      |<a href="docs/about.html#header"></a>
+      |<a href="index.html#header"></a> <a href="docs/about.html#header"></a>
       |""".stripMargin
   )
 
@@ -142,10 +141,7 @@ class RelativizeSuite extends FunSuite {
       |""".stripMargin,
     """
       |/docs/about.html
-      |<a href="../index.html"></a>
-      |<a href="index.html"></a>
-      |<a href="index.html"></a>
-      |<a href="../users/index.html"></a>
+      |<a href="../index.html"></a> <a href="index.html"></a> <a href="index.html"></a> <a href="../users/index.html"></a>
       |/users/index.html
       |Users
       |""".stripMargin
