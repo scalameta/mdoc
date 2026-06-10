@@ -29,12 +29,21 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$MdocApp$$anonfun$1.apply(basic.md:8)
            |```
     """.stripMargin,
-      Compat.ScalaNext ->
+      Compat.Scala37 ->
         """|```scala
            |val x = 1
            |???
            |// scala.NotImplementedError: an implementation is missing
            |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:383)
+           |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(basic.md:9)
+           |```
+    """.stripMargin,
+      Compat.ScalaNext ->
+        """|```scala
+           |val x = 1
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(basic.md:9)
            |```
     """.stripMargin,
@@ -150,11 +159,19 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$MdocApp$$anonfun$1.apply(relative.md:9)
            |```
     """.stripMargin,
-      Compat.ScalaNext ->
+      Compat.Scala37 ->
         """|```scala
            |???
            |// scala.NotImplementedError: an implementation is missing
            |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:383)
+           |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(relative.md:8)
+           |```
+    """.stripMargin,
+      Compat.ScalaNext ->
+        """|```scala
+           |???
+           |// scala.NotImplementedError: an implementation is missing
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(relative.md:8)
            |```
     """.stripMargin,
@@ -341,12 +358,21 @@ class CrashSuite extends BaseMarkdownSuite {
            |// 	at repl.MdocSession$MdocApp$$anonfun$1.apply(multiple-statements.md:10)
            |// 	at repl.MdocSession$MdocApp$$anonfun$1.apply(multiple-statements.md:8)
            |```""".stripMargin,
-      Compat.ScalaNext ->
+      Compat.Scala37 ->
         """|```scala
            |class Cat { def func = ??? }
            |(new Cat).func
            |// scala.NotImplementedError: an implementation is missing
            |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:383)
+           |//  at repl.MdocSession$MdocApp$Cat$1.func(multiple-statements.md:8)
+           |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(multiple-statements.md:9)
+           |```""".stripMargin,
+      Compat.ScalaNext ->
+        """|```scala
+           |class Cat { def func = ??? }
+           |(new Cat).func
+           |// scala.NotImplementedError: an implementation is missing
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
            |//  at repl.MdocSession$MdocApp$Cat$1.func(multiple-statements.md:8)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(multiple-statements.md:9)
            |```""".stripMargin,

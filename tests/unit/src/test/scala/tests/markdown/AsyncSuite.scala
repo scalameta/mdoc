@@ -83,13 +83,12 @@ class AsyncSuite extends BaseMarkdownSuite {
            |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
            |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
            |java.util.concurrent.TimeoutException: Future timed out after [10 milliseconds]
-           | at scala.concurrent.Future$.timeoutError(Future.scala:580)
-           | at scala.concurrent.impl.Promise$DefaultPromise.tryAwait0(Promise.scala:247)
-           | at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:260)
-           | at scala.concurrent.Await$.result$$anonfun$1(package.scala:209)
-           | at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:63)
-           | at scala.concurrent.package$.blocking(package.scala:126)
-           | at scala.concurrent.Await$.result(package.scala:209)
+           | at scala.concurrent.Future$.timeoutError(Future.scala:612)
+           | at scala.concurrent.impl.Promise$DefaultPromise.tryAwait0(Promise.scala:272)
+           | at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:285)
+           | at scala.concurrent.Await$.result$$anonfun$1(package.scala:216)
+           | at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:67)
+           | at scala.concurrent.Await$.result(package.scala:133)
            | at repl.MdocSession$MdocApp.<clinit>(timeout.md:13)
            | at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin,
@@ -106,6 +105,21 @@ class AsyncSuite extends BaseMarkdownSuite {
            |	at scala.concurrent.Await$.result(package.scala:125)
            |	at repl.MdocSession$MdocApp.<clinit>(timeout.md:13)
            |	at repl.MdocSession$.app(timeout.md:3)
+           |""".stripMargin,
+      Compat.Scala37 ->
+        """|error: timeout.md:4:1: Future timed out after [10 milliseconds]
+           |Await.result(Future(Thread.sleep(1000)), Duration("10ms"))
+           |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           |java.util.concurrent.TimeoutException: Future timed out after [10 milliseconds]
+           | at scala.concurrent.Future$.timeoutError(Future.scala:580)
+           | at scala.concurrent.impl.Promise$DefaultPromise.tryAwait0(Promise.scala:247)
+           | at scala.concurrent.impl.Promise$DefaultPromise.result(Promise.scala:260)
+           | at scala.concurrent.Await$.result$$anonfun$1(package.scala:209)
+           | at scala.concurrent.BlockContext$DefaultBlockContext$.blockOn(BlockContext.scala:63)
+           | at scala.concurrent.package$.blocking(package.scala:126)
+           | at scala.concurrent.Await$.result(package.scala:209)
+           | at repl.MdocSession$MdocApp.<clinit>(timeout.md:13)
+           | at repl.MdocSession$.app(timeout.md:3)
            |""".stripMargin
     )
   )
