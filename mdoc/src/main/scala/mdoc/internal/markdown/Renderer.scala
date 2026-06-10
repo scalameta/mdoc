@@ -163,7 +163,7 @@ object Renderer {
         val endOfLinePosition =
           Position.Range(pos.input, pos.startLine, pos.startColumn, pos.endLine, Int.MaxValue)
         if (!section.mod.isFailOrWarn) {
-          sb.append(endOfLinePosition.text)
+          sb.append(endOfLinePosition.text.stripLineEnd)
         }
         if (statement.out.nonEmpty) {
           sb.append("\n")
