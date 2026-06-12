@@ -461,6 +461,7 @@ lazy val docs = project
     sharedSettings,
     moduleName := "mdoc-docs",
     publish / skip := true,
+    docusaurusVersion := DocusaurusVersion.V1,
     scalaVersion := scala212,
     crossScalaVersions := List(scala212),
     mdocAutoDependency := false,
