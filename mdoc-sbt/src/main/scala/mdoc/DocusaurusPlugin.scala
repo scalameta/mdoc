@@ -19,11 +19,35 @@ object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
   object autoImport {
     val docusaurusProjectName =
       taskKey[String]("The siteConfig.js `projectName` setting value")
+    val docusaurusVersion =
+      settingKey[DocusaurusVersion](
+        "The Docusaurus version used in your project. Docusaurus build and publish commands differ between versions"
+      )
     @transient
     val docusaurusCreateSite =
       taskKey[File]("Create static build of docusaurus site")
+    @transient
     val docusaurusPublishGhpages =
       taskKey[Unit]("Publish docusaurus site to GitHub pages")
+
+    sealed trait DocusaurusVersion {
+      def buildArgs: List[String]
+      def publishArgs: List[String]
+      def createRootRedirect: Boolean
+    }
+    object DocusaurusVersion {
+      case object V1 extends DocusaurusVersion {
+        val buildArgs: List[String] = List("run", "build")
+        val publishArgs: List[String] = List("publish-gh-pages")
+        val createRootRedirect: Boolean = true
+      }
+      case object V3 extends DocusaurusVersion {
+        val buildArgs: List[String] = List("build")
+        val publishArgs: List[String] = List("deploy")
+        val createRootRedirect: Boolean = false
+      }
+    }
+
   }
   import autoImport._
   def website: Def.Initialize[File] =
@@ -54,65 +78,67 @@ object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
           .getOrElse("docusaurus@scalameta.org")
       }
     )
-  def installSsh: String =
-    """|#!/usr/bin/env bash
-       |
-       |set -eu
-       |DEPLOY_KEY=${GIT_DEPLOY_KEY:-${GITHUB_DEPLOY_KEY:-}}
-       |set-up-ssh() {
-       |  echo "Setting up ssh..."
-       |  mkdir -p $HOME/.ssh
-       |  ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-       |  git config --global user.name "Docusaurus bot"
-       |  git config --global user.email "${MDOC_EMAIL:-mdoc@docusaurus}"
-       |  git config --global push.default simple
-       |  DEPLOY_KEY_FILE=$HOME/.ssh/id_rsa
-       |  echo "$DEPLOY_KEY" | base64 --decode > ${DEPLOY_KEY_FILE}
-       |  chmod 600 ${DEPLOY_KEY_FILE}
-       |  eval "$(ssh-agent -s)"
-       |  ssh-add ${DEPLOY_KEY_FILE}
-       |}
-       |
-       |if [[ -n "${DEPLOY_KEY:-}" ]]; then
-       |  set-up-ssh
-       |else
-       |  echo "No deploy key found. Attempting to auth with ssh key saved in ssh-agent. To use a deploy key instead, set the GIT_DEPLOY_KEY environment variable."
-       |fi
-       |
-       |yarn install
-       |USE_SSH=true yarn publish-gh-pages
-    """.stripMargin
+  def installSsh(publishArgs: List[String]): String = {
+    val publishCommand = ("yarn" :: publishArgs).mkString(" ")
+    s"""|#!/usr/bin/env bash
+        |
+        |set -eu
+        |DEPLOY_KEY=$${GIT_DEPLOY_KEY:-$${GITHUB_DEPLOY_KEY:-}}
+        |set-up-ssh() {
+        |  echo "Setting up ssh..."
+        |  mkdir -p $$HOME/.ssh
+        |  ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+        |  git config --global user.name "Docusaurus bot"
+        |  git config --global user.email "$${MDOC_EMAIL:-mdoc@docusaurus}"
+        |  git config --global push.default simple
+        |  DEPLOY_KEY_FILE=$$HOME/.ssh/id_rsa
+        |  echo "$$DEPLOY_KEY" | base64 --decode > $${DEPLOY_KEY_FILE}
+        |  chmod 600 $${DEPLOY_KEY_FILE}
+        |  eval "$$(ssh-agent -s)"
+        |  ssh-add $${DEPLOY_KEY_FILE}
+        |}
+        |
+        |if [[ -n "$${DEPLOY_KEY:-}" ]]; then
+        |  set-up-ssh
+        |else
+        |  echo "No deploy key found. Attempting to auth with ssh key saved in ssh-agent. To use a deploy key instead, set the GIT_DEPLOY_KEY environment variable."
+        |fi
+        |
+        |yarn install
+        |USE_SSH=true $publishCommand
+     """.stripMargin
+  }
 
-  def installSshWindows: String =
-    """|@echo off
-       |call yarn install
-       |set USE_SSH=true
-       |call yarn publish-gh-pages
-    """.stripMargin
-
-  lazy val yarnBin =
-    if (scala.util.Properties.isWin) "yarn.cmd"
-    else "yarn"
+  def installSshWindows(publishArgs: List[String]): String = {
+    val publishCommand = ("yarn" :: publishArgs).mkString(" ")
+    s"""|@echo off
+        |call yarn install
+        |set USE_SSH=true
+        |call $publishCommand
+     """.stripMargin
+  }
 
   override def projectSettings: Seq[Def.Setting[_]] =
     List(
       (docusaurusPublishGhpages / aggregate) := false,
       (docusaurusCreateSite / aggregate) := false,
       docusaurusProjectName := moduleName.value.stripSuffix("-docs"),
+      docusaurusVersion := DocusaurusVersion.V3,
       MdocPlugin.mdocInternalVariables ++= List(
         "js-out-prefix" -> "assets"
       ),
       docusaurusPublishGhpages := {
         m.mdoc.toTask(" ").value
+        val version = docusaurusVersion.value
 
         val tmp =
           if (scala.util.Properties.isWin) {
             val tmp = Files.createTempFile("docusaurus", "install_ssh.bat")
-            Files.write(tmp, installSshWindows.getBytes())
+            Files.write(tmp, installSshWindows(version.publishArgs).getBytes())
             tmp
           } else {
             val tmp = Files.createTempFile("docusaurus", "install_ssh.sh")
-            Files.write(tmp, installSsh.getBytes())
+            Files.write(tmp, installSsh(version.publishArgs).getBytes())
             tmp
           }
 
@@ -126,12 +152,15 @@ object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
       },
       docusaurusCreateSite := {
         (Compile / m.mdoc).toTask(" ").value
-        Process(List(yarnBin, "install"), cwd = website.value).execute()
-        Process(List(yarnBin, "run", "build"), cwd = website.value).execute()
-        val redirectUrl = docusaurusProjectName.value + "/index.html"
-        val html = redirectHtml(redirectUrl)
+        val version = docusaurusVersion.value
+        Process(List("yarn", "install"), cwd = website.value).execute()
+        Process("yarn" :: version.buildArgs, cwd = website.value).execute()
         val out = website.value / "build"
-        IO.write(out / "index.html", html)
+        val redirectUrl = docusaurusProjectName.value + "/index.html"
+        if (version.createRootRedirect) {
+          val html = redirectHtml(redirectUrl)
+          IO.write(out / "index.html", html)
+        }
         out
       },
       cleanFiles := {

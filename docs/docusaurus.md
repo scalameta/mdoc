@@ -18,6 +18,7 @@ Docusaurus:
 
 ## Requirements
 
+- [`node`](https://nodejs.org)
 - [`yarn`](https://yarnpkg.com/en/): to run docusaurus.
 
 ## Installation
@@ -25,13 +26,14 @@ Docusaurus:
 First, install the sbt-mdoc plugin using the normal
 [mdoc installation instructions](installation.md#sbt).
 
-Next, enable the `mdoc.DocusaurusPlugin` in addition to the `mdoc.MdocPlugin`
-and define the `moduleName` setting to have your project name suffixed with
+Next, enable the `mdoc.DocusaurusPlugin` in addition to the `mdoc.MdocPlugin`,
+define the `moduleName` setting to have your project name suffixed with
 `-docs`.
 
 ```diff
  // build.sbt
  lazy val docs = project
++  .in(file("myproject-docs"))
    .settings(
 +    moduleName := "myproject-docs",
    )
@@ -40,30 +42,58 @@ and define the `moduleName` setting to have your project name suffixed with
    .dependsOn(myproject)
 ```
 
-Next, setup a normal Docusaurus site following the
-[Docusaurus installation instructions](https://docusaurus.io/).
+Next, set up a normal Docusaurus site with
 
-Once you have a Docusaurus site setup, update `siteConfig.js` to point
-`customDocsPath` to the `mdocOut` directory with the generated mdoc output.
+`npx create-docusaurus@latest website classic --package-manager yarn --javascript`
+
+This will create the Docusaurus site under the `website` directory.
+You can refer to [Docusaurus installation instructions](https://docusaurus.io/docs/installation) in case the above command fails.
+
+In `docusaurus.config.js`, update Docusaurus' docs path to point to mdoc's
+output directory. You can confirm the exact output directory with
+`show docs / mdocOut`.
 
 ```diff
-+ customDocsPath: "myproject-docs/target/mdoc",
++ const config = {
++   ...
++   presets: [
++     [
++       'classic',
++       {
++         docs: {
++           path: '../myproject-docs/target/mdoc',
++   ...
+}
 ```
+
+## Working on docs
+
+To work on the docs with a development server running locally:
+
+1. Start the Docusaurus development server
+
+`cd website && yarn start`
+
+2. Run mdoc in watch mode
+
+`sbt "docs/mdoc --watch"`
+
+As you edit your markdown files in `docs` folder, you should see mdoc rebuild
+ and Docusaurus will then reflect the change in the website
 
 ## Create static site
 
-Generate a static website with `docs/docusaurusCreateSite`. This task runs
+Generate a static website with `docs / docusaurusCreateSite`. This task runs
 several steps:
 
-- `sbt docs/mdoc`
-- `cd website && yarn install && yarn run build`
-- creates `website/build/index.html` that redirects to `/myproject/`
+- `sbt "docs / mdoc"`
+- Docusaurus: `cd website && yarn install && yarn build`
 - relativizes all links in the generated html so that it can be hosted on
   http://static.javadoc.io/
 
 The static website gets generated in the `website/build` directory. You can copy
 these files over to any static HTTP server to host your website. A simple
-`sbt docs/clean` will delete the previous folder since the `DocusaurusPlugin`
+`sbt "docs / clean"` will delete the previous folder since the `DocusaurusPlugin`
 will also bind it to the standard SBT `clean` task.
 
 ## Publish to GitHub pages locally
@@ -76,11 +106,11 @@ to include the following information:
 +  organizationName: "scalameta",
 ```
 
-Next, run `docs/docusaurusPublishGhpages` to publish the website to GitHub
+Next, run `docs / docusaurusPublishGhpages` to publish the website to GitHub
 pages. This task run several steps:
 
-- `sbt docs/mdoc`
-- `cd website && yarn install && USE_SSH=true yarn publish-gh-pages`
+- `sbt "docs / mdoc"`
+- Docusaurus: `cd website && yarn install && USE_SSH=true yarn deploy`
 
 ## Publish to GitHub pages from CI
 
@@ -154,7 +184,7 @@ Add the following values:
 > Skip this part if you are not using GitHub Actions.
 
 Next, create a new file at `.github/workflows/mdoc.yml` to trigger
-`docs/docusaurusPublishGhpages` on successful merge into main and on tag push.
+`docs / docusaurusPublishGhpages` on successful merge into main and on tag push.
 
 ```scala mdoc:file:.github/workflows/mdoc.yml
 
@@ -167,7 +197,7 @@ project and watch GitHub Actions release the docs 😎
 
 > Skip this part if you are not using Travis CI
 
-Next, update .travis.yml to trigger `docs/docusaurusPublishGhpages` on
+Next, update .travis.yml to trigger `docs / docusaurusPublishGhpages` on
 successful merge into main and on tag push. There are many ways to do this,
 but I recommend using Travis
 ["build stages"](https://docs.travis-ci.com/user/build-stages/). It's not
@@ -182,7 +212,7 @@ stages:
     if: (branch = main AND type = push) OR (tag IS present)
 ```
 
-Next, define your build matrix with `docs/docusaurusPublishGhpages` at the end
+Next, define your build matrix with `docs / docusaurusPublishGhpages` at the end
 
 ```yml
 jobs:
@@ -192,7 +222,7 @@ jobs:
       script: sbt test
     # release runs only if the previous stages passed
     - stage: release
-      script: sbt docs/docusaurusPublishGhpages
+      script: sbt "docs / docusaurusPublishGhpages"
 ```
 
 For a complete example of the Travis configuration, see the
@@ -228,7 +258,7 @@ Make sure that you've added the
 [sbt-unidoc](https://github.com/sbt/sbt-unidoc#how-to-add-this-plugin)
 dependency to `project/plugins.sbt`.
 
-Now the `docs/docusaurusCreateSite` command will generate Scaladocs in the
+Now the `docs / docusaurusCreateSite` command will generate Scaladocs in the
 `website/static/api` directory, which you'll probably want to add to your
 `.gitignore`:
 
