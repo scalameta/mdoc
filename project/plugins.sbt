@@ -16,7 +16,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % crossProjectV)
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % crossProjectV)
 
 libraryDependencies ++= List(
-  "org.jsoup" % "jsoup" % "1.12.2",
+  "org.jsoup" % "jsoup" % "1.22.2",
   "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 )
 Compile / unmanagedSourceDirectories ++= {
