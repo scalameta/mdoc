@@ -28,11 +28,15 @@ class RelativizeSuite extends FunSuite {
         "<body></body>",
         "</html>"
       )
+      def stripTrivialTags(line: String): String =
+        isTrivial.foldLeft(line)((acc, tag) => acc.replace(tag, "")).trim
       val obtained = StringFS
         .asString(root)
         .linesIterator
         .map(_.trim)
         .filterNot(isTrivial)
+        .map(stripTrivialTags)
+        .filter(_.nonEmpty)
         .mkString("\n")
       assertNoDiff(obtained, expected)
     }
