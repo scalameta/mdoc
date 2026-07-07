@@ -132,7 +132,7 @@ lazy val sharedJavaSettings = List(
 val V = new {
   val scalameta = "4.17.1"
 
-  val munit = "1.3.2"
+  val munit = "1.3.3"
 
   val scalacheck = "1.19.0"
 
