@@ -125,8 +125,9 @@ interesting, read ahead.
 
 ### Deploy key
 
-Open the "Deploy key" menu in your project settings:
-https://github.com/scalameta/mdoc/settings/keys. Press "Add deploy key".
+Open the "Deploy key" menu in your project settings
+(`https://github.com/OWNER/REPO/settings/keys`, replacing `OWNER`/`REPO`
+with your repository). Press "Add deploy key".
 
 - `Title`: use "Docusaurus Travis".
 - `Allow write access`: check the box, this is requires since we want to write
