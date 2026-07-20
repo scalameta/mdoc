@@ -160,11 +160,14 @@ Your screen should look like this
 
 ### Environment variables
 
-Next open the secrets settings for your CI provider. The URL for the mdoc repo
-looks like this:
+Next open the secrets settings for your CI provider. Use your own repository
+(replace `OWNER` and `REPO`):
 
-- GitHub Actions: https://github.com/scalameta/mdoc/settings/secrets
-- Travis CI: https://travis-ci.org/scalameta/mdoc/settings
+- GitHub Actions: `https://github.com/OWNER/REPO/settings/secrets/actions`
+- Travis CI: `https://travis-ci.org/OWNER/REPO/settings`
+
+For GitHub Actions you can also open **Settings → Secrets and variables → Actions**
+in your repository.
 
 Add the following values:
 
