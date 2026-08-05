@@ -15,7 +15,7 @@ def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
 def scalajsBinaryVersion = "1"
-def scalajsDom = "2.0.0"
+def scalajsDom = "2.0.5"
 
 def isCI = System.getenv("CI") != null
 
