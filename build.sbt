@@ -10,9 +10,35 @@ addCommandAlias(
 def scala212 = "2.12.21"
 def scala213 = "2.13.18"
 def scala3 = "3.3.8"
+def scala3Next = "3.8.4"
 def scala3ForSbt = "3.7.3"
 def scala2Versions = List(scala212, scala213)
+
+/** Binary-published modules (parser, cli, js-worker) use one latest version per ABI. */
 def allScalaVersions = scala2Versions :+ scala3
+
+/** Last mdoc release published with binary Scala suffixes (`_2.12`, `_2.13`, `_3`). sbt-mdoc uses
+  * this for Scala versions that are no longer in `fullScalaVersions`. Do not bump this when cutting
+  * new releases.
+  *
+  * When dropping a version from `fullScalaVersions`, add a full-suffix fallback in the plugin (last
+  * mdoc that published that `_$scalaVersion` artifact) rather than sending users back to this
+  * binary release.
+  */
+def lastBinaryMdocVersion = "2.8.2"
+
+def scala212Versions = List("2.12.18", "2.12.19", "2.12.20", scala212)
+def scala213Versions = List("2.13.15", "2.13.16", "2.13.17", scala213)
+def scala3LtsVersions = List("3.3.5", "3.3.6", "3.3.7", scala3)
+def scala3NextVersions = List("3.8.1", "3.8.2", "3.8.3", scala3Next)
+
+/** Compiler-dependent modules are published with `CrossVersion.full`. */
+def fullScalaVersions =
+  scala212Versions ++ scala213Versions ++ scala3LtsVersions ++ scala3NextVersions
+
+/** Scala versions used by scripted tests; must be a subset of `fullScalaVersions`. */
+def scriptedScalaVersions =
+  List(scala212, scala213, scala3, scala3Next, "2.12.18", "2.13.15", "3.3.6").distinct
 
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
@@ -81,6 +107,7 @@ inThisBuild(
       }
       dynverGitDescribeOutput.value.mkVersion(dynVer, curVersion)
     },
+    allowUnsafeScalaLibUpgrade := true,
     scalaVersion := scala213,
     crossScalaVersions := allScalaVersions,
     organization := "org.scalameta",
@@ -175,6 +202,8 @@ lazy val runtime = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
+    crossVersion := CrossVersion.full,
+    crossScalaVersions := fullScalaVersions,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("runtime").value,
     libraryDependencies ++= crossSetting(
       scalaVersion.value,
@@ -229,6 +258,8 @@ lazy val mdoc = project
     sharedSettings,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("mdoc").value,
     moduleName := "mdoc",
+    crossVersion := CrossVersion.full,
+    crossScalaVersions := fullScalaVersions,
     Compile / mainClass := Some("mdoc.Main"),
     run / fork := true,
     buildInfoPackage := "mdoc.internal",
@@ -332,6 +363,7 @@ lazy val unit = project
   .settings(
     sharedSettings,
     publish / skip := true,
+    mdocAutoDependency := false,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit").value,
     libraryDependencies ++= {
       if (isScala3.value) List()
@@ -360,6 +392,7 @@ lazy val unitJS = project
   .settings(
     sharedSettings,
     publish / skip := true,
+    mdocAutoDependency := false,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies += depMunit % Test,
     buildInfoPackage := "tests.js",
@@ -404,6 +437,8 @@ lazy val plugin = project
       val props = new java.util.Properties()
       props.put("version", version.value)
       props.put("scalaJSVersion", scalaJSVersion)
+      props.put("lastBinaryMdocVersion", lastBinaryMdocVersion)
+      props.put("supportedScalaVersions", fullScalaVersions.mkString(","))
       IO.write(props, "sbt-mdoc properties", out)
       List(out)
     },
@@ -412,7 +447,7 @@ lazy val plugin = project
         .dependsOn(
           (interfaces / publishLocal)
             .dependsOn(jsApi / publishLocal)
-            .dependsOn(localCrossPublish(List(scala212, scala213, scala3)))
+            .dependsOn(localCrossPublish(scriptedScalaVersions))
         )
         .value
     },
@@ -450,6 +485,8 @@ lazy val js = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-js",
+    crossVersion := CrossVersion.full,
+    crossScalaVersions := fullScalaVersions,
     libraryDependencies ++= jsoniter,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("js").value
   )
@@ -492,6 +529,8 @@ lazy val docs = project
         "VERSION" -> stableVersion,
         "SCALA_BINARY_VERSION" -> scalaBinaryVersion.value,
         "SCALA_VERSION" -> scalaVersion.value,
+        "SUPPORTED_SCALA_VERSIONS" -> fullScalaVersions.mkString(", "),
+        "LAST_BINARY_MDOC_VERSION" -> lastBinaryMdocVersion,
         "SCALAJS_VERSION" -> scalaJSVersion,
         "SCALAJS_BINARY_VERSION" -> scalajsBinaryVersion,
         "SCALAJS_DOM_VERSION" -> scalajsDom

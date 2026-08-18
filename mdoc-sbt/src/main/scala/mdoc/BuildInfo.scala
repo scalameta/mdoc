@@ -9,6 +9,18 @@ object BuildInfo {
   def scalaJSVersion: String =
     props.getProperty("scalaJSVersion", "1.16.0")
 
+  def lastBinaryMdocVersion: String =
+    props.getProperty("lastBinaryMdocVersion", "2.8.2")
+
+  def supportedScalaVersions: Set[String] =
+    props
+      .getProperty("supportedScalaVersions", "")
+      .split(',')
+      .iterator
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .toSet
+
   private lazy val props: Properties = {
     val props = new Properties()
     val path = "sbt-mdoc.properties"

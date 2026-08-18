@@ -58,7 +58,7 @@ code fence has been evaluated.
 Install the `sbt-mdoc` plugin and create a `docs` project in build.sbt that
 enables `mdoc.MdocPlugin`.
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_VERSION@)
 
 ```scala
 // project/plugins.sbt
@@ -71,6 +71,10 @@ lazy val docs = project       // new documentation project
   .dependsOn(myproject)
   .enablePlugins(MdocPlugin)
 ```
+
+sbt-mdoc depends on an mdoc artifact compiled for your exact Scala version
+(`@SUPPORTED_SCALA_VERSIONS@`). If you use an older compiler, the plugin falls
+back to mdoc `@LAST_BINARY_MDOC_VERSION@`.
 
 Next, from the sbt shell, run the `docs/mdoc` task to generate the documentation
 site. By default, the `mdoc` task looks for markdown sources in the toplevel
@@ -124,12 +128,12 @@ The sbt-mdoc plugin supports the following settings.
 Use [coursier](https://github.com/coursier/coursier/#command-line) to launch
 mdoc outside of a build tool.
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_VERSION@)
 
 ```sh
 curl -L -o coursier https://git.io/coursier
 chmod +x coursier
-coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- --site.VERSION 1.0.0
+coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- --site.VERSION 1.0.0
 info: Compiling 1 file to website/target/docs
 info: Compiled in 1.2s (0 errors)
 ```
@@ -140,7 +144,7 @@ Use the `--classpath` argument to change the classpath used for compilation:
 
 ```diff
  coursier launch \
-   org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+   org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --classpath $(coursier fetch -p org.typelevel:cats-core_@SCALA_BINARY_VERSION@:1.5.0)
 ```
 
@@ -150,7 +154,7 @@ By default the `docs/` directory is processed as input. Use `--in` to customize
 the input directory where markdown sources are contained,
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --in mydocs
 ```
 
@@ -160,7 +164,7 @@ The `--in` flag doesn't have to be a directory, it also supports individual
 files.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --in mydocs/readme.md
 ```
 
@@ -170,7 +174,7 @@ Use `--site.VARIABLE=value` to add site variables that can be referenced from
 markdown as `@@VARIABLE@`.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --site.SCALA_VERSION @SCALA_VERSION@
 ```
 
@@ -180,7 +184,7 @@ Use `--out` to customize where your markdown sources are generated, by default
 the `out/` directory is used.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --out target/docs
 ```
 
@@ -190,7 +194,7 @@ The `--out` flag doesn't have to be a directory when the `--in` argument is a
 regular file, it can also be an individual file.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --in readme.template.md \
 +  --out readme.md
 ```
@@ -201,7 +205,7 @@ Repeat the `--in` and `--out` arguments to process multiple directories and
 regular files.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --in readme.template.md \
 +  --out readme.md \
 +  --in changelog.template.md \
@@ -217,7 +221,7 @@ Use `--watch` to start the file watcher with livereload. It's recommended to use
 performance.
 
 ```diff
- coursier launch org.scalameta:mdoc_@SCALA_BINARY_VERSION@:@VERSION@ -- \
+ coursier launch org.scalameta:mdoc_@SCALA_VERSION@:@VERSION@ -- \
 +  --watch
 ```
 
@@ -235,12 +239,12 @@ println("```")
 
 Add the following dependency to your build
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_BINARY_VERSION@)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scalameta/mdoc_@SCALA_VERSION@)](https://central.sonatype.com/artifact/org.scalameta/mdoc_@SCALA_VERSION@)
 
 ```scala
 // build.sbt
-scalaVersion := "@SCALA_VERSION@" // Any version in @SCALA_BINARY_VERSION@.x works.
-libraryDependencies += "org.scalameta" %% "mdoc" % "@VERSION@"
+scalaVersion := "@SCALA_VERSION@"
+libraryDependencies += "org.scalameta" %% "mdoc" % "@VERSION@" cross CrossVersion.full
 ```
 
 Then write a main function that invokes mdoc as a library
@@ -279,7 +283,7 @@ lazy val docs = project
 
 Consult the mdoc source to learn more how to use the library API. Scaladocs are
 available
-[here](https://www.javadoc.io/doc/org.scalameta/mdoc_@SCALA_BINARY_VERSION@/@VERSION@)
+[here](https://www.javadoc.io/doc/org.scalameta/mdoc_@SCALA_VERSION@/@VERSION@)
 but beware there are limited docstrings for classes and methods. Keep in mind
 that code in the package `mdoc.internal` is subject to binary and source
 breaking changes between any release, including PATCH versions.

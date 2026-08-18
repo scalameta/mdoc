@@ -112,7 +112,24 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         val isJS = mdocJS.value.isDefined
         if (mdocAutoDependency.value) {
           val suffix = if (isJS) "-js" else ""
-          List("org.scalameta" %% s"mdoc$suffix" % BuildInfo.version)
+          val scalaV = scalaVersion.value
+          val supported = BuildInfo.supportedScalaVersions
+          if (supported.nonEmpty && !supported.contains(scalaV)) {
+            sLog.value.warn(
+              s"Scala $scalaV is not among the Scala versions mdoc ${BuildInfo.version} publishes " +
+                s"(${supported.toSeq.sorted.mkString(", ")}). " +
+                s"Falling back to mdoc ${BuildInfo.lastBinaryMdocVersion}, which may not work with this compiler."
+            )
+          }
+          List(
+            MdocVersion.module(
+              s"mdoc$suffix",
+              scalaV,
+              BuildInfo.version,
+              BuildInfo.lastBinaryMdocVersion,
+              supported
+            )
+          )
         } else {
           List()
         }
@@ -145,9 +162,14 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         }
 
         val binaryVersion = scalaBinaryVersion.value
-        val log = streams.value.log
         val libraries = mdocJSLibraries.value.map(_.data)
         val workerClasspathOverride = mdocJSWorkerClasspath.value
+        val mdocArtifactVersion = MdocVersion.artifactVersion(
+          scalaVersion.value,
+          BuildInfo.version,
+          BuildInfo.lastBinaryMdocVersion,
+          BuildInfo.supportedScalaVersions
+        )
 
         mdocJSCompileOptions.value.foreach { options =>
           val userSJSVersion = detectScalaJSVersion
@@ -173,8 +195,8 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
           }
 
           val mdocJSDependency = binaryVersion match {
-            case "3" => "org.scalameta" % "mdoc-js-worker_3" % BuildInfo.version
-            case other => "org.scalameta" % s"mdoc-js-worker_$other" % BuildInfo.version
+            case "3" => "org.scalameta" % "mdoc-js-worker_3" % mdocArtifactVersion
+            case other => "org.scalameta" % s"mdoc-js-worker_$other" % mdocArtifactVersion
           }
 
           val workerClasspath = workerClasspathOverride.getOrElse(getJars(mdocJSDependency))
