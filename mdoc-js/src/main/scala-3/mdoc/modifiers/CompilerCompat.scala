@@ -1,6 +1,6 @@
 package mdoc.modifiers
 
-import dotty.tools.io.{AbstractFile, VirtualDirectory}
+import dotty.tools.io.{AbstractFile, VirtualDirectory, VirtualDirectoryCompat}
 
 import mdoc.internal.markdown.MarkdownCompiler
 import scala.meta.inputs.Input
@@ -9,5 +9,5 @@ import mdoc.internal.pos.TokenEditDistance
 import mdoc.internal.markdown.FileImport
 
 private[modifiers] object CompilerCompat {
-  def abstractFile(tg: String) = new VirtualDirectory(tg, None)
+  def abstractFile(tg: String) = VirtualDirectoryCompat.virtualDirectory(tg)
 }

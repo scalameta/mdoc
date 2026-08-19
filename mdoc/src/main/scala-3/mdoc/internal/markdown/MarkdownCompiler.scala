@@ -39,7 +39,7 @@ import dotty.tools.dotc.interfaces.{Diagnostic => IDiagnostic}
 import dotty.tools.dotc.reporting._
 import dotty.tools.dotc.parsing.Parsers.Parser
 import dotty.tools.dotc.Compiler
-import dotty.tools.io.{AbstractFile, VirtualDirectory}
+import dotty.tools.io.{AbstractFile, VirtualDirectory, VirtualDirectoryCompat}
 import dotty.tools.dotc.util.SourceFile
 
 import scala.annotation.implicitNotFound
@@ -64,7 +64,7 @@ class MarkdownDriver(val settings: List[String]) extends Driver {
 class MarkdownCompiler(
     classpath: String,
     val scalacOptions: List[String],
-    target: AbstractFile = new VirtualDirectory("(memory)")
+    target: AbstractFile = VirtualDirectoryCompat.virtualDirectory("(memory)")
 ) {
 
   private val defaultFlags =
@@ -119,11 +119,6 @@ class MarkdownCompiler(
     this.getClass.getClassLoader
   )
 
-  private def clearTarget(): Unit = target match {
-    case vdir: VirtualDirectory => vdir.clear()
-    case _ =>
-  }
-
   private def toSource(input: Input): SourceFile = {
     SourceFile.virtual(input.filename, new String(input.chars))
   }
@@ -142,7 +137,6 @@ class MarkdownCompiler(
       fileImports: List[FileImport]
   ): Unit = {
     reset()
-    clearTarget()
     val compiler = new Compiler
     val run = compiler.newRun(using context)
     val inputs = List(input)

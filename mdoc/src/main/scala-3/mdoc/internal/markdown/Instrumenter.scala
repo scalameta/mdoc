@@ -198,7 +198,7 @@ object Instrumenter {
     def unapply(tree: Tree): Option[List[Name]] =
       tree match {
         case t: Defn.Val if t.mods.exists(_.isInstanceOf[Lazy]) => Some(Nil)
-        case t: Tree.WithPats with Defn => Some(t.pats.flatMap(binders))
+        case t: (Tree.WithPats & Defn) => Some(t.pats.flatMap(binders))
         case _: Defn => Some(Nil)
         case _: Import => Some(Nil)
         case _ => None
