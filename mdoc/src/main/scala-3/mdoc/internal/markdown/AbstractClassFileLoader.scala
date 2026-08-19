@@ -19,16 +19,39 @@ import java.util.Collections
 
 class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
     extends ClassLoader(parent):
-  private def findAbstractFile(name: String) =
-    root.lookupPath(name.split('/').toIndexedSeq, directory = false)
+
+  /** Splits the given path using the given separator char, and finds the corresponding file through
+    * subdirectories. Optionally adds the given suffix to the last component. This is intended to
+    * make it easy to find files in formats such as "java/lang/Object" or "java.lang.Object".
+    */
+  final def lookupPath(
+      path: String,
+      separator: Char,
+      lastSuffix: String = "",
+      directory: Boolean = false
+  ): Option[AbstractFile] =
+    var file: AbstractFile = root
+    var idx = 0
+    var nextStepIdx = -1
+    while
+      nextStepIdx = path.indexOf(separator, idx)
+      nextStepIdx != -1
+    do
+      file.lookupName(path.substring(idx, nextStepIdx), directory = true) match
+        case null => return None
+        case f =>
+          file = f
+          idx = nextStepIdx + 1
+    Option(file.lookupName(path.substring(idx) + lastSuffix, directory = directory))
+  end lookupPath
 
   // on JDK 20 the URL constructor we're using is deprecated,
   // but the recommended replacement, URL.of, doesn't exist on JDK 8
   @annotation.nowarn("cat=deprecation")
   override protected def findResource(name: String): URL | Null =
-    findAbstractFile(name) match
-      case null => null
-      case file => new URL(
+    lookupPath(name, '/') match
+      case None => null
+      case Some(file) => new URL(
           null,
           s"memory:${file.path}",
           new URLStreamHandler {

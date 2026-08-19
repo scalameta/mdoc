@@ -157,7 +157,7 @@ class JsModifier extends mdoc.PreModifier {
 
     val hasErrors = ctx.reporter.errorCount > oldErrors
 
-    val sjsirFiles = target.toList
+    val sjsirFiles = target.iterator
       .filter(_.name.endsWith(".sjsir"))
       .map(file => scalajsApi.get.inMemory(file.path, file.toByteArray))
 
