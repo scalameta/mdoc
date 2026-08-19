@@ -1,0 +1,50 @@
+name: Publish Scala version
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Mdoc version (e.g., 1.2.3)"
+        required: true
+      branch:
+        description: "Branch or tag to release from (e.g., v1.6.3)"
+        required: true
+      scala:
+        description: "Scala version (e.g., 2.13.17)"
+        required: false
+
+concurrency:
+  group: publish-scala
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.scala-version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.branch }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - uses: olafurpg/setup-gpg@v3
+      - name: Publish ${{ github.event.inputs.project }} to Sonatype
+        run: sbt "set ThisBuild/version := \"${{ github.event.inputs.version }}\" ; set ThisBuild/isSnapshot := false; ++${{github.event.inputs.scala}}!; ci-release"
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          CI_COMMIT_TAG: v${{ github.event.inputs.version }}
+          CI_RELEASE: runtime/publishSigned; mdoc/publishSigned; js/publishSigned
+          CI_SNAPSHOT_RELEASE: publishFullScala ${{ inputs.scala-version }}
+      - name: Check git diff
+        if: ${{ failure() }}
+        run: git diff
