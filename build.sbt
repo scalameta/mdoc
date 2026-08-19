@@ -301,13 +301,9 @@ val jsdocs = project
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
     depJsDom,
-    scalaJSUseMainModuleInitializer := true,
-    Compile / npmDependencies ++= List(
-      "ms" -> "2.1.1"
-    ),
-    webpackBundlingMode := BundlingMode.LibraryOnly()
+    scalaJSUseMainModuleInitializer := true
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
 
 val jswebsitedocs = project
   .in(file("tests/websiteJs"))
