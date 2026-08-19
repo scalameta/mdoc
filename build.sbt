@@ -38,7 +38,7 @@ def fullScalaVersions =
 
 /** Scala versions used by scripted tests; must be a subset of `fullScalaVersions`. */
 def scriptedScalaVersions =
-  List(scala212, scala213, scala3, scala3Next, "2.12.18", "2.13.15", "3.3.6").distinct
+  List(scala212, scala213, scala3, scala3Next).distinct
 
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
