@@ -4,6 +4,7 @@ import java.io.File
 import sbt.Keys._
 import sbt.{_, given}
 import scala.collection.mutable.ListBuffer
+import xsbti.FileConverter
 import xsbti.VirtualFileRef
 
 object MdocPlugin extends AutoPlugin with MdocPluginCompat {
@@ -197,17 +198,9 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         }
         props.put("in", mdocIn.value.toString)
         props.put("out", mdocOut.value.toString)
-        val converter = fileConverter.value
-        val pluginPrefix = "-Xplugin:"
         props.put(
           "scalacOptions",
-          (Compile / scalacOptions).value
-            .map { o =>
-              val withoutPrefix = o.stripPrefix(pluginPrefix)
-              if (withoutPrefix eq o) o
-              else pluginPrefix + converter.toPath(VirtualFileRef.of(withoutPrefix))
-            }
-            .mkString("\n")
+          resolvePluginPaths(fileConverter.value, (Compile / scalacOptions).value).mkString("\n")
         )
         val classpath = ListBuffer.empty[File]
         // Can't use fullClasspath.value because it introduces cyclic dependency between
@@ -297,10 +290,20 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         case _: ClassNotFoundException => Def.setting(None)
       }
     }
+  // sbt 2 states a compiler plugin as ${CSR_CACHE}/..., which scalac cannot open
+  private def resolvePluginPaths(converter: FileConverter, options: Seq[String]): Seq[String] = {
+    val prefix = "-Xplugin:"
+    options.map { option =>
+      val path = option.stripPrefix(prefix)
+      if ((path eq option) || !path.startsWith("${")) option
+      else prefix + converter.toPath(VirtualFileRef.of(path))
+    }
+  }
+
   private def mdocCompileOptions(ref: Project): Def.Initialize[Task[CompileOptions]] =
     Def.task {
       CompileOptions(
-        (ref / Compile / scalacOptions).value,
+        resolvePluginPaths(fileConverter.value, (ref / Compile / scalacOptions).value),
         getClasspathFiles(ref / Compile / fullClasspath).value,
         classloadedSetting(
           ref,

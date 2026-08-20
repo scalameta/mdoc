@@ -21,8 +21,8 @@ object Extensions {
 
   }
 
-  // sbt 1 takes projectMatrix from a plugin; sbt 2 has it built in
-  type Matrix = sbt.internal.ProjectMatrix
+  // sbt 1 took projectMatrix from a plugin; sbt 2 has it built in
+  type Matrix = sbt.ProjectMatrix
 
   def scala212 = "2.12.21"
   def scala213 = "2.13.18"
