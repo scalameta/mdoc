@@ -49,6 +49,11 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         "If false, do not add mdoc as a library dependency this project. " +
           "Default value is true."
       )
+    val mdocPropertiesPrefix =
+      settingKey[String](
+        "Prefix for the names of the generated properties resources, so that two projects on one " +
+          "classpath do not both answer to mdoc.properties. Default value is the empty string."
+      )
     val esModuleImportJSMapFile =
       settingKey[Option[File]](
         "File containing an import map for remapping ESModules at link time. " +
@@ -90,6 +95,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
       mdocJSWorkerClasspath := None,
       mdocAutoDependency := true,
       mdocInternalVariables := Nil,
+      mdocPropertiesPrefix := "",
       esModuleImportJSMapFile := None,
       mdoc := Def.inputTaskDyn {
         validateSettings.value
@@ -118,7 +124,8 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         }
       },
       (Compile / resourceGenerators) += Def.task {
-        val out = (Compile / managedResourceDirectories).value.head / "mdoc.properties"
+        val prefix = mdocPropertiesPrefix.value
+        val out = (Compile / managedResourceDirectories).value.head / s"${prefix}mdoc.properties"
         val props = new java.util.Properties()
         mdocVariables.value.foreach { case (key, value) =>
           props.put(key, value)
@@ -214,7 +221,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
         IO.write(props, "mdoc properties", out)
         val esVersion = props.clone().asInstanceOf[java.util.Properties]
         esVersion.put("js-module-kind", "ESModule")
-        val esOut = (Compile / managedResourceDirectories).value.head / "es.properties"
+        val esOut = (Compile / managedResourceDirectories).value.head / s"${prefix}es.properties"
         IO.write(
           esVersion,
           "mdoc esmoddule properties",

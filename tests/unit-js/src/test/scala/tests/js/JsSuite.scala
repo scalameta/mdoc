@@ -13,9 +13,9 @@ class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
   // By default, we create new modifiers for each unit test, which is usually fast.
   override def baseSettings(resourcePropertyFileName: String): Settings = super
-    .baseSettings()
+    .baseSettings(JsTests.propertyFileName)
     .copy(
-      site = super.baseSettings().site ++ Map(
+      site = super.baseSettings(JsTests.propertyFileName).site ++ Map(
         "js-opt" -> "fast"
       )
     )

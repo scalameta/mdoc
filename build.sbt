@@ -331,6 +331,8 @@ def jsWorkerClasspath(v: String) = {
 
 def unitJSRow(v: String) = Def.settings(
   mdocJS := Some(jsdocs.js(v)),
+  // unit ships an mdoc.properties of its own, and it comes first on the test classpath
+  mdocPropertiesPrefix := "js-",
   unitRow(v),
   jsWorkerClasspath(v)
 )
