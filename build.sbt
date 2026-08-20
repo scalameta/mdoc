@@ -115,9 +115,10 @@ inThisBuild(
   )
 )
 
-name := "mdocRoot"
-publish / skip := true
-crossScalaVersions := Nil
+LocalRootProject / name := "mdocRoot"
+LocalRootProject / publish / skip := true
+LocalRootProject / crossScalaVersions := Nil
+
 lazy val sharedSettings = List(
   scalacOptions ++= crossSetting(
     scalaVersion.value,
