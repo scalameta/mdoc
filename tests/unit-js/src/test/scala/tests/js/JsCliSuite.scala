@@ -126,7 +126,7 @@ class JsCliSuite extends BaseCliSuite {
       "--property-file-name",
       JsTests.esPropertyFileName,
       "--import-map-path",
-      Paths.get(this.getClass.getClassLoader.getResource("importmap.json").toURI).toString()
+      Resources.asPath("importmap.json").toString()
     )
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
     val generatedJs =

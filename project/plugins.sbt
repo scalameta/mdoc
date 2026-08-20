@@ -12,7 +12,8 @@ libraryDependencies ++= List(
 )
 Compile / unmanagedSourceDirectories ++= {
   val dir = (ThisBuild / baseDirectory).value.getParentFile / "mdoc-sbt" / "src" / "main"
-  Seq(dir / "scala", dir / "scala-2")
+  // the meta-build is Scala 2 on sbt 1 and Scala 3 on sbt 2, and the plugin
+  // keeps a compat shim for each
+  val variant = if (scalaBinaryVersion.value == "3") "scala-3" else "scala-2"
+  Seq(dir / "scala", dir / variant)
 }
-
-addSbtPlugin("com.eed3si9n" % "sbt-projectmatrix" % "0.11.0")

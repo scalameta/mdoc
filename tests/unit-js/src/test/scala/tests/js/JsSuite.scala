@@ -7,7 +7,6 @@ import tests.markdown.BaseMarkdownSuite
 import tests.js.JsTests.suffix
 import tests.markdown.Compat
 import scala.meta.io.AbsolutePath
-import java.nio.file.Paths
 
 class JsSuite extends BaseMarkdownSuite {
   // NOTE(olafur) Optimization. Cache settings to reuse the Scala.js compiler instance.
@@ -80,13 +79,7 @@ class JsSuite extends BaseMarkdownSuite {
     settings = {
       baseSettings().copy(
         site = baseSettings().site.updated("js-module-kind", "ESModule"),
-        importMapPath = Some(
-          AbsolutePath(
-            Paths
-              .get(this.getClass.getClassLoader.getResource("importmap.json").toURI())
-              .toAbsolutePath()
-          )
-        )
+        importMapPath = Some(AbsolutePath(Resources.asPath("importmap.json")))
       )
     }
   )

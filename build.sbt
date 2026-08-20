@@ -11,12 +11,12 @@ def rowsAt(task: String, v: String, extraJvm: Matrix*) = {
   onEach(task, v, jvm ++ extraJvm, Iterable(jsdocs, jswebsitedocs))
 }
 
-addCommandAlias("testAllNonNative", rowsAt("test", scala213, parser))
-addCommandAlias("test212", rowsAt("test", scala212))
-addCommandAlias("test213", rowsAt("test", scala213))
-addCommandAlias("test33", rowsAt("test", scala3))
+addCommandAlias("testAllNonNative", rowsAt("testFull", scala213, parser))
+addCommandAlias("test212", rowsAt("testFull", scala212))
+addCommandAlias("test213", rowsAt("testFull", scala213))
+addCommandAlias("test33", rowsAt("testFull", scala3))
 // the next Scala is tested where the 3.8.4 job tested it
-addCommandAlias("test38", onEach("test", scala3next, List(unit, worksheets), Nil))
+addCommandAlias("test38", onEach("testFull", scala3next, List(unit, worksheets), Nil))
 
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
@@ -104,6 +104,8 @@ LocalRootProject / publish / skip := true
 LocalRootProject / crossScalaVersions := Nil
 
 lazy val sharedSettings = List(
+  // mdoc-interfaces is Java, so its row carries whichever Scala version the build defaults to
+  allowMismatchScala := true,
   scalacOptions ++= crossSetting(
     scalaVersion.value,
     if2 = List("-Yrangepos", "-deprecation"),
@@ -283,11 +285,18 @@ val jswebsitedocs = projectMatrix.jsPlatform(allScalaVersions)
   )
   .enablePlugins(ScalaJSPlugin)
 
+// a forked JVM takes the platform charset before Java 18, and the tests read UTF-8 sources
+def forkedTests = Def.settings(
+  Test / fork := true,
+  Test / javaOptions += "-Dfile.encoding=UTF-8"
+)
+
 lazy val worksheets = projectMatrix.allJvm()
   .in(file("tests/worksheets"))
   .settings(
     sharedSettings,
     unpublished,
+    forkedTests,
     libraryDependencies += depMunit % Test
   )
   .dependsOn(mdoc, tests)
@@ -301,6 +310,7 @@ lazy val unit = projectMatrix
   .settings(
     sharedSettings,
     unpublished,
+    forkedTests,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit").value,
     libraryDependencies ++= {
       if (isScala3.value) List()
@@ -376,7 +386,7 @@ lazy val plugin = project
       props.put("version", version.value)
       props.put("scalaJSVersion", scalaJSVersion)
       IO.write(props, "sbt-mdoc properties", out)
-      List(out)
+      Seq(out)
     },
     publishLocal := {
       publishLocal
@@ -388,6 +398,13 @@ lazy val plugin = project
         .value
     },
     scriptedBufferLog := false,
+    // the sbt that runs the scripted tests, not the floor a user must be on: sbt 1.5.0 ships
+    // Scala 2.12.13, which cannot read the classfiles of a current JDK
+    scriptedSbt :=
+      (scalaBinaryVersion.value match {
+        case "2.12" => "1.12.13"
+        case _ => (pluginCrossBuild / sbtVersion).value
+      }),
     scriptedLaunchOpts ++= Seq(
       "-Xmx2048M",
       s"-Dplugin.version=${version.value}"
@@ -437,16 +454,19 @@ lazy val docs = project
     crossScalaVersions := List(scala212),
     mdocAutoDependency := false,
     libraryDependencies ++= List(
-      "org.scala-sbt" % "sbt" % sbtVersion.value,
+      // the sbt the plugin is built against, not the one running this build
+      "org.scala-sbt" % "sbt" % (plugin / pluginCrossBuild / sbtVersion).value,
       "io.github.cibotech" %% "evilplot" % "0.9.2"
     ),
-    watchSources += (ThisBuild / baseDirectory).value / "docs",
+    watchSources := Def.uncached(
+      watchSources.value :+ WatchSource((ThisBuild / baseDirectory).value / "docs")
+    ),
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jswebsitedocs.js(scala212)),
     jsWorkerClasspath(scala212),
     dependencyOverrides += {
-      "org.scala-lang.modules" %%% "scala-xml" % "2.4.0"
+      "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
     },
     mdocVariables := {
       val stableVersion: String =
@@ -479,5 +499,5 @@ def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] = {
 val depMunit = "org.scalameta" %% "munit" % V.munit
 
 lazy val depJsDom = Def.settings(
-  libraryDependencies += "org.scala-js" %%% "scalajs-dom" % scalajsDom
+  libraryDependencies += "org.scala-js" %% "scalajs-dom" % scalajsDom
 )
