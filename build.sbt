@@ -13,7 +13,7 @@ Global / resolvers += "scala-nightlies" at
 def scala212 = "2.12.21"
 def scala213 = "2.13.18"
 def scala3 = "3.3.8"
-def scala3ForSbt = "3.7.3"
+def scala3next = "3.8.4"
 def scala2Versions = List(scala212, scala213)
 def allScalaVersions = scala2Versions :+ scala3
 
@@ -386,12 +386,13 @@ lazy val plugin = project
     sharedSettings,
     sbtPlugin := true,
     scalaVersion := scala212,
+    // the floor a user of this plugin must be on, not the sbt we build with
     pluginCrossBuild / sbtVersion :=
       (scalaBinaryVersion.value match {
         case "2.12" => "1.5.0"
-        case _ => "2.0.0-RC6"
+        case _ => "2.0.0"
       }),
-    crossScalaVersions := List(scala212, scala3ForSbt),
+    crossScalaVersions := List(scala212, scala3next),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.23.1",
