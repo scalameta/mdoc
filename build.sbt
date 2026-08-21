@@ -502,33 +502,26 @@ lazy val docs = project
   .dependsOn(mdoc, js, plugin)
   .enablePlugins(DocusaurusPlugin)
 
-def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] =
+def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] = {
+  val all = Seq(parser)
+  val jvm = Seq(runtime, cli, mdoc, js, jsWorker)
+  val rows = (all ++ jvm).reverse.flatMap(_.componentProjects).toList
   versions
-    .map(localCrossPublishProjects)
-    .reduceLeft(_ dependsOn _)
-
-def localCrossPublishProjects(scalaV: String): Def.Initialize[Task[Unit]] = {
-  val projects = List(parser, runtime, cli, mdoc, js, jsWorker).reverse
-  projects
-    .flatMap(_.componentProjects)
-    .map(p => localCrossPublishProject(p, scalaV))
-    .reduceLeft(_ dependsOn _)
+    .flatMap { v =>
+      rows.map(p => (p, v))
+    }
+    .map { case (p, v) => publishLocalAt(p, v, rows) }
+    .reduceLeft((a, b) => a.dependsOn(b))
 }
 
-def localCrossPublishProject(ref: Project, scalaV: String): Def.Initialize[Task[Unit]] =
-  Def.task {
-    val versionValue = (ThisBuild / version).value
-    val projects = List(parser, runtime, cli, mdoc, js, jsWorker)
-    val setttings = (ThisBuild / version := versionValue) ::
-      projects.flatMap(_.componentProjects).map(p => p / scalaVersion := scalaV)
-    val newState = Project
-      .extract(state.value)
-      .appendWithSession(
-        setttings,
-        state.value
-      )
-    val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
-  }
+// a row builds one Scala version, so each publish runs in a session of its own
+def publishLocalAt(ref: Project, scalaV: String, rows: List[Project]) = Def.task {
+  val versionValue = (ThisBuild / version).value
+  val settings = (ThisBuild / version := versionValue) ::
+    rows.map(p => p / scalaVersion := scalaV)
+  val newState = Project.extract(state.value).appendWithSession(settings, state.value)
+  val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
+}
 
 val depMunit = "org.scalameta" %% "munit" % V.munit
 
