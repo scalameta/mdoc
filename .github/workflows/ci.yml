@@ -93,8 +93,7 @@ jobs:
       matrix:
         java: [17]
         command:
-          # Test legacy Scala versions, where reporting API changed
-          - "'++2.12.12! testAllNonNative'" # compiler version too old for Scala Native
+          # one alias per Scala version: ++ does not select matrix rows
           - "test212"
           - "test213"
           # Minimal supported version
