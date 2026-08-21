@@ -295,6 +295,10 @@ lazy val worksheets = project
   )
   .dependsOn(mdoc, tests)
 
+def unitRow = buildInfoKeys := Seq[BuildInfoKey](
+  "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
+)
+
 lazy val unit = project
   .in(file("tests/unit"))
   .settings(
@@ -316,12 +320,23 @@ lazy val unit = project
       if (isScala3.value) dep.cross(CrossVersion.for3Use2_13) else dep
     },
     buildInfoPackage := "tests.cli",
-    buildInfoKeys := Seq[BuildInfoKey](
-      "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
-    )
+    unitRow
   )
   .dependsOn(parser.jvm, mdoc, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
+
+// products returns the output directories, and compiles the worker first
+def jsWorkerClasspath = {
+  val cfg = jsWorker / Compile
+  MdocPlugin.mdocJSWorkerClasspath :=
+    Some((cfg / products).value ++ (cfg / resourceDirectories).value)
+}
+
+def unitJSRow = Def.settings(
+  mdocJS := Some(jsdocs),
+  unitRow,
+  jsWorkerClasspath
+)
 
 lazy val unitJS = project
   .in(file("tests/unit-js"))
@@ -331,19 +346,7 @@ lazy val unitJS = project
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies += depMunit % Test,
     buildInfoPackage := "tests.js",
-    buildInfoKeys := Seq[BuildInfoKey](
-      "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
-    ),
-    mdocJS := Some(jsdocs),
-    MdocPlugin.mdocJSWorkerClasspath := {
-      val _ = (jsWorker / Compile / compile).value
-
-      val folders = Seq(
-        (jsWorker / Compile / classDirectory).value
-      ) ++ (jsWorker / Compile / resourceDirectories).value
-
-      Some(folders)
-    }
+    unitJSRow
   )
   .dependsOn(mdoc, js, testsInput, tests, unit)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
@@ -442,15 +445,7 @@ lazy val docs = project
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
     mdocJS := Some(jswebsitedocs),
-    MdocPlugin.mdocJSWorkerClasspath := {
-      val _ = (jsWorker / Compile / compile).value
-
-      val folders = Seq(
-        (jsWorker / Compile / classDirectory).value
-      ) ++ (jsWorker / Compile / resourceDirectories).value
-
-      Some(folders)
-    },
+    jsWorkerClasspath,
     dependencyOverrides += {
       "org.scala-lang.modules" %%% "scala-xml" % "2.4.0"
     },
