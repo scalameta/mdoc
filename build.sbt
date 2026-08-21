@@ -1,3 +1,5 @@
+import Extensions._
+
 import scala.collection.mutable
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import scala.scalanative.build._
@@ -10,13 +12,6 @@ addCommandAlias(
 Global / resolvers += "scala-nightlies" at
   "https://repo.scala-lang.org/artifactory/maven-nightlies"
 
-def scala212 = "2.12.21"
-def scala213 = "2.13.18"
-def scala3 = "3.3.8"
-def scala3next = "3.8.4"
-def scala2Versions = List(scala212, scala213)
-def allScalaVersions = scala2Versions :+ scala3
-
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
 
@@ -24,19 +19,6 @@ def isCI = System.getenv("CI") != null
 
 def jsoniter = List("core", "macros").map { pkg =>
   "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.40.1"
-}
-
-val isScala212 = Def.setting {
-  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("2.12.x"))
-}
-
-val isScala3 = Def.setting {
-  // doesn't work well with >= 3.0.0 for `3.0.0-M1`
-  VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=2.99.0"))
-}
-
-val isScalaJs1 = Def.setting {
-  VersionNumber(scalaJSVersion).matchesSemVer(SemanticSelector(">=1.0.0"))
 }
 
 def multiScalaDirectories(projectName: String) =
@@ -129,22 +111,6 @@ lazy val sharedSettings = List(
 lazy val sharedJavaSettings = List(
   javacOptions ++= Seq("--release", "11")
 )
-
-val V = new {
-  val scalameta = "4.17.3"
-
-  val munit = "1.3.4"
-
-  val scalacheck = "1.19.0"
-
-  val pprint = "0.9.6"
-
-  val fansi = "0.5.1"
-
-  val fs2 = "3.13.0"
-
-  val metaconfig = "0.18.7"
-}
 
 lazy val depCoursierInterfaces = Def.settings(
   libraryDependencies += "io.get-coursier" % "interface" % "1.0.28"
@@ -266,7 +232,7 @@ lazy val testsInput = project
   .in(file("tests/input"))
   .settings(
     sharedSettings,
-    publish / skip := true
+    unpublished
   )
 
 def scala212LibraryDependencies(deps: List[ModuleID]) =
@@ -280,7 +246,7 @@ val tests = project
   .in(file("tests/tests"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     libraryDependencies += depMunit,
     buildInfoPackage := "tests",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -294,7 +260,7 @@ val jsdocs = project
   .in(file("tests/jsdocs"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
@@ -307,7 +273,7 @@ val jswebsitedocs = project
   .in(file("tests/websiteJs"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
     },
@@ -319,7 +285,7 @@ lazy val worksheets = project
   .in(file("tests/worksheets"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     libraryDependencies += depMunit % Test
   )
   .dependsOn(mdoc, tests)
@@ -328,7 +294,7 @@ lazy val unit = project
   .in(file("tests/unit"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit").value,
     libraryDependencies ++= {
       if (isScala3.value) List()
@@ -356,7 +322,7 @@ lazy val unitJS = project
   .in(file("tests/unit-js"))
   .settings(
     sharedSettings,
-    publish / skip := true,
+    unpublished,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies += depMunit % Test,
     buildInfoPackage := "tests.js",
@@ -458,7 +424,7 @@ lazy val docs = project
   .settings(
     sharedSettings,
     moduleName := "mdoc-docs",
-    publish / skip := true,
+    unpublished,
     docusaurusVersion := DocusaurusVersion.V1,
     scalaVersion := scala212,
     crossScalaVersions := List(scala212),
