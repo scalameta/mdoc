@@ -9,7 +9,6 @@ import tests.markdown.StringSyntax._
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.charset.StandardCharsets
-import java.nio.file.Paths
 import scala.io.Source
 import scala.meta.internal.io.FileIO
 import scala.meta.internal.io.PathIO
@@ -126,7 +125,7 @@ class JsCliSuite extends BaseCliSuite {
       "--property-file-name",
       JsTests.esPropertyFileName,
       "--import-map-path",
-      Resources.asPath("importmap.json").toString()
+      JsTests.importMap.toString
     )
     val code = mdoc.Main.process(args, new PrintStream(myStdout), in().toNIO)
     val generatedJs =

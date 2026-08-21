@@ -285,6 +285,7 @@ val jswebsitedocs = projectMatrix.jsPlatform(allScalaVersions)
   )
   .enablePlugins(ScalaJSPlugin)
 
+// mdoc runs the Scala 2 compiler in process, which needs the classpath of a real JVM
 // a forked JVM takes the platform charset before Java 18, and the tests read UTF-8 sources
 def forkedTests = Def.settings(
   Test / fork := true,

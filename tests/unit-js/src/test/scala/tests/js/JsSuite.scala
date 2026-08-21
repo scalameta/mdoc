@@ -79,7 +79,7 @@ class JsSuite extends BaseMarkdownSuite {
     settings = {
       baseSettings().copy(
         site = baseSettings().site.updated("js-module-kind", "ESModule"),
-        importMapPath = Some(AbsolutePath(Resources.asPath("importmap.json")))
+        importMapPath = Some(AbsolutePath(JsTests.importMap.toAbsolutePath))
       )
     }
   )
