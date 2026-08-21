@@ -2,13 +2,18 @@ import scala.collection.mutable
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import scala.scalanative.build._
 
+Global / resolvers += "scala-nightlies" at
+  "https://repo.scala-lang.org/artifactory/maven-nightlies"
+
 addCommandAlias(
   "testAllNonNative",
   "interfaces/test;runtime/test;parser/test;cli/test;mdoc/test;testsInput/test;tests/test;jsdocs/test;worksheets/test;unit/test;unitJS/test;jsApi/test;jsWorker/test;js/test;"
 )
-
-Global / resolvers += "scala-nightlies" at
-  "https://repo.scala-lang.org/artifactory/maven-nightlies"
+addCommandAlias("test212", "++2.12.21 test")
+addCommandAlias("test213", "++2.13.18 test")
+addCommandAlias("test33", "++3.3.8 test")
+// the next Scala is tested where the 3.8.4 job tested it
+addCommandAlias("test38", "++3.8.4!; unit/test; worksheets/test")
 
 def scala212 = "2.12.21"
 def scala213 = "2.13.18"

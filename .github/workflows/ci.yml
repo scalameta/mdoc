@@ -95,16 +95,14 @@ jobs:
         command:
           # Test legacy Scala versions, where reporting API changed
           - "'++2.12.12! testAllNonNative'" # compiler version too old for Scala Native
-          - "'++2.12.21 test'"
-          - "'++2.13.18 test'"
+          - "test212"
+          - "test213"
           # Minimal supported version
-          - "'++3.3.8 test'"
+          - "test33"
+          - "test38"
           - "'++3.8.4 plugin/test'"
           - "'++2.12.21 scripted'"
           - "'++3.8.4 scripted'"
-        include:
-          - java: 17
-            command: "'++3.8.4!; unit/test; worksheets/test'"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
