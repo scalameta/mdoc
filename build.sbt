@@ -22,11 +22,6 @@ def scalajsDom = "2.0.0"
 
 def isCI = System.getenv("CI") != null
 
-def isScala2(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2)
-def isScala212(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 12)
-def isScala213(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 2) && v.exists(_._2 == 13)
-def isScala3(v: Option[(Long, Long)]): Boolean = v.exists(_._1 == 3)
-
 def jsoniter = List("core", "macros").map { pkg =>
   "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.40.1"
 }
@@ -61,10 +56,12 @@ def crossSetting[A](
     if213: List[A] = Nil
 ): List[A] =
   CrossVersion.partialVersion(scalaVersion) match {
-    case partialVersion if isScala213(partialVersion) => if2 ::: if213
-    case partialVersion if isScala212(partialVersion) => if2 ::: if212
-    case partialVersion if isScala2(partialVersion) => if2
-    case partialVersion if isScala3(partialVersion) => if3
+    case Some((2, minor)) => minor match {
+        case 12 => if2 ::: if212
+        case 13 => if2 ::: if213
+        case _ => if2
+      }
+    case Some((3, _)) => if3
     case _ => Nil
   }
 
