@@ -1,21 +1,22 @@
 import Extensions._
 
 import scala.collection.mutable
-import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import scala.scalanative.build._
 
 Global / resolvers += "scala-nightlies" at
   "https://repo.scala-lang.org/artifactory/maven-nightlies"
 
-addCommandAlias(
-  "testAllNonNative",
-  "interfaces/test;runtime/test;parser/test;cli/test;mdoc/test;testsInput/test;tests/test;jsdocs/test;worksheets/test;unit/test;unitJS/test;jsApi/test;jsWorker/test;js/test;"
-)
-addCommandAlias("test212", "++2.12.21 test")
-addCommandAlias("test213", "++2.13.18 test")
-addCommandAlias("test33", "++3.3.8 test")
+def rowsAt(task: String, v: String, extraJvm: Matrix*) = {
+  val jvm = Iterable(runtime, cli, mdoc, testsInput, tests, worksheets, unit, unitJS, js, jsWorker)
+  onEach(task, v, jvm ++ extraJvm, Iterable(jsdocs, jswebsitedocs))
+}
+
+addCommandAlias("testAllNonNative", rowsAt("test", scala213, parser))
+addCommandAlias("test212", rowsAt("test", scala212))
+addCommandAlias("test213", rowsAt("test", scala213))
+addCommandAlias("test33", rowsAt("test", scala3))
 // the next Scala is tested where the 3.8.4 job tested it
-addCommandAlias("test38", "++3.8.4!; unit/test; worksheets/test")
+addCommandAlias("test38", onEach("test", scala3next, List(unit, worksheets), Nil))
 
 def scalajsBinaryVersion = "1"
 def scalajsDom = "2.0.0"
@@ -28,7 +29,7 @@ def jsoniter = List("core", "macros").map { pkg =>
 
 def multiScalaDirectories(projectName: String) =
   Def.setting {
-    val base = (ThisBuild / baseDirectory).value / projectName / "src" / "main"
+    val base = srcWithRoot((ThisBuild / baseDirectory).value, projectName, "main")
     def path(ver: String) = base / s"scala-$ver"
     val paths = path(scalaVersion.value) :: path(if (isScala3.value) "3" else "2") :: Nil
     val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
@@ -69,7 +70,6 @@ inThisBuild(
       dynverGitDescribeOutput.value.mkVersion(dynVer, curVersion)
     },
     scalaVersion := scala213,
-    crossScalaVersions := allScalaVersions,
     organization := "org.scalameta",
     licenses := Seq(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
@@ -143,7 +143,7 @@ lazy val interfaces = project
     javacOptions ++= Seq("--release", "8")
   )
 
-lazy val runtime = project
+lazy val runtime = projectMatrix.allJvm()
   .settings(
     sharedSettings,
     moduleName := "mdoc-runtime",
@@ -173,19 +173,16 @@ lazy val depScalameta = Def.settings(
   }
 )
 
-lazy val parser = crossProject(JVMPlatform, NativePlatform, JSPlatform)
-  .withoutSuffixFor(JVMPlatform)
+lazy val parser = projectMatrix.crossAll
   .settings(
     sharedSettings,
     moduleName := "mdoc-parser"
   )
 
-lazy val cli = project
+lazy val cli = projectMatrix.allJvm()
   .settings(
     sharedSettings,
     moduleName := "mdoc-cli",
-    scalaVersion := scala213,
-    crossScalaVersions := allScalaVersions,
     depCoursierInterfaces,
     libraryDependencies ++= List(
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
@@ -194,9 +191,9 @@ lazy val cli = project
     ),
     depScalameta
   )
-  .dependsOn(parser.jvm)
+  .dependsOn(parser)
 
-lazy val mdoc = project
+lazy val mdoc = projectMatrix.allJvm()
   .settings(
     sharedSettings,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("mdoc").value,
@@ -230,10 +227,10 @@ lazy val mdoc = project
       "com.lihaoyi" %% "pprint" % V.pprint
     )
   )
-  .dependsOn(parser.jvm, runtime, cli)
+  .dependsOn(parser, runtime, cli)
   .enablePlugins(BuildInfoPlugin)
 
-lazy val testsInput = project
+lazy val testsInput = projectMatrix.allJvm()
   .in(file("tests/input"))
   .settings(
     sharedSettings,
@@ -247,7 +244,7 @@ def scala212LibraryDependencies(deps: List[ModuleID]) =
       else Nil
     }
   )
-val tests = project
+val tests = projectMatrix.allJvm()
   .in(file("tests/tests"))
   .settings(
     sharedSettings,
@@ -261,7 +258,7 @@ val tests = project
   )
   .enablePlugins(BuildInfoPlugin)
 
-val jsdocs = project
+val jsdocs = projectMatrix.jsPlatform(allScalaVersions)
   .in(file("tests/jsdocs"))
   .settings(
     sharedSettings,
@@ -274,7 +271,7 @@ val jsdocs = project
   )
   .enablePlugins(ScalaJSPlugin)
 
-val jswebsitedocs = project
+val jswebsitedocs = projectMatrix.jsPlatform(allScalaVersions)
   .in(file("tests/websiteJs"))
   .settings(
     sharedSettings,
@@ -286,7 +283,7 @@ val jswebsitedocs = project
   )
   .enablePlugins(ScalaJSPlugin)
 
-lazy val worksheets = project
+lazy val worksheets = projectMatrix.allJvm()
   .in(file("tests/worksheets"))
   .settings(
     sharedSettings,
@@ -295,11 +292,11 @@ lazy val worksheets = project
   )
   .dependsOn(mdoc, tests)
 
-def unitRow = buildInfoKeys := Seq[BuildInfoKey](
-  "testsInputClassDirectory" -> (testsInput / Compile / classDirectory).value
+def unitRow(v: String) = buildInfoKeys := Seq[BuildInfoKey](
+  "testsInputClassDirectory" -> (testsInput.jvm(v) / Compile / classDirectory).value
 )
 
-lazy val unit = project
+lazy val unit = projectMatrix
   .in(file("tests/unit"))
   .settings(
     sharedSettings,
@@ -319,35 +316,35 @@ lazy val unit = project
       val dep = "co.fs2" %% "fs2-core" % V.fs2
       if (isScala3.value) dep.cross(CrossVersion.for3Use2_13) else dep
     },
-    buildInfoPackage := "tests.cli",
-    unitRow
+    buildInfoPackage := "tests.cli"
   )
-  .dependsOn(parser.jvm, mdoc, testsInput, tests)
+  .allJvmRows(unitRow)
+  .dependsOn(parser, mdoc, testsInput, tests)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
 // products returns the output directories, and compiles the worker first
-def jsWorkerClasspath = {
-  val cfg = jsWorker / Compile
+def jsWorkerClasspath(v: String) = {
+  val cfg = jsWorker.jvm(v) / Compile
   MdocPlugin.mdocJSWorkerClasspath :=
     Some((cfg / products).value ++ (cfg / resourceDirectories).value)
 }
 
-def unitJSRow = Def.settings(
-  mdocJS := Some(jsdocs),
-  unitRow,
-  jsWorkerClasspath
+def unitJSRow(v: String) = Def.settings(
+  mdocJS := Some(jsdocs.js(v)),
+  unitRow(v),
+  jsWorkerClasspath(v)
 )
 
-lazy val unitJS = project
+lazy val unitJS = projectMatrix
   .in(file("tests/unit-js"))
   .settings(
     sharedSettings,
     unpublished,
     Compile / unmanagedSourceDirectories ++= multiScalaDirectories("tests/unit-js").value,
     libraryDependencies += depMunit % Test,
-    buildInfoPackage := "tests.js",
-    unitJSRow
+    buildInfoPackage := "tests.js"
   )
+  .jvmRows(allScalaVersions)(unitJSRow)
   .dependsOn(mdoc, js, testsInput, tests, unit)
   .enablePlugins(BuildInfoPlugin, MdocPlugin)
 
@@ -403,7 +400,7 @@ lazy val jsApi =
     .settings(sharedJavaSettings)
 
 lazy val jsWorker =
-  project
+  projectMatrix.jvmPlatform(allScalaVersions)
     .in(file("mdoc-js-worker"))
     .dependsOn(jsApi)
     .settings(
@@ -416,7 +413,7 @@ lazy val jsWorker =
       )
     )
 
-lazy val js = project
+lazy val js = projectMatrix.jvmPlatform(allScalaVersions)
   .in(file("mdoc-js"))
   .dependsOn(jsApi)
   .settings(
@@ -444,8 +441,8 @@ lazy val docs = project
     watchSources += (ThisBuild / baseDirectory).value / "docs",
     Global / cancelable := true,
     MdocPlugin.autoImport.mdoc := (Compile / run).evaluated,
-    mdocJS := Some(jswebsitedocs),
-    jsWorkerClasspath,
+    mdocJS := Some(jswebsitedocs.js(scala212)),
+    jsWorkerClasspath(scala212),
     dependencyOverrides += {
       "org.scala-lang.modules" %%% "scala-xml" % "2.4.0"
     },
@@ -462,28 +459,19 @@ lazy val docs = project
       )
     }
   )
-  .dependsOn(mdoc, js, plugin)
+  .dependsOn(mdoc.jvm(scala212), js.jvm(scala212), plugin)
   .enablePlugins(DocusaurusPlugin)
 
+// a row per version exists now, so publishing them needs no session surgery
 def localCrossPublish(versions: List[String]): Def.Initialize[Task[Unit]] = {
   val all = Seq(parser)
   val jvm = Seq(runtime, cli, mdoc, js, jsWorker)
-  val rows = (all ++ jvm).reverse.flatMap(_.componentProjects).toList
   versions
     .flatMap { v =>
-      rows.map(p => (p, v))
+      all.flatMap(x => Seq(x.jvm(v), x.js(v), x.native(v))) ++ jvm.map(x => x.jvm(v))
     }
-    .map { case (p, v) => publishLocalAt(p, v, rows) }
+    .map(p => (p / publishLocal).map(_ => ()))
     .reduceLeft((a, b) => a.dependsOn(b))
-}
-
-// a row builds one Scala version, so each publish runs in a session of its own
-def publishLocalAt(ref: Project, scalaV: String, rows: List[Project]) = Def.task {
-  val versionValue = (ThisBuild / version).value
-  val settings = (ThisBuild / version := versionValue) ::
-    rows.map(p => p / scalaVersion := scalaV)
-  val newState = Project.extract(state.value).appendWithSession(settings, state.value)
-  val _ = Project.extract(newState).runTask(ref / publishLocal, newState)
 }
 
 val depMunit = "org.scalameta" %% "munit" % V.munit
