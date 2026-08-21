@@ -3,9 +3,13 @@ package tests
 import munit.FunSuite
 import munit.Location
 import munit.diff.DiffOptions
+import scala.concurrent.duration._
 import tests.markdown.Compat
 
 class BaseSuite extends FunSuite {
+  // a suite compiles and links its own input, which takes minutes on a Windows runner
+  override def munitTimeout = 3.minutes
+
   def postProcessObtained: Map[Compat.ScalaVersion, String => String] = Map.empty
   def postProcessExpected: Map[Compat.ScalaVersion, String => String] = Map.empty
   override def assertNoDiff(obtained: String, expected: String, clue: => Any)(implicit
