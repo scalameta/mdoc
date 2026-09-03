@@ -7,9 +7,9 @@ object Extensions {
 
     val scalameta = "4.17.3"
 
-    val munit = "1.3.4"
+    val munit = "1.3.6"
 
-    val scalacheck = "1.19.0"
+    val scalacheck = "1.20.0"
 
     val pprint = "0.9.6"
 
@@ -17,7 +17,7 @@ object Extensions {
 
     val fs2 = "3.13.0"
 
-    val metaconfig = "0.18.7"
+    val metaconfig = "0.18.8"
 
   }
 
