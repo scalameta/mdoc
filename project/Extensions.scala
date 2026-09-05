@@ -103,24 +103,47 @@ object Extensions {
     Test / unmanagedSourceDirectories ++= roots(base, "test").value
   )
 
+  /* `bspEnabled := false` leaves a row out of the BSP workspace, so an IDE does not import it.
+   * IntelliJ can't load multiple versions, though, so force 2.13 if `ide.scala` is absent. */
+  private val ideScala = {
+    val prop = sys.props.getOrElse("ide.scala", "").trim
+    if (prop.nonEmpty) Some(prop)
+    else if (sys.props.contains("idea.managed")) Some(scala213) // this looks like IntelliJ
+    else None
+  }
+
+  // an empty set is no filter, so every platform
+  private val idePlatforms = {
+    val prop = sys.props.getOrElse("ide.platform", "").trim
+    if (prop.isEmpty) Set.empty else prop.split("\\s*,\\s*").toSet
+  }
+
+  def ideImportFor(axes: Def.Initialize[Seq[VirtualAxis]]) = bspEnabled := ! {
+    autoScalaLibrary.value && ideScala.exists(s => s != scalaBinaryVersion.value && s != scalaVersion.value) ||
+    idePlatforms.nonEmpty && !platformOf(axes.value).exists(idePlatforms)
+  }
+
+  // a project that is not a matrix has no axes to read, and none of them leaves the JVM
+  val ideImportJvm = ideImportFor(Def.setting(Seq(VirtualAxis.jvm)))
+
   implicit class MatrixExtensions(private val self: Matrix) extends AnyVal {
     // projectMatrix names its rows after the val it is assigned to, so rows are added to the
     // receiver and never built here
     def jvmRows(versions: Iterable[String])(ss: String => Def.SettingsDefinition): Matrix =
-      versions.foldLeft(self)((m, v) => m.crossJvmRows(v)(Nil, ss(v)))
+      versions.foldLeft(sharedSetup)((m, v) => m.crossJvmRows(v)(Nil, ss(v)))
 
     def crossJvmRows(sv: String*)(axes: List[VirtualAxis], ss: Def.SettingsDefinition*): Matrix =
       self.jvmPlatform(sv, axes, ss.flatMap(_.settings))
 
     // one row per published version
-    def crossJvm(ss: Def.SettingsDefinition*): Matrix = self
-      .crossJvmRows(allScalaVersions *)(Nil, ss *)
+    def withJvm(ss: Def.SettingsDefinition*): Matrix = crossJvmRows(allScalaVersions *)(Nil, ss *)
+    def crossJvm(ss: Def.SettingsDefinition*): Matrix = sharedSetup.withJvm(ss *)
 
-    def crossJs(ss: Def.SettingsDefinition*): Matrix = self
-      .jsPlatform(allScalaVersions, ss.flatMap(_.settings))
+    def withJs(ss: Def.SettingsDefinition*): Matrix = self.jsPlatform(allScalaVersions, ss.flatMap(_.settings))
+    def crossJs(ss: Def.SettingsDefinition*): Matrix = sharedSetup.withJs(ss *)
 
-    def crossNative(ss: Def.SettingsDefinition*): Matrix = self
-      .nativePlatform(allScalaVersions, ss.flatMap(_.settings))
+    def withNative(ss: Def.SettingsDefinition*): Matrix = self.nativePlatform(allScalaVersions, ss.flatMap(_.settings))
+    def crossNative(ss: Def.SettingsDefinition*): Matrix = sharedSetup.withNative(ss *)
 
     // the next Scala is tested, never published
     def jvmScala3Next(ss: Def.SettingsDefinition*): Matrix = crossJvmRows(scala3next)(
@@ -136,7 +159,9 @@ object Extensions {
       jvmScala3Next(ss(scala3next)).jvmRows(allScalaVersions)(ss)
 
     // the shared tree and each platform's own, as crossProject would read them
-    def crossAll = self.settings(unmanagedSources(self.base)).allJvm().crossJs().crossNative()
+    def crossAll: Matrix = self.settings(unmanagedSources(self.base)).allJvm().withJs().withNative()
+
+    private def sharedSetup: Matrix = self.settings(ideImportFor(virtualAxes))
   }
 
 }
