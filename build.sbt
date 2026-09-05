@@ -30,10 +30,7 @@ def jsoniter = List("core", "macros").map { pkg =>
 def multiScalaDirectories(projectName: String) =
   Def.setting {
     val base = srcWithRoot((ThisBuild / baseDirectory).value, projectName, "main")
-    def path(ver: String) = base / s"scala-$ver"
-    val paths = path(scalaVersion.value) :: path(if (isScala3.value) "3" else "2") :: Nil
-    val partialVersion = CrossVersion.partialVersion(scalaVersion.value)
-    partialVersion.collect { case (major, minor) => path(s"$major.$minor") }.fold(paths)(_ :: paths)
+    scalaVersionDirs(scalaVersion.value).map(base / _)
   }
 
 def crossSetting[A](
@@ -260,7 +257,7 @@ val tests = projectMatrix.allJvm()
   )
   .enablePlugins(BuildInfoPlugin)
 
-val jsdocs = projectMatrix.jsPlatform(allScalaVersions)
+val jsdocs = projectMatrix.crossJs()
   .in(file("tests/jsdocs"))
   .settings(
     sharedSettings,
@@ -273,7 +270,7 @@ val jsdocs = projectMatrix.jsPlatform(allScalaVersions)
   )
   .enablePlugins(ScalaJSPlugin)
 
-val jswebsitedocs = projectMatrix.jsPlatform(allScalaVersions)
+val jswebsitedocs = projectMatrix.crossJs()
   .in(file("tests/websiteJs"))
   .settings(
     sharedSettings,
@@ -420,7 +417,7 @@ lazy val jsApi =
     .settings(sharedJavaSettings)
 
 lazy val jsWorker =
-  projectMatrix.jvmPlatform(allScalaVersions)
+  projectMatrix.crossJvm()
     .in(file("mdoc-js-worker"))
     .dependsOn(jsApi)
     .settings(
@@ -433,7 +430,7 @@ lazy val jsWorker =
       )
     )
 
-lazy val js = projectMatrix.jvmPlatform(allScalaVersions)
+lazy val js = projectMatrix.crossJvm()
   .in(file("mdoc-js"))
   .dependsOn(jsApi)
   .settings(
