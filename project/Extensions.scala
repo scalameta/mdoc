@@ -1,5 +1,8 @@
-import sbt._
-import sbt.Keys._
+// scalafmt: { maxColumn = 120 }
+
+import sbt.*
+import sbt.Keys.*
+import sbt.VirtualAxis.PlatformAxis
 
 object Extensions {
 
@@ -40,8 +43,6 @@ object Extensions {
     VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=1.0.0 || >=2.99.0"))
   }
 
-  // the next Scala is tested, never published
-  def nextRow = List(VirtualAxis.scalaPartialVersion(scala3next))
   def unpublished = Def.settings(publish / skip := true)
 
   // sbt runs a `;`-separated list, and the leading separator is required
@@ -56,43 +57,86 @@ object Extensions {
 
   def srcWithRoot(root: File, dir: String, cfg: String) = root / dir / "src" / cfg
 
-  // crossProject's layout, wired by hand: a matrix has one base directory, so
-  // each cell names the trees it shares. Absent directories are harmless.
-  def roots(base: File, cfg: String, dirs: String*) = Def.setting[Seq[File]] {
-    val variants = List("scala", "java", if (isScala3.value) "scala-3" else "scala-2")
-    // a matrix base may be relative, and a relative source root resolves against the wrong directory
-    val root = IO.resolve((ThisBuild / baseDirectory).value, base)
-    for (dir <- dirs; base = srcWithRoot(root, dir, cfg); variant <- variants)
-      yield base / variant
+  // `scala-2.13.18`, then every shorter prefix of it
+  def scalaVersionDirs(version: String): List[String] = {
+    val res = List.newBuilder[String]
+    var end = version.length
+    while (end > 0) {
+      res += s"scala-${version.substring(0, end)}"
+      end = version.lastIndexOf('.', end - 1)
+    }
+    res.result()
   }
 
-  def unmanagedSources(base: File, dirs: String*) = Def.settings(
-    Compile / unmanagedSourceDirectories ++= roots(base, "main", dirs: _*).value,
-    Test / unmanagedSourceDirectories ++= roots(base, "test", dirs: _*).value
+  // the trees a platform reads: its own, and every tree it shares
+  private val allPlatformAxes =
+    Seq(VirtualAxis.jvm, VirtualAxis.js, VirtualAxis.native).map(_.value).sorted.toIndexedSeq
+
+  private def platformDirs(platform: String): Seq[String] = {
+    val builder = Seq.newBuilder[String]
+    builder += "shared"
+    builder += platform
+    val idx = allPlatformAxes.indexOf(platform)
+    if (idx >= 0) {
+      allPlatformAxes.take(idx).foreach { x => builder += s"$x-$platform" }
+      allPlatformAxes.drop(idx + 1).foreach { x => builder += s"$platform-$x" }
+    }
+    builder.result()
+  }
+
+  private def platformOf(axes: Seq[VirtualAxis]) = axes.collectFirst { case a: VirtualAxis.PlatformAxis => a.value }
+
+  // crossProject's layout, wired by hand: a matrix has one base directory, so a cell reads the
+  // trees its own platform names. Absent directories are harmless.
+  def roots(base: File, cfg: String) = Def.setting(platformOf(virtualAxes.value).fold(Seq.empty[File]) { platform =>
+    val variants = "scala" :: scalaVersionDirs(scalaVersion.value)
+    // a matrix base may be relative, and a relative source root resolves against the wrong directory
+    val root = IO.resolve((ThisBuild / baseDirectory).value, base)
+    val res = Seq.newBuilder[File]
+    res += srcWithRoot(root, platform, cfg) / "java"
+    for (dir <- platformDirs(platform); src = srcWithRoot(root, dir, cfg); variant <- variants) res += src / variant
+    res.result()
+  })
+
+  def unmanagedSources(base: File) = Def.settings(
+    Compile / unmanagedSourceDirectories ++= roots(base, "main").value,
+    Test / unmanagedSourceDirectories ++= roots(base, "test").value
   )
 
   implicit class MatrixExtensions(private val self: Matrix) extends AnyVal {
     // projectMatrix names its rows after the val it is assigned to, so rows are added to the
     // receiver and never built here
     def jvmRows(versions: Iterable[String])(ss: String => Def.SettingsDefinition): Matrix =
-      versions.foldLeft(self)((m, v) => m.jvmPlatform(Seq(v), Nil, ss(v).settings))
+      versions.foldLeft(self)((m, v) => m.crossJvmRows(v)(Nil, ss(v)))
+
+    def crossJvmRows(sv: String*)(axes: List[VirtualAxis], ss: Def.SettingsDefinition*): Matrix =
+      self.jvmPlatform(sv, axes, ss.flatMap(_.settings))
+
+    // one row per published version
+    def crossJvm(ss: Def.SettingsDefinition*): Matrix = self
+      .crossJvmRows(allScalaVersions *)(Nil, ss *)
+
+    def crossJs(ss: Def.SettingsDefinition*): Matrix = self
+      .jsPlatform(allScalaVersions, ss.flatMap(_.settings))
+
+    def crossNative(ss: Def.SettingsDefinition*): Matrix = self
+      .nativePlatform(allScalaVersions, ss.flatMap(_.settings))
+
+    // the next Scala is tested, never published
+    def jvmScala3Next(ss: Def.SettingsDefinition*): Matrix = crossJvmRows(scala3next)(
+      List(VirtualAxis.scalaPartialVersion(scala3next)),
+      unpublished ++ ss *
+    )
 
     // a row per published version, and one for the next Scala
-    def allJvm(ss: Def.SettingsDefinition*): Matrix = {
-      val settings = ss.flatMap(_.settings)
-      self.jvmPlatform(allScalaVersions, settings)
-        .jvmPlatform(List(scala3next), nextRow, settings ++ unpublished)
-    }
+    def allJvm(ss: Def.SettingsDefinition*): Matrix = self.crossJvm(ss *).jvmScala3Next(ss *)
 
     // the same rows, where each one is configured from its own version
-    def allJvmRows(ss: String => Def.SettingsDefinition): Matrix = self
-      .jvmPlatform(List(scala3next), nextRow, unpublished ++ ss(scala3next).settings)
-      .jvmRows(allScalaVersions)(ss)
+    def allJvmRows(ss: String => Def.SettingsDefinition): Matrix =
+      jvmScala3Next(ss(scala3next)).jvmRows(allScalaVersions)(ss)
 
     // the shared tree and each platform's own, as crossProject would read them
-    def crossAll = self.allJvm(unmanagedSources(self.base, "shared", "jvm"))
-      .jsPlatform(allScalaVersions, unmanagedSources(self.base, "shared", "js"))
-      .nativePlatform(allScalaVersions, unmanagedSources(self.base, "shared", "native"))
+    def crossAll = self.settings(unmanagedSources(self.base)).allJvm().crossJs().crossNative()
   }
 
 }
