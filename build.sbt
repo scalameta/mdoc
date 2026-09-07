@@ -376,7 +376,7 @@ lazy val plugin = project
     crossScalaVersions := List(scala212, scala3next),
     moduleName := "sbt-mdoc",
     libraryDependencies ++= List(
-      "org.jsoup" % "jsoup" % "1.23.1",
+      "org.jsoup" % "jsoup" % "1.23.2",
       "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
       depMunit % Test,
       "org.scalameta" %% "testkit" % V.scalameta % Test
