@@ -123,7 +123,7 @@ lazy val depCoursierInterfaces = Def.settings(
 lazy val interfaces = project
   .in(file("mdoc-interfaces"))
   .settings(
-    ideImportJvm,
+    ideSkip(VirtualAxis.jvm, ""),
     moduleName := "mdoc-interfaces",
     autoScalaLibrary := false,
     depCoursierInterfaces,
@@ -362,7 +362,7 @@ lazy val unitJS = projectMatrix
 lazy val plugin = project
   .in(file("mdoc-sbt"))
   .settings(
-    ideImportJvm,
+    ideSkip(VirtualAxis.jvm, scala212),
     sharedSettings,
     sbtPlugin := true,
     scalaVersion := scala212,
@@ -446,7 +446,7 @@ lazy val js = projectMatrix.crossJvm()
 lazy val docs = project
   .in(file("mdoc-docs"))
   .settings(
-    ideImportJvm,
+    ideSkip(VirtualAxis.jvm, scala212),
     sharedSettings,
     moduleName := "mdoc-docs",
     unpublished,
