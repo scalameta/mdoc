@@ -43,7 +43,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |val x = 1
            |???
            |// scala.NotImplementedError: an implementation is missing
-           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:398)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(basic.md:9)
            |```
     """.stripMargin,
@@ -171,7 +171,7 @@ class CrashSuite extends BaseMarkdownSuite {
         """|```scala
            |???
            |// scala.NotImplementedError: an implementation is missing
-           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:398)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(relative.md:8)
            |```
     """.stripMargin,
@@ -372,7 +372,7 @@ class CrashSuite extends BaseMarkdownSuite {
            |class Cat { def func = ??? }
            |(new Cat).func
            |// scala.NotImplementedError: an implementation is missing
-           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:396)
+           |//  at scala.Predef$.$qmark$qmark$qmark(Predef.scala:398)
            |//  at repl.MdocSession$MdocApp$Cat$1.func(multiple-statements.md:8)
            |//  at repl.MdocSession$MdocApp.$init$$$anonfun$1(multiple-statements.md:9)
            |```""".stripMargin,
