@@ -1,5 +1,9 @@
 # Contributing
 
+## Formatting
+
+`./bin/scalafmt` formats the code, and CI runs it with `--test`.
+
 ## Narrowing what an IDE imports
 
 sbt builds each project of this build once per Scala version and platform. Several of those rows
