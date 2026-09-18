@@ -2,7 +2,7 @@
 // site configuration options.
 
 const repoUrl = "https://github.com/scalameta/mdoc";
-const gitterUrl = "https://gitter.im/scalameta/mdoc";
+const discordUrl = "https://discord.gg/FN9uG7k";
 const baseUrl = "/mdoc/";
 
 const siteConfig = {
@@ -63,7 +63,7 @@ const siteConfig = {
   editUrl: `${repoUrl}/edit/main/docs/`,
 
   repoUrl,
-  gitterUrl
+  discordUrl
 };
 
 module.exports = siteConfig;

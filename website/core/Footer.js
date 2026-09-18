@@ -35,8 +35,8 @@ class Footer extends React.Component {
           </div>
           <div>
             <h5>Community</h5>
-            <a href={siteConfig.gitterUrl} target="_blank">
-              Chat on Gitter
+            <a href={siteConfig.discordUrl} target="_blank">
+              Chat on Discord
             </a>
           </div>
           <div>
