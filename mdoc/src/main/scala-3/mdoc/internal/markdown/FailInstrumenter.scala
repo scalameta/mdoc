@@ -6,7 +6,7 @@ import scala.meta._
 
 final class FailInstrumenter(sections: List[SectionInput], i: Int) {
   private val out = new ByteArrayOutputStream()
-  private val gensym = new Gensym()
+  private val gensym = new Gensym(Instrumenter.userDefinedNames(sections))
   def instrument(): String = {
     printAsScript()
     out.toString
