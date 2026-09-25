@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "3.3.8"
+ThisBuild / scalaVersion := "3.3.9-RC1"
 
 enablePlugins(MdocPlugin)
 
