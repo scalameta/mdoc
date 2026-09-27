@@ -39,7 +39,7 @@ class Instrumenter(
   }
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
-  val gensym = new Gensym(Instrumenter.userDefinedNames(sections))
+  val gensym = new Gensym(UserDefinedNames(sections))
   val nest = new Nesting(sb)
   private def printAsScript(): Unit = {
     sections.zipWithIndex.foreach { case (section, i) =>
@@ -187,29 +187,6 @@ object Instrumenter {
       .toString()
     wrapped
   }
-  /** Top-level names defined by the user in worksheet/markdown sections. */
-  def userDefinedNames(sections: List[SectionInput]): Set[String] = {
-    val names = Set.newBuilder[String]
-    sections.foreach { section =>
-      section.source.stats.foreach { stat =>
-        names ++= topLevelDefinedNames(stat)
-      }
-    }
-    names.result()
-  }
-
-  private def topLevelDefinedNames(stat: Tree): List[String] =
-    stat match {
-      case t: Defn.Val => t.pats.flatMap(Binders.binders).map(_.value)
-      case t: Defn.Var => t.pats.flatMap(Binders.binders).map(_.value)
-      case t: Defn.Def => List(t.name.value)
-      case t: Defn.Object => List(t.name.value)
-      case t: Defn.Class => List(t.name.value)
-      case t: Defn.Trait => List(t.name.value)
-      case t: Defn.Type => List(t.name.value)
-      case _ => Nil
-    }
-
   object Binders {
     def binders(pat: Pat): List[Name] =
       pat.collect { case m: Member => m.name }

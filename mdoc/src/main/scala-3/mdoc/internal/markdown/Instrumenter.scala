@@ -36,7 +36,7 @@ class Instrumenter(
     magic.visitUsingFile(section.input)
   }
   private val out = new ByteArrayOutputStream()
-  val gensym = new Gensym(Instrumenter.userDefinedNames(sections))
+  val gensym = new Gensym(UserDefinedNames(sections))
   val sb = new CodePrinter(new PrintStream(out))
 
   private def printAsScript(): Unit = {
@@ -192,29 +192,6 @@ object Instrumenter {
 
     wrapped.toString()
   }
-  /** Top-level names defined by the user in worksheet/markdown sections. */
-  def userDefinedNames(sections: List[SectionInput]): Set[String] = {
-    val names = Set.newBuilder[String]
-    sections.foreach { section =>
-      section.source.stats.foreach { stat =>
-        names ++= topLevelDefinedNames(stat)
-      }
-    }
-    names.result()
-  }
-
-  private def topLevelDefinedNames(stat: Tree): List[String] =
-    stat match {
-      case t: Defn.Val => t.pats.flatMap(Binders.binders).map(_.value)
-      case t: Defn.Var => t.pats.flatMap(Binders.binders).map(_.value)
-      case t: Defn.Def => List(t.name.value)
-      case t: Defn.Object => List(t.name.value)
-      case t: Defn.Class => List(t.name.value)
-      case t: Defn.Trait => List(t.name.value)
-      case t: Defn.Type => List(t.name.value)
-      case _ => Nil
-    }
-
   object Binders {
     def binders(pat: Pat): List[Name] =
       pat.collect { case m: Member => m.name }
