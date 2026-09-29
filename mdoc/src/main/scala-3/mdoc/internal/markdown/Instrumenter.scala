@@ -36,7 +36,7 @@ class Instrumenter(
     magic.visitUsingFile(section.input)
   }
   private val out = new ByteArrayOutputStream()
-  val gensym = new Gensym()
+  val gensym = new Gensym(UserDefinedNames(sections))
   val sb = new CodePrinter(new PrintStream(out))
 
   private def printAsScript(): Unit = {

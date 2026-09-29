@@ -39,7 +39,7 @@ class Instrumenter(
   }
   private val out = new ByteArrayOutputStream()
   private val sb = new PrintStream(out)
-  val gensym = new Gensym()
+  val gensym = new Gensym(UserDefinedNames(sections))
   val nest = new Nesting(sb)
   private def printAsScript(): Unit = {
     sections.zipWithIndex.foreach { case (section, i) =>

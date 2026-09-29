@@ -687,6 +687,41 @@ class WorksheetSuite extends BaseSuite {
        |""".stripMargin
   )
 
+  // Regression: user `val resN` must not clash with synthetic binders (metals#5680)
+  checkDecorations(
+    "res-collision",
+    """
+      |1 + 1
+      |2 + 2
+      |3 + 3
+      |val res2 = 1
+      |res2 + 10
+      |""".stripMargin,
+    """|
+       |<1 + 1> // : Int = 2
+       |res0: Int = 2
+       |<2 + 2> // : Int = 4
+       |res1: Int = 4
+       |<3 + 3> // : Int = 6
+       |res3: Int = 6
+       |<val res2 = 1> // : Int = 1
+       |res2: Int = 1
+       |<res2 + 10> // : Int = 11
+       |res4: Int = 11
+       |""".stripMargin
+  )
+
+  checkDiagnostics(
+    "res-collision-no-error",
+    """
+      |1 + 1
+      |2 + 2
+      |3 + 3
+      |val res2 = 1
+      |""".stripMargin,
+    ""
+  )
+
   def checkDiagnostics(
       options: TestOptions,
       original: String,

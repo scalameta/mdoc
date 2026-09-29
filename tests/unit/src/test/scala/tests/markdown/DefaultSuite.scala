@@ -360,4 +360,31 @@ class DefaultSuite extends BaseMarkdownSuite {
        |```
        |""".stripMargin
   )
+
+  // Regression: user `val resN` must not clash with synthetic binders (metals#5680)
+  check(
+    "res-collision",
+    """
+      |```scala mdoc
+      |List(1).map(_ + 1)
+      |List(2).map(_ + 1)
+      |List(3).map(_ + 1)
+      |val res2 = 1
+      |res2 + 1
+      |```
+    """.stripMargin,
+    """|```scala
+       |List(1).map(_ + 1)
+       |// res0: List[Int] = List(2)
+       |List(2).map(_ + 1)
+       |// res1: List[Int] = List(3)
+       |List(3).map(_ + 1)
+       |// res3: List[Int] = List(4)
+       |val res2 = 1
+       |// res2: Int = 1
+       |res2 + 1
+       |// res4: Int = 2
+       |```
+    """.stripMargin
+  )
 }
