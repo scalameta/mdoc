@@ -8,7 +8,7 @@ object Extensions {
 
   object V {
 
-    val scalameta = "4.17.3"
+    val scalameta = "4.17.4"
 
     val munit = "1.3.6"
 
