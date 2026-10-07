@@ -24,7 +24,7 @@ def scalajsDom = "2.0.0"
 def isCI = System.getenv("CI") != null
 
 def jsoniter = List("core", "macros").map { pkg =>
-  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.40.1"
+  "com.github.plokhotnyuk.jsoniter-scala" %% s"jsoniter-scala-$pkg" % "2.41.2"
 }
 
 def multiScalaDirectories(projectName: String) =
