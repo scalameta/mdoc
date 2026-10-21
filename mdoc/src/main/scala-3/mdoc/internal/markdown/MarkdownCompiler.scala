@@ -43,6 +43,7 @@ import dotty.tools.io.{AbstractFile, VirtualDirectory, VirtualDirectoryCompat}
 import dotty.tools.dotc.util.SourceFile
 
 import scala.annotation.implicitNotFound
+import scala.util.control.NonFatal
 
 class MarkdownDriver(val settings: List[String]) extends Driver {
 
@@ -249,21 +250,24 @@ class MarkdownCompiler(
       val msg = nullableMessage(diagnostic.message)
 
       if (diagnostic.position.isPresent) {
-        val pos = diagnostic.position.get
-
-        val mpos = toMetaPosition(edit, pos)
-        val actualMessage =
-          if (mpos == Position.None) {
-            val line = pos.lineContent
-            if (line.nonEmpty) {
-              formatMessage(pos, msg)
+        try {
+          val pos = diagnostic.position.get
+          val mpos = toMetaPosition(edit, pos)
+          val actualMessage =
+            if (mpos == Position.None) {
+              val line = pos.lineContent
+              if (line.nonEmpty) {
+                formatMessage(pos, msg)
+              } else {
+                msg
+              }
             } else {
               msg
             }
-          } else {
-            msg
-          }
-        reportMessage(vreporter, diagnostic, mpos, "\n" + actualMessage)
+          reportMessage(vreporter, diagnostic, mpos, "\n" + actualMessage)
+        } catch {
+          case NonFatal(e) =>
+        }
       } else
         reportMessage(vreporter, diagnostic, Position.None, "\n" + msg)
     }
