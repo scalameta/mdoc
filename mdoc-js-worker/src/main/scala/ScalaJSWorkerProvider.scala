@@ -17,7 +17,7 @@ class ScalaJSWorkerProvider extends i.ScalajsWorkerProvider {
     }
   }
   def create(config: i.ScalajsConfig, logger: i.ScalajsLogger): i.ScalajsWorkerApi = {
-    val wrappedLogger = new sjslogging.Logger {
+    val wrappedLogger = new AbstractLogger {
       def log(level: sjslogging.Level, message: => String) =
         logger.log(mapping(level), message)
 

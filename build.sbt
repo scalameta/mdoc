@@ -338,12 +338,25 @@ def jsWorkerClasspath(v: String) = {
     Some((cfg / products).value ++ (cfg / resourceDirectories).value)
 }
 
+/* The Scala 3 build of the Scala.js linker. It stays off the test classpath, because the class
+ * loader of the worker takes org.scalajs.linker classes from the test classpath first. */
+lazy val ScalaJSLinker3 = config("scalajs-linker-3").hide
+
+def scalaJSLinker3Classpath = Def.settings(
+  ivyConfigurations += ScalaJSLinker3,
+  libraryDependencies += "org.scala-js" % "scalajs-linker_3" % scalaJSVersion % ScalaJSLinker3,
+  buildInfoKeys += BuildInfoKey.map(update) { case (_, report) =>
+    "scalaJSLinker3Classpath" -> report.select(configurationFilter(ScalaJSLinker3.name))
+  }
+)
+
 def unitJSRow(v: String) = Def.settings(
   mdocJS := Some(jsdocs.js(v)),
   // unit ships an mdoc.properties of its own, and it comes first on the test classpath
   mdocPropertiesPrefix := "js-",
   unitRow(v),
-  jsWorkerClasspath(v)
+  jsWorkerClasspath(v),
+  if (v == scala3) scalaJSLinker3Classpath else Nil
 )
 
 lazy val unitJS = projectMatrix
@@ -424,6 +437,7 @@ lazy val jsWorker =
     .dependsOn(jsApi)
     .settings(
       sharedSettings,
+      sharedJavaSettings,
       moduleName := "mdoc-js-worker",
       libraryDependencies ++= Seq(
         "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross
