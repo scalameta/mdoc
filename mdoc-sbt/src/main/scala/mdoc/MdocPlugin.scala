@@ -85,7 +85,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
       "if not provided, the classpath will be formed by resolving the worker dependency"
   )
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     List(
       mdocIn := (ThisBuild / baseDirectory).value / "docs",
       mdocOut := (Compile / target).value / "mdoc",
@@ -278,7 +278,7 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
     Def.settingDyn {
       def proxyForSetting(): Def.Initialize[Option[AnyRef]] = {
         val cls = Class.forName(fullyQualifiedClassName)
-        val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[_] = cls }
+        val stageManifest = new Manifest[AnyRef] { override def runtimeClass: Class[?] = cls }
         (ref / SettingKey(attributeName)(using stageManifest, anyWriter)).?
       }
       try {

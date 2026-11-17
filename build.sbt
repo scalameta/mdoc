@@ -383,10 +383,13 @@ lazy val plugin = project
     pluginCrossBuild / sbtVersion :=
       (scalaBinaryVersion.value match {
         case "2.12" => "1.5.0"
-        case _ => "2.0.0"
+        case _ => "2.1.0"
       }),
-    crossScalaVersions := List(scala212, scala3next),
+    crossScalaVersions := List(scala212, scala3Sbt),
     moduleName := "sbt-mdoc",
+    scalacOptions ++= {
+      if (scalaBinaryVersion.value == "2.12") Seq("-Xsource:3") else Nil
+    },
     libraryDependencies ++= List(
       "org.jsoup" % "jsoup" % "1.23.2",
       "org.scalacheck" %% "scalacheck" % V.scalacheck % Test,
