@@ -91,7 +91,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [17]
+        java: [17, 21, 25]
         command:
           # one alias per Scala version: ++ does not select matrix rows
           - "test212"
@@ -99,9 +99,9 @@ jobs:
           # Minimal supported version
           - "test33"
           - "test38"
-          - "'++3.8.4 plugin/test'"
+          - "'++3.9.0 plugin/test'"
           - "'++2.12.21 scripted'"
-          - "'++3.8.4 scripted'"
+          - "'++3.9.0 scripted'"
           - "'++3.10.1!; unit/test; worksheets/test'"
     steps:
       - uses: actions/checkout@v7

@@ -118,7 +118,7 @@ object DocusaurusPlugin extends AutoPlugin with MdocPluginCompat {
      """.stripMargin
   }
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     List(
       (docusaurusPublishGhpages / aggregate) := false,
       (docusaurusCreateSite / aggregate) := false,
