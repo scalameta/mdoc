@@ -30,6 +30,7 @@ import scala.meta.inputs.Position
 
 import dotty.tools.dotc.Driver
 import dotty.tools.dotc.core.Contexts.{Context, FreshContext}
+import dotty.tools.dotc.config.Settings.Setting
 import dotty.tools.dotc.config.Settings.Setting._
 import dotty.tools.dotc.interfaces.SourcePosition
 import dotty.tools.dotc.ast.Trees.Tree
@@ -59,6 +60,19 @@ class MarkdownDriver(val settings: List[String]) extends Driver {
       case None => rootCtx
     ctx.initialize()(using ctx)
     ctx
+  }
+}
+
+/** Looks up compiler settings by name. mdoc is compiled against one Scala 3 version and runs with
+  * the user's compiler, so calling `ctx.settings` directly isn't binary compatible: its return type
+  * changed from `class ScalaSettings` to `ScalaSettings.type` in Scala 3.10.2. The `Setting`
+  * accessors and the `Setting` API are the same in both, so only the lookup of the settings object
+  * goes through reflection.
+  */
+object CompilerSettings {
+  def get[T](name: String)(using ctx: Context): Setting[T] = {
+    val settings = classOf[Context].getMethod("settings").invoke(ctx)
+    settings.getClass.getMethod(name).invoke(settings).asInstanceOf[Setting[T]]
   }
 }
 
@@ -94,7 +108,7 @@ class MarkdownCompiler(
     ctx
       .setReporter(new CollectionReporter)
       .setSetting(
-        ctx.settings.outputDir,
+        CompilerSettings.get[AbstractFile]("outputDir")(using ctx),
         target
       )
   }
@@ -104,8 +118,7 @@ class MarkdownCompiler(
   def shutdown(): Unit = {}
 
   def classpathEntries: Seq[Path] =
-    context.settings.classpath
-      .value(using context)
+    classpath
       .split(File.pathSeparator)
       .map(url => Paths.get(url))
 
@@ -145,8 +158,41 @@ class MarkdownCompiler(
     report(vreporter, input, fileImports, run.runContext, edit)
   }
 
-  class CollectionReporter extends dotty.tools.dotc.reporting.Reporter with UniqueMessagePositions {
+  /** Collects diagnostics and suppresses multiple messages per position, the same way the
+    * compiler's `UniqueMessagePositions` does. We don't mix in that trait because its private field
+    * gets compiled into this class, which breaks binary compatibility whenever the field's type
+    * changes in the compiler, such as `HashMap` becoming `Map` in Scala 3.10.2.
+    */
+  class CollectionReporter extends dotty.tools.dotc.reporting.Reporter {
     val allDiags = List.newBuilder[Diagnostic]
+
+    private val positions =
+      scala.collection.mutable.HashMap.empty[(SourceFile, Int), Diagnostic]
+
+    private def hides(dia1: Diagnostic, dia2: Diagnostic): Boolean =
+      if (dia2.msg.showAlways) dia1.msg.getClass == dia2.msg.getClass
+      else dia1.level >= dia2.level
+
+    override def isHidden(dia: Diagnostic)(using ctx: Context): Boolean =
+      super.isHidden(dia) || (
+        dia.pos.exists &&
+          !CompilerSettings.get[Boolean]("YshowSuppressedErrors").value &&
+          dia.pos.start.to(dia.pos.end).exists { offset =>
+            positions.get((ctx.source, offset)).exists(hides(_, dia))
+          }
+      )
+
+    override def markReported(dia: Diagnostic)(using ctx: Context): Unit = {
+      if (dia.pos.exists) {
+        for (offset <- dia.pos.start.to(dia.pos.end)) {
+          positions.get((ctx.source, offset)) match {
+            case Some(previous) if hides(previous, dia) =>
+            case _ => positions((ctx.source, offset)) = dia
+          }
+        }
+      }
+      super.markReported(dia)
+    }
 
     override def doReport(dia: Diagnostic)(using Context) =
       allDiags += dia
