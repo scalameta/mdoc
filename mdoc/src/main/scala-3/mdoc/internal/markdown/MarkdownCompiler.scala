@@ -151,7 +151,7 @@ class MarkdownCompiler(
     override def doReport(dia: Diagnostic)(using Context) =
       allDiags += dia
 
-    override def pendingMessages(using Context) = allDiags.result()
+    def getPendingMessages() = allDiags.result()
   }
 
   def compile(
@@ -196,19 +196,20 @@ class MarkdownCompiler(
     val out = new ByteArrayOutputStream()
     val ps = new PrintStream(out)
 
-    context.reporter.pendingMessages(using context).foreach { diagnostic =>
-      val msg = nullableMessage(diagnostic.message)
-      val mpos = toMetaPosition(edit, diagnostic.position.get)
-      if (sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
-        val severity = diagnostic.level match {
-          case IDiagnostic.ERROR => "error"
-          case IDiagnostic.WARNING => "warn"
-          case IDiagnostic.INFO => "info"
+    context.reporter.asInstanceOf[CollectionReporter].getPendingMessages().foreach {
+      diagnostic =>
+        val msg = nullableMessage(diagnostic.message)
+        val mpos = toMetaPosition(edit, diagnostic.position.get)
+        if (sectionPos.contains(mpos) || diagnostic.level == IDiagnostic.ERROR) {
+          val severity = diagnostic.level match {
+            case IDiagnostic.ERROR => "error"
+            case IDiagnostic.WARNING => "warn"
+            case IDiagnostic.INFO => "info"
+          }
+          val formatted =
+            PositionSyntax.formatMessage(mpos, severity, "\n" + msg, includePath = false)
+          ps.println(formatted)
         }
-        val formatted =
-          PositionSyntax.formatMessage(mpos, severity, "\n" + msg, includePath = false)
-        ps.println(formatted)
-      }
     }
 
     out.toString()
@@ -245,7 +246,9 @@ class MarkdownCompiler(
       edit: TokenEditDistance
   ): Unit = {
 
-    val infos = context.reporter.pendingMessages(using context).toSeq.sortBy(_.pos.source.path)
+    val infos = context.reporter.asInstanceOf[CollectionReporter].getPendingMessages().toSeq.sortBy(
+      _.pos.source.path
+    )
     infos.foreach { diagnostic =>
       val msg = nullableMessage(diagnostic.message)
 
