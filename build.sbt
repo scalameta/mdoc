@@ -445,7 +445,7 @@ lazy val jsWorker =
       libraryDependencies ++= Seq(
         "org.scala-js" %% "scalajs-linker" % scalaJSVersion % Provided cross
           CrossVersion.for3Use2_13,
-        "com.armanbilge" %% "scalajs-importmap" % "0.1.1" cross CrossVersion.for3Use2_13
+        "com.armanbilge" %% "scalajs-importmap" % "0.2.0" cross CrossVersion.for3Use2_13
       )
     )
 

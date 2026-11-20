@@ -175,9 +175,9 @@ object MdocPlugin extends AutoPlugin with MdocPluginCompat {
           }
 
           val importMapDependency = binaryVersion match {
-            case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.1.1"
+            case "3" => "com.armanbilge" % "scalajs-importmap_2.13" % "0.2.0"
             case scalaBinaryVersion =>
-              "com.armanbilge" % s"scalajs-importmap_$scalaBinaryVersion" % "0.1.1"
+              "com.armanbilge" % s"scalajs-importmap_$scalaBinaryVersion" % "0.2.0"
           }
 
           val mdocJSDependency = binaryVersion match {
