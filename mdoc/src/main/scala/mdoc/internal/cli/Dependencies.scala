@@ -4,7 +4,6 @@ import scala.meta.io.Classpath
 import coursierapi.Dependency
 import mdoc.internal.markdown.MarkdownCompiler
 import mdoc.internal.markdown.MarkdownBuilder
-import mdoc.internal.cli.ScalacOptions
 import scala.meta.io.AbsolutePath
 import coursierapi.Repository
 import mdoc.internal.markdown.Instrumented
