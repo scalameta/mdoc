@@ -1277,7 +1277,7 @@ function $h_s_util_DynamicVariable() {
 }
 $h_s_util_DynamicVariable.prototype = $c_s_util_DynamicVariable.prototype;
 $c_s_util_DynamicVariable.prototype.toString__T = (function() {
-  return (("DynamicVariable(" + this.s_util_DynamicVariable__f_v) + ")");
+  return (("DynamicVariable(" + String(this.s_util_DynamicVariable__f_v)) + ")");
 });
 var $d_s_util_DynamicVariable = new $TypeData().initClass($c_s_util_DynamicVariable, "scala.util.DynamicVariable", ({
   s_util_DynamicVariable: 1
@@ -1291,8 +1291,8 @@ $c_jl_Number.prototype.constructor = $c_jl_Number;
 function $h_jl_Number() {
 }
 $h_jl_Number.prototype = $c_jl_Number.prototype;
-function $ct_jl_Throwable__T__jl_Throwable__Z__Z__($thiz, s, e, enableSuppression, writableStackTrace) {
-  $thiz.jl_Throwable__f_s = s;
+function $ct_jl_Throwable__T__Z__Z__($thiz, message, enableSuppression, writableStackTrace) {
+  $thiz.jl_Throwable__f_message = message;
   if (writableStackTrace) {
     $thiz.fillInStackTrace__jl_Throwable();
   }
@@ -1301,10 +1301,10 @@ function $ct_jl_Throwable__T__jl_Throwable__Z__Z__($thiz, s, e, enableSuppressio
 class $c_jl_Throwable extends Error {
   constructor() {
     super();
-    this.jl_Throwable__f_s = null;
+    this.jl_Throwable__f_message = null;
   }
   getMessage__T() {
-    return this.jl_Throwable__f_s;
+    return this.jl_Throwable__f_message;
   }
   fillInStackTrace__jl_Throwable() {
     var reference = (false ? this.sjs_js_JavaScriptException__f_exception : this);
@@ -1407,7 +1407,7 @@ function $f_jl_Character__hashCode__I($thiz) {
   return $thiz;
 }
 function $f_jl_Character__toString__T($thiz) {
-  return ("" + $cToS($thiz));
+  return $cToS($thiz);
 }
 var $d_jl_Character = new $TypeData().initClass(0, "java.lang.Character", ({
   jl_Character: 1,
@@ -1459,7 +1459,7 @@ $h_Ljava_io_FilterOutputStream.prototype = $c_Ljava_io_FilterOutputStream.protot
 class $c_jl_ArithmeticException extends $c_jl_RuntimeException {
   constructor(s) {
     super();
-    $ct_jl_Throwable__T__jl_Throwable__Z__Z__(this, s, null, true, true);
+    $ct_jl_Throwable__T__Z__Z__(this, s, true, true);
   }
 }
 var $d_jl_ArithmeticException = new $TypeData().initClass($c_jl_ArithmeticException, "java.lang.ArithmeticException", ({
