@@ -34,7 +34,8 @@ jobs:
       - run: sbt '++2.12.21; docs/mdoc'
   test-windows:
     name: "Windows"
-    runs-on: windows-latest
+    # MSVC 14.52 on windows-latest needs Clang 22, which Scala Native 0.5.12 does not support
+    runs-on: windows-2022
     steps:
       - name: Install LLVM
         shell: pwsh
