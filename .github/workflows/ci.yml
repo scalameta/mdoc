@@ -44,8 +44,9 @@ jobs:
           $retryDelay = 5  # seconds
 
           function InstallLLVM {
-              Write-Host "Attempting to install LLVM (try $($retryCount + 1 - $global:retryAttempt) of $($retryCount + 1))..."
+              Write-Host "Attempting to install LLVM (try $global:retryAttempt of $retryCount)..."
               choco install llvm --version="20.1.4" --allow-downgrade --force
+              if ($LASTEXITCODE -ne 0) { throw "choco exited with code $LASTEXITCODE" }
           }
 
           # Attempt to install LLVM with retries
