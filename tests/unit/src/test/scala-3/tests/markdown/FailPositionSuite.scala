@@ -73,8 +73,10 @@ class FailPositionSuite extends BaseMarkdownSuite {
        |```scala
        |operation("not ok")
        |operation("bad")
-       |// error: 
+       |// error:
        |// invalid query
+       |// operation("not ok")
+       |// ^^^^^^^^^^^^^^^^^^^
        |// error:
        |// invalid query
        |// operation("bad")

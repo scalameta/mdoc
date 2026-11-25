@@ -177,8 +177,12 @@ object Renderer {
               binder.value match {
                 case FailSection(instrumented, startLine, startColumn, endLine, endColumn) =>
                   val input = Input.String(instrumented)
+                  // These must be the sections that FailInstrumenter writes into `input`.
+                  val instrumentedSections = doc.sections
+                    .take(doc.sections.indexWhere(_ eq section) + 1)
+                    .filter(other => (other eq section) || !other.mod.isFailOrWarn)
                   val edit =
-                    TokenEditDistance.fromTrees(Seq(section.source.source), input)
+                    TokenEditDistance.fromTrees(instrumentedSections.map(_.source.source), input)
                   val originalPos = section.source.pos.input match {
                     // get the original input from the input containing the slice
                     case slc @ Slice(input, start, end) =>
