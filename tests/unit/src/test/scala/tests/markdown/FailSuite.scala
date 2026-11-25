@@ -528,4 +528,98 @@ class FailSuite extends BaseMarkdownSuite {
     )
   )
 
+  check(
+    "argument-error-after-similar-call",
+    """
+      |```scala mdoc
+      |def greet(name: String, times: Int): String = name * times
+      |greet("abc", 2)
+      |```
+      |
+      |```scala mdoc:fail
+      |greet("a", "b")
+      |```
+    """.stripMargin,
+    """|```scala
+       |def greet(name: String, times: Int): String = name * times
+       |greet("abc", 2)
+       |// res0: String = "abcabc"
+       |```
+       |
+       |```scala
+       |greet("a", "b")
+       |// error: type mismatch;
+       |//  found   : String("b")
+       |//  required: Int
+       |// greet("a", "b")
+       |//            ^^^
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |def greet(name: String, times: Int): String = name * times
+           |greet("abc", 2)
+           |// res0: String = "abcabc"
+           |```
+           |
+           |```scala
+           |greet("a", "b")
+           |// error:
+           |// Found:    ("b" : String)
+           |// Required: Int
+           |// greet("a", "b")
+           |//            ^^^
+           |```
+    """.stripMargin
+    )
+  )
+
+  check(
+    "call-error-after-similar-call",
+    """
+      |```scala mdoc
+      |def greet(name: String, times: Int): String = name * times
+      |greet("abc", 2)
+      |```
+      |
+      |```scala mdoc:fail
+      |val n: Int = greet("a", 1)
+      |```
+    """.stripMargin,
+    """|```scala
+       |def greet(name: String, times: Int): String = name * times
+       |greet("abc", 2)
+       |// res0: String = "abcabc"
+       |```
+       |
+       |```scala
+       |val n: Int = greet("a", 1)
+       |// error: type mismatch;
+       |//  found   : String
+       |//  required: Int
+       |// val n: Int = greet("a", 1)
+       |//              ^^^^^^^^^^^^^
+       |```
+    """.stripMargin,
+    compat = Map(
+      Compat.Scala3 ->
+        """|```scala
+           |def greet(name: String, times: Int): String = name * times
+           |greet("abc", 2)
+           |// res0: String = "abcabc"
+           |```
+           |
+           |```scala
+           |val n: Int = greet("a", 1)
+           |// error:
+           |// Found:    String
+           |// Required: Int
+           |// val n: Int = greet("a", 1)
+           |//              ^^^^^^^^^^^^^
+           |```
+    """.stripMargin
+    )
+  )
+
 }
