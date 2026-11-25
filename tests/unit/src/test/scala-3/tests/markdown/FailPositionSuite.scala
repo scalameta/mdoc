@@ -40,4 +40,51 @@ class FailPositionSuite extends BaseMarkdownSuite {
     """.stripMargin
   )
 
+  check(
+    "macro-call-after-similar-call",
+    """|```scala mdoc
+       |inline def operation(inline query: String): String =
+       |  inline if query == "ok" then query else scala.compiletime.error("invalid query")
+       |```
+       |
+       |```scala mdoc
+       |operation("ok")
+       |```
+       |
+       |```scala mdoc:fail
+       |operation("not ok")
+       |operation("bad")
+       |```
+       |
+       |```scala mdoc:silent
+       |operation("ok")
+       |```
+    """.stripMargin,
+    """|```scala
+       |inline def operation(inline query: String): String =
+       |  inline if query == "ok" then query else scala.compiletime.error("invalid query")
+       |```
+       |
+       |```scala
+       |operation("ok")
+       |// res0: String = "ok"
+       |```
+       |
+       |```scala
+       |operation("not ok")
+       |operation("bad")
+       |// error: 
+       |// invalid query
+       |// error:
+       |// invalid query
+       |// operation("bad")
+       |// ^^^^^^^^^^^^^^^^
+       |```
+       |
+       |```scala
+       |operation("ok")
+       |```
+    """.stripMargin
+  )
+
 }
