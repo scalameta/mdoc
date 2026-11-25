@@ -110,8 +110,6 @@ class Processor(implicit ctx: Context) {
       filename: String
   ): Unit = {
     val sectionInputs = inputs.map { case ScalaFenceInput(_, input, mod) =>
-      import scala.meta._
-
       (input, MdocDialect.scala).parse[Source] match {
         case parsers.Parsed.Success(source) =>
           SectionInput(input, ParsedSource(source), mod)
