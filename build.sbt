@@ -164,12 +164,8 @@ lazy val runtime = projectMatrix.allJvm()
 
 lazy val depScalameta = Def.settings(
   libraryDependencies += {
-    val sm = ("org.scalameta" %% "scalameta" % V.scalameta).excludeAll("com.lihaoyi")
-    if (isScala3.value)
-      sm.excludeAll(
-        "org.scala-lang.modules" % s"scala-collection-compat_${scalaBinaryVersion.value}"
-      ).cross(CrossVersion.for3Use2_13)
-    else sm
+    ("org.scalameta" %% "scalameta" % V.scalameta)
+      .exclude("com.lihaoyi", s"sourcecode_${scalaBinaryVersion.value}")
   }
 )
 
