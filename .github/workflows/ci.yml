@@ -104,7 +104,7 @@ jobs:
           - "'++3.9.0 plugin/test'"
           - "'++2.12.21 scripted'"
           - "'++3.9.0 scripted'"
-          - "'++3.10.2-RC1!; unit/test; worksheets/test'"
+          - "'++3.10.2-RC2!; unit/test; worksheets/test'"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
